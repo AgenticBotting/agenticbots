@@ -7,6 +7,11 @@ import { PlanCta } from "./PlanCta";
 import { StatBand } from "./StatBand";
 import { FaqAccordion } from "./FaqAccordion";
 import { CategoryVignette } from "./CategoryVignette";
+import { BotFactory } from "./BotFactory";
+import { BotOrbit } from "./BotOrbit";
+import { ProofBar } from "./ProofBar";
+import { TaskConveyor } from "./Conveyor";
+import { LeadMagnet } from "./LeadMagnet";
 import { getPillar, categoryHref, type Category } from "@/lib/catalog";
 import { renderHeadline } from "@/lib/headline";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
@@ -50,7 +55,7 @@ export function CategoryPage({ category }: { category: Category }) {
               <span className="text-[var(--text-body)]">{category.name}</span>
             </nav>
 
-            <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-20 items-start">
+            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-start">
               <Reveal>
                 <div className="flex items-center gap-4 mb-7">
                   <BotIndex index={category.index} size="lg" />
@@ -66,7 +71,9 @@ export function CategoryPage({ category }: { category: Category }) {
                 <p className="body-lg mt-6 max-w-[52ch] text-pretty">{category.intro}</p>
 
                 <div className="mt-9 flex flex-wrap items-center gap-4">
-                  <PlanCta source={`${category.pillar}-${category.slug}-hero`} />
+                  <BotOrbit>
+                    <PlanCta source={`${category.pillar}-${category.slug}-hero`} />
+                  </BotOrbit>
                   <a
                     href="#included"
                     className="text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
@@ -77,10 +84,14 @@ export function CategoryPage({ category }: { category: Category }) {
               </Reveal>
 
               <Reveal delay={0.1}>
-                <div className="border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-4 mb-8">
-                  <CategoryVignette slug={category.slug} />
-                </div>
-                <div className="border-t-2 border-ink-950 pt-7">
+                {/* The same line the homepage runs, staffed with this bot's
+                    own four jobs — the page's unique twist on a familiar
+                    scene rather than a different scene entirely. */}
+                <BotFactory
+                  stations={category.stations}
+                  title={`${category.botName}, going to work`}
+                />
+                <div className="border-t-2 border-ink-950 pt-7 mt-8">
                   <p className="eyebrow">What you get</p>
                   <p className="display-lg mt-4 text-balance">{category.outcome}</p>
                   <dl className="mt-9 space-y-0">
@@ -96,6 +107,21 @@ export function CategoryPage({ category }: { category: Category }) {
                   </dl>
                 </div>
               </Reveal>
+            </div>
+          </Container>
+        </section>
+
+        <ProofBar />
+
+        {/* ── The work itself, on a belt ── */}
+        <section className="section-pad-sm bg-[var(--bg-alt)] border-b border-[var(--border)]">
+          <Container>
+            <SectionHeader
+              eyebrow={`${category.botName} · what it runs`}
+              title="Every one of these, continuously."
+            />
+            <div className="mt-10 -mx-5 sm:-mx-8">
+              <TaskConveyor tasks={category.capabilities} />
             </div>
           </Container>
         </section>
@@ -147,6 +173,9 @@ export function CategoryPage({ category }: { category: Category }) {
                     eyebrow="How it works"
                     title={`What ${category.botName} does differently.`}
                   />
+                  <div className="mt-10 border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-4">
+                    <CategoryVignette slug={category.slug} />
+                  </div>
                 </div>
               </Reveal>
               <Reveal delay={0.08}>
@@ -223,6 +252,8 @@ export function CategoryPage({ category }: { category: Category }) {
         </section>
 
         <StatBand eyebrow={category.name} title={category.outcome} metrics={category.metrics} />
+
+        <LeadMagnet source={`${category.pillar}-${category.slug}`} />
 
         {/* ── FAQ ── */}
         <section className="section-pad border-b border-[var(--border)]">

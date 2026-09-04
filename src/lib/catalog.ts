@@ -35,6 +35,9 @@ export interface Category {
   metrics: Metric[];
   /** Three before/after pairs. The most persuasive block on the page. */
   contrast: Contrast[];
+  /** Four jobs for the hero factory scene. Kept short — they render inside
+      a fixed-width station box, and SVG text does not wrap. */
+  stations: { label: string; meta: string }[];
   faqs: Faq[];
 }
 
@@ -87,6 +90,12 @@ const MARKETING: Category[] = [
       { value: "24/7", label: "Budget pacing and anomaly alerts" },
       { value: "1 view", label: "Spend, leads, cost per booked job" },
     ],
+    stations: [
+      { label: "Reading search terms", meta: "Every query, daily" },
+      { label: "Killing wasted spend", meta: "Negatives before noon" },
+      { label: "Writing new ads", meta: "Variants on rotation" },
+      { label: "Moving the budget", meta: "Toward booked work" },
+    ],
     contrast: [
       { today: "Search terms get reviewed when someone remembers. Budget burns on junk queries for weeks.", after: "Every query that triggered an ad is read daily. Junk gets a negative before it costs a second day." },
       { today: "One set of ads runs until performance decays and somebody notices.", after: "New headline, copy and image variants generated and rotated continuously." },
@@ -132,6 +141,12 @@ const MARKETING: Category[] = [
       { value: "Daily", label: "Rank tracking across your keyword set" },
       { value: "Monthly", label: "Competitor gap refresh" },
     ],
+    stations: [
+      { label: "Crawling your site", meta: "Nightly, every page" },
+      { label: "Fixing what broke", meta: "Links, speed, schema" },
+      { label: "Writing the pages", meta: "The ones you lack" },
+      { label: "Watching rankings", meta: "Movement, not vanity" },
+    ],
     contrast: [
       { today: "An audit lands once a year, gets read, and the fixes never ship.", after: "The site is crawled on a schedule and what broke gets fixed the same week." },
       { today: "You find out a competitor owns a topic when a customer mentions them.", after: "Coverage gaps are mapped continuously, ranked by what closing them is worth." },
@@ -174,6 +189,12 @@ const MARKETING: Category[] = [
       { value: "Many", label: "Assets cut from one source piece" },
       { value: "Weekly", label: "Publishing cadence, held" },
       { value: "1", label: "Voice profile, applied everywhere" },
+    ],
+    stations: [
+      { label: "Turning one into ten", meta: "Every source piece" },
+      { label: "Holding the calendar", meta: "Weekly, without fail" },
+      { label: "Keeping your voice", meta: "Captured once, reused" },
+      { label: "Filing everything", meta: "Where the team looks" },
     ],
     contrast: [
       { today: "A post goes up in January. The next one goes up when someone feels guilty.", after: "The calendar is planned, drafted and published on cadence without anybody chasing it." },
@@ -218,6 +239,12 @@ const MARKETING: Category[] = [
       { value: "Auto", label: "Sequence exit the moment a lead converts" },
       { value: "Weekly", label: "Deliverability and list health check" },
     ],
+    stations: [
+      { label: "Sorting the list", meta: "By what they did" },
+      { label: "Sending the follow-up", meta: "Not just the blast" },
+      { label: "Rewriting subjects", meta: "What actually opens" },
+      { label: "Watching deliverability", meta: "Before it slips" },
+    ],
     contrast: [
       { today: "Quotes go out and nobody follows up unless the customer calls first.", after: "Every unaccepted quote gets a timed nudge that stops the moment the job is booked." },
       { today: "The list is a stale export somebody made last year.", after: "Segments rebuild from live CRM data, bounces are removed, dead contacts sunset." },
@@ -261,6 +288,12 @@ const MARKETING: Category[] = [
       { value: "Per test", label: "Statistical significance before rollout" },
       { value: "Mobile", label: "First, not last" },
     ],
+    stations: [
+      { label: "Reading the drop-off", meta: "Where they leave" },
+      { label: "Shipping the test", meta: "Not planning it" },
+      { label: "Cutting form fields", meta: "The ones nobody needs" },
+      { label: "Calling the winner", meta: "On the numbers" },
+    ],
     contrast: [
       { today: "You pay for the traffic and guess why it does not convert.", after: "Session replays and heatmaps show the exact field and scroll depth where people give up." },
       { today: "The form asks for eleven things because someone added a field in 2021.", after: "Forms are cut to what you actually need to follow up, then tested against live traffic." },
@@ -301,6 +334,12 @@ const MARKETING: Category[] = [
       { value: "1", label: "Dashboard, not fifteen" },
       { value: "Weekly", label: "Plain-language performance summary" },
       { value: "Channel", label: "Level cost-per-booked-job visibility" },
+    ],
+    stations: [
+      { label: "Joining the sources", meta: "Ads, CRM, calls" },
+      { label: "Naming the truth", meta: "One number, agreed" },
+      { label: "Flagging the change", meta: "Before you ask" },
+      { label: "Writing the report", meta: "Monday, automatically" },
     ],
     contrast: [
       { today: "Fifteen dashboards, and no one can say which channel paid for itself.", after: "One view: spend, leads, cost per lead and cost per closed job, per channel." },
@@ -349,6 +388,12 @@ const SALES: Category[] = [
       { value: "Continuous", label: "Intent and trigger monitoring" },
       { value: "1", label: "Documented ICP everyone works from" },
     ],
+    stations: [
+      { label: "Building the list", meta: "Fit, not volume" },
+      { label: "Verifying contacts", meta: "Before you burn one" },
+      { label: "Watching for triggers", meta: "Hiring, funding, moves" },
+      { label: "Queuing the outreach", meta: "Ready when you are" },
+    ],
     contrast: [
       { today: "The list is whoever came up in a search, contacted in whatever order.", after: "An explicit ICP with firmographics, triggers and disqualifiers everyone works from." },
       { today: "Contacts are scraped, half the emails bounce, the domain takes the damage.", after: "Records are enriched from licensed sources and verified before anyone is contacted." },
@@ -389,6 +434,12 @@ const SALES: Category[] = [
       { value: "Auto", label: "Reply triage and sentiment sorting" },
       { value: "Warmed", label: "Sending infrastructure, monitored" },
     ],
+    stations: [
+      { label: "Sending the sequence", meta: "Every step, on time" },
+      { label: "Reading the replies", meta: "Sorting real interest" },
+      { label: "Warming the domains", meta: "So you land in inbox" },
+      { label: "Booking the meeting", meta: "Straight to calendar" },
+    ],
     contrast: [
       { today: "Sequences die at step three when the person running them gets busy.", after: "Every sequence runs to the last touch, across email, LinkedIn and phone." },
       { today: "Volume goes up, deliverability falls over, the main domain gets burned.", after: "Separate domains, warmed properly, volume capped and monitored." },
@@ -428,6 +479,12 @@ const SALES: Category[] = [
       { value: "<60s", label: "Typical first response, any hour" },
       { value: "24/7", label: "Nights, weekends and holidays covered" },
       { value: "0", label: "Inbound leads left unanswered" },
+    ],
+    stations: [
+      { label: "Catching the call", meta: "Missed means texted" },
+      { label: "Answering the question", meta: "In real conversation" },
+      { label: "Qualifying on fit", meta: "Before your time goes" },
+      { label: "Booking the slot", meta: "On the right calendar" },
     ],
     contrast: [
       { today: "A missed call at 6pm gets returned at 9am. The job is already booked elsewhere.", after: "A text goes back within seconds and starts qualifying before a competitor picks up." },
@@ -470,6 +527,12 @@ const SALES: Category[] = [
       { value: "Daily", label: "Duplicate and hygiene pass" },
       { value: "Alerted", label: "Stalled deals, before they go cold" },
     ],
+    stations: [
+      { label: "Logging the call", meta: "Nobody types it up" },
+      { label: "Moving the stage", meta: "When the work moves" },
+      { label: "Merging duplicates", meta: "Quietly, in the night" },
+      { label: "Flagging stale deals", meta: "Before they die" },
+    ],
     contrast: [
       { today: "Nobody updates the CRM, so nobody trusts it, so nobody updates it.", after: "Calls, emails and meetings log themselves against the right record automatically." },
       { today: "Deals sit in a stage because nobody dragged the card.", after: "Stages advance on real signals — a proposal sent, a meeting held." },
@@ -510,6 +573,12 @@ const SALES: Category[] = [
       { value: "Same day", label: "Proposal turnaround" },
       { value: "Auto", label: "Signature reminders and CRM updates" },
       { value: "Current", label: "Battle cards, continuously refreshed" },
+    ],
+    stations: [
+      { label: "Building the quote", meta: "Minutes, not a week" },
+      { label: "Chasing the signature", meta: "Politely, repeatedly" },
+      { label: "Keeping the pricing", meta: "One source of truth" },
+      { label: "Filing the paperwork", meta: "Where it belongs" },
     ],
     contrast: [
       { today: "A quote takes four days because the person who knows the pricing is travelling.", after: "It is generated from your rate card and the deal record the same day it is asked for." },
@@ -552,6 +621,12 @@ const SALES: Category[] = [
       { value: "Scored", label: "Churn risk across every account" },
       { value: "Ahead", label: "Renewal reminders, well before the date" },
     ],
+    stations: [
+      { label: "Watching for silence", meta: "The churn tell" },
+      { label: "Sending the check-in", meta: "After the sale, too" },
+      { label: "Spotting the upsell", meta: "From how they use it" },
+      { label: "Asking for the review", meta: "At the right moment" },
+    ],
     contrast: [
       { today: "Onboarding depends on who picked up the account that week.", after: "Every new customer gets the same check-ins, resources and milestones, triggered on close." },
       { today: "You learn about churn when the cancellation email arrives.", after: "Usage drops, silence and support patterns combine into a risk score that fires early." },
@@ -592,6 +667,12 @@ const SALES: Category[] = [
       { value: "Weekly", label: "Forecast refresh on live pipeline" },
       { value: "Tracked", label: "SLA compliance between every team" },
       { value: "Auto", label: "Commission calculation from closed-won" },
+    ],
+    stations: [
+      { label: "Cleaning the pipeline", meta: "What is really there" },
+      { label: "Forecasting honestly", meta: "No hopeful math" },
+      { label: "Routing the leads", meta: "To whoever can close" },
+      { label: "Reporting the leaks", meta: "Where deals drop" },
     ],
     contrast: [
       { today: "The forecast is whatever the reps felt like typing on Friday.", after: "It is weighted on deal activity and your own historical conversion rates." },

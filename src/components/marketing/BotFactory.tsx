@@ -32,17 +32,34 @@ const SPINE = 236;
 const DESK_X = 326;
 const DESK_W = 216;
 
-const STATIONS = [
-  { y: 64, label: "Answering calls", meta: "24/7 · in seconds" },
-  { y: 152, label: "Following up", meta: "Every single quote" },
-  { y: 240, label: "Running ads", meta: "Reviewed daily" },
-  { y: 328, label: "Updating the CRM", meta: "Nobody has to ask" },
+/** The default four, for pages that are not about one bot in particular. */
+const DEFAULT_STATIONS = [
+  { label: "Answering calls", meta: "24/7 · in seconds" },
+  { label: "Following up", meta: "Every single quote" },
+  { label: "Running ads", meta: "Reviewed daily" },
+  { label: "Updating the CRM", meta: "Nobody has to ask" },
 ];
+
+const ROW_Y = [64, 152, 240, 328];
 
 const CYCLE = 11;
 const route = (y: number) => `M ${BAY.x} ${BAY.y} H ${SPINE} V ${y} H ${DESK_X - 4}`;
 
-export function BotFactory({ place }: { place?: string }) {
+export function BotFactory({
+  place,
+  stations,
+  title,
+}: {
+  place?: string;
+  /** Four jobs for this page's bot. Falls back to the fleet-level four. */
+  stations?: { label: string; meta: string }[];
+  /** Overrides the header line entirely. */
+  title?: string;
+}) {
+  const STATIONS = (stations?.length ? stations : DEFAULT_STATIONS)
+    .slice(0, 4)
+    .map((st, i) => ({ ...st, y: ROW_Y[i] }));
+
   const [motionOk, setMotionOk] = useState(false);
 
   useEffect(() => {
@@ -59,7 +76,7 @@ export function BotFactory({ place }: { place?: string }) {
         <span className="flex items-center gap-2 min-w-0">
           <span className="w-1.5 h-1.5 shrink-0 bg-accent-500 animate-pulse-dot" />
           <span className="text-[12.5px] font-semibold tracking-[-0.01em] truncate">
-            {place ? `Your fleet, working in ${place}` : "Your fleet, going to work"}
+            {title ?? (place ? `Your fleet, working in ${place}` : "Your fleet, going to work")}
           </span>
         </span>
         <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)] shrink-0 hidden sm:block">
@@ -68,7 +85,7 @@ export function BotFactory({ place }: { place?: string }) {
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} className="block w-full h-auto" role="img"
-        aria-label="Bots leaving a factory and taking up four stations: answering calls, following up, running ads and updating the CRM.">
+        aria-label={`Bots leaving a factory and taking up four stations: ${STATIONS.map((st) => st.label.toLowerCase()).join(", ")}.`}>
 
         {/* ── Routing ── */}
         {STATIONS.map((s) => (
