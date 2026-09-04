@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { BotFace } from "@/components/ui";
+import { LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, categoryHref, type Category } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,8 @@ function Belt({
         aria-hidden={hidden || undefined}
         className="group flex shrink-0 items-center gap-3 border border-[var(--border)] bg-white px-5 py-3.5 hover:border-ink-950 transition-colors"
       >
-        <BotFace className="w-6 h-[7px] shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] transition-colors" />
+        <LogoMask art="mark" height={22} className="text-ink-300 group-hover:text-accent-500 transition-colors duration-200" />
+        <span className="h-7 w-px shrink-0 bg-[var(--border)]" aria-hidden="true" />
         <span className="whitespace-nowrap">
           <span className="block text-[14.5px] font-semibold tracking-[-0.015em] leading-none">
             {c.botName}
@@ -87,7 +88,8 @@ export function BotConveyor() {
             href={categoryHref(c)}
             className="group flex items-center gap-3 border border-[var(--border)] bg-white px-5 py-3.5 hover:border-ink-950 transition-colors"
           >
-            <BotFace className="w-6 h-[7px] shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] transition-colors" />
+            <LogoMask art="mark" height={22} className="text-ink-300 group-hover:text-accent-500 transition-colors duration-200" />
+            <span className="h-7 w-px shrink-0 bg-[var(--border)]" aria-hidden="true" />
             <span>
               <span className="block text-[14.5px] font-semibold tracking-[-0.015em] leading-none">
                 {c.botName}

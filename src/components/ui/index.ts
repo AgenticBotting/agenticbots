@@ -9,3 +9,4 @@ export { BrandMark } from "./BrandMark";
 export { BotPattern } from "./BotPattern";
 export { Section } from "./Section";
 export { MediaSlot } from "./MediaSlot";
+export { LogoMask } from "./LogoMask";
