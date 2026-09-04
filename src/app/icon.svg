@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The bot mark on the brand ink, glyph in accent-500 (#7FA200).
+       Full multi-size ICO/PNG set lands in Phase 7; this kills the 404. -->
+  <rect width="64" height="64" fill="#080A08"/>
+  <g transform="translate(4 22.4)">
+    <path fill="#7FA200" fill-rule="evenodd" clip-rule="evenodd"
+      d="M10.304 0h36.706a9 9 0 0 1 0 17.99H0Z
+         M15.137 5.958h7.93a3.086 3.086 0 0 1 0 6.171h-7.93a3.086 3.086 0 0 1 0-6.171Z
+         M37.078 5.958h8.12a3.086 3.086 0 0 1 0 6.171h-8.12a3.086 3.086 0 0 1 0-6.171Z"/>
+  </g>
+</svg>
