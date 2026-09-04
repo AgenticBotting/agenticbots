@@ -180,7 +180,7 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* ── Centered dark closer, then the form. ── */}
         <JoinBand
-          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
+          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — and ${svc.name.toLowerCase()} stops being the thing nobody has time for.`}
           source={`local-hub-${svc.slug}-joinband`}
         />

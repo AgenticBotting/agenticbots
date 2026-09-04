@@ -256,7 +256,7 @@ export default async function CityPage({ params }: Params) {
         </Section>
 
         <JoinBand
-          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
+          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${ct.name} market, not a template.`}
           source={`local-${svc.slug}-${ct.slug}-joinband`}
         />
@@ -449,7 +449,7 @@ function StructuralCityService({ svc, st, rec }: {
         </Section>
 
         <JoinBand
-          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
+          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
           source={`local-${svc.slug}-${rec.city_slug}-joinband`}
         />
