@@ -9,6 +9,7 @@ import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
 
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, type Region } from "@/lib/geo/regions";
+import { MarketSearch } from "./MarketSearch";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -201,9 +202,12 @@ export function Header() {
         {/* ── Mega: Service areas — region cards, then that region's states ── */}
         {openMenu === "areas" && (
           <MegaPanel ref={panelRef}>
+            <div className="mb-7 max-w-[520px]">
+              <MarketSearch onNavigate={closeMenu} />
+            </div>
             {regionSel === null ? (
               <>
-                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your part of the country." />
+                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Or pick your part of the country." />
                 <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                   {regions.map(({ region, states }) => {
                     const metros = states.reduce((n, st) => n + allCitiesInState(st.slug).length, 0);
@@ -327,6 +331,7 @@ export function Header() {
                 kicker="Where we deploy"
                 title="Service areas"
               >
+                <li className="pb-3"><MarketSearch dark onNavigate={() => setMobileOpen(false)} /></li>
                 <MobileRow href="/markets" onGo={() => setMobileOpen(false)}>All markets</MobileRow>
                 {regions.map(({ region, states }) => (
                   <MobileRow key={region} href={`/markets#${region.toLowerCase()}`} onGo={() => setMobileOpen(false)}>
