@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Reveal, SectionHeader, BrandMark, Section } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -66,9 +66,9 @@ function Hero() {
 /* ─────────────────────────  THREE PLAIN STEPS  ──────────────────────── */
 
 const SIMPLE_STEPS = [
-  { n: "1", t: "Tell us what's stuck", d: "Two minutes. You get a free written plan back in one business day — no call, no pressure." },
-  { n: "2", t: "We build your bots", d: "Wired into the tools you already use. First one is working in about two weeks." },
-  { n: "3", t: "Customers stop slipping through", d: "Every call answered, every quote followed up, day and night. You see everything it does." },
+  { n: "01", t: "Tell us what's stuck", d: "Two minutes. You get a free written plan back in one business day — no call, no pressure.", Art: VignetteAsk },
+  { n: "02", t: "We build your bots", d: "Wired into the tools you already use. First one is working in about two weeks.", Art: VignetteBuild },
+  { n: "03", t: "Customers stop slipping through", d: "Every call answered, every quote followed up, day and night. You see everything it does.", Art: VignetteBooked },
 ];
 
 function HowSimple() {
@@ -80,13 +80,17 @@ function HowSimple() {
       heading="Three steps. No jargon."
     >
       <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-        {SIMPLE_STEPS.map((x) => (
-          <div key={x.n} className="card-cell p-8">
-            <span className="flex h-11 w-11 items-center justify-center notch bg-ink-950 text-white font-display font-semibold text-[17px]">
-              {x.n}
-            </span>
-            <h3 className="display-lg mt-5">{x.t}</h3>
-            <p className="body-base mt-2.5">{x.d}</p>
+        {SIMPLE_STEPS.map(({ n, t, d, Art }) => (
+          <div key={n} className="card-cell flex flex-col">
+            {/* The image slot from the wireframe — drawn, not photographed. */}
+            <div className="border-b border-[var(--border)] bg-[var(--bg-alt)] px-4 pt-5 pb-3">
+              <Art />
+            </div>
+            <div className="p-7">
+              <p className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">Step {n}</p>
+              <h3 className="display-lg mt-2">{t}</h3>
+              <p className="body-base mt-2.5">{d}</p>
+            </div>
           </div>
         ))}
       </div>
