@@ -204,7 +204,7 @@ export default async function CityPage({ params }: Params) {
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
             { value: "24/7", label: "Coverage — nights, weekends and holidays" },
-            ...svc.baseline.slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+            ...svc.baseline.filter((b) => b.value !== "24/7").slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
           ]}
           source={`local-${svc.slug}-${ct.slug}-statsplit`}
           note="No per-seat pricing. No percentage of ad spend. No lock-in."
@@ -256,7 +256,7 @@ export default async function CityPage({ params }: Params) {
         </Section>
 
         <JoinBand
-          heading={<>Put {svc.botName} to work in <span className="em-green">{ct.name}.</span></>}
+          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${ct.name} market, not a template.`}
           source={`local-${svc.slug}-${ct.slug}-joinband`}
         />
@@ -413,7 +413,7 @@ function StructuralCityService({ svc, st, rec }: {
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
             { value: "24/7", label: "Coverage — nights, weekends and holidays" },
-            ...svc.baseline.slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+            ...svc.baseline.filter((b) => b.value !== "24/7").slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
           ]}
           source={`local-${svc.slug}-${rec.city_slug}-statsplit`}
           note="No per-seat pricing. No percentage of ad spend. No lock-in."
@@ -449,7 +449,7 @@ function StructuralCityService({ svc, st, rec }: {
         </Section>
 
         <JoinBand
-          heading={<>Put {svc.botName} to work in <span className="em-green">{rec.city}.</span></>}
+          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
           source={`local-${svc.slug}-${rec.city_slug}-joinband`}
         />

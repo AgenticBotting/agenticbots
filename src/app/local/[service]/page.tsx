@@ -105,7 +105,7 @@ export default async function ServiceHub({ params }: Params) {
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
             { value: "24/7", label: "Coverage — nights, weekends and holidays" },
-            ...svc.baseline.slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+            ...svc.baseline.filter((b) => b.value !== "24/7").slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
           ]}
           source={`local-hub-${svc.slug}-statsplit`}
           note="No per-seat pricing. No percentage of ad spend. No lock-in."
@@ -180,7 +180,7 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* ── Centered dark closer, then the form. ── */}
         <JoinBand
-          heading={<>Put {svc.botName} to work in <span className="em-green">your market.</span></>}
+          heading={<>Deploy agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — and ${svc.name.toLowerCase()} stops being the thing nobody has time for.`}
           source={`local-hub-${svc.slug}-joinband`}
         />

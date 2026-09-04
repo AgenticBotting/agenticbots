@@ -244,7 +244,7 @@ export default async function CityMarketHub({ params }: Params) {
         </Section>
 
         <JoinBand
-          heading={<>Put the fleet to work in <span className="em-green">{rec.city}.</span></>}
+          heading={<>Deploy agentic bots to swarm your <span className="em-green">marketing and sales tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
           source={`market-hub-${rec.city_slug}-joinband`}
         />
