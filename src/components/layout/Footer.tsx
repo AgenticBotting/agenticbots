@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail, ArrowRight } from "lucide-react";
 import { Logo, BotPattern } from "@/components/ui";
 import { CATALOG, categoryHref } from "@/lib/catalog";
+import { LOCAL_SERVICES } from "@/lib/geo/data";
 
 const COMPANY = [
   { label: "How it works", href: "/how-it-works" },
@@ -68,6 +69,16 @@ export function Footer() {
 
           {/* Company */}
           <div>
+            <p className="mb-5 label-caps text-white">By market</p>
+            <ul className="space-y-2.5 mb-8">
+              {LOCAL_SERVICES.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/local/${s.slug}`} className="text-[13.5px] text-ink-300 hover:text-white transition-colors">
+                    {s.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
             <p className="mb-5 label-caps text-white">Company</p>
             <ul className="space-y-2.5">
               {COMPANY.map((l) => (
