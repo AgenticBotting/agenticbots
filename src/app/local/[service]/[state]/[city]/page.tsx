@@ -77,10 +77,11 @@ export default async function CityPage({ params }: Params) {
                 <p className="eyebrow mb-5">
                   {svc.name} <span className="eyebrow-dim">· {ct.name}, {ct.stateAbbr}</span>
                 </p>
-                <h1 className="display-hero max-w-[22ch] text-balance">
-                  {svc.headlinePattern.replace("{city}", ct.name)}
+                <h1 className="display-hero max-w-[24ch] text-balance">
+                  {svc.headlinePattern.replace("{city}", ct.name).replace("{st}", ct.stateAbbr)}
                 </h1>
-                <p className="body-lg mt-6 max-w-[54ch]">{svc.intro}</p>
+                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
+                <p className="body-lg mt-5 max-w-[54ch]">{svc.intro}</p>
                 <p className="body-base mt-4 max-w-[54ch]">
                   <span className="font-semibold text-[var(--accent-text)]">{rotatedValueProp(svc.slug, ct.slug)}</span>
                   {" — "}from {ct.districts[0]} to {ct.districts[ct.districts.length - 1]}, wherever your {ct.name} customers are.

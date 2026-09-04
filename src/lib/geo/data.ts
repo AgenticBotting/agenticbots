@@ -207,7 +207,8 @@ const CITIES_RAW = [
 
 const SERVICES_RAW = [
   { slug: "ppc", name: "Agentic PPC", catalogPillar: "marketing" as const, catalogSlug: "paid-media", botName: "Ads Bot",
-    headlinePattern: "Agentic PPC management in {city} — reviewed daily, not quarterly.",
+    headlinePattern: "Agentic PPC Company in {city}, {st}",
+    hook: "Reviewed daily, not quarterly.",
     intro: "An ad account managed by an agent reads every search term, every day, and moves budget while the human agencies are preparing next month's slide deck. Same platforms, radically shorter feedback loop.",
     implementationWeeks: 2,
     baseline: [
@@ -216,7 +217,8 @@ const SERVICES_RAW = [
       { metric: "Budget-shift latency", value: "<24h" },
     ] },
   { slug: "seo", name: "Agentic SEO", catalogPillar: "marketing" as const, catalogSlug: "seo", botName: "SEO Bot",
-    headlinePattern: "Agentic SEO in {city} — maintenance, not a one-time audit.",
+    headlinePattern: "Agentic SEO Company in {city}, {st}",
+    hook: "Maintenance, not a one-time audit.",
     intro: "Rankings decay because nobody re-crawls, re-writes and re-links after the audit PDF lands. An agent runs the crawl on a schedule, fixes what broke, and closes coverage gaps while they are still cheap.",
     implementationWeeks: 3,
     baseline: [
@@ -225,7 +227,8 @@ const SERVICES_RAW = [
       { metric: "Content gap refresh", value: "monthly" },
     ] },
   { slug: "crm", name: "Agentic CRM", catalogPillar: "sales" as const, catalogSlug: "crm", botName: "CRM Bot",
-    headlinePattern: "Agentic CRM operations in {city} — records that update themselves.",
+    headlinePattern: "Agentic CRM Automation Company in {city}, {st}",
+    hook: "Records that update themselves.",
     intro: "A CRM nobody updates is a reporting liability you pay monthly for. An agent logs every call, email and meeting against the right record, advances stages on evidence, and merges the duplicates nobody has time for.",
     implementationWeeks: 2,
     baseline: [
@@ -234,7 +237,8 @@ const SERVICES_RAW = [
       { metric: "Stalled-deal alerts", value: "real-time" },
     ] },
   { slug: "speed-to-lead", name: "Speed-to-Lead", catalogPillar: "sales" as const, catalogSlug: "inbound", botName: "Speed-to-Lead Bot",
-    headlinePattern: "Speed-to-lead automation in {city} — under a minute, any hour.",
+    headlinePattern: "AI Speed-to-Lead Company in {city}, {st}",
+    hook: "Under a minute, any hour.",
     intro: "The first responder wins the job, and the decay is measured in minutes. An agent answers every call, form and chat within seconds, qualifies in real conversation, and books straight onto the calendar.",
     implementationWeeks: 2,
     baseline: [

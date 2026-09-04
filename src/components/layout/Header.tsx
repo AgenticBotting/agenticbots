@@ -7,6 +7,7 @@ import { Menu, X, ArrowRight, Mail, ChevronDown, MapPin } from "lucide-react";
 import { Logo, BotIndex } from "@/components/ui";
 import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
 import { STATES, citiesInState } from "@/lib/geo/data";
+import { groupByRegion } from "@/lib/geo/regions";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -201,36 +202,42 @@ export function Header() {
             {stateSel === null ? (
               <>
                 <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your state." />
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {STATES.map((st) => {
-                    const n = citiesInState(st.slug).length;
-                    return (
-                      <li key={st.slug} className="flex">
-                        <button
-                          onClick={() => setSelectedState(st.slug)}
-                          className="group w-full flex items-center justify-between gap-4 px-5 py-4 text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                        >
-                          <span className="flex items-center gap-3 min-w-0">
-                            <MapPin className="w-4 h-4 shrink-0 text-[var(--accent-text)]" />
-                            <span className="display-md !text-[15px]">{st.name}</span>
-                          </span>
-                          <span className="flex items-center gap-4 shrink-0">
-                            <span className="text-[12.5px] font-semibold text-[var(--text-muted)]">
-                              {n} metro{n > 1 ? "s" : ""}
-                            </span>
-                            <ArrowRight className="w-4 h-4 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+                {/* Five region columns — 51 states never become one wall. */}
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-8">
+                  {groupByRegion(STATES).map(({ region, states }) => (
+                    <div key={region}>
+                      <p className="flex items-center gap-2 pb-2.5 mb-3 border-b border-[var(--border)] mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
+                        <MapPin className="w-3 h-3 text-[var(--accent-text)]" />
+                        {region}
+                      </p>
+                      <ul className="space-y-1">
+                        {states.map((st) => {
+                          const n = citiesInState(st.slug).length;
+                          return (
+                            <li key={st.slug}>
+                              <button
+                                onClick={() => setSelectedState(st.slug)}
+                                className="group w-full flex items-center justify-between gap-2 py-2 px-2 -mx-2 text-left hover:bg-[var(--bg-alt)] transition-colors"
+                              >
+                                <span className="text-[14px] font-medium tracking-[-0.012em]">{st.name}</span>
+                                <span className="flex items-center gap-2 shrink-0">
+                                  <span className="mono text-[10.5px] tabular-nums text-[var(--text-muted)]">{n}</span>
+                                  <ArrowRight className="w-3.5 h-3.5 text-[var(--accent-text)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </>
             ) : (
               <>
                 <StepBack onBack={() => setSelectedState(null)} backLabel="All states"
                   eyebrow={`${stateSel.name.toUpperCase()} · Step 2 of 2`} title="Pick your market." />
-                <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <ul className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
                   {citiesInState(stateSel.slug).map((c) => (
                     <li key={c.slug} className="flex">
                       <Link

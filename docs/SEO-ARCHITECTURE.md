@@ -1,5 +1,31 @@
 # SEO Architecture (Phases 6–7)
 
+> **Sept 4 2026 — the national plan is adopted.** `docs/PROGRAMMATIC-SEO-PLAN.md`,
+> `docs/SERVICE-CONTENT-BLUEPRINT.md` and `src/data/cities-dataset.json` are now
+> the governing documents for the programmatic build-out (924 cities · 51 states ·
+> 8 services · 8,783 URLs, tiered release). `scripts/validate-cities.mjs` is the
+> Phase-A gate — dataset currently validates clean (tiers exactly 481/248/195,
+> all 4,496 surrounding refs resolve; DC legitimately has none).
+>
+> **⚠️ OPEN DECISION — two different 8-service lists ship in these files:**
+> `cities-dataset.json` defines *agentic-ppc, agentic-seo, ai-sdr-agents,
+> agentic-crm, ai-lead-generation, agentic-cro, ai-marketing-automation,
+> ai-revops* (H1s say "Company"), while `SERVICE-CONTENT-BLUEPRINT.md` §1
+> restructures into *marketing-firm parent + ppc-management / seo / email +
+> google-ads / linkedin-ads / facebook-ads / local-seo* (H1s say "Firm") with
+> owns/excludes cannibalization gates. These produce different 7,392-page URL
+> sets. **Do not mass-generate until one list is chosen.** The blueprint reads
+> as the newer thinking; the dataset's `h1_pattern`s match the older list.
+>
+> **Migration map (current live → plan target):** `/local/{service}/{state}/{city}`
+> → `/services/{service}/{state}/{city}` and `/markets/{state}[/{city}]` →
+> `/locations/{state}[/{city}]`; nothing is deployed or indexed, so slugs can
+> move freely until launch. Live pages already follow the blueprint's H1
+> discipline (exact "… Company in {City}, {ST}" pattern in H1 + title, flavor
+> line demoted to a kicker). Release schedule, crawl-budget rules, lastmod-from-
+> content-hash, and the link-graph invariants come from the plan doc verbatim.
+
+
 ## Data model
 
 - `src/lib/geo/schema.ts` — Zod contracts. A row that fails parsing **fails the build** (schemas parse at module load in `data.ts`).

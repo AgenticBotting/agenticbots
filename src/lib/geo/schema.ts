@@ -43,6 +43,8 @@ export const LocalServiceSchema = z.object({
   catalogSlug: z.string(),
   botName: z.string(),
   headlinePattern: z.string().includes("{city}"),
+  /** The flavor line that used to be the H1 — now the kicker under it. */
+  hook: z.string().min(10),
   intro: z.string().min(120),
   implementationWeeks: z.number().int().min(1).max(8),
   baseline: z.array(z.object({ metric: z.string(), value: z.string() })).min(2),
