@@ -12,72 +12,96 @@ import { CitySchema, LocalServiceSchema, type City, type LocalService } from "./
 
 const CITIES_RAW = [
   { slug: "miami", name: "Miami", stateSlug: "florida", stateName: "Florida", stateAbbr: "FL",
+    districts: ["Brickell", "Wynwood", "Coral Gables", "Doral", "Little Havana"],
+    character: "A trade-and-tourism economy layered over a fast-growing finance and startup corridor — Brickell towers, Doral logistics parks and neighborhood service businesses all buying very differently.",
     metroPopulation: 6_100_000, businessCount: 730_000,
     industries: ["hospitality", "construction", "healthcare", "real estate", "logistics"],
     cpcBand: [6, 28] as [number, number], competition: "saturated" as const, timezone: "America/New_York",
     nearby: ["fort-lauderdale", "west-palm-beach", "orlando"],
     localNote: "Miami's service market is bilingual by default — ad copy, intake flows and follow-up sequences that only run in English leave measurable volume on the table, and seasonal demand swings around hurricane season are sharp enough to need budget pacing rules of their own." },
   { slug: "fort-lauderdale", name: "Fort Lauderdale", stateSlug: "florida", stateName: "Florida", stateAbbr: "FL",
+    districts: ["Las Olas", "Flagler Village", "Port Everglades corridor", "Cypress Creek"],
+    character: "A marine-and-professional-services economy where the boatyards of Port Everglades sit twenty minutes from the Cypress Creek office parks.",
     metroPopulation: 1_950_000, businessCount: 240_000,
     industries: ["marine services", "construction", "hospitality", "healthcare"],
     cpcBand: [5, 22] as [number, number], competition: "high" as const, timezone: "America/New_York",
     nearby: ["miami", "west-palm-beach"],
     localNote: "Broward's marine-services cluster is unusual: yacht maintenance, dock construction and marina trades carry ticket sizes closer to commercial than residential work, which changes what a lead is worth and how hard follow-up should push." },
   { slug: "west-palm-beach", name: "West Palm Beach", stateSlug: "florida", stateName: "Florida", stateAbbr: "FL",
+    districts: ["Clematis Street", "Rosemary Square", "Northwood", "Palm Beach Lakes corridor"],
+    character: "Finance firms relocating onto Flagler share the market with the contractors serving the island's estates — two clienteles, two price books.",
     metroPopulation: 1_530_000, businessCount: 210_000,
     industries: ["construction", "healthcare", "financial services", "hospitality"],
     cpcBand: [5, 24] as [number, number], competition: "high" as const, timezone: "America/New_York",
     nearby: ["fort-lauderdale", "miami"],
     localNote: "Palm Beach County splits into two markets wearing one zip prefix — coastal high-ticket residential and inland volume work — and campaigns that don't separate them pay coastal CPCs for inland jobs." },
   { slug: "orlando", name: "Orlando", stateSlug: "florida", stateName: "Florida", stateAbbr: "FL",
+    districts: ["Lake Nona", "Downtown Orlando", "Dr. Phillips", "UCF research corridor"],
+    character: "Tourism dollars fund the headlines, but Lake Nona's medical city and the UCF research corridor drive the B2B services demand.",
     metroPopulation: 2_800_000, businessCount: 310_000,
     industries: ["tourism", "construction", "healthcare", "technology"],
     cpcBand: [4, 19] as [number, number], competition: "high" as const, timezone: "America/New_York",
     nearby: ["tampa", "miami"],
     localNote: "Orlando's tourism economy means a large share of searches come from visitors, not buyers — negative-keyword discipline and geo-fencing do more for wasted spend here than bid strategy does." },
   { slug: "tampa", name: "Tampa", stateSlug: "florida", stateName: "Florida", stateAbbr: "FL",
+    districts: ["Westshore", "Ybor City", "Water Street", "New Tampa"],
+    character: "Westshore is Florida's largest office submarket — a dense B2B services market wrapped inside a fast-growing consumer metro.",
     metroPopulation: 3_300_000, businessCount: 350_000,
     industries: ["healthcare", "construction", "financial services", "logistics"],
     cpcBand: [4, 18] as [number, number], competition: "high" as const, timezone: "America/New_York",
     nearby: ["orlando", "miami"],
     localNote: "Tampa Bay's growth corridors (Wesley Chapel, Riverview, Lakewood Ranch) shift year to year — service-area pages and ad geo targets that were right in 2023 quietly bleed budget into areas the crews no longer prioritize." },
   { slug: "atlanta", name: "Atlanta", stateSlug: "georgia", stateName: "Georgia", stateAbbr: "GA",
+    districts: ["Buckhead", "Midtown", "Ponce City Market corridor", "Alpharetta", "The Battery"],
+    character: "The Southeast's B2B capital: Buckhead and Midtown towers, an Alpharetta tech corridor, and a logistics ring that moves half the region's freight.",
     metroPopulation: 6_300_000, businessCount: 680_000,
     industries: ["logistics", "film & media", "fintech", "construction", "healthcare"],
     cpcBand: [5, 21] as [number, number], competition: "saturated" as const, timezone: "America/New_York",
     nearby: ["charlotte", "nashville"],
     localNote: "Metro Atlanta's sprawl makes drive-time the hidden qualifier: a lead 40 miles across the perimeter can cost more to serve than it returns, so lead scoring that weighs distance beats raw volume every time here." },
   { slug: "charlotte", name: "Charlotte", stateSlug: "north-carolina", stateName: "North Carolina", stateAbbr: "NC",
+    districts: ["Uptown", "South End", "Ballantyne", "University City"],
+    character: "A banking town whose South End and Ballantyne growth has spawned a second economy of contractors, agencies and professional services chasing the new rooftops.",
     metroPopulation: 2_800_000, businessCount: 290_000,
     industries: ["banking", "construction", "healthcare", "manufacturing"],
     cpcBand: [4, 17] as [number, number], competition: "moderate" as const, timezone: "America/New_York",
     nearby: ["atlanta", "nashville"],
     localNote: "Charlotte adds roughly a hundred residents a day, and the new-construction warranty cycle that follows creates a predictable second wave of service demand two to three years behind each subdivision — a calendar most local campaigns ignore." },
   { slug: "nashville", name: "Nashville", stateSlug: "tennessee", stateName: "Tennessee", stateAbbr: "TN",
+    districts: ["The Gulch", "Music Row", "Wedgewood-Houston", "Cool Springs"],
+    character: "Healthcare administration headquarters anchor the economy; Cool Springs and The Gulch carry the professional-services growth that follows it.",
     metroPopulation: 2_100_000, businessCount: 230_000,
     industries: ["healthcare", "music & entertainment", "construction", "hospitality"],
     cpcBand: [4, 18] as [number, number], competition: "moderate" as const, timezone: "America/Chicago",
     nearby: ["atlanta", "charlotte"],
     localNote: "Nashville is a healthcare-administration capital — a B2B sales floor here sells into hospital systems with long committee cycles, which changes what 'speed to lead' means: the first response still wins, but nurture depth decides the deal." },
   { slug: "houston", name: "Houston", stateSlug: "texas", stateName: "Texas", stateAbbr: "TX",
+    districts: ["The Galleria", "Energy Corridor", "Texas Medical Center", "The Heights", "Downtown"],
+    character: "Energy Corridor procurement culture and the world's largest medical complex make this a market where RFQ discipline decides who wins the work.",
     metroPopulation: 7_300_000, businessCount: 750_000,
     industries: ["energy", "logistics", "healthcare", "construction", "manufacturing"],
     cpcBand: [5, 23] as [number, number], competition: "saturated" as const, timezone: "America/Chicago",
     nearby: ["dallas", "austin"],
     localNote: "Houston's energy-sector procurement culture bleeds into everything: even residential-adjacent trades see RFQ-style multi-bid behavior, so quote follow-up cadence — not ad spend — is usually the highest-leverage fix in this metro." },
   { slug: "dallas", name: "Dallas", stateSlug: "texas", stateName: "Texas", stateAbbr: "TX",
+    districts: ["Uptown", "Legacy West", "Deep Ellum", "Las Colinas", "Frisco"],
+    character: "Corporate relocations keep filling Legacy West and Las Colinas — a B2B market that grows a new submarket faster than most metros grow a subdivision.",
     metroPopulation: 7_900_000, businessCount: 800_000,
     industries: ["technology", "logistics", "financial services", "construction", "healthcare"],
     cpcBand: [5, 22] as [number, number], competition: "saturated" as const, timezone: "America/Chicago",
     nearby: ["houston", "austin"],
     localNote: "DFW is two ad markets pretending to be one — Dallas-side and Fort Worth-side searches price differently and convert differently, and single-campaign structures average away the difference instead of arbitraging it." },
   { slug: "austin", name: "Austin", stateSlug: "texas", stateName: "Texas", stateAbbr: "TX",
+    districts: ["The Domain", "South Congress", "East Austin", "Mueller"],
+    character: "A software-native buyer base from The Domain to East Austin that expects product-grade responsiveness from every vendor, trades included.",
     metroPopulation: 2_500_000, businessCount: 270_000,
     industries: ["technology", "construction", "hospitality", "professional services"],
     cpcBand: [5, 20] as [number, number], competition: "high" as const, timezone: "America/Chicago",
     nearby: ["houston", "dallas"],
     localNote: "Austin's buyer expects software-grade responsiveness from everyone — a plumber included. Review velocity and response-time badges move conversion here more than they do in any comparable Texas metro." },
   { slug: "phoenix", name: "Phoenix", stateSlug: "arizona", stateName: "Arizona", stateAbbr: "AZ",
+    districts: ["Camelback Corridor", "Old Town Scottsdale", "Tempe", "Deer Valley"],
+    character: "Semiconductor money is rebuilding Deer Valley while the Camelback Corridor stays the professional-services spine — a two-speed market in one valley.",
     metroPopulation: 5_100_000, businessCount: 480_000,
     industries: ["construction", "healthcare", "semiconductors", "real estate"],
     cpcBand: [4, 20] as [number, number], competition: "high" as const, timezone: "America/Phoenix",
@@ -135,7 +159,19 @@ export const getState = (slug: string) => STATES.find((s) => s.slug === slug);
 export const getCity = (stateSlug: string, citySlug: string) =>
   CITIES.find((c) => c.stateSlug === stateSlug && c.slug === citySlug);
 export const citiesInState = (stateSlug: string) => CITIES.filter((c) => c.stateSlug === stateSlug);
-export const nearbyCities = (city: City) =>
-  city.nearby.map((slug) => CITIES.find((c) => c.slug === slug)).filter((c): c is City => Boolean(c));
+/**
+ * Nearby markets, Lot Sealers-style: hand-picked `nearby` first, then the
+ * rest of the same state, then adjacent markets — deduped, capped.
+ */
+export function nearbyCities(city: City, limit = 5): City[] {
+  const out: City[] = [];
+  const push = (c?: City) => {
+    if (c && c.slug !== city.slug && !out.some((x) => x.slug === c.slug) && out.length < limit) out.push(c);
+  };
+  city.nearby.forEach((slug) => push(CITIES.find((c) => c.slug === slug)));
+  CITIES.filter((c) => c.stateSlug === city.stateSlug).forEach(push);
+  CITIES.forEach(push);
+  return out;
+}
 
 export const fmt = new Intl.NumberFormat("en-US");

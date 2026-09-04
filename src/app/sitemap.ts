@@ -33,7 +33,18 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
         url: `${BASE}/local/${s.slug}/${c.stateSlug}/${c.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.65,
       }))
     );
-    return [...hubs, ...states, ...cities];
+    const marketHubs: MetadataRoute.Sitemap = [
+      { url: `${BASE}/markets`, lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+      ...STATES.map((st) => ({
+        url: `${BASE}/markets/${st.slug}`, lastModified: now,
+        changeFrequency: "monthly" as const, priority: 0.65,
+      })),
+      ...CITIES.map((c) => ({
+        url: `${BASE}/markets/${c.stateSlug}/${c.slug}`, lastModified: now,
+        changeFrequency: "monthly" as const, priority: 0.7,
+      })),
+    ];
+    return [...hubs, ...states, ...cities, ...marketHubs];
   }
 
   const statics = [
@@ -46,6 +57,7 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
     { url: `${BASE}/blog`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/terms`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${BASE}/site-map`, changeFrequency: "monthly", priority: 0.3 },
   ].map((e) => ({ ...e, lastModified: now })) as MetadataRoute.Sitemap;
 
   const pillars: MetadataRoute.Sitemap = CATALOG.map((p) => ({

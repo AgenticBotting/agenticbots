@@ -15,6 +15,7 @@ const COMPANY = [
 const LEGAL = [
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
+  { label: "Site map", href: "/site-map" },
 ];
 
 export function Footer() {
@@ -71,6 +72,11 @@ export function Footer() {
           <div>
             <p className="mb-5 label-caps text-white">By market</p>
             <ul className="space-y-2.5 mb-8">
+              <li>
+                <Link href="/markets" className="text-[13.5px] text-ink-300 hover:text-white transition-colors">
+                  All markets
+                </Link>
+              </li>
               {LOCAL_SERVICES.map((s) => (
                 <li key={s.slug}>
                   <Link href={`/local/${s.slug}`} className="text-[13.5px] text-ink-300 hover:text-white transition-colors">

@@ -1,12 +1,12 @@
 # Analytics — event taxonomy & funnels (Phase 9)
 
-Transport: PostHog HTTP capture API called directly from `src/lib/analytics.ts` — the posthog-js SDK (~50KB gz) was declined against the 150KB route JS budget. Named events only; autocapture off by construction. Without `NEXT_PUBLIC_POSTHOG_KEY`, events console.debug in dev and no-op in prod, so instrumentation stays correct before credentials exist.
+Transport: **Umami** (the user's standard). The tracker script loads from the layout only when `NEXT_PUBLIC_UMAMI_URL` + `NEXT_PUBLIC_UMAMI_WEBSITE_ID` are set — until then every `track()` console.debugs in dev and no-ops in prod, so instrumentation stays correct before the account exists. Named events via `window.umami.track`; server-side conversions post to Umami's `/api/send` (set `UMAMI_URL` + `UMAMI_WEBSITE_ID` server-side).
 
-**To activate:** set `NEXT_PUBLIC_POSTHOG_KEY` (client) and optionally `POSTHOG_SERVER_KEY` (server-side conversions) and `NEXT_PUBLIC_POSTHOG_HOST`. Session replay for converters + feature-flag A/B require adding the SDK later — do it behind a route-level dynamic import and re-measure the JS budget in the same PR.
+Deliberately dormant for now — activate when there's traffic worth reading.
 
 ## Naming convention
 
-`object_action`, snake_case, past tense. One event per user intention — no page-view spam (PostHog pageviews can be enabled server-side later if wanted).
+`object_action`, snake_case, past tense. One event per user intention — Umami records pageviews itself; custom events stay intention-level.
 
 ## Event catalog (typed in `analytics.ts` — adding an event means extending `EventName`)
 
@@ -25,7 +25,7 @@ Transport: PostHog HTTP capture API called directly from `src/lib/analytics.ts` 
 | `nav_mega_opened` | header Bots menu | — |
 | `roster_bot_focused` | reserved for BotScrollList focus dwell | `slug` |
 
-Common properties on every client event: `$current_url`, `path`, stable `distinct_id` (localStorage UUID; degrades to `anonymous` in private mode).
+Umami attaches URL/referrer itself; event `data` carries the properties above.
 
 ## Funnels
 
@@ -35,8 +35,8 @@ Common properties on every client event: `$current_url`, `path`, stable `distinc
 
 ## Server-side conversions
 
-`/api/plan` fires `plan_form_submitted { converted: true, source_side: "server" }` after successful delivery — the client event can be lost to ad blockers; the server one cannot. Dedupe in analysis on source_side.
+`/api/plan` fires `plan_form_submitted { converted: true, source_side: "server" }` via Umami `/api/send` after successful delivery — the client event can be lost to ad blockers; the server one cannot. Dedupe on source_side.
 
 ## Deferred (needs deployment + accounts)
 
-Weekly automated report, GSC query pull, A/B harness at section level — each requires the site to be live with credentials. The Section component's `id` prop is the designed hook for section-level experiments.
+Weekly automated report, GSC query pull, A/B harness at section level, session replay (Umami has none — would be a separate tool if ever wanted) — each requires the site to be live. The Section component's `id` prop is the designed hook for section-level experiments.

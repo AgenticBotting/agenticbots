@@ -5,14 +5,33 @@
 - `src/lib/geo/schema.ts` — Zod contracts. A row that fails parsing **fails the build** (schemas parse at module load in `data.ts`).
 - `src/lib/geo/data.ts` — Tier-0 dataset: **12 metros × 4 services** (ppc, seo, crm, speed-to-lead). Population/business counts are public-source estimates; CPC bands are estimated ranges; **every page renders an estimates disclosure**. The uniqueness lever is `localNote` — a hand-written, locally-true observation per metro (min 80 chars, enforced).
 
-## Route map
+## Route map — dual hierarchy (Lot Sealers pattern)
+
+Two hierarchies that cross-link, mirroring the proven Lot Sealers structure
+(`/services/{service}/{city}` × `/service-areas/{county}/{city}`):
 
 ```
-/local/{service}                     4 hub pages (real content)
-/local/{service}/{state}             24 state hubs (aggregate figures + market grid)
+SERVICE-FIRST (money pages)
+/local/{service}                     4 hub pages
+/local/{service}/{state}             24 state hubs
 /local/{service}/{state}/{city}      48 city pages
+
+LOCATION-FIRST (market hubs)
+/markets                             index (states + cities + service links)
+/markets/{state}                     6 state market hubs (character lines)
+/markets/{state}/{city}              12 city market hubs (all services × city)
+
+/site-map                            HTML sitemap (crawlable + human-usable)
 ```
-All `generateStaticParams` SSG. Click depth ≤3 via the footer "By market" column. Composite per-page content: market snapshot rows, dominant-industry scenario, the localNote, nearby-market links, per-city FAQs (also in `FAQPage` JSON-LD).
+
+**Internal-linking mesh** (the LS levers, all ported):
+- City service page → "Other bots in {city}" cross-service block (LS's highest-leverage block) → the other 3 service×city pages
+- City service page → the city market hub, nearby markets (same state first, then fill — `nearbyCities()`), state hub, service hub, breadcrumbs
+- City market hub → all 4 service×city pages, nearby market hubs, state hub
+- Footer → /markets + 4 service hubs; legal row → /site-map
+- Click depth ≤3 to any page
+
+**Per-page uniqueness levers:** hand-written `localNote` + `character` + named `districts` (real places: Brickell, Buckhead, The Domain…) woven into copy, plus **deterministic rotation** (`src/lib/geo/seo-rotation.ts`, djb2 hash — LS's `seo-content.ts` pattern): stable per-city value-prop and CTA lines so no two pages share framing. Per-city FAQs also in `FAQPage` JSON-LD.
 
 ## Quality gates (fail the build, not the SERP)
 
@@ -28,7 +47,7 @@ All `generateStaticParams` SSG. Click depth ≤3 via the footer "By market" colu
 
 ## Sitemaps & crawl
 
-- Segmented via `generateSitemaps`: `/sitemap/0.xml` core (27 URLs), `/sitemap/1.xml` local (76 URLs); both referenced in robots.txt so Search Console coverage reads per segment. (Next 16 note: the segment `id` arrives as a **Promise resolving to a string** — resolve before comparing.)
+- Segmented via `generateSitemaps`: `/sitemap/0.xml` core (28 URLs incl. /site-map), `/sitemap/1.xml` local (95 URLs: service hierarchy + markets hierarchy); both referenced in robots.txt so Search Console coverage reads per segment. (Next 16 note: the segment `id` arrives as a **Promise resolving to a string** — resolve before comparing.)
 - robots.txt disallows `/api/`, `/plan/thanks`; `/design` is meta-noindexed.
 
 ## Structured data

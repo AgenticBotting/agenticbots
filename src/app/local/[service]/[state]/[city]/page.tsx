@@ -6,6 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import { BotPlanForm, PlanCta, StatBand, FaqAccordion } from "@/components/marketing";
 import { CITIES, LOCAL_SERVICES, getService, getState, getCity, nearbyCities, fmt } from "@/lib/geo/data";
+import { rotatedValueProp, rotatedCta } from "@/lib/geo/seo-rotation";
 import { getCategory } from "@/lib/catalog";
 import type { PillarSlug } from "@/lib/catalog";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
@@ -80,6 +81,10 @@ export default async function CityPage({ params }: Params) {
                   {svc.headlinePattern.replace("{city}", ct.name)}
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">{svc.intro}</p>
+                <p className="body-base mt-4 max-w-[54ch]">
+                  <span className="font-semibold text-[var(--accent-text)]">{rotatedValueProp(svc.slug, ct.slug)}</span>
+                  {" — "}from {ct.districts[0]} to {ct.districts[ct.districts.length - 1]}, wherever your {ct.name} customers are.
+                </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <PlanCta source={`local-${svc.slug}-${ct.slug}`} />
                   {category && (
@@ -127,7 +132,7 @@ export default async function CityPage({ params }: Params) {
           <div className="grid lg:grid-cols-2 gap-10 max-w-[1000px]">
             <div>
               <p className="display-md mb-3">The local read</p>
-              <p className="body-base">{ct.localNote}</p>
+              <p className="body-base">{ct.character} {ct.localNote}</p>
             </div>
             <div>
               <p className="display-md mb-3">For a {dominant} business here</p>
@@ -155,6 +160,32 @@ export default async function CityPage({ params }: Params) {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
+        {/* Other services in this city — the highest-leverage internal-link
+            block from the Lot Sealers playbook. */}
+        <Section variant="light" size="sm" eyebrow={`Also running in ${ct.name}`}
+          heading={`Other bots ${ct.name} businesses deploy.`}>
+          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+            {LOCAL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
+              <Link key={o.slug} href={`/local/${o.slug}/${st.slug}/${ct.slug}`} className="group card-cell p-6">
+                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
+                <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
+                  {o.name} in {ct.name}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
+                  Open
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p className="body-sm mt-6">
+            Or see the whole market at once:{" "}
+            <Link href={`/markets/${st.slug}/${ct.slug}`} className="font-semibold text-[var(--accent-text)] hover:underline underline-offset-4">
+              the {ct.name} market hub
+            </Link>.
+          </p>
+        </Section>
+
         <Section variant="alt" size="sm" eyebrow="Nearby markets">
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {near.map((n) => (
@@ -171,7 +202,7 @@ export default async function CityPage({ params }: Params) {
         </Section>
 
         <Section variant="light" eyebrow="Start here" heading={`Get the ${ct.name} bot plan.`}
-          sub="Tell us what you sell and where it is getting stuck. The plan comes back mapped to this market — free, one business day.">
+          sub={`Tell us what you sell and where it is getting stuck. ${rotatedCta(svc.slug, ct.slug)}`}>
           <div className="max-w-[640px]">
             <BotPlanForm source={`local-${svc.slug}-${ct.slug}-form`} defaultFocus={category?.name} />
           </div>

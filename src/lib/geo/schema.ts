@@ -28,6 +28,10 @@ export const CitySchema = z.object({
   nearby: z.array(z.string()).min(1).max(5),
   /** One locally-true observation, hand-written per metro. The anti-doorway clause. */
   localNote: z.string().min(80),
+  /** 3–5 named business districts/corridors — real places, woven into copy. */
+  districts: z.array(z.string().min(3)).min(3).max(5),
+  /** One specific sentence about the metro's commercial character. */
+  character: z.string().min(60),
 });
 export type City = z.infer<typeof CitySchema>;
 

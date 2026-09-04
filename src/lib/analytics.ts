@@ -1,13 +1,10 @@
 /**
- * Analytics (Phase 9). Named events only — autocapture is deliberately off.
+ * Analytics (Phase 9) — Umami.
  *
- * Transport: PostHog's HTTP capture endpoint, called directly. The
- * posthog-js SDK is ~50KB gz against a 150KB route budget; the capture
- * API is a fetch. Session replay and feature flags need the SDK — add it
- * behind a flag when a concrete replay need exists (docs/ANALYTICS.md).
- *
- * No key configured (NEXT_PUBLIC_POSTHOG_KEY) -> events log to console in
- * dev and no-op in prod, so instrumentation is correct before credentials.
+ * Named events only. The Umami script loads from the layout ONLY when
+ * NEXT_PUBLIC_UMAMI_URL + NEXT_PUBLIC_UMAMI_WEBSITE_ID are set; until
+ * then every call console.debugs in dev and no-ops in prod, so the
+ * instrumentation stays correct before the account exists.
  */
 
 export type EventName =
@@ -24,61 +21,40 @@ export type EventName =
   | "nav_mega_opened"
   | "roster_bot_focused";
 
-const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
-
-function distinctId(): string {
-  try {
-    const k = "ab_did";
-    let id = localStorage.getItem(k);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(k, id);
-    }
-    return id;
-  } catch {
-    return "anonymous";
+declare global {
+  interface Window {
+    umami?: { track: (event: string, data?: Record<string, unknown>) => void };
   }
 }
 
 /** Fire a named product event. Never throws; never blocks the UI. */
 export function track(event: EventName, props: Record<string, unknown> = {}): void {
   if (typeof window === "undefined") return;
-  const payload = {
-    api_key: KEY,
-    event,
-    distinct_id: distinctId(),
-    properties: { ...props, $current_url: location.href, path: location.pathname },
-    timestamp: new Date().toISOString(),
-  };
-  if (!KEY) {
-    if (process.env.NODE_ENV !== "production") console.debug("[analytics]", event, props);
+  if (window.umami) {
+    try { window.umami.track(event, props); } catch { /* never break the UI */ }
     return;
   }
-  const body = JSON.stringify(payload);
-  // sendBeacon survives page unloads (mat dismissals, exit clicks).
-  if (!navigator.sendBeacon?.(`${HOST}/i/v0/e/`, body)) {
-    fetch(`${HOST}/i/v0/e/`, { method: "POST", body, keepalive: true }).catch(() => {});
-  }
+  if (process.env.NODE_ENV !== "production") console.debug("[analytics]", event, props);
 }
 
-/** Server-side conversion capture — used by /api/plan (Phase 9 spec). */
+/**
+ * Server-side conversion capture — Umami's /api/send endpoint.
+ * No-ops without UMAMI_URL + UMAMI_WEBSITE_ID (server-side vars).
+ */
 export async function trackServer(event: EventName, props: Record<string, unknown> = {}): Promise<void> {
-  const key = process.env.POSTHOG_SERVER_KEY || KEY;
-  if (!key) return;
+  const host = process.env.UMAMI_URL || process.env.NEXT_PUBLIC_UMAMI_URL;
+  const website = process.env.UMAMI_WEBSITE_ID || process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+  if (!host || !website) return;
   try {
-    await fetch(`${HOST}/i/v0/e/`, {
+    await fetch(`${host.replace(/\/$/, "")}/api/send`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "User-Agent": "agenticbots-server" },
       body: JSON.stringify({
-        api_key: key,
-        event,
-        distinct_id: "server",
-        properties: { ...props, source_side: "server" },
-        timestamp: new Date().toISOString(),
+        type: "event",
+        payload: { website, name: event, data: { ...props, source_side: "server" }, url: "/api/plan", hostname: "agenticbots.dev" },
       }),
     });
   } catch {
-    /* conversion still succeeded; analytics must never break the funnel */
+    /* the conversion still succeeded; analytics must never break the funnel */
   }
 }
