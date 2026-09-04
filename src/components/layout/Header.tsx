@@ -7,7 +7,7 @@ import { Menu, X, ArrowRight, Mail, ChevronDown, MapPin } from "lucide-react";
 import { Logo, BotIndex } from "@/components/ui";
 import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
 import { STATES, citiesInState } from "@/lib/geo/data";
-import { groupByRegion } from "@/lib/geo/regions";
+import { groupByRegion, type Region } from "@/lib/geo/regions";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -24,7 +24,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedPillar, setSelectedPillar] = useState<PillarSlug | null>(null);
-  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<string | null>("marketing");
   const navRef = useRef<HTMLDivElement>(null);
@@ -61,19 +61,20 @@ export function Header() {
   function closeMenu() {
     setOpenMenu(null);
     setSelectedPillar(null);
-    setSelectedState(null);
+    setSelectedRegion(null);
   }
 
   function toggleMenu(id: Exclude<MenuId, null>) {
     if (openMenu === id) { closeMenu(); return; }
     track("nav_mega_opened", { menu: id });
     setSelectedPillar(null);
-    setSelectedState(null);
+    setSelectedRegion(null);
     setOpenMenu(id);
   }
 
   const pillar = selectedPillar ? CATALOG.find((p) => p.slug === selectedPillar) ?? null : null;
-  const stateSel = selectedState ? STATES.find((s) => s.slug === selectedState) ?? null : null;
+  const regions = groupByRegion(STATES);
+  const regionSel = selectedRegion ? regions.find((r) => r.region === selectedRegion) ?? null : null;
 
   return (
     <div className="sticky top-0 z-50">
@@ -196,76 +197,73 @@ export function Header() {
           </MegaPanel>
         )}
 
-        {/* ── Mega: Service areas (two-step, the Lot Sealers pattern) ── */}
+        {/* ── Mega: Service areas — region cards, then that region's states ── */}
         {openMenu === "areas" && (
           <MegaPanel ref={panelRef}>
-            {stateSel === null ? (
+            {regionSel === null ? (
               <>
-                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your state." />
-                {/* Five region columns — 51 states never become one wall. */}
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-8">
-                  {groupByRegion(STATES).map(({ region, states }) => (
-                    <div key={region}>
-                      <p className="flex items-center gap-2 pb-2.5 mb-3 border-b border-[var(--border)] mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                        <MapPin className="w-3 h-3 text-[var(--accent-text)]" />
-                        {region}
-                      </p>
+                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your part of the country." />
+                <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                  {regions.map(({ region, states }) => {
+                    const metros = states.reduce((n, st) => n + citiesInState(st.slug).length, 0);
+                    return (
+                      <li key={region} className="flex">
+                        <button
+                          onClick={() => setSelectedRegion(region)}
+                          className="group w-full flex flex-col justify-between gap-8 p-5 min-h-[132px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        >
+                          <span>
+                            <span className="block display-lg">{region}</span>
+                            <span className="mt-2 block mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                              {states.length} state{states.length > 1 ? "s" : ""} · {metros} metro{metros > 1 ? "s" : ""}
+                            </span>
+                          </span>
+                          <ArrowRight className="w-4 h-4 self-end text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : (
+              <>
+                <StepBack onBack={() => setSelectedRegion(null)} backLabel="All regions"
+                  eyebrow={`${regionSel.region.toUpperCase()} · Step 2 of 2`} title="Pick your market." />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
+                  {regionSel.states.map((st) => (
+                    <div key={st.slug}>
+                      <Link
+                        href={`/markets/${st.slug}`}
+                        onClick={closeMenu}
+                        className="group flex items-center gap-2 pb-2.5 mb-3 border-b border-[var(--border)] display-md !text-[15px] hover:text-[var(--accent-text)] transition-colors"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-[var(--accent-text)]" />
+                        {st.name}
+                        <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      </Link>
                       <ul className="space-y-1">
-                        {states.map((st) => {
-                          const n = citiesInState(st.slug).length;
-                          return (
-                            <li key={st.slug}>
-                              <button
-                                onClick={() => setSelectedState(st.slug)}
-                                className="group w-full flex items-center justify-between gap-2 py-2 px-2 -mx-2 text-left hover:bg-[var(--bg-alt)] transition-colors"
-                              >
-                                <span className="text-[14px] font-medium tracking-[-0.012em]">{st.name}</span>
-                                <span className="flex items-center gap-2 shrink-0">
-                                  <span className="mono text-[10.5px] tabular-nums text-[var(--text-muted)]">{n}</span>
-                                  <ArrowRight className="w-3.5 h-3.5 text-[var(--accent-text)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
+                        {citiesInState(st.slug).map((c) => (
+                          <li key={c.slug}>
+                            <Link
+                              href={`/markets/${st.slug}/${c.slug}`}
+                              onClick={closeMenu}
+                              className="block py-1.5 px-2 -mx-2 text-[13.5px] text-[var(--text-body)] hover:bg-[var(--bg-alt)] hover:text-[var(--accent-text)] transition-colors"
+                            >
+                              {c.name}
+                            </Link>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   ))}
                 </div>
               </>
-            ) : (
-              <>
-                <StepBack onBack={() => setSelectedState(null)} backLabel="All states"
-                  eyebrow={`${stateSel.name.toUpperCase()} · Step 2 of 2`} title="Pick your market." />
-                <ul className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-                  {citiesInState(stateSel.slug).map((c) => (
-                    <li key={c.slug} className="flex">
-                      <Link
-                        href={`/markets/${c.stateSlug}/${c.slug}`}
-                        onClick={closeMenu}
-                        className="group w-full flex items-center justify-between gap-3 px-4 py-3.5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                      >
-                        <span className="min-w-0">
-                          <span className="block display-md !text-[15px]">{c.name}</span>
-                          <span className="block mt-0.5 text-[12px] leading-snug text-[var(--text-muted)]">
-                            {c.industries[0]} · {c.competition} competition
-                          </span>
-                        </span>
-                        <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 body-sm">
-                  Or the whole state at once:{" "}
-                  <Link href={`/markets/${stateSel.slug}`} onClick={closeMenu}
-                    className="font-semibold text-[var(--accent-text)] hover:underline underline-offset-4">
-                    all {stateSel.name} markets
-                  </Link>
-                </p>
-              </>
             )}
-            <MegaFooter onAct={closeMenu} />
+            <MegaFooter
+              onAct={closeMenu}
+              label="Don't see your market?"
+              text="We're expanding toward all 50 states. Tell us where you are — the plan comes back mapped to your market either way."
+            />
           </MegaPanel>
         )}
       </header>
@@ -418,14 +416,13 @@ function StepBack({ onBack, backLabel, eyebrow, title }: {
   );
 }
 
-function MegaFooter({ onAct }: { onAct: () => void }) {
+function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string; text?: string }) {
   return (
     <div className="flex items-center justify-between flex-wrap gap-6 mt-9 pt-6 border-t border-[var(--border)]">
       <div className="max-w-[52ch]">
-        <p className="mb-1.5 eyebrow">Not sure which one you need?</p>
+        <p className="mb-1.5 eyebrow">{label ?? "Not sure which one you need?"}</p>
         <p className="text-[13.5px] leading-relaxed text-[var(--text-secondary)]">
-          Most businesses need two or three, not thirteen. Tell us what is getting
-          stuck and we will map it — free, in one business day.
+          {text ?? "Most businesses need two or three, not thirteen. Tell us what is getting stuck and we will map it — free, in one business day."}
         </p>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
