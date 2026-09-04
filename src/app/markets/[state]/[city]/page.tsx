@@ -151,7 +151,7 @@ export default async function CityMarketHub({ params }: Params) {
             {LOCAL_SERVICES.map((s) => (
               <Link
                 key={s.slug}
-                href={enriched ? `/local/${s.slug}/${st.slug}/${rec.city_slug}` : `/local/${s.slug}`}
+                href={`/local/${s.slug}/${st.slug}/${rec.city_slug}`}
                 className="group card-cell p-7"
               >
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{s.botName}</p>

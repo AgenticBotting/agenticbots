@@ -1,35 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import { PlanCta } from "@/components/marketing";
-import { LOCAL_SERVICES, STATES, citiesInState, getService, getState, fmt } from "@/lib/geo/data";
+import { LOCAL_SERVICES, citiesInState, getService, fmt } from "@/lib/geo/data";
+import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 
 type Params = { params: Promise<{ service: string; state: string }> };
 
 export function generateStaticParams() {
-  return LOCAL_SERVICES.flatMap((s) => STATES.map((st) => ({ service: s.slug, state: st.slug })));
+  return LOCAL_SERVICES.flatMap((s) => ALL_STATES.map((st) => ({ service: s.slug, state: st.slug })));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { service, state } = await params;
-  const svc = getService(service); const st = getState(state);
+  const svc = getService(service); const st = getDatasetState(state);
   if (!svc || !st) return {};
+  const cities = allCitiesInState(state);
+  const enriched = citiesInState(state).length > 0;
   return {
     title: `${svc.name} in ${st.name}`,
-    description: `${svc.name} for ${st.name} businesses — market-tuned agent systems in ${citiesInState(state).slice(0, 3).map((c) => c.name).join(", ")}${citiesInState(state).length > 3 ? ` and ${citiesInState(state).length - 3} more metros` : ""}.`,
+    description: `${svc.name} for ${st.name} businesses — ${svc.botName} deployed across ${cities.length} cities including ${cities.slice(0, 3).map((c) => c.city).join(", ")}.`,
     alternates: { canonical: `/local/${service}/${state}` },
+    ...(enriched ? {} : { robots: { index: false, follow: true } }),
   };
 }
 
 export default async function StateHub({ params }: Params) {
   const { service, state } = await params;
-  const svc = getService(service); const st = getState(state);
+  const svc = getService(service); const st = getDatasetState(state);
   if (!svc || !st) notFound();
-  const cities = citiesInState(state);
-  const totalBiz = cities.reduce((s, c) => s + c.businessCount, 0);
+  const all = allCitiesInState(state);
+  const enrichedCities = citiesInState(state);
+  const totalBiz = enrichedCities.reduce((s, c) => s + c.businessCount, 0);
 
   return (
     <>
@@ -47,27 +51,41 @@ export default async function StateHub({ params }: Params) {
               {svc.name} across {st.name}.
             </h1>
             <p className="body-lg mt-6 max-w-[54ch]">
-              {cities.length} {st.name} metro{cities.length > 1 ? "s" : ""}, roughly {fmt.format(totalBiz)} businesses
-              between them — each market page below carries its own local read, CPC band and industry mix, because
-              the same playbook priced for {cities[0].name} would be wrong in {cities[cities.length - 1].name}.
+              {all.length} {st.name} cities covered
+              {totalBiz > 0 ? `, roughly ${fmt.format(totalBiz)} businesses across the focus metros alone` : ""} —
+              {svc.botName} deploys remotely into any of them, wired into the tools each business already uses.
             </p>
             <div className="mt-8"><PlanCta source={`local-state-${svc.slug}-${st.slug}`} /></div>
           </Container>
         </section>
 
-        <Section variant="alt" eyebrow="Markets" heading={`${st.name} metros we deploy in.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {cities.map((c) => (
-              <Link key={c.slug} href={`/local/${svc.slug}/${st.slug}/${c.slug}`} className="group card-cell p-7">
-                <p className="display-md group-hover:text-[var(--accent-text)] transition-colors">{c.name}</p>
-                <p className="body-xs mt-2">
-                  ~{fmt.format(c.businessCount)} businesses · {c.industries[0]} · competition {c.competition}
+        <Section variant="alt" eyebrow={`${all.length} cities`} heading={`${svc.name} across ${st.name}.`}
+          sub="Grouped by metro — every city links to its own service page.">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[...new Map(all.map((c) => [c.metro, all.filter((x) => x.metro === c.metro)])).entries()].map(([metro, list]) => (
+              <div key={metro} className="border border-[var(--border)] bg-white p-5">
+                <p className="flex items-baseline justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--border)]">
+                  <span className="display-md !text-[15px]">{metro} metro</span>
+                  <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+                    {list.length} {list.length > 1 ? "cities" : "city"}
+                  </span>
                 </p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
-                  {svc.name} in {c.name}
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </span>
-              </Link>
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                  {list.map((c) => (
+                    <li key={c.city_slug}>
+                      <Link
+                        href={`/local/${svc.slug}/${st.slug}/${c.city_slug}`}
+                        className="group flex items-center gap-1.5 py-1 text-[13px] text-[var(--text-body)] hover:text-[var(--accent-text)] transition-colors"
+                      >
+                        <span className="truncate">{c.city}</span>
+                        {isEnriched(c.state_slug, c.city_slug) && (
+                          <span className="h-1.5 w-1.5 shrink-0 bg-accent-500" title="Focus market" />
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </Section>
