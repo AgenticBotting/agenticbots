@@ -142,6 +142,11 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
 }
+@keyframes bot-belt {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @keyframes bot-orbit {
   from { offset-distance: 0%; }
   to   { offset-distance: 100%; }
@@ -546,6 +551,27 @@
   .animate-fade-in  { animation: fade-in 0.45s ease-out both; }
   .animate-pulse-dot{ animation: pulse-dot 2s ease-in-out infinite; }
   .animate-bot-wake { animation: bot-wake 9s ease-in-out infinite; }
+
+  /* Two belts of bots drifting opposite ways. Both stop when the pointer
+     or keyboard focus is anywhere in the conveyor, so nothing a visitor
+     reaches for is still moving. The track holds the list twice and
+     travels exactly -50%, which is what makes the loop seamless. */
+  .bot-belt {
+    animation-name: bot-belt;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+  .bot-belt-reverse { animation-direction: reverse; }
+  .bot-conveyor:hover .bot-belt,
+  .bot-conveyor:focus-within .bot-belt { animation-play-state: paused; }
+
+  /* The belts run edge to edge; fade the ends so items arrive and leave
+     rather than being chopped off by the container. */
+  .bot-conveyor {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
 
   /* Duration comes from the component so each orbit can set its own pace. */
   .bot-orbit {

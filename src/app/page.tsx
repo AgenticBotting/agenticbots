@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotOrbit, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -129,8 +129,13 @@ function BotRoster() {
           />
         </Reveal>
 
+        {/* The fleet in one glance. The full catalog lives on the pillar
+            pages below — the homepage should not try to be an index. */}
+        <div className="mt-12 -mx-6 sm:-mx-8">
+          <BotConveyor />
+        </div>
         {/* The two pillars, one line each — the old two-card section, folded in. */}
-        <div className="mt-9 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] max-w-[860px]">
+        <div className="mt-12 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] max-w-[860px]">
           {CATALOG.map((p) => (
             <Link key={p.slug} href={`/${p.slug}`} className="group card-cell px-6 py-4 flex items-center justify-between gap-4">
               <span>
@@ -144,9 +149,6 @@ function BotRoster() {
           ))}
         </div>
 
-        <div className="mt-14">
-          <BotScrollList />
-        </div>
       </Container>
     </section>
   );
