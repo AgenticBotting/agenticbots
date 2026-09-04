@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
-import { Container, Reveal, SectionHeader, BrandMark, Section } from "@/components/ui";
+import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
 import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
@@ -348,6 +348,82 @@ function FinalCta() {
 
 /* ────────────────────────────────────────────────────────────────────── */
 
+
+/* ──────────────────────────  WHO THIS IS FOR  ───────────────────────── */
+
+/* The site sells to a plumber and to a VP of growth. Nothing on the page
+   showed either of them. Faces and job sites do the work that another
+   paragraph of copy cannot. */
+const TRADES = [
+  { id: "W-01", label: "Home-service crew on a job", spec: "1200×1500 · vertical · real crew, real van, natural light. No stock handshakes.", who: "Home services", eg: "Plumbing · HVAC · roofing · electrical" },
+  { id: "W-02", label: "Owner on the phone in a truck", spec: "1200×1500 · vertical · the moment a lead comes in and nobody can answer.", who: "Owner-operators", eg: "The person who is also doing four other jobs" },
+  { id: "W-03", label: "Ops lead at a desk, two screens", spec: "1200×1500 · vertical · CRM visible but unreadable. Focus on the person.", who: "Multi-location", eg: "Franchise groups · regional operators" },
+  { id: "W-04", label: "Marketing lead presenting", spec: "1200×1500 · vertical · a meeting, not a boardroom cliché.", who: "In-house teams", eg: "The growth lead who needs headcount they cannot hire" },
+];
+
+function WhoFor() {
+  return (
+    <Section
+      variant="alt"
+      eyebrow="Who this is for"
+      heading={<>Built for the people <span className="em-green">answering the phone.</span></>}
+      sub="Whether you run three trucks or three regions, the failure is the same: leads arrive faster than anyone can work them."
+    >
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        {TRADES.map((t) => (
+          <div key={t.id}>
+            <MediaSlot id={t.id} ratio="4 / 5" label={t.label} spec={t.spec} />
+            <p className="display-md mt-4">{t.who}</p>
+            <p className="body-sm mt-1.5">{t.eg}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ───────────────────────────  IN THEIR WORDS  ───────────────────────── */
+
+/* The audit's biggest conversion gap and the biggest design gap have the
+   same fix: real people. Copy stays empty until real quotes exist. */
+const VOICES = [
+  { id: "V-01", role: "Owner, plumbing company", place: "Awaiting first client quote" },
+  { id: "V-02", role: "Marketing lead, HVAC group", place: "Awaiting first client quote" },
+  { id: "V-03", role: "VP Growth, services platform", place: "Awaiting first client quote" },
+];
+
+function Voices() {
+  return (
+    <Section
+      variant="light"
+      eyebrow="In their words"
+      heading="The part we cannot write ourselves."
+      sub="These slots stay empty until real clients fill them. Nothing here is invented."
+    >
+      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+        {VOICES.map((v) => (
+          <div key={v.id} className="card-cell p-7">
+            <MediaSlot
+              id={v.id}
+              ratio="1 / 1"
+              label="Client headshot"
+              spec="800×800 · square · real person, plain background, eyes to camera."
+              className="w-20"
+            />
+            <p className="body-base mt-5 text-[var(--text-muted)] italic">
+              &ldquo;Quote goes here — one specific thing that changed, in their words, with a number
+              they are willing to stand behind.&rdquo;
+            </p>
+            <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mt-5">
+              {v.role} · {v.place}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -357,9 +433,11 @@ export default function HomePage() {
         <Hero />
         <ProofBar />
         <HowSimple />
+        <WhoFor />
         <BotRoster />
         <DemoSection />
         <FieldBand />
+        <Voices />
         <Faq />
         <FinalCta />
       </main>

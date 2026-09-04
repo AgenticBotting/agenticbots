@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Container, BotFace } from "@/components/ui";
+import { Container, BotFace, MediaSlot } from "@/components/ui";
 import { BlogOptin, ReadingProgress, PostToc, PostOptin, ShareRow } from "@/components/marketing";
 import { POSTS, getPost, postHeadings, SORTED_POSTS, type Block } from "@/lib/posts";
 import { JsonLd, articleLd } from "@/components/JsonLd";
@@ -140,6 +140,15 @@ export default async function PostPage({ params }: Params) {
 
               <PostOptin source={`blog-hero-${post.slug}`} className="mt-8" />
             </div>
+
+            <MediaSlot
+              id={`B-${post.slug}`}
+              ratio="21 / 9"
+              label={`Cover image — ${post.title}`}
+              spec="2100×900 · wide · one idea, literal not abstract. A phone screen, a whiteboard, a van, a dashboard."
+              className="mt-14"
+              priority
+            />
           </Container>
         </section>
 
