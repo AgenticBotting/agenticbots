@@ -29,3 +29,4 @@ export { AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand } f
 export type { TriadItem, ZigRow } from "./GeoSections";
 export { PostOptin } from "./PostOptin";
 export { ShareRow } from "./ShareRow";
+export { BotOrbit } from "./BotOrbit";

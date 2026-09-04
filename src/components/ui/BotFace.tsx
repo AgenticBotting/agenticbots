@@ -15,14 +15,18 @@ import { cn } from "@/lib/utils";
 export const BOT_VIEWBOX = "0 0 100 32.13";
 export const BOT_RATIO = 3.112;
 
-export const BOT_PATH = [
-  // Body: diagonal in from the left, flat top, semicircular right cap, flat bottom.
-  "M18.4 0H83.94a16.07 16.07 0 0 1 0 32.13H0Z",
-  // Left eye.
+/** Body: diagonal in from the left, flat top, semicircular right cap, flat bottom. */
+export const BOT_BODY_PATH = "M18.4 0H83.94a16.07 16.07 0 0 1 0 32.13H0Z";
+
+/** The two eyes, as their own shapes — for painting them a second color
+    instead of punching them through. */
+export const BOT_EYE_PATHS = [
   "M27.03 10.64h14.16a5.51 5.51 0 0 1 0 11.02H27.03a5.51 5.51 0 0 1 0-11.02Z",
-  // Right eye.
   "M66.21 10.64h14.5a5.51 5.51 0 0 1 0 11.02h-14.5a5.51 5.51 0 0 1 0-11.02Z",
-].join("");
+];
+
+/** Body with the eyes as evenodd cutouts — the mark on any background. */
+export const BOT_PATH = [BOT_BODY_PATH, ...BOT_EYE_PATHS].join("");
 
 export function BotFace({ className }: { className?: string }) {
   return (

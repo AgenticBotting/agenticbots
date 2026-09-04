@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotOrbit, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -31,7 +31,9 @@ function Hero() {
               are asleep for.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <PlanCta source="home-hero" />
+              <BotOrbit>
+                <PlanCta source="home-hero" />
+              </BotOrbit>
               <Link
                 href="/how-it-works"
                 className="text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
@@ -39,22 +41,26 @@ function Hero() {
                 See how it works
               </Link>
             </div>
-            <dl className="mt-9 pt-7 border-t border-[var(--border)] grid grid-cols-3 gap-8 max-w-[480px]">
+            <dl className="mt-9 pt-8 border-t border-[var(--border)] grid grid-cols-3 gap-6 max-w-[520px]">
               {[
-                { v: "41s", u: "median", l: "First response" },
-                { v: "24/7", u: "coverage", l: "Nights and weekends" },
-                { v: "14d", u: "to live", l: "First bot in production" },
+                { v: "41", u: "s", l: "To the first reply" },
+                { v: "24/7", u: "", l: "Nights and weekends" },
+                { v: "14", u: "d", l: "To your first bot live" },
               ].map((s) => (
                 <div key={s.l}>
-                  <dt className="flex items-baseline gap-1.5">
-                    <span className="text-[1.375rem] font-semibold tracking-[-0.03em] tabular-nums">
+                  <dt className="flex items-baseline">
+                    <span className="text-[clamp(1.9rem,3vw,2.5rem)] font-semibold tracking-[-0.045em] leading-[0.9] tabular-nums text-[var(--foreground)]">
                       {s.v}
                     </span>
-                    <span className="mono text-[10.5px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                      {s.u}
-                    </span>
+                    {s.u && (
+                      <span className="text-[clamp(1.1rem,1.6vw,1.4rem)] font-semibold tracking-[-0.03em] leading-none text-[var(--accent-text)]">
+                        {s.u}
+                      </span>
+                    )}
                   </dt>
-                  <dd className="body-xs mt-2 leading-snug">{s.l}</dd>
+                  <dd className="text-[13.5px] font-medium tracking-[-0.01em] mt-3 leading-snug text-[var(--text-body)]">
+                    {s.l}
+                  </dd>
                 </div>
               ))}
             </dl>

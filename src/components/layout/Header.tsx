@@ -10,6 +10,7 @@ import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, type Region } from "@/lib/geo/regions";
 import { MarketSearch } from "./MarketSearch";
+import { BotOrbit } from "@/components/marketing/BotOrbit";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
@@ -129,14 +130,18 @@ export function Header() {
             </nav>
 
             <div className="justify-self-end flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => { closeMenu(); openBotPlan("header"); }}
-                className="hidden sm:inline-flex btn btn-primary h-11"
-              >
-                Get your bot plan
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              {/* Green body, black eyes — the header rides on ink-950, so a
+                  cutout-eyed bot would lose its face against the dark. */}
+              <BotOrbit tone="text-accent-500" eyes="text-ink-950" className="hidden sm:inline-flex">
+                <button
+                  type="button"
+                  onClick={() => { closeMenu(); openBotPlan("header"); }}
+                  className="btn btn-primary h-11"
+                >
+                  Get your bot plan
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </BotOrbit>
               <button
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
