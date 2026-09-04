@@ -26,17 +26,27 @@ export function PostToc({ items }: { items: { id: string; text: string }[] }) {
 
   if (!items.length) return null;
 
+  const jump = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    history.replaceState(null, "", `#${id}`);
+  };
+
   const list = (
     <ol className="space-y-2.5">
       {items.map((h) => (
         <li key={h.id}>
           <a
             href={`#${h.id}`}
+            onClick={jump(h.id)}
             aria-current={active === h.id ? "location" : undefined}
             className={cn(
               "block text-[13px] leading-snug transition-colors border-l-2 pl-3 py-0.5",
               active === h.id
-                ? "border-accent-500 text-[#1A1A1A] font-medium"
+                ? "border-accent-500 text-[var(--foreground)] font-medium"
                 : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-body)]"
             )}
           >

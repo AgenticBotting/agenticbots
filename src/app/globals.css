@@ -152,7 +152,12 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  /* NO global `scroll-behavior: smooth`. Next scrolls to the top on every
+     route change, and a smooth scroll animates that — the new page renders
+     mid-animation and strands the reader partway down (measured: leaving a
+     page at 4509px landed the next one at 121px, not 0). Smooth belongs on
+     the handful of in-page anchors that want it, and those opt in via
+     scrollIntoView — see PostToc. */
 
   body {
     background: var(--background);
