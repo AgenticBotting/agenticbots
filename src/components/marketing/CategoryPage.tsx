@@ -8,6 +8,7 @@ import { StatBand } from "./StatBand";
 import { FaqAccordion } from "./FaqAccordion";
 import { getPillar, categoryHref, type Category } from "@/lib/catalog";
 import { renderHeadline } from "@/lib/headline";
+import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 
 const STACK = [
   ["CRM", "HubSpot · Salesforce · Pipedrive · Close · GoHighLevel"],
@@ -24,6 +25,15 @@ export function CategoryPage({ category }: { category: Category }) {
 
   return (
     <>
+      <JsonLd data={[
+        serviceLd({ name: `${category.name} (${category.botName})`, description: category.blurb, path: `/${category.pillar}/${category.slug}` }),
+        breadcrumbLd([
+          { name: "Home", path: "/" },
+          { name: pillar.name, path: `/${pillar.slug}` },
+          { name: category.name, path: `/${category.pillar}/${category.slug}` },
+        ]),
+        faqLd(category.faqs),
+      ]} />
       <Header />
       <main>
         {/* ── Hero: numeral, name, outcome ── */}

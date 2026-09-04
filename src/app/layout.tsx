@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ExitIntent, RogueBot } from "@/components/marketing";
+import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: {
     default: "AgenticBots — Bots that get you customers",
     template: "%s | AgenticBots",
@@ -71,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
+        <JsonLd data={[orgLd, webSiteLd]} />
         {children}
         <BotPlanFlow />
         <ExitIntent />

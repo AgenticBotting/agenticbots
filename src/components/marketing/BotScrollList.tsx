@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { BotIndex } from "@/components/ui";
 import { ALL_CATEGORIES, categoryHref } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -59,14 +58,7 @@ export function BotScrollList() {
       {/* Pinned detail */}
       <div className="hidden lg:block">
         <div className="sticky top-32">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current.slug}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            >
+          <div key={current.slug} className="animate-fade-up">
               <BotIndex index={current.index} size="lg" />
               <p className="mono text-[11px] uppercase tracking-[0.11em] text-[var(--text-muted)] mt-7">
                 {current.pillar} · {current.name}
@@ -81,18 +73,16 @@ export function BotScrollList() {
                 Open {current.botName}
                 <ArrowRight className="w-4 h-4" />
               </Link>
-            </motion.div>
-          </AnimatePresence>
+          </div>
 
           <div className="mt-12 flex items-center gap-3">
             <span className="mono text-[11px] tabular-nums text-[var(--text-muted)]">
               {String(active + 1).padStart(2, "0")} / {ALL_CATEGORIES.length}
             </span>
             <span className="relative h-px flex-1 bg-[var(--border)]">
-              <motion.span
-                className="absolute inset-y-0 left-0 bg-ink-950"
-                animate={{ width: `${((active + 1) / ALL_CATEGORIES.length) * 100}%` }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              <span
+                className="absolute inset-y-0 left-0 bg-ink-950 transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ width: `${((active + 1) / ALL_CATEGORIES.length) * 100}%` }}
               />
             </span>
           </div>

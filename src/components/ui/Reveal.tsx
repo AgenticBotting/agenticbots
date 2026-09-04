@@ -1,9 +1,14 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
-/** Scroll-triggered fade-up. Fires once, 16px travel, matches --ease-smooth. */
+/**
+ * Scroll-triggered fade-up. CSS transition + one IntersectionObserver —
+ * replaced framer-motion (≈45KB gz) for a 150KB route budget (Phase 7).
+ * Fires once; `prefers-reduced-motion` is honored by the global CSS rule
+ * that zeroes transition durations.
+ */
 export function Reveal({
   children,
   className,
@@ -14,17 +19,35 @@ export function Reveal({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -60px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 16 }}
-      animate={inView ? { opacity: 1, y: 0 } : undefined}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
+      style={{ transitionDelay: shown ? `${delay}s` : undefined }}
+      className={cn(
+        "transition-[opacity,transform] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+        shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+        className
+      )}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

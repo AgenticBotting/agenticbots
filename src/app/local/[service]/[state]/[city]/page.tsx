@@ -8,6 +8,7 @@ import { BotPlanForm, PlanCta, StatBand, FaqAccordion } from "@/components/marke
 import { CITIES, LOCAL_SERVICES, getService, getState, getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { getCategory } from "@/lib/catalog";
 import type { PillarSlug } from "@/lib/catalog";
+import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 
 type Params = { params: Promise<{ service: string; state: string; city: string }> };
 
@@ -49,6 +50,16 @@ export default async function CityPage({ params }: Params) {
 
   return (
     <>
+      <JsonLd data={[
+        serviceLd({ name: `${svc.name} in ${ct.name}, ${ct.stateAbbr}`, description: svc.intro, path: `/local/${svc.slug}/${st.slug}/${ct.slug}`, areaServed: `${ct.name}, ${ct.stateName}` }),
+        breadcrumbLd([
+          { name: "Home", path: "/" },
+          { name: svc.name, path: `/local/${svc.slug}` },
+          { name: st.name, path: `/local/${svc.slug}/${st.slug}` },
+          { name: ct.name, path: `/local/${svc.slug}/${st.slug}/${ct.slug}` },
+        ]),
+        faqLd(faqs),
+      ]} />
       <Header />
       <main>
         <section className="border-b border-[var(--border)]">

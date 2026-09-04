@@ -6,6 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, BotFace } from "@/components/ui";
 import { BlogOptin, ReadingProgress, PostToc } from "@/components/marketing";
 import { POSTS, getPost, postHeadings, SORTED_POSTS, type Block } from "@/lib/posts";
+import { JsonLd, articleLd } from "@/components/JsonLd";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -111,6 +112,7 @@ export default async function PostPage({ params }: Params) {
 
   return (
     <>
+      <JsonLd data={articleLd({ title: post.title, description: post.excerpt, slug: post.slug, date: post.date })} />
       <ReadingProgress />
       <Header />
       <main className="prose-surface">
