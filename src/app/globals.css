@@ -65,6 +65,7 @@
   --color-brand-500:  var(--color-accent-400);
 
   /* ── Bot field: the dim majority of the pattern ── */
+  --color-caution: #E8A13C; /* blocked/warning states in log surfaces */
   --color-bot-dim: #222622;
   --color-bot-mid: #343A34;
 

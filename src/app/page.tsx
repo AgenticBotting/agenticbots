@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Plug, Rocket, LineChart, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Reveal, SectionHeader, ButtonLink, BrandMark, Section } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, SecurityBlock, AgentTrace, CplDecayChart, BeforeAfterChart } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, AgentTrace, CplDecayChart, BeforeAfterChart, SignalFlow, Timeline, AuditLogPanel } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -33,10 +33,6 @@ function Hero() {
                 See how it works
               </Link>
             </div>
-            <p className="body-base mt-5 max-w-[50ch]">
-              Deployed the same way for a three-hundred-person revenue org and a
-              three-truck shop. The leak is in the same place in both.
-            </p>
             <dl className="mt-9 pt-7 border-t border-[var(--border)] grid grid-cols-3 gap-8 max-w-[480px]">
               {[
                 { v: "41s", u: "median", l: "First response" },
@@ -67,102 +63,18 @@ function Hero() {
   );
 }
 
-/* ──────────────────────────  WHAT A BOT DOES  ───────────────────────── */
+/* ──────────────────────────  THE SYSTEM, DRAWN  ─────────────────────── */
 
-const HOW_PLAIN = [
-  {
-    n: "01",
-    title: "It watches",
-    body: "Your ads, your inbox, your forms, your phone, your CRM. Everywhere a customer might show up or a deal might stall.",
-  },
-  {
-    n: "02",
-    title: "It acts",
-    body: "Answers the lead, writes the follow-up, fixes the bid, books the call, updates the record — in seconds, by the rules you set.",
-  },
-  {
-    n: "03",
-    title: "It reports",
-    body: "You get one plain-English view of what it did, what it cost, and what came back. No dashboard archaeology.",
-  },
-];
-
-function WhatABotDoes() {
+function SystemSection() {
   return (
-    <section className="section-pad border-b border-[var(--border)]">
-      <Container>
-        <Reveal>
-          <SectionHeader
-            eyebrow="In plain english"
-            title={<>A bot is just work that <span className="em-green">happens without you.</span></>}
-            copy="Not a chatbot on your website. A worker that watches your business, does the repetitive part correctly every time, and tells you what happened. It does not call in sick and it does not forget step four."
-          />
-        </Reveal>
-
-        <div className="mt-14 grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
-          {HOW_PLAIN.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.08}>
-              <div className="bg-white h-full p-7 sm:p-8">
-                <span
-                  className="text-[12px] text-[var(--accent-text)] mono"
-                >
-                  {s.n}
-                </span>
-                <h3 className="display-lg mt-4">{s.title}</h3>
-                <p className="body-base mt-3">{s.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-/* ────────────────────────────  THE PILLARS  ─────────────────────────── */
-
-function Pillars() {
-  return (
-    <section className="relative overflow-hidden section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
-      <BrandMark className="-right-24 top-10" size={560} />
-      <Container className="relative">
-        <Reveal>
-          <SectionHeader
-            eyebrow="Two halves of one problem"
-            title={<>Getting found, and <span className="em-green">getting paid.</span></>}
-            copy="Marketing bots create the demand. Sales bots capture it. Most businesses are leaking on one side or the other — usually both."
-          />
-        </Reveal>
-
-        <div className="mt-14 grid md:grid-cols-2 gap-6">
-          {CATALOG.map((pillar, i) => (
-            <Reveal key={pillar.slug} delay={i * 0.08}>
-              <Link
-                href={`/${pillar.slug}`}
-                className="card card-hover group block h-full p-8 sm:p-10"
-              >
-                <p className="eyebrow">{pillar.tagline}</p>
-                <h3 className="display-xl mt-3">{pillar.name}</h3>
-                <p className="body-base mt-4 max-w-[44ch]">{pillar.intro}</p>
-
-                <ul className="mt-7 flex flex-wrap gap-2">
-                  {pillar.categories.map((c) => (
-                    <li key={c.slug} className="chip">
-                      {c.botName}
-                    </li>
-                  ))}
-                </ul>
-
-                <span className="mt-8 inline-flex items-center gap-2 text-[14px] font-medium text-[var(--accent-text)]">
-                  Explore {pillar.name.toLowerCase()} bots
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </span>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </Container>
-    </section>
+    <Section
+      id="system"
+      variant="light"
+      eyebrow={<>In plain english <span className="eyebrow-dim">· one drawing</span></>}
+      heading={<>A bot is just work that <span className="em-green">happens without you.</span></>}
+    >
+      <SignalFlow />
+    </Section>
   );
 }
 
@@ -170,15 +82,32 @@ function Pillars() {
 
 function BotRoster() {
   return (
-    <section className="section-pad border-b border-[var(--border)]">
-      <Container>
+    <section className="relative overflow-hidden section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
+      <BrandMark className="-right-24 top-10" size={560} />
+      <Container className="relative">
         <Reveal>
           <SectionHeader
             eyebrow="The full roster"
-            title="Thirteen bots. Pick the ones that fix your bottleneck."
-            copy="Nobody buys all thirteen. A two-person shop and a Fortune 500 team both start the same way — one bot on the worst bottleneck, proven, then the next."
+            title="Thirteen bots. Two halves of one problem."
+            copy="Marketing bots create the demand; sales bots capture it. Nobody buys all thirteen — start on the worst bottleneck, prove it, add the next."
           />
         </Reveal>
+
+        {/* The two pillars, one line each — the old two-card section, folded in. */}
+        <div className="mt-9 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] max-w-[860px]">
+          {CATALOG.map((p) => (
+            <Link key={p.slug} href={`/${p.slug}`} className="group card-cell px-6 py-4 flex items-center justify-between gap-4">
+              <span>
+                <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--accent-text)]">{p.tagline}</span>
+                <span className="block display-md group-hover:text-[var(--accent-text)] transition-colors">
+                  {p.name} <span className="text-[var(--text-muted)] font-normal">· {p.categories.length} bots</span>
+                </span>
+              </span>
+              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          ))}
+        </div>
+
         <div className="mt-14">
           <BotScrollList />
         </div>
@@ -225,56 +154,56 @@ function ResultsSection() {
 
 /* ───────────────────────────  HOW IT WORKS  ─────────────────────────── */
 
-const BUILD_STEPS = [
-  { icon: LineChart, title: "Audit", body: "We look at where leads come from, what happens to them, and where they die. You get the map whether or not you hire us." },
-  { icon: Plug, title: "Connect", body: "Bots wire into the tools you already run — your CRM, calendar, phone, ad accounts and inbox. Nothing gets replaced." },
-  { icon: Rocket, title: "Launch", body: "First bots go live in monitored mode against real traffic, so edge cases get caught before a customer hits one." },
-  { icon: Check, title: "Tune", body: "Weekly passes on what the bots did and what it produced. Rules tightened, budget moved, new bots added as the last one proves out." },
-];
-
 function HowItWorks() {
   return (
-    <section className="section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
-      <Container>
-        <Reveal>
-          <SectionHeader
-            eyebrow="How we work"
-            title="Four steps, first bot live in about two weeks."
-          />
-        </Reveal>
+    <Section
+      id="process"
+      variant="light"
+      eyebrow={<>How we work <span className="eyebrow-dim">· first bot live ~2 weeks</span></>}
+      heading="Four steps on one rail."
+      cta={
+        <ButtonLink href="/how-it-works" variant="outline">
+          See the full process
+          <ArrowRight className="w-4 h-4" />
+        </ButtonLink>
+      }
+    >
+      <Timeline />
+    </Section>
+  );
+}
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {BUILD_STEPS.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <Reveal key={s.title} delay={i * 0.07}>
-                <div className="card h-full p-7">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-none bg-ink-950 text-white">
-                    <Icon className="w-4 h-4" />
-                  </span>
-                  <p
-                    className="mt-5 text-[12px] text-[var(--text-muted)] mono"
-                  >
-                    0{i + 1}
-                  </p>
-                  <h3 className="display-md mt-1.5">{s.title}</h3>
-                  <p className="body-sm mt-2.5">{s.body}</p>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
+/* ─────────────────────────────  SECURITY  ───────────────────────────── */
 
-        <Reveal delay={0.1}>
-          <div className="mt-10">
-            <ButtonLink href="/how-it-works" variant="outline">
-              See the full process
-              <ArrowRight className="w-4 h-4" />
-            </ButtonLink>
-          </div>
-        </Reveal>
-      </Container>
-    </section>
+const GOVERNANCE = [
+  ["Your data stays in your accounts", "scoped credentials you can revoke"],
+  ["Human-in-the-loop by default", "explicit escalation rules, monitored launch"],
+  ["Every action logged", "what, when, on which record, and why"],
+  ["Rollback, always", "pause any bot instantly, nothing breaks"],
+  ["Least-privilege access", "read-only wherever writing isn't required"],
+  ["DPA on request", "procurement-ready documentation"],
+];
+
+function Security() {
+  return (
+    <Section
+      id="security"
+      variant="dark"
+      eyebrow="Security & governance"
+      heading="Autonomy you can audit."
+    >
+      <div className="grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-16 items-start">
+        <ul className="border-t border-ink-700">
+          {GOVERNANCE.map(([t, d]) => (
+            <li key={t} className="flex items-baseline justify-between gap-6 py-4 border-b border-ink-700">
+              <span className="text-[15px] font-medium text-white">{t}</span>
+              <span className="mono text-[11px] text-ink-400 text-right shrink-0 max-w-[24ch]">{d}</span>
+            </li>
+          ))}
+        </ul>
+        <AuditLogPanel />
+      </div>
+    </Section>
   );
 }
 
@@ -285,7 +214,6 @@ const HOME_FAQ = [
   { q: "Do I have to replace my current tools?", a: "No. Bots plug into the CRM, calendar, phone system, ad accounts and email platform you already use. Replacing your stack is almost never the right first move." },
   { q: "How fast does something go live?", a: "The audit takes a few days. The first bot is typically live in monitored mode inside two weeks, and fully autonomous a couple of weeks after that." },
   { q: "Are we too small — or too big — for this?", a: "Neither. A two-truck contractor and a 400-person sales organisation lose customers the same way: nobody answered fast enough and nobody followed up. Small teams usually see the faster lift because there is nobody covering nights. Large teams see the bigger number, because the leak is multiplied across every rep." },
-  { q: "What if I only need one thing fixed?", a: "That is the normal starting point. Pick the single bot that addresses your worst bottleneck, prove it, then add. Nobody should buy thirteen bots on day one." },
   { q: "Who owns everything you build?", a: "You do. The accounts, the data, the sequences, the automations. If we part ways, it all stays with you and keeps running." },
 ];
 
@@ -354,8 +282,7 @@ export default function HomePage() {
         <Hero />
         <ProofBar />
         <ProblemDiagram />
-        <WhatABotDoes />
-        <Pillars />
+        <SystemSection />
         <BotRoster />
         <DemoSection />
         <ResultsSection />
@@ -369,7 +296,7 @@ export default function HomePage() {
           ]}
         />
         <HowItWorks />
-        <SecurityBlock />
+        <Security />
         <Faq />
         <FinalCta />
       </main>
