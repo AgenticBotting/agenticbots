@@ -21,3 +21,4 @@ export { RogueBot } from "./RogueBot";
 export { SignalFlow } from "./SignalFlow";
 export { Timeline } from "./Timeline";
 export { AuditLogPanel } from "./AuditLogPanel";
+export { AgentField } from "./AgentField";

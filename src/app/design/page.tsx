@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Section, BotIndex, BotPattern, BrandMark, ButtonLink, Container } from "@/components/ui";
 import {
   ProofBar, ProblemDiagram, SecurityBlock, StatBand, PipelineMockup,
-  FaqAccordion, BotPlanForm, PlanCta,
+  FaqAccordion, BotPlanForm, PlanCta, AgentField,
 } from "@/components/marketing";
 
 export const metadata: Metadata = {
@@ -142,6 +142,11 @@ export default function DesignPage() {
 
       <Label>BotPlanForm</Label>
       <Container className="py-10 max-w-[640px]"><BotPlanForm source="design" /></Container>
+
+      <Label>AgentField — live</Label>
+      <div className="bg-ink-950 on-dark px-6 py-6">
+        <AgentField height={220} />
+      </div>
 
       <Label>Brand fields</Label>
       <div className="relative bg-ink-900 h-[320px] overflow-hidden">

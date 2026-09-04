@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Reveal, SectionHeader, BrandMark, Section } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -182,6 +182,45 @@ function DemoSection() {
 
 /* ───────────────────────────  HOW IT WORKS  ─────────────────────────── */
 
+/* ─────────────────────────────  THE FIELD  ─────────────────────────── */
+
+function FieldBand() {
+  return (
+    <section className="bg-ink-900 on-dark border-b border-ink-700">
+      <div className="h-px rule-agent opacity-60" />
+      <Container className="section-pad-sm">
+        <div className="max-w-[52ch]">
+          <p className="eyebrow mb-4">
+            What &ldquo;every hour&rdquo; looks like <span className="eyebrow-dim">· live</span>
+          </p>
+          <h2 className="display-xl text-balance">
+            Hundreds of little jobs, done the moment they appear.
+          </h2>
+        </div>
+
+        <div className="mt-10 border border-ink-700 bg-ink-950 px-4 pt-4 pb-2">
+          <AgentField height={250} />
+        </div>
+
+        <dl className="mt-8 grid gap-px sm:grid-cols-3 border border-ink-700 bg-ink-700">
+          {[
+            { value: "<60s", label: "First response to any lead, any hour" },
+            { value: "24/7", label: "Nights, weekends and holidays covered" },
+            { value: "0", label: "Leads that go unfollowed because someone got busy" },
+          ].map((m) => (
+            <div key={m.label} className="bg-ink-800 px-6 py-6">
+              <dt className="text-[1.75rem] font-semibold tracking-[-0.035em] leading-none tabular-nums text-accent-400">
+                {m.value}
+              </dt>
+              <dd className="mt-2.5 text-[13.5px] leading-snug text-ink-300">{m.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </Container>
+    </section>
+  );
+}
+
 /* ──────────────────────────────  FAQ  ───────────────────────────────── */
 
 const HOME_FAQ = [
@@ -309,15 +348,7 @@ export default function HomePage() {
         <HowSimple />
         <BotRoster />
         <DemoSection />
-        <StatBand
-          eyebrow="What changes"
-          title="The gap between a lead arriving and someone doing something about it."
-          metrics={[
-            { value: "<60s", label: "First response to any inbound lead, any hour" },
-            { value: "24/7", label: "Nights, weekends and holidays covered" },
-            { value: "0", label: "Leads that go unfollowed because someone got busy" },
-          ]}
-        />
+        <FieldBand />
         <Faq />
         <FinalCta />
       </main>
