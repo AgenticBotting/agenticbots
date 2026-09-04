@@ -101,10 +101,13 @@ export function BotScrollList() {
               href={categoryHref(c)}
               className={cn(
                 "group grid grid-cols-[auto_1fr_auto] items-center gap-5 py-6 lg:py-7 transition-opacity duration-300",
-                i === active ? "lg:opacity-100" : "lg:opacity-40"
+                i === active ? "lg:opacity-100" : "lg:opacity-[0.55] hover:lg:opacity-80"
               )}
             >
-              <span className="mono text-[12px] tabular-nums text-[var(--text-muted)] w-6">
+              <span className={cn(
+                "mono text-[12px] tabular-nums w-6",
+                i === active ? "text-[var(--accent-text)]" : "text-[var(--text-muted)]"
+              )}>
                 {c.index}
               </span>
               <span className="min-w-0">

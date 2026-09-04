@@ -84,7 +84,9 @@ export function AgentTrace() {
   }, [time, playing]);
 
   const effTime = reduced ? Math.max(time, DURATION) : time;
-  const visible = TRACE.filter((s) => s.t <= effTime);
+  const untouched = !reduced && time === 0 && !playing;
+  // Before first play the full trace shows dimmed — content, not a void.
+  const visible = untouched ? TRACE : TRACE.filter((s) => s.t <= effTime);
   const done = effTime >= DURATION;
 
   return (
@@ -112,7 +114,8 @@ export function AgentTrace() {
           value={time}
           onChange={(e) => { setPlaying(false); setTime(Number(e.target.value)); track("trace_scrubbed", {}); }}
           aria-label="Scrub through the trace"
-          className="flex-1 accent-[#97BD27] h-1"
+          className="flex-1 h-[3px]"
+          style={{ accentColor: "var(--color-accent-400)" }}
         />
         <span className="mono text-[11px] tabular-nums text-ink-400 shrink-0">
           {time.toFixed(1)}s / {DURATION}s
@@ -120,19 +123,18 @@ export function AgentTrace() {
       </div>
 
       {/* Log */}
-      <ol
-        ref={logRef}
-        role="log"
-        aria-live="polite"
-        className="h-[340px] overflow-y-auto px-5 py-4 space-y-2.5 scroll-smooth"
-      >
-        {visible.length === 0 && (
-          <li className="mono text-[12px] text-ink-500">
-            Press play — one missed call, start to booked. {SPEED_LABEL}.
-          </li>
-        )}
+      <div className="relative">
+        <ol
+          ref={logRef}
+          role="log"
+          aria-live="polite"
+          className={cn(
+            "h-[340px] overflow-y-auto px-5 py-4 space-y-2.5 scroll-smooth",
+            untouched && "opacity-[0.28] overflow-hidden"
+          )}
+        >
         {visible.map((s) => (
-          <li key={s.t} className={cn("grid grid-cols-[52px_1fr] gap-3", !reduced && "animate-fade-up")}>
+          <li key={s.t} className={cn("grid grid-cols-[52px_1fr] gap-3", !reduced && !untouched && "animate-fade-up")}>
             <span className="mono text-[11px] tabular-nums text-ink-500 pt-0.5">
               +{s.t.toFixed(1)}s
             </span>
@@ -157,7 +159,24 @@ export function AgentTrace() {
             </div>
           </li>
         ))}
-      </ol>
+        </ol>
+
+        {untouched && (
+          <button
+            type="button"
+            onClick={() => { setPlaying(true); track("trace_played", { replay: false }); }}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-4 group"
+            aria-label="Play the trace"
+          >
+            <span className="flex h-16 w-16 items-center justify-center notch bg-accent-500 text-ink-950 transition-transform group-hover:scale-105">
+              <Play className="w-7 h-7 ml-0.5" strokeWidth={2.5} />
+            </span>
+            <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-200">
+              Play the trace · 14s
+            </span>
+          </button>
+        )}
+      </div>
 
       <div className="px-5 py-3 border-t border-ink-700 flex items-center justify-between gap-4">
         <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-500">

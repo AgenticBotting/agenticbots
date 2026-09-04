@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Search, Plug, Rocket, RefreshCw } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Reveal, SectionHeader } from "@/components/ui";
-import { BotPlanForm, StatBand, FaqAccordion, PlanCta } from "@/components/marketing";
+import { BotPlanForm, StatBand, FaqAccordion, PlanCta, Timeline, AuditLogPanel } from "@/components/marketing";
 
 export const metadata: Metadata = {
   title: "How it works",
@@ -98,6 +98,12 @@ export default function HowItWorksPage() {
           </Container>
         </section>
 
+        <section className="section-pad-sm border-b border-[var(--border)]">
+          <Container>
+            <Timeline />
+          </Container>
+        </section>
+
         <section className="section-pad border-b border-[var(--border)]">
           <Container>
             <div className="space-y-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
@@ -148,6 +154,36 @@ export default function HowItWorksPage() {
             { value: "Weekly", label: "Tuning passes for as long as it runs" },
           ]}
         />
+
+        <section className="section-pad bg-ink-900 on-dark border-b border-ink-700">
+          <Container>
+            <div className="max-w-[62ch]">
+              <p className="eyebrow mb-4">Security &amp; governance</p>
+              <h2 className="display-xl text-balance">Autonomy you can audit.</h2>
+            </div>
+            <div className="mt-12 grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-16 items-start">
+              <ul className="border-t border-ink-700">
+                {[
+                  ["Your data stays in your accounts", "scoped credentials you can revoke"],
+                  ["Human-in-the-loop by default", "explicit escalation rules, monitored launch"],
+                  ["Every action logged", "what, when, on which record, and why"],
+                  ["Rollback, always", "pause any bot instantly, nothing breaks"],
+                  ["Least-privilege access", "read-only wherever writing isn't required"],
+                  ["DPA on request", "procurement-ready documentation"],
+                ].map(([t, d], i) => (
+                  <li key={t} className="grid grid-cols-[32px_1fr] gap-4 py-[1.05rem] border-b border-ink-700">
+                    <span className="mono text-[11px] tabular-nums text-ink-500 pt-1">0{i + 1}</span>
+                    <span>
+                      <span className="block text-[15px] font-medium text-white tracking-[-0.01em]">{t}</span>
+                      <span className="block text-[13px] text-ink-400 mt-0.5">{d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <AuditLogPanel />
+            </div>
+          </Container>
+        </section>
 
         <section className="section-pad border-b border-[var(--border)]">
           <Container>

@@ -33,7 +33,7 @@ export function ProofBar() {
           ))}
         </dl>
         <p className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] pb-3 -mt-1">
-          Pilot-cohort medians · updated quarterly
+          Early-client averages · updated quarterly
         </p>
       </div>
     </div>

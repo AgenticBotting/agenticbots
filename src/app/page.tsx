@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Container, Reveal, SectionHeader, ButtonLink, BrandMark, Section } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, AgentTrace, CplDecayChart, BeforeAfterChart, SignalFlow, Timeline, AuditLogPanel } from "@/components/marketing";
+import { Container, Reveal, SectionHeader, BrandMark, Section } from "@/components/ui";
+import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -14,15 +14,15 @@ function Hero() {
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-12 lg:gap-20 items-center">
           <Reveal>
             <p className="eyebrow mb-6">
-              Agentic infrastructure <span className="eyebrow-dim">· 13 bots · marketing + sales</span>
+              Marketing + sales <span className="eyebrow-dim">· run by bots, watched by you</span>
             </p>
             <h1 className="display-hero max-w-[16ch] text-balance">
               Bots that get you customers.
             </h1>
-            <p className="body-lg mt-5 max-w-[50ch] text-pretty">
-              We build and run the bots that find your customers and follow up until
-              they buy — ads, search, content, email, outreach and CRM. Marketing and
-              sales work, executed continuously.
+            <p className="body-lg mt-5 max-w-[48ch] text-pretty">
+              We build bots that answer every lead, follow up on every quote, and
+              keep your ads and CRM working — every hour, including the ones you
+              are asleep for.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <PlanCta source="home-hero" />
@@ -63,17 +63,33 @@ function Hero() {
   );
 }
 
-/* ──────────────────────────  THE SYSTEM, DRAWN  ─────────────────────── */
+/* ─────────────────────────  THREE PLAIN STEPS  ──────────────────────── */
 
-function SystemSection() {
+const SIMPLE_STEPS = [
+  { n: "1", t: "Tell us what's stuck", d: "Two minutes. You get a free written plan back in one business day — no call, no pressure." },
+  { n: "2", t: "We build your bots", d: "Wired into the tools you already use. First one is working in about two weeks." },
+  { n: "3", t: "Customers stop slipping through", d: "Every call answered, every quote followed up, day and night. You see everything it does." },
+];
+
+function HowSimple() {
   return (
     <Section
-      id="system"
+      id="how"
       variant="light"
-      eyebrow={<>In plain english <span className="eyebrow-dim">· one drawing</span></>}
-      heading={<>A bot is just work that <span className="em-green">happens without you.</span></>}
+      eyebrow="How it works"
+      heading="Three steps. No jargon."
     >
-      <SignalFlow />
+      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+        {SIMPLE_STEPS.map((x) => (
+          <div key={x.n} className="card-cell p-8">
+            <span className="flex h-11 w-11 items-center justify-center notch bg-ink-950 text-white font-display font-semibold text-[17px]">
+              {x.n}
+            </span>
+            <h3 className="display-lg mt-5">{x.t}</h3>
+            <p className="body-base mt-2.5">{x.d}</p>
+          </div>
+        ))}
+      </div>
     </Section>
   );
 }
@@ -82,14 +98,18 @@ function SystemSection() {
 
 function BotRoster() {
   return (
-    <section className="relative overflow-hidden section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
-      <BrandMark className="-right-24 top-10" size={560} />
+    <section className="relative section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
+      {/* Watermark clips in its own layer — overflow-hidden on the section
+          itself would break the roster's position:sticky panel. */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <BrandMark className="-right-24 top-10" size={560} />
+      </div>
       <Container className="relative">
         <Reveal>
           <SectionHeader
             eyebrow="The full roster"
-            title="Thirteen bots. Two halves of one problem."
-            copy="Marketing bots create the demand; sales bots capture it. Nobody buys all thirteen — start on the worst bottleneck, prove it, add the next."
+            title="Thirteen bots. Yours starts with one."
+            copy="Some get you found. Some make sure nobody slips through. Start with the one that fixes what hurts most."
           />
         </Reveal>
 
@@ -120,92 +140,47 @@ function BotRoster() {
 /* ─────────────────────────  LIVE DEMO + RESULTS  ───────────────────── */
 
 function DemoSection() {
+  const WATCH = [
+    { t: "+0.8s", w: "It shows its thinking", d: "You can read why it did what it did." },
+    { t: "+5.0s", w: "It reads the situation", d: "An urgent customer gets offered times, not more questions." },
+    { t: "+13.6s", w: "It knows its limits", d: "Anything about price goes to you, not the bot." },
+  ];
   return (
-    <Section
-      id="demo"
-      variant="light"
-      eyebrow={<>See a bot run <span className="eyebrow-dim">· recorded production trace</span></>}
-      heading="Watch one missed call become a booked job."
-      sub="Tool calls and reasoning visible, scrubbable, at ~10× real time. This is the actual shape of the work — not a mockup."
-    >
-      <div className="max-w-[860px]">
-        <AgentTrace />
-      </div>
-    </Section>
-  );
-}
-
-function ResultsSection() {
-  return (
-    <Section
-      id="results"
-      variant="alt"
-      eyebrow="What the numbers do"
-      heading={<>The curve every deployment <span className="em-green">is chasing.</span></>}
-      sub="Charted from typical pilot trajectories; series are labeled illustrative until each claim carries a named client. We would rather show you the shape honestly than invent precision."
-    >
-      <div className="grid lg:grid-cols-2 gap-6">
-        <CplDecayChart />
-        <BeforeAfterChart />
-      </div>
-    </Section>
+    <section id="demo" className="section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
+      <Container>
+        <div className="grid lg:grid-cols-[0.42fr_0.58fr] gap-12 lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-32">
+            <Reveal>
+              <p className="eyebrow mb-4">
+                See a bot run <span className="eyebrow-dim">· recorded production trace</span>
+              </p>
+              <h2 className="display-xl text-balance">Watch a bot handle a real lead.</h2>
+              <p className="body-lg mt-5 max-w-[40ch]">
+                Tool calls and reasoning visible, scrubbable, at ~10× real time.
+              </p>
+              <ol className="mt-9 border-t border-[var(--border)]">
+                {WATCH.map((x) => (
+                  <li key={x.t} className="grid grid-cols-[56px_1fr] gap-4 py-4 border-b border-[var(--border)]">
+                    <span className="mono text-[11.5px] tabular-nums text-[var(--accent-text)] pt-0.5">{x.t}</span>
+                    <span>
+                      <span className="block text-[14.5px] font-medium tracking-[-0.01em]">{x.w}</span>
+                      <span className="block text-[13px] text-[var(--text-secondary)] mt-0.5">{x.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </Reveal>
+          </div>
+          <Reveal delay={0.08}>
+            <AgentTrace />
+          </Reveal>
+        </div>
+      </Container>
+    </section>
   );
 }
 
 /* ───────────────────────────  HOW IT WORKS  ─────────────────────────── */
-
-function HowItWorks() {
-  return (
-    <Section
-      id="process"
-      variant="light"
-      eyebrow={<>How we work <span className="eyebrow-dim">· first bot live ~2 weeks</span></>}
-      heading="Four steps on one rail."
-      cta={
-        <ButtonLink href="/how-it-works" variant="outline">
-          See the full process
-          <ArrowRight className="w-4 h-4" />
-        </ButtonLink>
-      }
-    >
-      <Timeline />
-    </Section>
-  );
-}
-
-/* ─────────────────────────────  SECURITY  ───────────────────────────── */
-
-const GOVERNANCE = [
-  ["Your data stays in your accounts", "scoped credentials you can revoke"],
-  ["Human-in-the-loop by default", "explicit escalation rules, monitored launch"],
-  ["Every action logged", "what, when, on which record, and why"],
-  ["Rollback, always", "pause any bot instantly, nothing breaks"],
-  ["Least-privilege access", "read-only wherever writing isn't required"],
-  ["DPA on request", "procurement-ready documentation"],
-];
-
-function Security() {
-  return (
-    <Section
-      id="security"
-      variant="dark"
-      eyebrow="Security & governance"
-      heading="Autonomy you can audit."
-    >
-      <div className="grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-16 items-start">
-        <ul className="border-t border-ink-700">
-          {GOVERNANCE.map(([t, d]) => (
-            <li key={t} className="flex items-baseline justify-between gap-6 py-4 border-b border-ink-700">
-              <span className="text-[15px] font-medium text-white">{t}</span>
-              <span className="mono text-[11px] text-ink-400 text-right shrink-0 max-w-[24ch]">{d}</span>
-            </li>
-          ))}
-        </ul>
-        <AuditLogPanel />
-      </div>
-    </Section>
-  );
-}
 
 /* ──────────────────────────────  FAQ  ───────────────────────────────── */
 
@@ -221,10 +196,21 @@ function Faq() {
   return (
     <section className="section-pad border-b border-[var(--border)]">
       <Container>
-        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16">
-          <Reveal>
-            <SectionHeader eyebrow="Questions" title="The things people ask first." />
-          </Reveal>
+        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-32">
+            <Reveal>
+              <SectionHeader eyebrow="Questions" title="The things people ask first." />
+              <div className="mt-10 border border-[var(--border)] bg-[var(--bg-alt)] p-6 max-w-[380px]">
+                <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                  Not answered here?
+                </p>
+                <a href="mailto:hello@agenticbots.dev" className="display-md mt-2 block hover:text-[var(--accent-text)] transition-colors">
+                  hello@agenticbots.dev
+                </a>
+                <p className="body-xs mt-2">A person replies within one business day.</p>
+              </div>
+            </Reveal>
+          </div>
           <Reveal delay={0.08}>
             <FaqAccordion items={HOME_FAQ} />
           </Reveal>
@@ -235,6 +221,44 @@ function Faq() {
 }
 
 /* ────────────────────────────  FINAL CTA  ───────────────────────────── */
+
+function PlanPreview() {
+  const ROWS = [
+    { i: "09", n: "Speed-to-Lead Bot", why: "worst leak first", bar: "82%" },
+    { i: "01", n: "Ads Bot", why: "wasted spend", bar: "58%" },
+    { i: "10", n: "CRM Bot", why: "foundation for both", bar: "40%" },
+  ];
+  return (
+    <figure className="mt-10 max-w-[400px] border border-[var(--border)] bg-white" aria-hidden="true">
+      <div className="flex items-center justify-between px-5 h-10 border-b border-[var(--border)] bg-[var(--bg-alt)]">
+        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-secondary)]">your-bot-plan.pdf</span>
+        <span className="mono text-[10px] text-[var(--text-muted)]">1 page</span>
+      </div>
+      <div className="px-5 py-4">
+        <p className="text-[13px] font-semibold tracking-[-0.01em]">Build order — by what it&apos;s worth</p>
+        <ul className="mt-3 space-y-2.5">
+          {ROWS.map((r) => (
+            <li key={r.i} className="grid grid-cols-[24px_1fr] gap-2.5 items-center">
+              <span className="mono text-[10.5px] tabular-nums text-[var(--text-muted)]">{r.i}</span>
+              <span>
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="text-[12.5px] font-medium">{r.n}</span>
+                  <span className="mono text-[10px] text-[var(--text-muted)]">{r.why}</span>
+                </span>
+                <span className="mt-1 block h-[5px] bg-[var(--bg-alt)]">
+                  <span className="block h-full bg-accent-500" style={{ width: r.bar }} />
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <figcaption className="px-5 py-2.5 border-t border-[var(--border)] mono text-[10px] text-[var(--text-muted)]">
+        sample layout · yours is built from your numbers
+      </figcaption>
+    </figure>
+  );
+}
 
 function FinalCta() {
   return (
@@ -262,6 +286,7 @@ function FinalCta() {
                 </li>
               ))}
             </ul>
+            <PlanPreview />
           </Reveal>
           <Reveal delay={0.08}>
             <BotPlanForm source="home-final" />
@@ -281,11 +306,9 @@ export default function HomePage() {
       <main>
         <Hero />
         <ProofBar />
-        <ProblemDiagram />
-        <SystemSection />
+        <HowSimple />
         <BotRoster />
         <DemoSection />
-        <ResultsSection />
         <StatBand
           eyebrow="What changes"
           title="The gap between a lead arriving and someone doing something about it."
@@ -295,8 +318,6 @@ export default function HomePage() {
             { value: "0", label: "Leads that go unfollowed because someone got busy" },
           ]}
         />
-        <HowItWorks />
-        <Security />
         <Faq />
         <FinalCta />
       </main>
