@@ -65,7 +65,34 @@ Three posts exist today:
 - `B-what-agentic-actually-means`
 - `B-your-crm-is-lying-to-you`
 
-## Priority 4 — logo wall
+## Priority 4 — the explainer video (`V-MAIN`)
+
+**1920×1080, 60–90 seconds.** A screen recording of one missed call handled end
+to end — text back, questions answered, slot offered, booked, written to the
+CRM. Voiceover in plain English, **captions burned in** (the section promises
+"no sound needed"). No slides, no stock b-roll, no music bed over narration.
+
+Drop the file in `public/media/` and pass `src` to `<VideoSection>`; it becomes
+a real player with controls, no autoplay. A `poster` frame is worth supplying —
+it is what people see before pressing play.
+
+## Priority 5 — the guide (`G-01`)
+
+Two pieces: the **PDF itself** and a **1200×1600 portrait cover** rendered as it
+will look as a thumbnail (title in Geist 600, black on white, AB mark
+bottom-left). The section already lists what the guide promises to contain:
+
+- What an agent actually is, without the hype
+- The five jobs worth automating first
+- What it costs to run, honestly
+- Questions to ask any vendor before you sign
+- How to tell a real agent from a chatbot
+
+Write those five sections and the guide exists. **Note:** the form captures the
+email but nothing yet delivers the file — wire the PDF into the Resend template
+in `src/lib/notify.ts`, or the promise on that button breaks.
+
+## Priority 6 — logo wall
 
 Six to eight client or integration marks, **SVG, monochrome**, for a strip under
 the hero. Integration logos (HubSpot, Salesforce, Twilio, Google Ads) are honest

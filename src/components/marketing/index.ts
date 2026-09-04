@@ -29,5 +29,7 @@ export type { TriadItem, ZigRow } from "./GeoSections";
 export { PostOptin } from "./PostOptin";
 export { ShareRow } from "./ShareRow";
 export { BotOrbit } from "./BotOrbit";
-export { BotConveyor } from "./BotConveyor";
+export { BotConveyor, TaskConveyor } from "./Conveyor";
 export { BotFactory } from "./BotFactory";
+export { VideoSection } from "./VideoSection";
+export { LeadMagnet } from "./LeadMagnet";

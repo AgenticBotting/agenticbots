@@ -6,7 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
   BotPlanForm, PlanCta, FaqAccordion, ProofBar,
-  AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand,
+  AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand, TaskConveyor,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES, getService, citiesInState } from "@/lib/geo/data";
@@ -80,6 +80,22 @@ export default async function ServiceHub({ params }: Params) {
         </section>
 
         <StackStrip />
+
+        {/* The actual work, on a belt — this bot's capability list, not the
+            whole roster. */}
+        {category && (
+          <Section
+            variant="alt"
+            size="sm"
+            eyebrow={`${svc.botName} · what it runs`}
+            heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+          >
+            <div className="-mx-5 sm:-mx-8">
+              <TaskConveyor tasks={category.capabilities} />
+            </div>
+          </Section>
+        )}
+
         <ProofBar />
 
         {/* ── Zig-zag deep dives: the before/after pairs, one mockup each. ── */}

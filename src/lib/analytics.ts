@@ -20,7 +20,8 @@ export type EventName =
   | "trace_scrubbed"
   | "nav_mega_opened"
   | "roster_bot_focused"
-  | "market_searched";
+  | "market_searched"
+  | "guide_requested";
 
 declare global {
   interface Window {

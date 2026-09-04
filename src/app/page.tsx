@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
-import { BotPlanForm, BotFactory, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { BotPlanForm, BotFactory, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, VideoSection, LeadMagnet, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -441,11 +441,16 @@ export default function HomePage() {
         <Hero />
         <ProofBar />
         <HowSimple />
+        <VideoSection
+          heading={<>Ninety seconds, <span className="em-green">start to booked.</span></>}
+          sub="One missed call, handled end to end. No slides, no diagrams — just the thing running."
+        />
         <WhoFor />
         <BotRoster />
         <DemoSection />
         <FieldBand />
         <Voices />
+        <LeadMagnet source="home" />
         <Faq />
         <FinalCta />
       </main>

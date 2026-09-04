@@ -6,7 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
   BotPlanForm, PlanCta, FaqAccordion, CityVignette,
-  AgentConsole, StackStrip, StatSplit, ZigZag, JoinBand,
+  AgentConsole, StackStrip, StatSplit, ZigZag, JoinBand, TaskConveyor,
 } from "@/components/marketing";
 import { LOCAL_SERVICES, getService, getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
@@ -130,6 +130,20 @@ export default async function CityPage({ params }: Params) {
         </section>
 
         <StackStrip />
+
+        {/* This bot's own work, named for this market. */}
+        {category && (
+          <Section
+            variant="alt"
+            size="sm"
+            eyebrow={`${svc.botName} in ${ct.name}`}
+            heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+          >
+            <div className="-mx-5 sm:-mx-8">
+              <TaskConveyor tasks={category.capabilities} />
+            </div>
+          </Section>
+        )}
 
         {/* ── Market snapshot: horizontal band, estimates labeled. ── */}
         <section className="border-b border-[var(--border)] bg-[var(--bg-alt)]">
@@ -360,6 +374,20 @@ function StructuralCityService({ svc, st, rec }: {
         </section>
 
         <StackStrip />
+
+        {/* This bot's own work, named for this market. */}
+        {category && (
+          <Section
+            variant="alt"
+            size="sm"
+            eyebrow={`${svc.botName} in ${rec.city}`}
+            heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+          >
+            <div className="-mx-5 sm:-mx-8">
+              <TaskConveyor tasks={category.capabilities} />
+            </div>
+          </Section>
+        )}
 
         {/* ── Zig-zag deep dives: before/after pairs with mockups. ── */}
         {category && (
