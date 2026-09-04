@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const cities = citiesInState(state);
   return {
     title: `${st.name} markets`,
-    description: `Agent systems for ${st.name} businesses — ${cities.map((c) => c.name).join(", ")}: market snapshots, local reads, and all four services per metro.`,
+    description: `Agent systems for ${st.name} businesses — ${cities.slice(0, 3).map((c) => c.name).join(", ")}${cities.length > 3 ? ` and ${cities.length - 3} more` : ""}: market snapshots, local reads, all four services.`,
     alternates: { canonical: `/markets/${state}` },
   };
 }

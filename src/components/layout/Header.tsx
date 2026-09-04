@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowRight, Mail, ChevronDown } from "lucide-react";
+import { Menu, X, ArrowRight, Mail, ChevronDown, MapPin } from "lucide-react";
 import { Logo, BotIndex } from "@/components/ui";
 import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
+import { STATES, citiesInState } from "@/lib/geo/data";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
@@ -16,12 +17,15 @@ const NAV_LINKS = [
   { label: "Blog", href: "/blog" },
 ];
 
+type MenuId = "bots" | "areas" | null;
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedPillar, setSelectedPillar] = useState<PillarSlug | null>(null);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobilePillar, setMobilePillar] = useState<string | null>("marketing");
+  const [mobileGroup, setMobileGroup] = useState<string | null>("marketing");
   const navRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -39,7 +43,7 @@ export function Header() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!openMenu) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
     const onClick = (e: MouseEvent) => {
       const t = e.target as Node;
@@ -51,14 +55,24 @@ export function Header() {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onClick);
     };
-  }, [menuOpen]);
+  }, [openMenu]);
 
   function closeMenu() {
-    setMenuOpen(false);
+    setOpenMenu(null);
     setSelectedPillar(null);
+    setSelectedState(null);
+  }
+
+  function toggleMenu(id: Exclude<MenuId, null>) {
+    if (openMenu === id) { closeMenu(); return; }
+    track("nav_mega_opened", { menu: id });
+    setSelectedPillar(null);
+    setSelectedState(null);
+    setOpenMenu(id);
   }
 
   const pillar = selectedPillar ? CATALOG.find((p) => p.slug === selectedPillar) ?? null : null;
+  const stateSel = selectedState ? STATES.find((s) => s.slug === selectedState) ?? null : null;
 
   return (
     <div className="sticky top-0 z-50">
@@ -87,22 +101,9 @@ export function Header() {
           >
             <Logo height={30} className="justify-self-start" />
 
-            {/* Nav — white on hover, never green. Green is the CTA only. */}
-            <nav className="hidden lg:flex justify-self-center items-center gap-9">
-              <button
-                type="button"
-                onClick={() => { if (menuOpen) { closeMenu(); } else { track("nav_mega_opened", {}); setMenuOpen(true); } }}
-                aria-expanded={menuOpen}
-                className={cn(
-                  "nav-link inline-flex items-center gap-1.5 transition-colors",
-                  menuOpen ? "text-white" : "text-ink-200 hover:text-white"
-                )}
-              >
-                Bots
-                <ChevronDown
-                  className={cn("w-3.5 h-3.5 transition-transform duration-200", menuOpen && "rotate-180")}
-                />
-              </button>
+            <nav className="hidden lg:flex justify-self-center items-center gap-8">
+              <MenuTrigger label="Bots" open={openMenu === "bots"} onClick={() => toggleMenu("bots")} />
+              <MenuTrigger label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -138,28 +139,23 @@ export function Header() {
           </div>
         </div>
 
-        {/* ── Mega menu — two steps, like Okeechobee ── */}
-        {menuOpen && (
+        {/* ── Mega: Bots (two-step) ── */}
+        {openMenu === "bots" && (
           <MegaPanel ref={panelRef}>
             {pillar === null ? (
               <>
-                <MegaHeader
-                  eyebrow="Bots · Step 1 of 2"
-                  title="Pick a side of the business."
-                />
+                <MegaHeader eyebrow="Bots · Step 1 of 2" title="Pick a side of the business." />
                 <ul className="grid gap-3">
                   {CATALOG.map((p) => (
                     <li key={p.slug} className="flex">
                       <button
                         onClick={() => setSelectedPillar(p.slug)}
-                        className="group w-full flex items-center justify-between gap-6 px-6 py-5 text-left rounded-none border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        className="group w-full flex items-center justify-between gap-6 px-6 py-5 text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                       >
                         <span className="min-w-0">
                           <span className="block eyebrow mb-1.5">{p.tagline}</span>
                           <span className="block display-lg">{p.name}</span>
-                          <span className="block mt-1.5 text-[14px] text-[var(--text-secondary)]">
-                            {p.menuBlurb}
-                          </span>
+                          <span className="block mt-1.5 text-[14px] text-[var(--text-secondary)]">{p.menuBlurb}</span>
                         </span>
                         <span className="flex items-center gap-5 shrink-0">
                           <span className="text-[13px] font-semibold tracking-[-0.01em] text-[var(--text-muted)]">
@@ -174,43 +170,94 @@ export function Header() {
               </>
             ) : (
               <>
-                <div className="flex items-center gap-6 mb-6 pb-4 border-b border-[var(--border)]">
-                  <button
-                    onClick={() => setSelectedPillar(null)}
-                    className="px-4 py-2.5 rounded-none border border-[var(--border-strong)] text-[13.5px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
-                  >
-                    ← All bots
-                  </button>
-                  <div>
-                    <p className="mb-1 eyebrow">
-                      {pillar.name.toUpperCase()} · Step 2 of 2
-                    </p>
-                    <h3 className="display-md">Pick the job you need done.</h3>
-                  </div>
-                </div>
-
+                <StepBack onBack={() => setSelectedPillar(null)} backLabel="All bots"
+                  eyebrow={`${pillar.name.toUpperCase()} · Step 2 of 2`} title="Pick the job you need done." />
                 <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {pillar.categories.map((c) => (
-                      <li key={c.slug} className="flex">
-                        <Link
-                          href={categoryHref(c)}
-                          onClick={closeMenu}
-                          className="group w-full flex items-start gap-3 p-4 rounded-none border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                        >
-                          <BotIndex index={c.index} size="sm" tone="outline" />
-                          <span className="min-w-0">
-                            <span className="block display-md !text-[15px]">{c.botName}</span>
-                            <span className="block mt-1 text-[12.5px] leading-snug text-[var(--text-secondary)]">
-                              {c.name}
-                            </span>
-                          </span>
-                        </Link>
-                      </li>
+                    <li key={c.slug} className="flex">
+                      <Link
+                        href={categoryHref(c)}
+                        onClick={closeMenu}
+                        className="group w-full flex items-start gap-3 p-4 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      >
+                        <BotIndex index={c.index} size="sm" tone="outline" />
+                        <span className="min-w-0">
+                          <span className="block display-md !text-[15px]">{c.botName}</span>
+                          <span className="block mt-1 text-[12.5px] leading-snug text-[var(--text-secondary)]">{c.name}</span>
+                        </span>
+                      </Link>
+                    </li>
                   ))}
                 </ul>
               </>
             )}
+            <MegaFooter onAct={closeMenu} />
+          </MegaPanel>
+        )}
 
+        {/* ── Mega: Service areas (two-step, the Lot Sealers pattern) ── */}
+        {openMenu === "areas" && (
+          <MegaPanel ref={panelRef}>
+            {stateSel === null ? (
+              <>
+                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your state." />
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {STATES.map((st) => {
+                    const n = citiesInState(st.slug).length;
+                    return (
+                      <li key={st.slug} className="flex">
+                        <button
+                          onClick={() => setSelectedState(st.slug)}
+                          className="group w-full flex items-center justify-between gap-4 px-5 py-4 text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        >
+                          <span className="flex items-center gap-3 min-w-0">
+                            <MapPin className="w-4 h-4 shrink-0 text-[var(--accent-text)]" />
+                            <span className="display-md !text-[15px]">{st.name}</span>
+                          </span>
+                          <span className="flex items-center gap-4 shrink-0">
+                            <span className="text-[12.5px] font-semibold text-[var(--text-muted)]">
+                              {n} metro{n > 1 ? "s" : ""}
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : (
+              <>
+                <StepBack onBack={() => setSelectedState(null)} backLabel="All states"
+                  eyebrow={`${stateSel.name.toUpperCase()} · Step 2 of 2`} title="Pick your market." />
+                <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {citiesInState(stateSel.slug).map((c) => (
+                    <li key={c.slug} className="flex">
+                      <Link
+                        href={`/markets/${c.stateSlug}/${c.slug}`}
+                        onClick={closeMenu}
+                        className="group w-full flex items-center justify-between gap-3 px-4 py-3.5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      >
+                        <span className="min-w-0">
+                          <span className="block display-md !text-[15px]">{c.name}</span>
+                          <span className="block mt-0.5 text-[12px] leading-snug text-[var(--text-muted)]">
+                            {c.industries[0]} · {c.competition} competition
+                          </span>
+                        </span>
+                        <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 body-sm">
+                  Or the whole state at once:{" "}
+                  <Link href={`/markets/${stateSel.slug}`} onClick={closeMenu}
+                    className="font-semibold text-[var(--accent-text)] hover:underline underline-offset-4">
+                    all {stateSel.name} markets
+                  </Link>
+                </p>
+              </>
+            )}
             <MegaFooter onAct={closeMenu} />
           </MegaPanel>
         )}
@@ -232,42 +279,37 @@ export function Header() {
             </div>
 
             <div className="pb-16 pt-4">
-              {CATALOG.map((p) => {
-                const open = mobilePillar === p.slug;
-                return (
-                  <div key={p.slug} className="border-b border-ink-700">
-                    <button
-                      onClick={() => setMobilePillar(open ? null : p.slug)}
-                      aria-expanded={open}
-                      className="w-full flex items-center justify-between py-5 text-left"
-                    >
-                      <span>
-                        <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">{p.tagline}</span>
-                        <span className="block display-lg text-white mt-1">{p.name}</span>
-                      </span>
-                      <ChevronDown
-                        className={cn("w-5 h-5 text-ink-400 transition-transform duration-200", open && "rotate-180")}
-                      />
-                    </button>
-                    {open && (
-                      <ul className="pb-5 space-y-1">
-                        {p.categories.map((c) => (
-                          <li key={c.slug}>
-                            <Link
-                              href={categoryHref(c)}
-                              onClick={() => setMobileOpen(false)}
-                              className="flex items-center justify-between py-2.5 text-[15px] text-ink-200"
-                            >
-                              {c.botName}
-                              <ArrowRight className="w-4 h-4 text-ink-500" />
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
+              {CATALOG.map((p) => (
+                <MobileGroup
+                  key={p.slug}
+                  id={p.slug}
+                  open={mobileGroup === p.slug}
+                  onToggle={() => setMobileGroup(mobileGroup === p.slug ? null : p.slug)}
+                  kicker={p.tagline}
+                  title={p.name}
+                >
+                  {p.categories.map((c) => (
+                    <MobileRow key={c.slug} href={categoryHref(c)} onGo={() => setMobileOpen(false)}>
+                      {c.botName}
+                    </MobileRow>
+                  ))}
+                </MobileGroup>
+              ))}
+
+              <MobileGroup
+                id="areas"
+                open={mobileGroup === "areas"}
+                onToggle={() => setMobileGroup(mobileGroup === "areas" ? null : "areas")}
+                kicker="Where we deploy"
+                title="Service areas"
+              >
+                <MobileRow href="/markets" onGo={() => setMobileOpen(false)}>All markets</MobileRow>
+                {STATES.map((st) => (
+                  <MobileRow key={st.slug} href={`/markets/${st.slug}`} onGo={() => setMobileOpen(false)}>
+                    {st.name}
+                  </MobileRow>
+                ))}
+              </MobileGroup>
 
               <ul className="py-4">
                 {NAV_LINKS.map((l) => (
@@ -309,7 +351,24 @@ export function Header() {
   );
 }
 
-/* ───────────────────────────  Mega primitives  ─────────────────────────── */
+/* ───────────────────────────  Primitives  ─────────────────────────── */
+
+function MenuTrigger({ label, open, onClick }: { label: string; open: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={open}
+      className={cn(
+        "nav-link inline-flex items-center gap-1.5 transition-colors",
+        open ? "text-white" : "text-ink-200 hover:text-white"
+      )}
+    >
+      {label}
+      <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", open && "rotate-180")} />
+    </button>
+  );
+}
 
 const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
   function MegaPanel({ children }, ref) {
@@ -318,7 +377,7 @@ const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
         ref={ref}
         className="hidden lg:block absolute left-0 right-0 bg-white border-b border-[var(--border)] shadow-mega animate-fade-up"
       >
-        <div className="container-site py-10">{children}</div>
+        <div className="container-site py-10 max-h-[calc(100vh-140px)] overflow-y-auto">{children}</div>
       </div>
     );
   }
@@ -329,6 +388,25 @@ function MegaHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
     <div className="mb-7 pb-4 border-b border-[var(--border)]">
       <p className="mb-1.5 eyebrow">{eyebrow}</p>
       <h3 className="display-md">{title}</h3>
+    </div>
+  );
+}
+
+function StepBack({ onBack, backLabel, eyebrow, title }: {
+  onBack: () => void; backLabel: string; eyebrow: string; title: string;
+}) {
+  return (
+    <div className="flex items-center gap-6 mb-6 pb-4 border-b border-[var(--border)]">
+      <button
+        onClick={onBack}
+        className="px-4 py-2.5 border border-[var(--border-strong)] text-[13.5px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
+      >
+        ← {backLabel}
+      </button>
+      <div>
+        <p className="mb-1 eyebrow">{eyebrow}</p>
+        <h3 className="display-md">{title}</h3>
+      </div>
     </div>
   );
 }
@@ -344,22 +422,42 @@ function MegaFooter({ onAct }: { onAct: () => void }) {
         </p>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
-        <Link
-          href="/how-it-works"
-          onClick={onAct}
-          className="btn btn-outline"
-        >
+        <Link href="/how-it-works" onClick={onAct} className="btn btn-outline">
           How it works
         </Link>
-        <button
-          type="button"
-          onClick={() => { onAct(); openBotPlan("mega-menu"); }}
-          className="btn btn-primary"
-        >
+        <button type="button" onClick={() => { onAct(); openBotPlan("mega-menu"); }} className="btn btn-primary">
           Get your bot plan
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
+  );
+}
+
+function MobileGroup({ id, open, onToggle, kicker, title, children }: {
+  id: string; open: boolean; onToggle: () => void; kicker: string; title: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-ink-700" data-group={id}>
+      <button onClick={onToggle} aria-expanded={open} className="w-full flex items-center justify-between py-5 text-left">
+        <span>
+          <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">{kicker}</span>
+          <span className="block display-lg text-white mt-1">{title}</span>
+        </span>
+        <ChevronDown className={cn("w-5 h-5 text-ink-400 transition-transform duration-200", open && "rotate-180")} />
+      </button>
+      {open && <ul className="pb-5 space-y-1">{children}</ul>}
+    </div>
+  );
+}
+
+function MobileRow({ href, onGo, children }: { href: string; onGo: () => void; children: React.ReactNode }) {
+  return (
+    <li>
+      <Link href={href} onClick={onGo} className="flex items-center justify-between py-2.5 text-[15px] text-ink-200">
+        {children}
+        <ArrowRight className="w-4 h-4 text-ink-500" />
+      </Link>
+    </li>
   );
 }

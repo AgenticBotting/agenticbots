@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!svc || !st) return {};
   return {
     title: `${svc.name} in ${st.name}`,
-    description: `${svc.name} for ${st.name} businesses — market-tuned agent systems in ${citiesInState(state).map((c) => c.name).join(", ")}.`,
+    description: `${svc.name} for ${st.name} businesses — market-tuned agent systems in ${citiesInState(state).slice(0, 3).map((c) => c.name).join(", ")}${citiesInState(state).length > 3 ? ` and ${citiesInState(state).length - 3} more metros` : ""}.`,
     alternates: { canonical: `/local/${service}/${state}` },
   };
 }
