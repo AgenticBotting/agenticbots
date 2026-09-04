@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { Menu, X, ArrowRight, Mail, ChevronDown, MapPin } from "lucide-react";
 import { Logo, BotIndex } from "@/components/ui";
 import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
-import { STATES, citiesInState } from "@/lib/geo/data";
+
+import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, type Region } from "@/lib/geo/regions";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
@@ -73,7 +74,7 @@ export function Header() {
   }
 
   const pillar = selectedPillar ? CATALOG.find((p) => p.slug === selectedPillar) ?? null : null;
-  const regions = groupByRegion(STATES);
+  const regions = groupByRegion(ALL_STATES);
   const regionSel = selectedRegion ? regions.find((r) => r.region === selectedRegion) ?? null : null;
 
   return (
@@ -205,7 +206,7 @@ export function Header() {
                 <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Pick your part of the country." />
                 <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                   {regions.map(({ region, states }) => {
-                    const metros = states.reduce((n, st) => n + citiesInState(st.slug).length, 0);
+                    const metros = states.reduce((n, st) => n + allCitiesInState(st.slug).length, 0);
                     return (
                       <li key={region} className="flex">
                         <button
@@ -215,7 +216,7 @@ export function Header() {
                           <span>
                             <span className="block display-lg">{region}</span>
                             <span className="mt-2 block mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
-                              {states.length} state{states.length > 1 ? "s" : ""} · {metros} metro{metros > 1 ? "s" : ""}
+                              {states.length} state{states.length > 1 ? "s" : ""} · {metros} cities
                             </span>
                           </span>
                           <ArrowRight className="w-4 h-4 self-end text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
@@ -228,34 +229,52 @@ export function Header() {
             ) : (
               <>
                 <StepBack onBack={() => setSelectedRegion(null)} backLabel="All regions"
-                  eyebrow={`${regionSel.region.toUpperCase()} · Step 2 of 2`} title="Pick your market." />
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
-                  {regionSel.states.map((st) => (
-                    <div key={st.slug}>
-                      <Link
-                        href={`/markets/${st.slug}`}
-                        onClick={closeMenu}
-                        className="group flex items-center gap-2 pb-2.5 mb-3 border-b border-[var(--border)] display-md !text-[15px] hover:text-[var(--accent-text)] transition-colors"
-                      >
-                        <MapPin className="w-3.5 h-3.5 text-[var(--accent-text)]" />
-                        {st.name}
-                        <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      </Link>
-                      <ul className="space-y-1">
-                        {citiesInState(st.slug).map((c) => (
-                          <li key={c.slug}>
-                            <Link
-                              href={`/markets/${st.slug}/${c.slug}`}
-                              onClick={closeMenu}
-                              className="block py-1.5 px-2 -mx-2 text-[13.5px] text-[var(--text-body)] hover:bg-[var(--bg-alt)] hover:text-[var(--accent-text)] transition-colors"
-                            >
-                              {c.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  eyebrow={`${regionSel.region.toUpperCase()} · Step 2 of 2`} title="Pick your state." />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {regionSel.states.map((st) => {
+                    const cities = allCitiesInState(st.slug);
+                    const top = cities.slice(0, 8);
+                    return (
+                      <div key={st.slug} className="border border-[var(--border)] bg-white p-5">
+                        <Link
+                          href={`/markets/${st.slug}`}
+                          onClick={closeMenu}
+                          className="group flex items-center justify-between gap-2 pb-3 mb-3 border-b border-[var(--border)]"
+                        >
+                          <span className="flex items-center gap-2 display-md !text-[15px] group-hover:text-[var(--accent-text)] transition-colors">
+                            <MapPin className="w-3.5 h-3.5 text-[var(--accent-text)]" />
+                            {st.name}
+                          </span>
+                          <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+                            {cities.length} cities
+                          </span>
+                        </Link>
+                        <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          {top.map((c) => (
+                            <li key={c.city_slug}>
+                              <Link
+                                href={`/markets/${st.slug}/${c.city_slug}`}
+                                onClick={closeMenu}
+                                className="block py-1 text-[13px] text-[var(--text-body)] hover:text-[var(--accent-text)] transition-colors truncate"
+                              >
+                                {c.city}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                        {cities.length > top.length && (
+                          <Link
+                            href={`/markets/${st.slug}`}
+                            onClick={closeMenu}
+                            className="mt-2.5 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all"
+                          >
+                            All {cities.length} {st.name} cities
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -309,9 +328,9 @@ export function Header() {
                 title="Service areas"
               >
                 <MobileRow href="/markets" onGo={() => setMobileOpen(false)}>All markets</MobileRow>
-                {STATES.map((st) => (
-                  <MobileRow key={st.slug} href={`/markets/${st.slug}`} onGo={() => setMobileOpen(false)}>
-                    {st.name}
+                {regions.map(({ region, states }) => (
+                  <MobileRow key={region} href={`/markets#${region.toLowerCase()}`} onGo={() => setMobileOpen(false)}>
+                    {region} · {states.length} states
                   </MobileRow>
                 ))}
               </MobileGroup>

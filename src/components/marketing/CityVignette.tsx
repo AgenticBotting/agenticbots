@@ -1,10 +1,9 @@
 import { BOT_PATH } from "@/components/ui/BotFace";
-import type { City } from "@/lib/geo/schema";
 
 /**
- * The city graphic, generated from real data: the bot circle at center,
- * this metro's actual business districts wired in around it. Every city
- * page gets art that is genuinely its own, because the districts are.
+ * The city graphic: the bot circle at center, real local places wired in
+ * around it — business districts for enriched metros, surrounding cities
+ * for structural ones. Every page's art is its own because the labels are.
  */
 
 const SLOTS: { x: number; y: number; anchor: "start" | "end" }[] = [
@@ -15,8 +14,10 @@ const SLOTS: { x: number; y: number; anchor: "start" | "end" }[] = [
   { x: 160, y: 26, anchor: "start" }, // top-center, handled specially
 ];
 
-export function CityVignette({ city }: { city: City }) {
-  const districts = city.districts.slice(0, 5);
+export function CityVignette({ name, stateAbbr, labels }: {
+  name: string; stateAbbr: string; labels: string[];
+}) {
+  const districts = labels.slice(0, 5);
   return (
     <svg viewBox="0 0 320 200" className="w-full h-auto block" aria-hidden="true">
       {districts.map((d, i) => {
@@ -50,12 +51,12 @@ export function CityVignette({ city }: { city: City }) {
       </g>
       <text x="160" y="121" textAnchor="middle" fontSize="7" fontFamily="var(--font-mono)"
         fill="var(--color-ink-300)" letterSpacing="1">
-        {city.name.toUpperCase().slice(0, 14)}
+        {name.toUpperCase().slice(0, 14)}
       </text>
 
       <text x="160" y="188" textAnchor="middle" fontSize="8" fontFamily="var(--font-mono)"
         fill="var(--text-muted)" letterSpacing="0.6">
-        {districts.length} DISTRICTS WIRED · {city.stateAbbr}
+        {districts.length} AREAS WIRED · {stateAbbr}
       </text>
     </svg>
   );

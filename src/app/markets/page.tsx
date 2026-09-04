@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import { PlanCta } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
-import { CITIES, STATES, LOCAL_SERVICES, citiesInState, fmt } from "@/lib/geo/data";
+import { LOCAL_SERVICES } from "@/lib/geo/data";
+import { ALL_STATES, ALL_CITIES, allCitiesInState } from "@/lib/geo/dataset";
+import { groupByRegion } from "@/lib/geo/regions";
 
 export const metadata: Metadata = {
   title: "Markets we serve",
   description:
-    "Every metro where AgenticBots deploys — each with a market snapshot, local read, and all four agent services.",
+    "Agent systems across the country — every state, organized by region, each city with its own market hub.",
   alternates: { canonical: "/markets" },
 };
 
-/** Location-first hub (the Lot Sealers /service-areas analogue). */
 export default function MarketsIndex() {
+  const regions = groupByRegion(ALL_STATES);
   return (
     <>
       <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }])} />
@@ -23,41 +25,46 @@ export default function MarketsIndex() {
       <main>
         <section className="border-b border-[var(--border)]">
           <Container className="py-16">
-            <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {CITIES.length} metros · {STATES.length} states</span></p>
+            <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {ALL_CITIES.length} cities · {ALL_STATES.length} states</span></p>
             <h1 className="display-hero max-w-[20ch] text-balance">
               Deployed where your customers are.
             </h1>
             <p className="body-lg mt-6 max-w-[54ch]">
-              A deliberately short list. Every market below carries its own local read,
-              CPC band and industry mix — because the same playbook priced for Miami
-              would be wrong in Phoenix. More metros open as these prove out.
+              The fleet deploys remotely, so coverage is national — organized here by region,
+              then state, then metro. Every market page carries its own coverage detail.
             </p>
             <div className="mt-8"><PlanCta source="markets-index" /></div>
           </Container>
         </section>
 
-        <Section variant="alt" eyebrow="By state" heading="Pick your market.">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {STATES.map((st) => (
-              <div key={st.slug}>
-                <Link href={`/markets/${st.slug}`} className="display-md hover:text-[var(--accent-text)] transition-colors">
-                  {st.name}
-                </Link>
-                <ul className="mt-3 space-y-2 border-t border-[var(--border)] pt-3">
-                  {citiesInState(st.slug).map((c) => (
-                    <li key={c.slug}>
-                      <Link href={`/markets/${st.slug}/${c.slug}`}
-                        className="group flex items-center justify-between text-[14px] text-[var(--text-body)] hover:text-[var(--accent-text)] transition-colors">
-                        <span>{c.name} <span className="body-xs">· ~{fmt.format(c.businessCount)} businesses</span></span>
-                        <ArrowRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </Section>
+        {regions.map(({ region, states }) => (
+          <Section
+            key={region}
+            id={region.toLowerCase()}
+            variant="alt"
+            size="sm"
+            eyebrow={<span className="inline-flex items-center gap-2"><MapPin className="w-3 h-3" />{region}</span>}
+            heading={`${region} markets.`}
+          >
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {states.map((st) => {
+                const cities = allCitiesInState(st.slug);
+                return (
+                  <Link key={st.slug} href={`/markets/${st.slug}`}
+                    className="group border border-[var(--border)] bg-white p-5 hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
+                    <span className="flex items-center justify-between gap-3">
+                      <span className="display-md !text-[15px] group-hover:text-[var(--accent-text)] transition-colors">{st.name}</span>
+                      <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />
+                    </span>
+                    <span className="mt-1.5 block mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
+                      {cities.length} cities
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </Section>
+        ))}
 
         <Section variant="light" size="sm" eyebrow="By service" heading="Or start from the service.">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
