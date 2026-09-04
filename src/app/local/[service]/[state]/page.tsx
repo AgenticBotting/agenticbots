@@ -63,7 +63,7 @@ export default async function StateHub({ params }: Params) {
           sub="Grouped by metro — every city links to its own service page.">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {[...new Map(all.map((c) => [c.metro, all.filter((x) => x.metro === c.metro)])).entries()].map(([metro, list]) => (
-              <div key={metro} className="rounded-[var(--radius)] border border-[var(--border)] bg-white p-5">
+              <div key={metro} className="border border-[var(--border)] bg-white p-5">
                 <p className="flex items-baseline justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--border)]">
                   <span className="display-md !text-[15px]">{metro} metro</span>
                   <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">

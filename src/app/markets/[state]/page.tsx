@@ -75,7 +75,7 @@ export default async function StateMarketPage({ params }: Params) {
           sub="Grouped by metro — pick yours, or the nearest cluster.">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {[...metros.entries()].map(([metro, list]) => (
-              <div key={metro} className="rounded-[var(--radius)] border border-[var(--border)] bg-white p-5">
+              <div key={metro} className="border border-[var(--border)] bg-white p-5">
                 <p className="flex items-baseline justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--border)]">
                   <span className="display-md !text-[15px]">{metro} metro</span>
                   <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
@@ -103,7 +103,7 @@ export default async function StateMarketPage({ params }: Params) {
         </Section>
 
         <Section variant="light" size="sm" eyebrow="Services" heading={`Every service, everywhere in ${st.name}.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
             {LOCAL_SERVICES.map((s) => {
               const enriched = enrichedCitiesInState(state).length > 0;
               return (

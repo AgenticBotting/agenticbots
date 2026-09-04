@@ -106,14 +106,14 @@ export default function HowItWorksPage() {
 
         <section className="section-pad border-b border-[var(--border)]">
           <Container>
-            <div className="space-y-px bg-[var(--border)] rounded-[var(--radius)] border border-[var(--border)]  overflow-hidden">
+            <div className="space-y-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
               {PHASES.map((p, i) => {
                 const Icon = p.icon;
                 return (
                   <Reveal key={p.n} delay={i * 0.05}>
                     <div className="bg-white grid lg:grid-cols-[auto_1fr_1fr] gap-8 lg:gap-12 p-8 sm:p-10">
                       <div className="lg:w-32">
-                        <span className="flex h-10 w-10 items-center justify-center  bg-ink-950 text-white">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-none bg-ink-950 text-white">
                           <Icon className="w-4.5 h-4.5" />
                         </span>
                         <p

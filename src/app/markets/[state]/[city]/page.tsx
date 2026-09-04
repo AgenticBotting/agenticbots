@@ -157,7 +157,7 @@ export default async function CityMarketHub({ params }: Params) {
 
         {/* All services × this city */}
         <Section variant="alt" eyebrow={`Services in ${rec.city}`} heading={`Every bot, deployed for ${rec.city}.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
             {LOCAL_SERVICES.map((s) => (
               <Link
                 key={s.slug}
@@ -183,7 +183,7 @@ export default async function CityMarketHub({ params }: Params) {
         {ct ? (
           <Section variant="light" eyebrow={`The ${ct.name} read`}>
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-              <div className="rounded-[var(--radius)] border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+              <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
                 <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
               </div>
               <blockquote className="border-l-2 border-accent-500 pl-7">
@@ -197,7 +197,7 @@ export default async function CityMarketHub({ params }: Params) {
         ) : (
           <Section variant="light" eyebrow="Coverage" heading={`The ${rec.metro} metro, covered.`}>
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-              <div className="rounded-[var(--radius)] border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+              <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
                 <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
               </div>
               <p className="body-base max-w-[52ch]">

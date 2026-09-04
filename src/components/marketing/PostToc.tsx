@@ -59,7 +59,7 @@ export function PostToc({ items }: { items: { id: string; text: string }[] }) {
         </div>
       </nav>
       {/* Mobile accordion */}
-      <details className="lg:hidden rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 mb-8">
+      <details className="lg:hidden border border-[var(--border)] bg-white px-4 py-3 mb-8">
         <summary className="mono text-[11px] uppercase tracking-[0.11em] cursor-pointer text-[var(--text-secondary)]">
           On this page
         </summary>

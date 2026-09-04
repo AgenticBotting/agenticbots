@@ -37,7 +37,7 @@ export default function ContactPage() {
                     const Icon = f.icon;
                     return (
                       <li key={f.t} className="flex gap-4">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center  rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-alt)] text-[var(--accent-text)]">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none border border-[var(--border)] bg-[var(--bg-alt)] text-[var(--accent-text)]">
                           <Icon className="w-4 h-4" />
                         </span>
                         <span>

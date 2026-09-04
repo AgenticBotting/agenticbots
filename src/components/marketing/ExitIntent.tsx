@@ -166,7 +166,7 @@ export function ExitIntent() {
   const formBody =
     step === "done" ? (
       <div className="py-6 text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center bg-[var(--bg-tint)] rounded-[var(--radius)] border border-[var(--border-tint)] text-[var(--accent-text)]">
+        <span className="mx-auto flex h-11 w-11 items-center justify-center bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
           <Check className="w-5 h-5" strokeWidth={2.5} />
         </span>
         <h3 className="display-lg mt-4">Sent.</h3>
@@ -234,7 +234,7 @@ export function ExitIntent() {
         <div className="relative hidden md:flex flex-col justify-between bg-ink-950 on-dark p-8 overflow-hidden">
           <div className="absolute inset-0 bg-grid-dark opacity-60" />
           <div className="relative">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-accent-500">
+            <span className="flex h-11 w-11 items-center justify-center notch bg-accent-500">
               <BotFace className="w-6 h-5 text-ink-950" />
             </span>
             <p className="eyebrow mt-7">Before you go</p>

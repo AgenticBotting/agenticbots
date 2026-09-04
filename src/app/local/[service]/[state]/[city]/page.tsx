@@ -176,7 +176,7 @@ export default async function CityPage({ params }: Params) {
           heading={`What we would actually change in ${ct.name}.`}
         >
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+            <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
               <CityVignette name={ct.name} stateAbbr={ct.stateAbbr} labels={ct.districts} />
             </div>
             <div className="space-y-8">
@@ -214,7 +214,7 @@ export default async function CityPage({ params }: Params) {
             block from the Lot Sealers playbook. */}
         <Section variant="light" size="sm" eyebrow={`Also running in ${ct.name}`}
           heading={`Other bots ${ct.name} businesses deploy.`}>
-          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {LOCAL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
               <Link key={o.slug} href={`/local/${o.slug}/${st.slug}/${ct.slug}`} className="group card-cell p-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
@@ -237,7 +237,7 @@ export default async function CityPage({ params }: Params) {
         </Section>
 
         <Section variant="alt" size="sm" eyebrow="Nearby markets">
-          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {near.map((n) => (
               <Link key={n.slug} href={`/local/${svc.slug}/${n.stateSlug}/${n.slug}`}
                 className="group card-cell p-6 flex items-center justify-between gap-4">
@@ -379,7 +379,7 @@ function StructuralCityService({ svc, st, rec }: {
         {/* ── Coverage: the metro vignette + surrounding markets, same service. ── */}
         <Section variant="alt" eyebrow="Coverage" heading={`The ${rec.metro} metro, covered.`}>
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+            <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
               <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
             </div>
             <div>
@@ -422,7 +422,7 @@ function StructuralCityService({ svc, st, rec }: {
         {/* Other services, same city — every internal link keeps the city. */}
         <Section variant="light" size="sm" eyebrow={`Also running in ${rec.city}`}
           heading={`Other bots ${rec.city} businesses deploy.`}>
-          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {LOCAL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
               <Link key={o.slug} href={`/local/${o.slug}/${st.slug}/${rec.city_slug}`} className="group card-cell p-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>

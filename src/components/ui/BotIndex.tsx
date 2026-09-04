@@ -27,15 +27,15 @@ export function BotIndex({
 
   const skin = {
     dark: "bg-ink-950 text-white",
-    outline: "rounded-[var(--radius)] border border-[var(--border-strong)] text-[var(--foreground)]",
-    light: "rounded-[var(--radius)] border border-ink-700 text-white",
+    outline: "border border-[var(--border-strong)] text-[var(--foreground)]",
+    light: "border border-ink-700 text-white",
   }[tone];
 
   return (
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex shrink-0 items-center justify-center font-display font-semibold tracking-[-0.03em] tabular-nums rounded-[var(--radius-sm)]",
+        "inline-flex shrink-0 items-center justify-center font-display font-semibold tracking-[-0.03em] tabular-nums notch",
         box,
         skin,
         className

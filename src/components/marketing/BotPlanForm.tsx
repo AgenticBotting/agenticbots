@@ -145,7 +145,7 @@ export function BotPlanForm({
   };
 
   return (
-    <div ref={panelRef} tabIndex={-1} className={cn("@container rounded-[var(--radius)] overflow-hidden border border-[var(--border-strong)] bg-white outline-none", className)}>
+    <div ref={panelRef} tabIndex={-1} className={cn("@container border border-[var(--border-strong)] bg-white outline-none", className)}>
       {/* ── Console header: status, progress pips, answers so far ── */}
       <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
@@ -175,7 +175,7 @@ export function BotPlanForm({
                 key={a.label}
                 type="button"
                 onClick={a.undo}
-                className="group inline-flex items-center gap-2 rounded-[var(--radius)] border border-ink-700 px-2.5 py-1 mono text-[10px] uppercase tracking-[0.1em] text-ink-300 hover:border-accent-500 hover:text-accent-400 transition-colors"
+                className="group inline-flex items-center gap-2 border border-ink-700 px-2.5 py-1 mono text-[10px] uppercase tracking-[0.1em] text-ink-300 hover:border-accent-500 hover:text-accent-400 transition-colors"
               >
                 {a.label}
                 <span className="text-ink-400 group-hover:text-accent-400">×</span>
@@ -190,7 +190,7 @@ export function BotPlanForm({
       <div className="p-6 sm:p-9 lg:p-11">
         {state === "done" ? (
           <div className="text-center py-6">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 rounded-[var(--radius-sm)]">
+            <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 notch">
               <Check className="w-6 h-6" strokeWidth={3} />
             </span>
             <h3 className="display-lg mt-5">Got it.</h3>
@@ -209,7 +209,7 @@ export function BotPlanForm({
               {stepIndex > 0 && (
                 <button
                   type="button" onClick={back} aria-label="Back"
-                  className="shrink-0 flex items-center justify-center w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] hover:border-ink-950 transition-colors"
+                  className="shrink-0 flex items-center justify-center w-9 h-9 border border-[var(--border)] hover:border-ink-950 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
@@ -219,7 +219,7 @@ export function BotPlanForm({
             {options.length > 0 ? (
               <>
                 <div className={cn(
-                  "mt-8 grid gap-px bg-[var(--border)] border border-[var(--border)] grid-frame",
+                  "mt-8 grid gap-px bg-[var(--border)] border border-[var(--border)]",
                   options.length === 3 ? "@3xl:grid-cols-3" : "@lg:grid-cols-2 @3xl:grid-cols-3"
                 )}>
                   {options.map((o, i) => (

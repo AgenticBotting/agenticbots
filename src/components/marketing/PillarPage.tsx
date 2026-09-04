@@ -52,7 +52,7 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
               />
             </Reveal>
 
-            <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame  overflow-hidden">
+            <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
               {pillar.categories.map((c, i) => (
                 <Reveal key={c.slug} delay={Math.min(i, 6) * 0.05}>
                   <Link

@@ -99,14 +99,14 @@ export function BotPlanFlow() {
   return (
     <div className="fixed inset-0 z-[80] bg-ink-950/70 backdrop-blur-sm overflow-y-auto animate-fade-in">
       <div className="min-h-full flex items-start sm:items-center justify-center p-0 sm:p-6">
-        <div className="w-full max-w-[840px] bg-white sm:rounded-[var(--radius)] shadow-mega min-h-screen sm:min-h-0">
+        <div className="w-full max-w-[840px] bg-white sm:rounded-none shadow-mega min-h-screen sm:min-h-0">
           {/* Bar */}
           <div className="flex items-center justify-between gap-4 px-5 sm:px-8 h-16 border-b border-[var(--border)]">
             <div className="flex items-center gap-3 min-w-0">
               {step > 0 && state !== "done" && (
                 <button
                   onClick={() => setStep((s) => s - 1)}
-                  className="flex items-center justify-center w-8 h-8  rounded-[var(--radius)] border border-[var(--border)] hover:border-ink-950 transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-none border border-[var(--border)] hover:border-ink-950 transition-colors"
                   aria-label="Back"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -118,7 +118,7 @@ export function BotPlanFlow() {
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center w-9 h-9  hover:bg-[var(--bg-alt)] transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-none hover:bg-[var(--bg-alt)] transition-colors"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -138,7 +138,7 @@ export function BotPlanFlow() {
           <div className="px-5 sm:px-8 py-8 sm:py-10">
             {state === "done" ? (
               <div className="text-center py-6">
-                <span className="mx-auto flex h-12 w-12 items-center justify-center  bg-[var(--bg-tint)] rounded-[var(--radius)] border border-[var(--border-tint)] text-[var(--accent-text)]">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
                   <Check className="w-6 h-6" strokeWidth={2.5} />
                 </span>
                 <h2 className="display-xl mt-6">You are in the queue.</h2>
@@ -265,7 +265,7 @@ function CardBtn({
       type="button"
       onClick={onClick}
       className={cn(
-        "group text-left p-5  rounded-[var(--radius)] border border-[var(--border)] bg-white",
+        "group text-left p-5 rounded-none border border-[var(--border)] bg-white",
         "hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift",
         "transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
         className

@@ -90,7 +90,7 @@ export function AgentTrace() {
   const done = effTime >= DURATION;
 
   return (
-    <div className="rounded-[var(--radius)] border border-ink-700 bg-ink-950 on-dark">
+    <div className="border border-ink-700 bg-ink-950 on-dark">
       {/* Transport */}
       <div className="flex items-center gap-4 px-5 h-14 border-b border-ink-700">
         <button
@@ -100,7 +100,7 @@ export function AgentTrace() {
             else setPlaying((p) => { if (!p) track("trace_played", { replay: false }); return !p; });
           }}
           aria-label={done ? "Replay trace" : playing ? "Pause trace" : "Play trace"}
-          className="flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 rounded-[var(--radius-sm)] hover:bg-accent-400 transition-colors"
+          className="flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 notch hover:bg-accent-400 transition-colors"
         >
           {done ? <RotateCcw className="w-4 h-4" strokeWidth={2.5} />
             : playing ? <Pause className="w-4 h-4" strokeWidth={2.5} />
@@ -144,7 +144,7 @@ export function AgentTrace() {
                   {s.label}
                 </p>
               ) : s.kind === "result" ? (
-                <div className="rounded-[var(--radius)] border border-accent-500/40 bg-accent-500/[0.07] px-4 py-3">
+                <div className="border border-accent-500/40 bg-accent-500/[0.07] px-4 py-3">
                   <p className="text-[13.5px] font-semibold text-accent-300">{s.label}</p>
                   {s.detail && <p className="text-[12.5px] text-ink-300 mt-1">{s.detail}</p>}
                 </div>
@@ -168,7 +168,7 @@ export function AgentTrace() {
             className="absolute inset-0 flex flex-col items-center justify-center gap-4 group"
             aria-label="Play the trace"
           >
-            <span className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-sm)] bg-accent-500 text-ink-950 transition-transform group-hover:scale-105">
+            <span className="flex h-16 w-16 items-center justify-center notch bg-accent-500 text-ink-950 transition-transform group-hover:scale-105">
               <Play className="w-7 h-7 ml-0.5" strokeWidth={2.5} />
             </span>
             <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-200">

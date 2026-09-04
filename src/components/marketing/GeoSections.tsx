@@ -78,7 +78,7 @@ export function AgentConsole({
 
   return (
     <div className="relative pb-16">
-      <div className="rounded-[var(--radius)] overflow-hidden border border-[var(--border-strong)] bg-white">
+      <div className="border border-[var(--border-strong)] bg-white">
         <div className="flex items-center justify-between gap-4 px-5 py-3.5 border-b border-[var(--border)]">
           <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-secondary)] truncate">
             {botName}{cityName ? ` · ${cityName}` : ""}
@@ -102,7 +102,7 @@ export function AgentConsole({
       </div>
 
       {/* Floating metric card — the wireframes' overlapping stat chip. */}
-      <div className="absolute bottom-2 right-0 rounded-[var(--radius)] border border-ink-950 bg-ink-950 on-dark px-6 py-4 max-w-[240px]">
+      <div className="absolute bottom-2 right-0 border border-ink-950 bg-ink-950 on-dark px-6 py-4 max-w-[240px]">
         <p className="text-[1.6rem] font-semibold tracking-[-0.035em] leading-none tabular-nums text-signal-500">{stat.value}</p>
         <p className="mt-2 text-[11.5px] leading-snug text-ink-300">{stat.label}</p>
       </div>
@@ -160,7 +160,7 @@ export function StatSplit({
     <section className="border-b border-[var(--border)] bg-white">
       <Container className="section-pad">
         <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-12 lg:gap-20 items-center">
-          <dl className="grid grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+          <dl className="grid grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)]">
             {stats.slice(0, 4).map((s) => (
               <div key={s.label} className="bg-white p-7 sm:p-8">
                 <dt className="text-[2rem] font-semibold tracking-[-0.035em] leading-none tabular-nums">
@@ -214,7 +214,7 @@ export function FeatureTriad({
           <h2 className="display-xl text-balance">{heading}</h2>
           {sub && <p className="body-lg mt-5 text-pretty">{sub}</p>}
         </div>
-        <div className="mt-12 grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
+        <div className="mt-12 grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
           {items.map((it) => (
             <div key={it.title} className="bg-white p-7 sm:p-8 flex flex-col">
               <p className="mono text-[11px] tracking-[0.08em] text-[var(--accent-text)]">{it.index}</p>
@@ -248,7 +248,7 @@ export function FeatureTriad({
 /** Deterministic mini mockups for the zig-zag media slots. */
 function MiniPanel({ variant, label }: { variant: 0 | 1 | 2; label: string }) {
   return (
-    <div className="rounded-[var(--radius)] overflow-hidden border border-[var(--border-strong)] bg-white">
+    <div className="border border-[var(--border-strong)] bg-white">
       <div className="px-5 py-3 border-b border-[var(--border)]">
         <p className="mono text-[10px] uppercase tracking-[0.11em] text-[var(--text-secondary)] truncate">{label}</p>
       </div>
@@ -282,7 +282,7 @@ function MiniPanel({ variant, label }: { variant: 0 | 1 | 2; label: string }) {
                 <p className="mono text-[9px] uppercase tracking-[0.1em] text-[var(--text-muted)] mb-2">{t}</p>
                 <div className="space-y-1.5">
                   {Array.from({ length: n as number }).map((_, i) => (
-                    <div key={i} className={cn("h-5 rounded-[var(--radius)] border border-[var(--border)]",
+                    <div key={i} className={cn("h-5 border border-[var(--border)]",
                       t === "Booked" ? "bg-accent-100 border-accent-500" : "bg-[var(--bg-alt)]")} />
                   ))}
                 </div>

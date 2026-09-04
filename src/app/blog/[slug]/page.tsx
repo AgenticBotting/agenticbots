@@ -129,7 +129,7 @@ export default async function PostPage({ params }: Params) {
               {/* Byline + share, then the inline email capture. */}
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-4">
                 <span className="flex items-center gap-2.5">
-                  <span className="flex h-8 w-8 items-center justify-center bg-ink-950 rounded-[var(--radius-sm)]">
+                  <span className="flex h-8 w-8 items-center justify-center bg-ink-950 notch">
                     <BotFace className="w-4 h-3.5 text-accent-500" />
                   </span>
                   <span className="text-[13.5px] font-semibold tracking-[-0.01em]">The AgenticBots team</span>
@@ -173,7 +173,7 @@ export default async function PostPage({ params }: Params) {
           <section className="section-pad-sm border-t border-[var(--border)]">
             <Container>
               <p className="eyebrow text-center mb-9">Keep reading</p>
-              <div className={`mx-auto max-w-[980px] grid gap-px bg-[var(--border)] border border-[var(--border)] grid-frame ${more.length === 1 ? "" : more.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+              <div className={`mx-auto max-w-[980px] grid gap-px bg-[var(--border)] border border-[var(--border)] ${more.length === 1 ? "" : more.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                 {more.map((p) => (
                   <Link key={p.slug} href={`/blog/${p.slug}`} className="group card-cell p-7 flex flex-col">
                     <span className="body-xs">{p.category}</span>

@@ -52,7 +52,7 @@ export function BlogOptin({
       <div className="relative mx-auto max-w-[46ch]">
         {state === "done" ? (
           <>
-            <span className="mx-auto mb-5 flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-signal-500 text-ink-950">
+            <span className="mx-auto mb-5 flex h-11 w-11 items-center justify-center notch bg-signal-500 text-ink-950">
               <Check className="w-5 h-5" strokeWidth={3} />
             </span>
             <h3 className="display-lg">You&apos;re on the list.</h3>
