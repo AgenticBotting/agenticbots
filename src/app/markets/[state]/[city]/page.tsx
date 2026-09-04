@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
-import { BotPlanForm, PlanCta, StatBand, CityVignette } from "@/components/marketing";
-import { JsonLd, breadcrumbLd, serviceLd } from "@/components/JsonLd";
+import { BotPlanForm, PlanCta, StatBand, CityVignette, ProofBar, FaqAccordion } from "@/components/marketing";
+import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES, getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 
@@ -50,6 +50,12 @@ export default async function CityMarketHub({ params }: Params) {
 
   const vignetteLabels = ct ? ct.districts : rec.surrounding.slice(0, 5).map((s0) => s0.city);
 
+  const faqs = [
+    { q: `Do you work with ${rec.city} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro. Every sequence is scheduled on your local hours, not ours.` },
+    { q: `How fast can this go live in ${rec.city}?`, a: `The typical build is about two weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
+    { q: `What does it cost?`, a: `A one-time build fee for getting your bots right, then a monthly fee to run and tune them — no per-seat pricing, no percentage of ad spend, no lock-in. The free plan comes back with numbers for your situation.` },
+  ];
+
   return (
     <>
       <JsonLd data={[
@@ -65,6 +71,7 @@ export default async function CityMarketHub({ params }: Params) {
           { name: st.name, path: `/markets/${st.slug}` },
           { name: rec.city, path: `/markets/${st.slug}/${rec.city_slug}` },
         ]),
+        faqLd(faqs),
       ]} />
       <Header />
       <main>
@@ -108,42 +115,39 @@ export default async function CityMarketHub({ params }: Params) {
                 <div className="mt-8"><PlanCta source={`market-hub-${rec.city_slug}`} /></div>
               </div>
 
-              <div>
-                <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3 mb-8">
-                  <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
-                </div>
-                {ct && (
-                  <div className="border-t-2 border-ink-950 pt-6">
-                    <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mb-5">
-                      {ct.name} snapshot · estimates
-                    </p>
-                    <dl className="space-y-0">
-                      {[
-                        ["Metro population", fmt.format(ct.metroPopulation)],
-                        ["Businesses", `~${fmt.format(ct.businessCount)}`],
-                        ["Dominant verticals", ct.industries.slice(0, 3).join(" · ")],
-                        ["Local-service CPC band", `$${ct.cpcBand[0]}–$${ct.cpcBand[1]} est.`],
-                        ["Agency competition", ct.competition],
-                      ].map(([k, v]) => (
-                        <div key={k as string} className="flex items-baseline justify-between gap-6 py-3 border-b border-[var(--border)]">
-                          <dt className="body-sm shrink-0">{k}</dt>
-                          <dd className="text-[13.5px] font-semibold text-right tracking-[-0.01em]">{v}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                    <p className="body-xs mt-4">
-                      Public-source estimates, refreshed periodically — shown for orientation, not quoted as audit data.
-                    </p>
-                  </div>
-                )}
+              <div className="border border-[var(--border)] bg-white px-6 pt-8 pb-4 self-center">
+                <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
               </div>
             </div>
           </Container>
         </section>
 
+        {ct && (
+          <section className="border-b border-[var(--border)] bg-[var(--bg-alt)]">
+            <Container className="py-7">
+              <dl className="grid grid-cols-2 lg:grid-cols-5 gap-x-10 gap-y-5">
+                {[
+                  ["Metro population", fmt.format(ct.metroPopulation)],
+                  ["Businesses", `~${fmt.format(ct.businessCount)}`],
+                  ["Dominant verticals", ct.industries.slice(0, 2).join(" · ")],
+                  ["CPC band", `$${ct.cpcBand[0]}–$${ct.cpcBand[1]} est.`],
+                  ["Competition", ct.competition],
+                ].map(([k, v]) => (
+                  <div key={k as string}>
+                    <dt className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{k}</dt>
+                    <dd className="text-[15px] font-semibold tracking-[-0.015em] mt-1">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Container>
+          </section>
+        )}
+
+        <ProofBar />
+
         {/* All services × this city */}
         <Section variant="alt" eyebrow={`Services in ${rec.city}`} heading={`Every bot, deployed for ${rec.city}.`}>
-          <div className="grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)]">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
             {LOCAL_SERVICES.map((s) => (
               <Link
                 key={s.slug}
@@ -152,11 +156,11 @@ export default async function CityMarketHub({ params }: Params) {
               >
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{s.botName}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
-                  {s.name} in {rec.city}
+                  {s.name}
                 </p>
-                <p className="body-sm mt-2.5">{s.intro.split(".")[0]}.</p>
+                <p className="body-sm mt-2 min-h-[2.6em]">{s.hook}</p>
                 <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
-                  {enriched ? `Open the ${rec.city} page` : `About ${s.name}`}
+                  {rec.city} details
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
@@ -165,8 +169,13 @@ export default async function CityMarketHub({ params }: Params) {
         </Section>
 
         {ct && (
-          <Section variant="light" eyebrow="The local read" heading={`What we would actually change in ${ct.name}.`}>
-            <p className="body-lg max-w-[64ch]">{ct.localNote}</p>
+          <Section variant="light" size="sm" eyebrow={`The ${ct.name} read`}>
+            <blockquote className="max-w-[62ch] border-l-2 border-accent-500 pl-7">
+              <p className="display-lg !font-medium !leading-[1.4] text-balance">{ct.localNote}</p>
+              <footer className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mt-5">
+                What we would actually change here — written by us, not generated
+              </footer>
+            </blockquote>
           </Section>
         )}
 
@@ -196,7 +205,11 @@ export default async function CityMarketHub({ params }: Params) {
           </Section>
         )}
 
-        <Section variant="light" eyebrow="Start here" heading={`Get the ${rec.city} bot plan.`}
+        <Section variant="light" eyebrow="Questions" heading={`${rec.city}, specifically.`}>
+          <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
+        </Section>
+
+        <Section variant="alt" eyebrow="Start here" heading={`Get the ${rec.city} bot plan.`}
           sub="Tell us what you sell and where it is getting stuck. The plan comes back mapped to this market — free, one business day.">
           <div className="max-w-[640px]">
             <BotPlanForm source={`market-hub-${rec.city_slug}-form`} />
