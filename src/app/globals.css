@@ -137,6 +137,10 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
 }
+@keyframes rogue-run {
+  0%   { transform: translateX(-140px); }
+  100% { transform: translateX(calc(100vw + 320px)); }
+}
 @keyframes bot-wake {
   0%, 88%, 100% { opacity: 0.30; }
   92%, 96%      { opacity: 1; }
@@ -527,6 +531,7 @@
   .animate-fade-in  { animation: fade-in 0.45s ease-out both; }
   .animate-pulse-dot{ animation: pulse-dot 2s ease-in-out infinite; }
   .animate-bot-wake { animation: bot-wake 9s ease-in-out infinite; }
+  .rogue-run { animation: rogue-run 5.5s linear forwards; }
 
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }

@@ -100,7 +100,10 @@ export function Footer() {
 
         <div className="pt-8 border-t border-ink-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-[12.5px] text-ink-500">
-            © {year} AgenticBots. All rights reserved.
+            © {year} AgenticBots. All rights reserved.{" "}
+            <span className="hidden sm:inline" title="It has never once asked for a raise.">
+              This footer was assembled by a bot that does not celebrate its own birthday.
+            </span>
           </p>
           <ul className="flex items-center gap-6">
             {LEGAL.map((l) => (

@@ -15,7 +15,9 @@ export default function NotFound() {
             That page <span className="em-green">does not exist.</span>
           </h1>
           <p className="body-lg mt-6 max-w-[46ch]">
-            The link may be old, or we may have moved it. Here is everything we build.
+            The link may be old, or we may have moved it. A bot has already logged the
+            miss, filed it under <span className="mono text-[0.9em]">routing.debt</span>,
+            and will not bring it up again.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-4">

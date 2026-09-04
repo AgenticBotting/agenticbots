@@ -15,3 +15,6 @@ export { ProblemDiagram } from "./ProblemDiagram";
 export { SecurityBlock } from "./SecurityBlock";
 export { ReadingProgress } from "./ReadingProgress";
 export { PostToc } from "./PostToc";
+export { AgentTrace } from "./AgentTrace";
+export { CplDecayChart, BeforeAfterChart } from "./Charts";
+export { RogueBot } from "./RogueBot";

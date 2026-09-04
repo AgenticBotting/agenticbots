@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Plug, Rocket, LineChart, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Container, Reveal, SectionHeader, ButtonLink, BrandMark } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, SecurityBlock } from "@/components/marketing";
+import { Container, Reveal, SectionHeader, ButtonLink, BrandMark, Section } from "@/components/ui";
+import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, SecurityBlock, AgentTrace, CplDecayChart, BeforeAfterChart } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -187,6 +187,42 @@ function BotRoster() {
   );
 }
 
+
+/* ─────────────────────────  LIVE DEMO + RESULTS  ───────────────────── */
+
+function DemoSection() {
+  return (
+    <Section
+      id="demo"
+      variant="light"
+      eyebrow={<>See a bot run <span className="eyebrow-dim">· recorded production trace</span></>}
+      heading="Watch one missed call become a booked job."
+      sub="Tool calls and reasoning visible, scrubbable, at ~10× real time. This is the actual shape of the work — not a mockup."
+    >
+      <div className="max-w-[860px]">
+        <AgentTrace />
+      </div>
+    </Section>
+  );
+}
+
+function ResultsSection() {
+  return (
+    <Section
+      id="results"
+      variant="alt"
+      eyebrow="What the numbers do"
+      heading={<>The curve every deployment <span className="em-green">is chasing.</span></>}
+      sub="Charted from typical pilot trajectories; series are labeled illustrative until each claim carries a named client. We would rather show you the shape honestly than invent precision."
+    >
+      <div className="grid lg:grid-cols-2 gap-6">
+        <CplDecayChart />
+        <BeforeAfterChart />
+      </div>
+    </Section>
+  );
+}
+
 /* ───────────────────────────  HOW IT WORKS  ─────────────────────────── */
 
 const BUILD_STEPS = [
@@ -321,6 +357,8 @@ export default function HomePage() {
         <WhatABotDoes />
         <Pillars />
         <BotRoster />
+        <DemoSection />
+        <ResultsSection />
         <StatBand
           eyebrow="What changes"
           title="The gap between a lead arriving and someone doing something about it."
