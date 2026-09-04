@@ -142,6 +142,37 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
 }
+/* ── Hero factory scene ── */
+@keyframes factory-bot {
+  0%   { offset-distance: 0%;   opacity: 0; }
+  6%   { opacity: 1; }
+  62%  { offset-distance: 100%; opacity: 1; }
+  100% { offset-distance: 100%; opacity: 1; }
+}
+/* A pulse of signal running the wire ahead of each unit. */
+@keyframes factory-wire {
+  0%, 100% { stroke-dasharray: 10 620; stroke-dashoffset: 620; opacity: 0; }
+  10%      { opacity: 0.9; }
+  60%      { stroke-dashoffset: 0; opacity: 0.9; }
+  75%      { opacity: 0; }
+}
+/* Build slots filling, then shipping. */
+@keyframes factory-slot {
+  0%, 100% { transform: scaleX(0.06); opacity: 0.5; }
+  70%      { transform: scaleX(1); opacity: 1; }
+  85%      { transform: scaleX(1); opacity: 0.15; }
+}
+/* A station comes alive when its unit lands. */
+@keyframes station-line {
+  0%, 58%  { transform: scaleX(0); opacity: 0; }
+  70%      { transform: scaleX(1); opacity: 1; }
+  100%     { transform: scaleX(1); opacity: 1; }
+}
+@keyframes station-dot {
+  0%, 58%  { fill: var(--color-ink-100); }
+  70%, 100%{ fill: var(--color-accent-500); }
+}
+
 @keyframes bot-belt {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -572,6 +603,14 @@
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   }
+
+  /* The factory scene. Every duration and delay is set per element in
+     BotFactory so one CYCLE constant keeps the whole line in step. */
+  .factory-bot   { animation-name: factory-bot; animation-timing-function: linear; animation-iteration-count: infinite; }
+  .factory-wire  { animation-name: factory-wire; animation-timing-function: ease-out; animation-iteration-count: infinite; }
+  .factory-slot  { animation-name: factory-slot; animation-timing-function: ease-in-out; animation-iteration-count: infinite; transform-box: fill-box; transform-origin: left center; }
+  .station-line  { animation-name: station-line; animation-timing-function: var(--ease-smooth); animation-iteration-count: infinite; transform-box: fill-box; transform-origin: left center; }
+  .station-dot   { animation-name: station-dot; animation-timing-function: steps(1, end); animation-iteration-count: infinite; }
 
   /* Duration comes from the component so each orbit can set its own pace. */
   .bot-orbit {

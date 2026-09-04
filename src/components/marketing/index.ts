@@ -30,3 +30,4 @@ export { PostOptin } from "./PostOptin";
 export { ShareRow } from "./ShareRow";
 export { BotOrbit } from "./BotOrbit";
 export { BotConveyor } from "./BotConveyor";
+export { BotFactory } from "./BotFactory";

@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { BotPlanForm, BotFactory, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -67,7 +67,7 @@ function Hero() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <PipelineMockup />
+            <BotFactory />
           </Reveal>
         </div>
       </Container>
