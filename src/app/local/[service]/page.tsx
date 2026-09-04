@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
-import { BotPlanForm, PlanCta, StatBand, FaqAccordion, ProofBar, CategoryVignette } from "@/components/marketing";
+import {
+  BotPlanForm, PlanCta, FaqAccordion, ProofBar,
+  AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand,
+} from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES, getService, citiesInState } from "@/lib/geo/data";
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
@@ -46,7 +49,7 @@ export default async function ServiceHub({ params }: Params) {
       ]} />
       <Header />
       <main>
-        {/* ── Hero: promise left, the bot's scene right — no empty half. ── */}
+        {/* ── Hero: promise left, the bot's console right (wireframe #2/#3). ── */}
         <section className="border-b border-[var(--border)]">
           <Container className="py-14 sm:py-16">
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
@@ -60,63 +63,74 @@ export default async function ServiceHub({ params }: Params) {
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   <PlanCta source={`local-hub-${svc.slug}`} />
                   {category && (
-                    <Link
-                      href={`/${category.pillar}/${category.slug}`}
-                      className="text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
-                    >
+                    <Link href={`/${category.pillar}/${category.slug}`} className="btn btn-outline">
                       How {category.botName} works
                     </Link>
                   )}
                 </div>
                 <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
               </div>
-              {category && (
-                <div className="border border-[var(--border)] bg-[var(--bg-alt)] px-6 pt-8 pb-5">
-                  <CategoryVignette slug={category.slug} />
-                </div>
-              )}
+              <AgentConsole
+                botName={svc.botName}
+                places={["your busiest market", "your next market"]}
+                stat={{ value: svc.baseline[0].value, label: svc.baseline[0].metric }}
+              />
             </div>
           </Container>
         </section>
 
+        <StackStrip />
         <ProofBar />
 
-        {/* ── Persuasion: the same before/after rows the category page earns. ── */}
+        {/* ── Zig-zag deep dives: the before/after pairs, one mockup each. ── */}
         {category && (
-          <Section
-            variant="light"
+          <ZigZag
             eyebrow="What changes"
             heading={<>Same business. <span className="em-green">Different week.</span></>}
-          >
-            <div className="border-t border-[var(--border-strong)] max-w-[1040px]">
-              {category.contrast.map((c, i) => (
-                <div key={c.today} className="grid md:grid-cols-[auto_1fr_1fr] gap-6 md:gap-12 py-8 border-b border-[var(--border)]">
-                  <span className="display-md text-[var(--text-muted)] md:w-10">0{i + 1}</span>
-                  <div>
-                    <p className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)] mb-2.5">Today</p>
-                    <p className="body-base">{c.today}</p>
-                  </div>
-                  <div className="md:pl-10 md:border-l-2 md:border-ink-950">
-                    <p className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-[var(--accent-text)] mb-2.5">
-                      With {svc.botName}
-                    </p>
-                    <p className="body-base !text-[var(--foreground)] font-medium">{c.after}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
+            botName={svc.botName}
+            rows={category.contrast.map((c, i) => ({
+              label: `${svc.botName} · ${category.highlights[i]?.title ?? svc.name}`,
+              title: category.highlights[i]?.title ?? svc.name,
+              today: c.today,
+              after: c.after,
+            }))}
+          />
         )}
 
-        <StatBand
-          eyebrow={`${svc.botName} cadence`}
-          title={`${svc.name} that never goes quiet.`}
-          metrics={svc.baseline.map((b) => ({ value: b.value, label: b.metric }))}
+        {/* ── Big-number stat split (wireframe #2's core block). ── */}
+        <StatSplit
+          eyebrow="The complete system"
+          heading={<>{svc.name}, run for you — <span className="em-green">end to end.</span></>}
+          body={`${category?.outcome ?? svc.hook} ${svc.botName} runs the whole loop — built, monitored and tuned continuously, inside the accounts you already own. You stay the owner of every account and every result.`}
+          stats={[
+            { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
+            { value: "24/7", label: "Coverage — nights, weekends and holidays" },
+            ...svc.baseline.slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+          ]}
+          source={`local-hub-${svc.slug}-statsplit`}
+          note="No per-seat pricing. No percentage of ad spend. No lock-in."
         />
+
+        {/* ── Checklist feature cards. ── */}
+        {category && (
+          <FeatureTriad
+            eyebrow={`What ${svc.botName} runs`}
+            heading={<>Everything under the hood, <span className="em-green">handled.</span></>}
+            sub={`The work an agency does monthly and a bot does continuously — the full list lives on the ${category.botName} page.`}
+            items={category.highlights.slice(0, 3).map((h, i) => ({
+              index: `0${i + 1}`,
+              title: h.title,
+              body: h.body,
+              bullets: category.capabilities.slice(i * 3, i * 3 + 3),
+              href: `/${category.pillar}/${category.slug}`,
+              linkLabel: "See the full scope",
+            }))}
+          />
+        )}
 
         {/* ── Markets: region columns, focused metros first. ── */}
         <Section
-          variant="alt"
+          variant="light"
           eyebrow="Markets"
           heading={`${svc.name}, anywhere in the country.`}
           sub="Our focus metros carry a full local market read; every other US market deploys the same way — remotely, into the tools you already use."
@@ -159,14 +173,20 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* ── Objections ── */}
         {faqs.length > 0 && (
-          <Section variant="light" eyebrow="Questions" heading={`${svc.name}, specifically.`}>
+          <Section variant="alt" eyebrow="Questions" heading={`${svc.name}, specifically.`}>
             <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
           </Section>
         )}
 
-        {/* ── Close ── */}
+        {/* ── Centered dark closer, then the form. ── */}
+        <JoinBand
+          heading={<>Put {svc.botName} to work in <span className="em-green">your market.</span></>}
+          sub={`One conversation, one free plan — and ${svc.name.toLowerCase()} stops being the thing nobody has time for.`}
+          source={`local-hub-${svc.slug}-joinband`}
+        />
+
         <Section
-          variant="alt"
+          variant="light"
           eyebrow="Start here"
           heading={`Get the ${svc.name.toLowerCase()} plan for your market.`}
           sub="Tell us what you sell and where you are. The plan comes back mapped to your market — free, one business day."

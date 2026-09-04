@@ -25,3 +25,5 @@ export { AgentField } from "./AgentField";
 export { VignetteAsk, VignetteBuild, VignetteBooked } from "./Vignettes";
 export { CategoryVignette } from "./CategoryVignette";
 export { CityVignette } from "./CityVignette";
+export { AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand } from "./GeoSections";
+export type { TriadItem, ZigRow } from "./GeoSections";
