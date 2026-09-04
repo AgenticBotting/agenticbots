@@ -169,7 +169,7 @@ export function AgentField({ height = 260 }: { height?: number }) {
     <figure aria-label="Animated field of agent cells lighting up as work completes">
       <canvas ref={canvasRef} className="block w-full" style={{ height }} />
       <figcaption className="mt-3 flex items-center justify-between gap-4 px-1">
-        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-500">
+        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-400">
           {shown.agents > 0 ? `${shown.agents.toLocaleString()} agents · each square is one` : ""}
         </span>
         {!reduced && (

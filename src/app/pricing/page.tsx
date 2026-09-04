@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
+import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, ButtonLink } from "@/components/ui";
 import { BotPlanForm, FaqAccordion } from "@/components/marketing";
 import { cn } from "@/lib/utils";
@@ -79,6 +80,7 @@ const FAQ = [
 export default function PricingPage() {
   return (
     <>
+      <JsonLd data={[faqLd(FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])]} />
       <Header />
       <main>
         <section className="border-b border-[var(--border)]">

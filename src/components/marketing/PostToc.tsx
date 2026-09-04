@@ -32,7 +32,7 @@ export function PostToc({ items }: { items: { id: string; text: string }[] }) {
         <li key={h.id}>
           <a
             href={`#${h.id}`}
-            aria-current={active === h.id ? "true" : undefined}
+            aria-current={active === h.id ? "location" : undefined}
             className={cn(
               "block text-[13px] leading-snug transition-colors border-l-2 pl-3 py-0.5",
               active === h.id

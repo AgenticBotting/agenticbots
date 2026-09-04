@@ -171,7 +171,7 @@ const MARKETING: Category[] = [
       { title: "A calendar you can see", body: "What is planned, drafted, in review and published — visible at all times, not living in someone's head." },
     ],
     metrics: [
-      { value: "8×", label: "Assets produced per source piece" },
+      { value: "Many", label: "Assets cut from one source piece" },
       { value: "Weekly", label: "Publishing cadence, held" },
       { value: "1", label: "Voice profile, applied everywhere" },
     ],
@@ -385,7 +385,7 @@ const SALES: Category[] = [
       { title: "Meetings booked into your calendar", body: "Time zones, buffers and availability handled, with the context from the thread attached to the invite." },
     ],
     metrics: [
-      { value: "100%", label: "Sequence completion rate" },
+      { value: "Every", label: "Step of the sequence, actually sent" },
       { value: "Auto", label: "Reply triage and sentiment sorting" },
       { value: "Warmed", label: "Sending infrastructure, monitored" },
     ],

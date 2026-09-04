@@ -156,7 +156,7 @@ function Cro() {
       <rect x="188" y="106" width="86" height="16" fill={GREEN} />
       <rect x="196" y="132" width="70" height="12" fill={TINT} stroke={TINT_LINE} />
       <text x="231" y="141" textAnchor="middle" fontSize="7.5" fontFamily={MONO} fill={GREEN_TXT}>+38% CALLS</text>
-      <Label x={160} y={166} anchor="middle">TESTED ON REAL VISITORS · B SHIPPED</Label>
+      <Label x={160} y={166} anchor="middle">ILLUSTRATIVE · HOW A WINNING TEST READS</Label>
     </svg>
   );
 }
@@ -169,7 +169,7 @@ function Analytics() {
       <rect x="34" y="26" width="252" height="128" fill={FILL} stroke={LINE} />
       <Label x={46} y={44}>ONE VIEW · NOT FIFTEEN TABS</Label>
       <text x="46" y="84" fontSize="30" fontWeight="600" fontFamily="var(--font-geist-sans)" fill={INK} letterSpacing="-1">$151</text>
-      <Label x={46} y={98} tone={GREEN_TXT}>COST PER BOOKED JOB · ↓64%</Label>
+      <Label x={46} y={98} tone={GREEN_TXT}>COST PER BOOKED JOB · ILLUSTRATIVE</Label>
       <polyline
         points={pts.map((y, i) => `${168 + i * 15},${y}`).join(" ")}
         fill="none" stroke={GREEN} strokeWidth="2"

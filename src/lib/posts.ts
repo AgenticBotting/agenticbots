@@ -43,7 +43,7 @@ export const POSTS: Post[] = [
         "Under an hour: you are one of two or three.",
         "Next morning: the job is often already booked with someone else.",
       ]},
-      { type: "stat", value: "391%", label: "higher contact rate when a lead is called back within five minutes versus thirty.", detail: "Lead response research is unusually consistent on this — the decay is minutes, not hours." },
+      { type: "stat", value: "391%", label: "higher contact rate when a lead is called back within five minutes versus thirty.", detail: "Oldroyd, McElheran & Elkington, MIT/InsideSales lead-response study. The decay is minutes, not hours." },
       { type: "p", text: "None of this is new. What is new is that you no longer need a human sitting by the phone to win it." },
       { type: "h2", text: "Why the fix keeps not happening" },
       { type: "p", text: "Every owner knows they should respond faster. The reason they do not is not laziness — it is that the responsibility falls on a person who is also doing four other jobs. At 8pm on a Friday, that person is not going to answer, and no amount of process documentation changes it." },

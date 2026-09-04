@@ -68,7 +68,7 @@ export function ShareRow({
       <button type="button" onClick={copy} aria-label="Copy link" className={btn}>
         {copied ? <Check className="w-4 h-4 text-[var(--accent-text)]" strokeWidth={3} /> : <Link2 className="w-4 h-4" />}
       </button>
-      {copied && <span className="text-[12.5px] text-[var(--accent-text)] font-semibold">Copied</span>}
+      <span role="status" className="text-[12.5px] text-[var(--accent-text)] font-semibold">{copied ? "Copied" : ""}</span>
     </div>
   );
 }

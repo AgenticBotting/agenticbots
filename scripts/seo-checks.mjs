@@ -1,7 +1,9 @@
 /**
  * CI SEO gate (Phase 10): title length + uniqueness, meta-description
- * length + uniqueness, exactly-one-H1 — validated against the actual
- * prerendered HTML in .next, so what ships is what's checked.
+ * length + uniqueness, exactly-one-H1, canonical-matches-route —
+ * validated against the actual prerendered HTML in .next, so what ships
+ * is what's checked. Link and dataset integrity live in
+ * scripts/link-integrity.mjs.
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -28,6 +30,7 @@ for (const p of pages) {
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
   const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
   const h1s = (html.match(/<h1[\s>]/g) || []).length;
+  const canon = html.match(/rel="canonical" href="([^"]*)"/)?.[1] ?? "";
 
   if (!title) errors.push(`${route}: missing <title>`);
   else {
@@ -42,6 +45,16 @@ for (const p of pages) {
     descs.set(desc, route);
   }
   if (h1s !== 1) errors.push(`${route}: ${h1s} <h1> elements (want exactly 1)`);
+
+  /* The root layout used to set alternates.canonical, which Next inherits,
+     so any page omitting its own silently self-canonicalized to "/".
+     Canonical is now per-page and must match the page's own route. */
+  if (!canon) errors.push(`${route}: missing rel=canonical`);
+  else {
+    const own = canon.replace(/^https?:\/\/[^/]+/, "").replace(/\/$/, "") || "/";
+    const want = route === "/index" ? "/" : route;
+    if (own !== want) errors.push(`${route}: canonical points at ${own}, not its own route`);
+  }
 }
 
 if (errors.length) {
@@ -49,4 +62,4 @@ if (errors.length) {
   for (const e of errors) console.error("  " + e);
   process.exit(1);
 }
-console.log(`seo-checks PASS: ${pages.length} prerendered pages — titles unique ≤70, descriptions unique ≤170, one H1 each.`);
+console.log(`seo-checks PASS: ${pages.length} prerendered pages — titles unique ≤70, descriptions unique ≤170, one H1 each, canonical matches route.`);

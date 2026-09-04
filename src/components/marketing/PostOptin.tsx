@@ -52,7 +52,7 @@ export function PostOptin({
     return (
       <div className={cn("mx-auto max-w-[440px]", className)}>
         {state === "done" ? (
-          <p className="flex items-center justify-center gap-2 border border-accent-500 bg-accent-100 px-5 py-3 text-[14px] font-semibold text-[var(--accent-text)]">
+          <p role="status" className="flex items-center justify-center gap-2 border border-accent-500 bg-accent-100 px-5 py-3 text-[14px] font-semibold text-[var(--accent-text)]">
             <Check className="w-4 h-4" strokeWidth={3} />
             You&apos;re on the list.
           </p>
@@ -75,7 +75,7 @@ export function PostOptin({
                   : <>Subscribe <ArrowRight className="w-4 h-4" /></>}
               </button>
             </form>
-            {state === "error" && <p className="mt-2 text-[13px] text-red-600">{error}</p>}
+            {state === "error" && <p role="alert" className="mt-2 text-[13px] text-[var(--color-danger)]">{error}</p>}
           </>
         )}
       </div>
@@ -89,7 +89,7 @@ export function PostOptin({
           <span className="mb-4 flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 notch">
             <Check className="w-4.5 h-4.5" strokeWidth={3} />
           </span>
-          <p className="display-md">You&apos;re on the list.</p>
+          <p role="status" className="display-md">You&apos;re on the list.</p>
           <p className="body-sm mt-2">The next one lands in your inbox.</p>
         </>
       ) : (
@@ -108,7 +108,7 @@ export function PostOptin({
               placeholder="Enter your email" aria-label="Email address"
               className="field"
             />
-            {state === "error" && <p className="text-[13px] text-red-600">{error}</p>}
+            {state === "error" && <p role="alert" className="text-[13px] text-[var(--color-danger)]">{error}</p>}
             <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full">
               {state === "sending"
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>

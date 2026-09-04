@@ -12,6 +12,7 @@ import { groupByRegion, type Region } from "@/lib/geo/regions";
 import { MarketSearch } from "./MarketSearch";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
+import { useDialog } from "@/hooks/useDialog";
 import { track } from "@/lib/analytics";
 
 const NAV_LINKS = [
@@ -44,6 +45,9 @@ export function Header() {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+  const drawerRef = useDialog(mobileOpen, closeMobile);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -84,7 +88,7 @@ export function Header() {
       <div className="hidden lg:block bg-ink-950 border-b border-white/[0.06]">
         <div className="container-site">
           <div className="flex items-center justify-between h-9">
-            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-500">Agentic bots for growth</span>
+            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-400">Agentic bots for growth</span>
             <a
               href="mailto:hello@agenticbots.dev"
               className="inline-flex items-center gap-2 text-[13px] text-ink-400 hover:text-white transition-colors"
@@ -113,6 +117,7 @@ export function Header() {
                   key={l.href}
                   href={l.href}
                   onClick={closeMenu}
+                  aria-current={pathname === l.href ? "page" : undefined}
                   className={cn(
                     "nav-link transition-colors",
                     pathname === l.href ? "text-white" : "text-ink-200 hover:text-white"
@@ -293,12 +298,18 @@ export function Header() {
 
       {/* ── Mobile drawer ── */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-[60] bg-ink-950 overflow-y-auto animate-fade-in">
+        <div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+          className="lg:hidden fixed inset-0 z-[60] bg-ink-950 overflow-y-auto animate-fade-in"
+        >
           <div className="container-site">
             <div className="flex items-center justify-between h-[76px]">
               <Logo height={26} />
               <button
-                onClick={() => setMobileOpen(false)}
+                onClick={closeMobile}
                 aria-label="Close menu"
                 className="flex items-center justify-center w-11 h-11 rounded-none border border-ink-600 text-white"
               >
@@ -469,7 +480,7 @@ function MobileGroup({ id, open, onToggle, kicker, title, children }: {
     <div className="border-b border-ink-700" data-group={id}>
       <button onClick={onToggle} aria-expanded={open} className="w-full flex items-center justify-between py-5 text-left">
         <span>
-          <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">{kicker}</span>
+          <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-ink-400">{kicker}</span>
           <span className="block display-lg text-white mt-1">{title}</span>
         </span>
         <ChevronDown className={cn("w-5 h-5 text-ink-400 transition-transform duration-200", open && "rotate-180")} />
@@ -484,7 +495,7 @@ function MobileRow({ href, onGo, children }: { href: string; onGo: () => void; c
     <li>
       <Link href={href} onClick={onGo} className="flex items-center justify-between py-2.5 text-[15px] text-ink-200">
         {children}
-        <ArrowRight className="w-4 h-4 text-ink-500" />
+        <ArrowRight className="w-4 h-4 text-ink-400" />
       </Link>
     </li>
   );

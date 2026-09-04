@@ -107,6 +107,10 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
 /**
  * Fan out to both sinks. Succeeds if nothing hard-failed — a skipped
  * sink (no credentials) counts as success so the form still works.
+ *
+ * The exception is production with BOTH sinks unconfigured: there is
+ * nowhere for the lead to land, so this must fail rather than let the
+ * visitor read a success message for a request that reached no one.
  */
 export async function deliverPlanRequest(req: PlanRequest): Promise<{ ok: boolean }> {
   const [list, inbox] = await Promise.all([toMailerLite(req), toInbox(req)]);
@@ -114,6 +118,14 @@ export async function deliverPlanRequest(req: PlanRequest): Promise<{ ok: boolea
   for (const [label, r] of [["mailerlite", list], ["resend", inbox]] as const) {
     if (r.skipped) console.warn(`[plan] ${label} not configured, skipped`);
     else if (!r.ok) console.error(`[plan] ${label} failed: ${r.error}`);
+  }
+
+  if (list.skipped && inbox.skipped) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("[plan] no delivery sink configured — lead would be lost, failing the request");
+      return { ok: false };
+    }
+    console.warn("[plan] no delivery sink configured (dev/preview) — lead logged only");
   }
 
   return { ok: list.ok && inbox.ok };

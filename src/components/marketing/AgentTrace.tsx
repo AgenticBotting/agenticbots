@@ -6,8 +6,12 @@ import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
 /**
- * The recorded agent trace — a timed, scrubbable replay of one real
- * unit of work: tool calls and reasoning visible (Phase 5 hero asset).
+ * The agent trace — a timed, scrubbable walkthrough of one unit of
+ * work: tool calls and reasoning visible (Phase 5 hero asset).
+ *
+ * HONESTY: the step list below is authored, not captured from a live
+ * run. It is labeled "Simulated" in the UI and must stay labeled that
+ * way until a real trace is recorded and swapped in.
  *
  * Deliberately a recording, not a live API call: same persuasion,
  * none of the latency lottery or prompt-injection surface.
@@ -36,7 +40,7 @@ const TRACE: Step[] = [
   { t: 11.2, kind: "event",     label: "sms.reply", detail: "“10 works”" },
   { t: 12.0, kind: "tool",      label: "calendar.book", detail: "Thu 10:00 · confirmed · reminder scheduled" },
   { t: 12.8, kind: "tool",      label: "crm.create", detail: "lead → Estimates · assigned Marco · transcript attached" },
-  { t: 13.6, kind: "result",    label: "Booked in 2m 12s of real time. No human touched it.", detail: "Escalation rules held: pricing was never quoted — that's Marco's call." },
+  { t: 13.6, kind: "result",    label: "Start to booked in 2m 12s, with no human in the loop.", detail: "Escalation rules held: pricing was never quoted — that stays with your estimator." },
 ];
 
 const DURATION = 14.2;
@@ -135,7 +139,7 @@ export function AgentTrace() {
         >
         {visible.map((s) => (
           <li key={s.t} className={cn("grid grid-cols-[52px_1fr] gap-3", !reduced && !untouched && "animate-fade-up")}>
-            <span className="mono text-[11px] tabular-nums text-ink-500 pt-0.5">
+            <span className="mono text-[11px] tabular-nums text-ink-400 pt-0.5">
               +{s.t.toFixed(1)}s
             </span>
             <div>
@@ -179,10 +183,10 @@ export function AgentTrace() {
       </div>
 
       <div className="px-5 py-3 border-t border-ink-700 flex items-center justify-between gap-4">
-        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-500">
-          Recorded production trace · numbers redacted
+        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-400">
+          Simulated trace · how a booking actually runs
         </span>
-        <span className="mono text-[10.5px] text-ink-500">{SPEED_LABEL}</span>
+        <span className="mono text-[10.5px] text-ink-400">{SPEED_LABEL}</span>
       </div>
     </div>
   );

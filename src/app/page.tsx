@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
+import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, BrandMark, Section } from "@/components/ui";
 import { BotPlanForm, PipelineMockup, FaqAccordion, PlanCta, BotScrollList, ProofBar, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
 
@@ -156,9 +162,9 @@ function DemoSection() {
           <div className="lg:sticky lg:top-32">
             <Reveal>
               <p className="eyebrow mb-4">
-                See a bot run <span className="eyebrow-dim">· recorded production trace</span>
+                See a bot run <span className="eyebrow-dim">· simulated, step for step</span>
               </p>
-              <h2 className="display-xl text-balance">Watch a bot handle a real lead.</h2>
+              <h2 className="display-xl text-balance">Watch how a bot handles a lead.</h2>
               <p className="body-lg mt-5 max-w-[40ch]">
                 Tool calls and reasoning visible, scrubbable, at ~10× real time.
               </p>
@@ -345,6 +351,7 @@ function FinalCta() {
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={[faqLd(HOME_FAQ)]} />
       <Header />
       <main>
         <Hero />

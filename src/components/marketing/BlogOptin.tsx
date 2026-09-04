@@ -55,7 +55,7 @@ export function BlogOptin({
             <span className="mx-auto mb-5 flex h-11 w-11 items-center justify-center notch bg-signal-500 text-ink-950">
               <Check className="w-5 h-5" strokeWidth={3} />
             </span>
-            <h3 className="display-lg">You&apos;re on the list.</h3>
+            <h3 role="status" className="display-lg">You&apos;re on the list.</h3>
             <p className="body-base mt-3">
               Your bot plan lands within one business day.
             </p>
@@ -73,14 +73,14 @@ export function BlogOptin({
 
             <form onSubmit={onSubmit} className="mt-8 mx-auto max-w-[420px] space-y-3">
               <input
-                className="field text-center" required placeholder="Your name" autoComplete="name"
+                className="field text-center" required placeholder="Your name" aria-label="Your name" autoComplete="name"
                 value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
               <input
-                className="field text-center" required type="email" placeholder="Work email" autoComplete="email"
+                className="field text-center" required type="email" placeholder="Work email" aria-label="Work email" autoComplete="email"
                 value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
-              {state === "error" && <p className="text-[13.5px] text-red-400">{error}</p>}
+              {state === "error" && <p role="alert" className="text-[13.5px] text-[var(--color-danger-dark)]">{error}</p>}
               <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full">
                 {state === "sending"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>

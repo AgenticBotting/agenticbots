@@ -7,6 +7,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Design system",
+  alternates: { canonical: "/design" },
   robots: { index: false, follow: false },
 };
 

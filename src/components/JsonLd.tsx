@@ -76,14 +76,23 @@ export function faqLd(faqs: { q: string; a: string }[]): Json {
   };
 }
 
-export function articleLd(opts: { title: string; description: string; slug: string; date: string }): Json {
+export function articleLd(opts: {
+  title: string; description: string; slug: string; date: string; updated?: string;
+}): Json {
+  const url = `${BASE}/blog/${opts.slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: opts.title,
     description: opts.description,
     datePublished: opts.date,
-    url: `${BASE}/blog/${opts.slug}`,
+    /* Google treats a missing dateModified as "never updated"; with no
+       edit history to draw on, publication date is the honest value. */
+    dateModified: opts.updated ?? opts.date,
+    /* The per-post OG route already renders this image. */
+    image: [`${url}/opengraph-image`],
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
     author: { "@type": "Organization", name: "AgenticBots", url: BASE },
     publisher: { "@id": `${BASE}/#org` },
   };

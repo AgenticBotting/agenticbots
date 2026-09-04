@@ -189,7 +189,7 @@ export function BotPlanForm({
       {/* ── Body ── */}
       <div className="p-6 sm:p-9 lg:p-11">
         {state === "done" ? (
-          <div className="text-center py-6">
+          <div role="status" className="text-center py-6">
             <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 notch">
               <Check className="w-6 h-6" strokeWidth={3} />
             </span>
@@ -284,7 +284,7 @@ export function BotPlanForm({
                   </label>
                 </div>
 
-                {state === "error" && <p className="mt-4 text-[13.5px] text-red-600">{error}</p>}
+                {state === "error" && <p role="alert" className="mt-4 text-[13.5px] text-[var(--color-danger)]">{error}</p>}
 
                 <div className="mt-7 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary sm:min-w-[260px]">

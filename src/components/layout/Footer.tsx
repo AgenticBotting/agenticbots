@@ -116,7 +116,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-ink-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-[12.5px] text-ink-500">
+          <p className="text-[12.5px] text-ink-400">
             © {year} AgenticBots. All rights reserved.{" "}
             <span className="hidden sm:inline" title="It has never once asked for a raise.">
               This footer was assembled by a bot that does not celebrate its own birthday.
@@ -127,7 +127,7 @@ export function Footer() {
               <li key={l.href}>
                 <Link
                   href={l.href}
-                  className="text-[12.5px] text-ink-500 hover:text-ink-200 transition-colors"
+                  className="text-[12.5px] text-ink-400 hover:text-ink-200 transition-colors"
                 >
                   {l.label}
                 </Link>

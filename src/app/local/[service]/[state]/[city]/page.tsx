@@ -136,8 +136,8 @@ export default async function CityPage({ params }: Params) {
           <Container className="py-7">
             <dl className="grid grid-cols-2 lg:grid-cols-5 gap-x-10 gap-y-5">
               {[
-                ["Metro population", fmt.format(ct.metroPopulation)],
-                ["Businesses in metro", `~${fmt.format(ct.businessCount)}`],
+                ["Metro population", `${fmt.format(ct.metroPopulation)} est.`],
+                ["Businesses in metro", `~${fmt.format(ct.businessCount)} est.`],
                 ["Local-service CPC band", `$${ct.cpcBand[0]}–$${ct.cpcBand[1]} est.`],
                 ["Agency competition", ct.competition],
                 ["Typical build", `${svc.implementationWeeks} weeks`],

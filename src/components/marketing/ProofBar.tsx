@@ -1,15 +1,15 @@
 /**
  * Proof strip under the hero (audit fix #3).
  *
- * PLACEHOLDER DATA — the numbers are illustrative until real client
- * results exist. They are deliberately conservative and labeled as
- * pilot-cohort figures; swap in verified numbers before launch.
+ * ILLUSTRATIVE DATA — these are the targets the systems are built to
+ * hit, not measured client results. The on-screen label says exactly
+ * that and must keep saying it until verified figures replace these.
  */
 const PROOF = [
-  { v: "38%", l: "median lift in booked leads, first 60 days" },
-  { v: "41s", l: "median first response across the fleet" },
-  { v: "6.2k", l: "agent actions executed per client, weekly" },
-  { v: "0", l: "leads lost to an unanswered night or weekend" },
+  { v: "38%", l: "target lift in booked leads, first 60 days" },
+  { v: "41s", l: "first-response target, any hour of the week" },
+  { v: "6.2k", l: "agent actions a week at full deployment" },
+  { v: "0", l: "leads left for an unanswered night or weekend" },
 ];
 
 export function ProofBar() {
@@ -33,7 +33,7 @@ export function ProofBar() {
           ))}
         </dl>
         <p className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] pb-3 -mt-1">
-          Early-client averages · updated quarterly
+          Illustrative — targets the fleet is built to hit, not client results
         </p>
       </div>
     </div>

@@ -18,12 +18,16 @@ jobs:
         run: npm run lint
       - name: Typecheck
         run: npx tsc --noEmit
+      - name: Dataset validation
+        run: node scripts/validate-cities.mjs
       - name: pSEO uniqueness gate
         run: node scripts/pseo-gate.mjs
       - name: Build (runs prebuild gate again)
         run: npm run build
-      - name: SEO gates — title/meta uniqueness, one H1
+      - name: SEO gates — title/meta uniqueness, one H1, canonical
         run: node scripts/seo-checks.mjs
+      - name: Link & data integrity — sitemap, hrefs, enriched⟕dataset
+        run: node scripts/link-integrity.mjs
       # Lighthouse budgets (LCP<2.0s mobile, JS<150KB, ≥95 all categories)
       # run against a deployed preview URL — wire once Vercel is connected:
       # - uses: treosh/lighthouse-ci-action with budgets.json

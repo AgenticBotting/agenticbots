@@ -97,14 +97,14 @@ export function MarketSearch({
           aria-label="Search markets"
           className={cn(
             "w-full bg-transparent outline-none text-[14.5px]",
-            dark ? "text-white placeholder:text-ink-500" : "text-[var(--text-body)] placeholder:text-[var(--text-muted)]"
+            dark ? "text-white placeholder:text-ink-400" : "text-[var(--text-body)] placeholder:text-[var(--text-muted)]"
           )}
         />
         {q && (
           <button
             type="button"
             onClick={() => { setQ(""); inputRef.current?.focus(); }}
-            className={cn("mono text-[10px] uppercase tracking-[0.08em]", dark ? "text-ink-500" : "text-[var(--text-muted)]")}
+            className={cn("mono text-[10px] uppercase tracking-[0.08em]", dark ? "text-ink-400" : "text-[var(--text-muted)]")}
           >
             clear
           </button>
@@ -128,7 +128,7 @@ export function MarketSearch({
               >
                 <span className="min-w-0 flex items-baseline gap-2.5">
                   <span className={cn("text-[14px] font-medium truncate", dark ? "text-white" : "")}>{h.label}</span>
-                  <span className={cn("mono text-[10.5px] shrink-0", dark ? "text-ink-500" : "text-[var(--text-muted)]")}>
+                  <span className={cn("mono text-[10.5px] shrink-0", dark ? "text-ink-400" : "text-[var(--text-muted)]")}>
                     {h.sub}
                   </span>
                 </span>

@@ -65,7 +65,11 @@
   --color-brand-500:  var(--color-accent-400);
 
   /* ── Bot field: the dim majority of the pattern ── */
-  --color-caution: #E8A13C; /* blocked/warning states in log surfaces */
+  --color-caution: #E8A13C;
+  /* Error text. Ramp has no red; these are the two steps that clear AA
+     on white (#B42318, 5.9:1) and on ink-950 (#FF9A8F, 7.4:1). */
+  --color-danger: #B42318;
+  --color-danger-dark: #FF9A8F; /* blocked/warning states in log surfaces */
   --color-bot-dim: #222622;
   --color-bot-mid: #343A34;
 

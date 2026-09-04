@@ -19,7 +19,7 @@ export function PipelineMockup() {
     <div className="card overflow-hidden shadow-lift">
       <div className="flex items-center justify-between gap-4 px-6 h-12 border-b border-[var(--border)] bg-[var(--bg-alt)]">
         <span className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse-dot" />
+          <span className="w-1.5 h-1.5 bg-accent-500 animate-pulse-dot" />
           <span className="text-[12.5px] font-semibold tracking-[-0.01em]">Your bot, working</span>
         </span>
         <span className="flex items-center gap-1.5 text-[12.5px] text-[var(--text-muted)]">
@@ -45,7 +45,7 @@ export function PipelineMockup() {
             )}
           >
             <span className="flex items-center gap-3 min-w-0">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--bg-tint)]">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-[var(--bg-tint)]">
                 <Check className="w-3 h-3 text-[var(--accent-text)]" strokeWidth={3} />
               </span>
               <span className="text-[14px] text-[var(--text-body)] truncate">{s.action}</span>

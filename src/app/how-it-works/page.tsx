@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Search, Plug, Rocket, RefreshCw } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
+import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader } from "@/components/ui";
 import { BotPlanForm, StatBand, FaqAccordion, PlanCta, Timeline, AuditLogPanel } from "@/components/marketing";
 
@@ -78,6 +79,7 @@ const FAQ = [
 export default function HowItWorksPage() {
   return (
     <>
+      <JsonLd data={[faqLd(FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/how-it-works" }])]} />
       <Header />
       <main>
         <section className="border-b border-[var(--border)]">
@@ -132,7 +134,7 @@ export default function HowItWorksPage() {
                             key={b}
                             className="flex items-start gap-3 text-[14px] text-[var(--text-secondary)]"
                           >
-                            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--accent-text)]" />
+                            <span className="mt-2 h-1 w-1 shrink-0 bg-[var(--accent-text)]" />
                             {b}
                           </li>
                         ))}
@@ -172,7 +174,7 @@ export default function HowItWorksPage() {
                   ["DPA on request", "procurement-ready documentation"],
                 ].map(([t, d], i) => (
                   <li key={t} className="grid grid-cols-[32px_1fr] gap-4 py-[1.05rem] border-b border-ink-700">
-                    <span className="mono text-[11px] tabular-nums text-ink-500 pt-1">0{i + 1}</span>
+                    <span className="mono text-[11px] tabular-nums text-ink-400 pt-1">0{i + 1}</span>
                     <span>
                       <span className="block text-[15px] font-medium text-white tracking-[-0.01em]">{t}</span>
                       <span className="block text-[13px] text-ink-400 mt-0.5">{d}</span>

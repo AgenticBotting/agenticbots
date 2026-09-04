@@ -198,12 +198,12 @@ export function ExitIntent() {
         <p className="eyebrow">Almost done</p>
         <h3 className="display-lg mt-3">Where should we send it?</h3>
         <div className="mt-5 space-y-3">
-          <input className="field" required autoFocus placeholder="Your name" autoComplete="name"
+          <input className="field" required autoFocus placeholder="Your name" aria-label="Your name" autoComplete="name"
             value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input className="field" required type="email" placeholder="Work email" autoComplete="email"
+          <input className="field" required type="email" placeholder="Work email" aria-label="Work email" autoComplete="email"
             value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
-        {error && <p className="mt-3 text-[13.5px] text-red-600">{error}</p>}
+        {error && <p role="alert" className="mt-3 text-[13.5px] text-[var(--color-danger)]">{error}</p>}
         <button type="submit" disabled={sending} className="btn btn-primary w-full mt-5">
           {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</> : <>Send my plan <ArrowRight className="w-4 h-4" /></>}
         </button>

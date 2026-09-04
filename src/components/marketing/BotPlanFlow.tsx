@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { X, ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { BOT_PLAN_EVENT } from "@/lib/lead-flow";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { useDialog } from "@/hooks/useDialog";
 
 /**
  * Full-screen multi-step bot plan flow.
@@ -50,12 +51,8 @@ export function BotPlanFlow() {
     return () => window.removeEventListener(BOT_PLAN_EVENT, onOpen);
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  const panelRef = useDialog(open, close);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -97,9 +94,18 @@ export function BotPlanFlow() {
   }
 
   return (
-    <div className="fixed inset-0 z-[80] bg-ink-950/70 backdrop-blur-sm overflow-y-auto animate-fade-in">
+    <div
+      className="fixed inset-0 z-[80] bg-ink-950/70 backdrop-blur-sm overflow-y-auto animate-fade-in"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}
+    >
       <div className="min-h-full flex items-start sm:items-center justify-center p-0 sm:p-6">
-        <div className="w-full max-w-[840px] bg-white sm:rounded-none shadow-mega min-h-screen sm:min-h-0">
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bot-plan-title"
+          className="w-full max-w-[840px] bg-white sm:rounded-none shadow-mega min-h-screen sm:min-h-0"
+        >
           {/* Bar */}
           <div className="flex items-center justify-between gap-4 px-5 sm:px-8 h-16 border-b border-[var(--border)]">
             <div className="flex items-center gap-3 min-w-0">
@@ -112,12 +118,12 @@ export function BotPlanFlow() {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               )}
-              <span className="label-caps text-[var(--text-muted)] truncate">
-                {state === "done" ? "Done" : `Step ${step + 1} of ${TOTAL}`}
+              <span id="bot-plan-title" className="label-caps text-[var(--text-muted)] truncate">
+                {state === "done" ? "Done" : `Get your bot plan — step ${step + 1} of ${TOTAL}`}
               </span>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={close}
               className="flex items-center justify-center w-9 h-9 rounded-none hover:bg-[var(--bg-alt)] transition-colors"
               aria-label="Close"
             >
@@ -137,7 +143,7 @@ export function BotPlanFlow() {
 
           <div className="px-5 sm:px-8 py-8 sm:py-10">
             {state === "done" ? (
-              <div className="text-center py-6">
+              <div role="status" className="text-center py-6">
                 <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
                   <Check className="w-6 h-6" strokeWidth={2.5} />
                 </span>
@@ -146,7 +152,7 @@ export function BotPlanFlow() {
                   Your bot plan lands at {form.email} within one business day. A real
                   person reads it first — no automated deck.
                 </p>
-                <button onClick={() => setOpen(false)} className="btn btn-secondary mt-8">
+                <button onClick={close} className="btn btn-secondary mt-8">
                   Back to the site
                 </button>
               </div>
@@ -227,7 +233,7 @@ export function BotPlanFlow() {
                     </Labeled>
                   </div>
 
-                  {state === "error" && <p className="mt-4 text-[13.5px] text-red-600">{error}</p>}
+                  {state === "error" && <p role="alert" className="mt-4 text-[13.5px] text-[var(--color-danger)]">{error}</p>}
 
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full mt-6">
                     {state === "sending"
