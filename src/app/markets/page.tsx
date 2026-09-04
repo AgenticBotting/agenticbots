@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
+import { BotFactory } from "@/components/marketing";
 import { PlanCta } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES } from "@/lib/geo/data";
@@ -24,16 +25,21 @@ export default function MarketsIndex() {
       <Header />
       <main>
         <section className="border-b border-[var(--border)]">
-          <Container className="py-16">
-            <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {ALL_CITIES.length} cities · {ALL_STATES.length} states</span></p>
-            <h1 className="display-hero max-w-[20ch] text-balance">
-              Deployed where your customers are.
-            </h1>
-            <p className="body-lg mt-6 max-w-[54ch]">
-              The fleet deploys remotely, so coverage is national — organized here by region,
-              then state, then metro. Every market page carries its own coverage detail.
-            </p>
-            <div className="mt-8"><PlanCta source="markets-index" /></div>
+          <Container className="py-14 sm:py-16">
+            <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
+              <div>
+                <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {ALL_CITIES.length} cities · {ALL_STATES.length} states</span></p>
+                <h1 className="display-hero max-w-[20ch] text-balance">
+                  Deployed where your customers are.
+                </h1>
+                <p className="body-lg mt-6 max-w-[54ch]">
+                  The fleet deploys remotely, so coverage is national — organized here by region,
+                  then state, then metro. Every market page carries its own coverage detail.
+                </p>
+                <div className="mt-8"><PlanCta source="markets-index" /></div>
+              </div>
+              <BotFactory />
+            </div>
           </Container>
         </section>
 

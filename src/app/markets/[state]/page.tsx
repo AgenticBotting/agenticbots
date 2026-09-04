@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
+import { BotFactory } from "@/components/marketing";
 import { PlanCta } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES, getState as getEnrichedState, citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
@@ -53,21 +54,26 @@ export default async function StateMarketPage({ params }: Params) {
       <Header />
       <main>
         <section className="border-b border-[var(--border)]">
-          <Container className="py-16">
+          <Container className="py-14 sm:py-16">
             <nav className="mb-8 flex items-center gap-2 text-[12.5px] text-[var(--text-muted)]">
               <Link href="/" className="hover:text-[var(--foreground)]">Home</Link><span>/</span>
               <Link href="/markets" className="hover:text-[var(--foreground)]">Markets</Link><span>/</span>
               <span className="text-[var(--text-body)]">{st.name}</span>
             </nav>
-            <p className="eyebrow mb-5">{st.name} <span className="eyebrow-dim">· {cities.length} cities · {metros.size} metro cluster{metros.size > 1 ? "s" : ""}</span></p>
-            <h1 className="display-hero max-w-[20ch] text-balance">
-              Agent systems for {st.name} businesses.
-            </h1>
-            <p className="body-lg mt-6 max-w-[54ch]">
-              Every call answered, every quote followed up, ads and CRM worked continuously —
-              deployed remotely, wired into the tools you already use, anywhere in {st.name}.
-            </p>
-            <div className="mt-8"><PlanCta source={`markets-${st.slug}`} /></div>
+            <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
+              <div>
+                <p className="eyebrow mb-5">{st.name} <span className="eyebrow-dim">· {cities.length} cities · {metros.size} metro cluster{metros.size > 1 ? "s" : ""}</span></p>
+                <h1 className="display-hero max-w-[20ch] text-balance">
+                  Agent systems for {st.name} businesses.
+                </h1>
+                <p className="body-lg mt-6 max-w-[54ch]">
+                  Every call answered, every quote followed up, ads and CRM worked continuously —
+                  deployed remotely, wired into the tools you already use, anywhere in {st.name}.
+                </p>
+                <div className="mt-8"><PlanCta source={`markets-${st.slug}`} /></div>
+              </div>
+              <BotFactory place={st.name} />
+            </div>
           </Container>
         </section>
 

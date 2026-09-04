@@ -29,20 +29,20 @@ const H = 400;
    bot animates along. */
 const BAY = { x: 146, y: 250 };
 const SPINE = 236;
-const DESK_X = 338;
-const DESK_W = 198;
+const DESK_X = 326;
+const DESK_W = 216;
 
 const STATIONS = [
-  { y: 64, label: "Answering calls", meta: "24/7 · under a minute" },
-  { y: 152, label: "Following up", meta: "Every quote, every time" },
+  { y: 64, label: "Answering calls", meta: "24/7 · in seconds" },
+  { y: 152, label: "Following up", meta: "Every single quote" },
   { y: 240, label: "Running ads", meta: "Reviewed daily" },
-  { y: 328, label: "Updating the CRM", meta: "Nobody has to remember" },
+  { y: 328, label: "Updating the CRM", meta: "Nobody has to ask" },
 ];
 
 const CYCLE = 11;
 const route = (y: number) => `M ${BAY.x} ${BAY.y} H ${SPINE} V ${y} H ${DESK_X - 4}`;
 
-export function BotFactory() {
+export function BotFactory({ place }: { place?: string }) {
   const [motionOk, setMotionOk] = useState(false);
 
   useEffect(() => {
@@ -56,13 +56,13 @@ export function BotFactory() {
   return (
     <div className="card overflow-hidden shadow-lift">
       <div className="flex items-center justify-between gap-4 px-6 h-12 border-b border-[var(--border)] bg-[var(--bg-alt)]">
-        <span className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-accent-500 animate-pulse-dot" />
-          <span className="text-[12.5px] font-semibold tracking-[-0.01em]">
-            Your fleet, going to work
+        <span className="flex items-center gap-2 min-w-0">
+          <span className="w-1.5 h-1.5 shrink-0 bg-accent-500 animate-pulse-dot" />
+          <span className="text-[12.5px] font-semibold tracking-[-0.01em] truncate">
+            {place ? `Your fleet, working in ${place}` : "Your fleet, going to work"}
           </span>
         </span>
-        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)] shrink-0 hidden sm:block">
           Built · deployed · running
         </span>
       </div>
@@ -153,12 +153,12 @@ export function BotFactory() {
                 />
               ))}
 
-              <text x={DESK_X + 70} y={s.y - 6} fontSize="13" fontWeight="600"
+              <text x={DESK_X + 72} y={s.y - 6} fontSize="13.5" fontWeight="600"
                 fontFamily="var(--font-display)" letterSpacing="-0.3" fill="var(--foreground)">
                 {s.label}
               </text>
-              <text x={DESK_X + 70} y={s.y + 12} fontSize="9.5" fontFamily="var(--font-mono)"
-                letterSpacing="0.6" fill="var(--text-muted)">
+              <text x={DESK_X + 72} y={s.y + 12} fontSize="9" fontFamily="var(--font-mono)"
+                letterSpacing="0.4" fill="var(--text-muted)" className="station-meta">
                 {s.meta.toUpperCase()}
               </text>
 
@@ -183,6 +183,7 @@ export function BotFactory() {
               className="factory-bot"
               style={{
                 offsetPath: `path("${route(s.y)}")`,
+                offsetRotate: "0deg",
                 animationDelay: `${i * (CYCLE / 4)}s`,
                 animationDuration: `${CYCLE}s`,
               }}

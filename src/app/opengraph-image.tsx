@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "AgenticBots — Bots that get you customers";
+export const alt = "AgenticBots — Agentic bots get you customers";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -32,7 +32,7 @@ export default function OgImage() {
         {BOT}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 72, fontWeight: 600, color: "#FFFFFF", letterSpacing: "-0.03em", lineHeight: 1.05 }}>
-            Bots that get you customers.
+            Agentic bots get you customers.
           </div>
           <div style={{ fontSize: 28, color: "#BEC4BE", marginTop: 24 }}>
             Marketing and sales, run by bots — agenticbots.dev

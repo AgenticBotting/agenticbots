@@ -23,7 +23,7 @@ function Hero() {
               Marketing + sales <span className="eyebrow-dim">· run by bots, watched by you</span>
             </p>
             <h1 className="display-hero max-w-[16ch] text-balance">
-              Bots that get you customers.
+              Agentic bots get you customers.
             </h1>
             <p className="body-lg mt-5 max-w-[48ch] text-pretty">
               We build bots that answer every lead, follow up on every quote, and
@@ -131,7 +131,7 @@ function BotRoster() {
 
         {/* The fleet in one glance. The full catalog lives on the pillar
             pages below — the homepage should not try to be an index. */}
-        <div className="mt-12 -mx-6 sm:-mx-8">
+        <div className="mt-12 -mx-5 sm:-mx-8">
           <BotConveyor />
         </div>
         {/* The two pillars, one line each — the old two-card section, folded in. */}

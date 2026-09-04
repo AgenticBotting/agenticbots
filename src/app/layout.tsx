@@ -33,7 +33,7 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AgenticBots — Bots that get you customers",
+    default: "AgenticBots — Agentic bots get you customers",
     template: "%s | AgenticBots",
   },
   description:
@@ -52,13 +52,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "AgenticBots",
     url: SITE_URL,
-    title: "AgenticBots — Bots that get you customers",
+    title: "AgenticBots — Agentic bots get you customers",
     description:
       "Marketing bots that find your customers. Sales bots that follow up until they buy.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgenticBots — Bots that get you customers",
+    title: "AgenticBots — Agentic bots get you customers",
     description:
       "Marketing bots that find your customers. Sales bots that follow up until they buy.",
   },

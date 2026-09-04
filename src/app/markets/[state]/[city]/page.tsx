@@ -6,7 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
   BotPlanForm, PlanCta, CityVignette, ProofBar, FaqAccordion,
-  AgentConsole, StackStrip, StatSplit, JoinBand,
+  BotFactory, StackStrip, StatSplit, JoinBand,
 } from "@/components/marketing";
 import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
 import { LOCAL_SERVICES, getCity, nearbyCities, fmt } from "@/lib/geo/data";
@@ -52,7 +52,6 @@ export default async function CityMarketHub({ params }: Params) {
         .map((s0) => ({ name: s0.city, abbr: rec.state_abbr, state, slug: s0.slug }));
 
   const vignetteLabels = ct ? ct.districts : rec.surrounding.slice(0, 5).map((s0) => s0.city);
-  const consolePlaces = vignetteLabels.length ? vignetteLabels : [rec.metro];
 
   const faqs = [
     { q: `Do you work with ${rec.city} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro. Every sequence is scheduled on your local hours, not ours.` },
@@ -120,12 +119,7 @@ export default async function CityMarketHub({ params }: Params) {
                 <div className="mt-8"><PlanCta source={`market-hub-${rec.city_slug}`} /></div>
                 <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
               </div>
-              <AgentConsole
-                botName="Speed-to-Lead Bot"
-                cityName={rec.city}
-                places={consolePlaces}
-                stat={{ value: "24/7", label: "Nights, weekends and holidays covered" }}
-              />
+              <BotFactory place={rec.city} />
             </div>
           </Container>
         </section>

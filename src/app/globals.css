@@ -600,8 +600,19 @@
   /* The belts run edge to edge; fade the ends so items arrive and leave
      rather than being chopped off by the container. */
   .bot-conveyor {
+    /* The belts are deliberately wider than the viewport. Without this
+       clip that width becomes document overflow and the whole page
+       scrolls sideways. */
+    overflow: hidden;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  /* Below 640px the whole scene scales to about 0.6, which takes the
+     station sub-labels under a legible size. Drop them and let the four
+     station names carry it. */
+  @media (max-width: 640px) {
+    .station-meta { display: none; }
   }
 
   /* The factory scene. Every duration and delay is set per element in
