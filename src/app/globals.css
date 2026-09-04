@@ -1,0 +1,487 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════
+   AgenticBots.dev — design system
+
+   Black = infrastructure.  White = clarity.  Green = active intelligence.
+
+   The site is 70–80% white. Green is a SIGNAL, never a background wash —
+   it means something in the system just became active.
+
+   Rules that hold everywhere:
+     · Display weight is 600. Mass is not authority — heavy geometric
+       type reads consumer, not infrastructure.
+     · Zero radius. Corners are square, or cut on a diagonal (.notch).
+     · One accent ramp, anchored #7FA200. Text-on-white uses
+       --accent-text (#5F7A00) only; on-dark uses the 300/400 steps;
+       labels on an accent fill are near-black, never white.
+     · One accent ramp, anchored #7FA200. Text-on-white is --accent-text
+       (#5F7A00) only; on-dark uses the 300/400 steps; labels on an accent
+       fill are near-black, never white.
+     · Never set lime as a paragraph color.
+     · One green phrase per headline, maximum.
+     · Elevation comes from borders, not blur.
+     · Display type carries -0.04em tracking.
+   ══════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Ink — one green-tinted neutral ramp, black through off-white ── */
+  --color-ink-950: #080A08;  /* deepest green-black — footer */
+  --color-ink-900: #0C0E0C;  /* dark green — nav, footer, dark sections */
+  --color-ink-800: #181B18;  /* cards on dark */
+  --color-ink-700: #272B27;  /* borders on dark */
+  --color-ink-600: #3A403A;  /* ghost button border on dark */
+  --color-ink-500: #626862;  /* body gray — secondary copy */
+  --color-ink-400: #8C928C;  /* muted gray — metadata on DARK only (3.18:1 on white) */
+  --color-ink-450: #6E746E;  /* metadata on WHITE — nearest AA-passing shade of ink-400 */
+  --color-ink-300: #BEC4BE;  /* body copy on dark */
+  --color-ink-200: #D9DDD9;  /* nav links */
+  --color-ink-100: #E2E6E1;  /* borders, dividers */
+  --color-ink-50:  #F7F9F6;  /* off-white — alternating sections */
+  --color-ink-text: #080A08; /* headline black — text only, never a surface */
+
+  /* ── Accent ramp — anchored at #7FA200 (500), OKLCH-interpolated:
+     perceptually even lightness steps, hue held at 123.6°, chroma
+     tapered toward the ends so the extremes don't muddy into olive.
+     Changing the accent again means regenerating this block only. ── */
+  --color-accent-50:  #EEFDD4;
+  --color-accent-100: #E0F8B1;
+  --color-accent-200: #C7E97D;
+  --color-accent-300: #ADD44E;
+  --color-accent-400: #97BD27;
+  --color-accent-500: #7FA200;  /* the anchor. FILLS ONLY on light — 2.97:1 as text */
+  --color-accent-600: #6C8A00;
+  --color-accent-700: #577000;
+  --color-accent-800: #435700;
+  --color-accent-900: #324101;
+  --color-accent-950: #253103;
+
+  /* Legacy aliases — components use these utility names; they resolve
+     into the ramp so the markup keeps working unchanged. */
+  --color-signal-500: var(--color-accent-400); /* on-dark accent — 8.9:1 on ink-900 */
+  --color-signal-400: var(--color-accent-300); /* on-dark bright — 11.4:1 */
+  --color-signal-50:  var(--color-accent-50);
+  --color-brand-600:  var(--color-accent-500);
+  --color-brand-500:  var(--color-accent-400);
+
+  /* ── Bot field: the dim majority of the pattern ── */
+  --color-bot-dim: #222622;
+  --color-bot-mid: #343A34;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-hair: 0 1px 2px rgba(8, 10, 8, 0.04);
+  --shadow-card: 0 1px 3px rgba(8, 10, 8, 0.05);
+  --shadow-lift: 0 12px 28px -12px rgba(8, 10, 8, 0.14);
+  --shadow-mega: 0 24px 56px -20px rgba(8, 10, 8, 0.20);
+}
+
+:root {
+  --background: #FFFFFF;
+  --bg-alt: #F7F9F6;
+  --bg-tint: var(--color-accent-50);
+  --border-tint: var(--color-accent-200);
+
+  --foreground: #080A08;      /* headlines only */
+  --text-body: #272B27;       /* paragraphs — never pure black */
+  --text-secondary: #626862;
+  --text-muted: #6E746E;      /* metadata on white. #8C928C fails AA there — use ink-400 on dark */
+
+  --border: #E2E6E1;
+  --border-strong: #C8CEC7;
+
+  /* Dark surfaces */
+  --dark-bg: #0C0E0C;
+  --dark-card: #181B18;
+  --dark-border: #272B27;
+  --dark-text: #BEC4BE;
+  --dark-nav: #D9DDD9;
+  --dark-ghost-border: #3A403A;
+
+  /* Accent usage contract:
+       · fills, badges, borders, glows  -> accent-500 (#7FA200)
+       · TEXT on light surfaces         -> --accent-text ONLY (500 is 2.97:1 there)
+       · text/marks on dark surfaces    -> accent-300/400
+       · text sitting ON a 500 fill     -> near-black, never white (2.79:1) */
+  --accent: var(--color-accent-400);        /* on-dark accent */
+  --accent-bright: var(--color-accent-300); /* on-dark bright */
+  --accent-ink: #080A08;                    /* label on an accent fill — 6.7:1 */
+  --accent-text: #5F7A00;                   /* AA text-on-white (4.92:1); sits between 600 and 700 */
+
+  /* Primary action — the accent anchor as a fill, black label. */
+  --cta-bg: var(--color-accent-500);
+  --cta-fg: #080A08;
+  --cta-bg-hover: var(--color-accent-400);
+
+  /* No rounding anywhere. The brand's corner is a diagonal cut, taken
+     straight off the logo's sloped left edge — see .notch. */
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-xs: 0;
+  --notch: 11px;
+
+  /* One neutral grotesque across display, body and UI. Weight stays at
+     600 — mass is not authority. Mono carries the technical register. */
+  --font-display: var(--font-geist-sans);
+  --font-body: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
+}
+@keyframes bot-wake {
+  0%, 88%, 100% { opacity: 0.30; }
+  92%, 96%      { opacity: 1; }
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--background);
+    color: var(--text-body);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.032em;
+    color: var(--foreground);
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection { background: var(--color-accent-300); color: var(--accent-ink); }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+  /* The AA text green is too dim as a ring on dark — lift it there. */
+  .on-dark :focus-visible, .bg-ink-900 :focus-visible, .bg-ink-950 :focus-visible {
+    outline-color: var(--color-accent-300);
+  }
+  /* On dark surfaces the AA text green is too dim for a ring — lift it. */
+  .on-dark :focus-visible, .bg-ink-900 :focus-visible, .bg-ink-950 :focus-visible {
+    outline-color: var(--color-accent-300);
+  }
+}
+
+@layer components {
+  /* ── Layout ── */
+  .container-site {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) { .container-site { padding-inline: 2rem; } }
+
+  .section-pad    { padding-block: clamp(3.25rem, 6vw, 5.75rem); }
+  .section-pad-sm { padding-block: clamp(2.25rem, 4vw, 3.5rem); }
+
+  /* ── Type ── */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--accent-text);
+  }
+  /* The dim half of an eyebrow — a count, a unit, a version. */
+  .eyebrow-dim { color: var(--text-muted); }
+  /* Eyebrow inside a dark section. */
+  .on-dark .eyebrow, .eyebrow-dark { color: var(--accent); }
+
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+  }
+  .display-xl {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.625rem, 2.6vw, 2.125rem);
+    line-height: 1.14;
+    letter-spacing: -0.032em;
+  }
+  .display-lg {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.1875rem, 1.7vw, 1.4375rem);
+    line-height: 1.22;
+    letter-spacing: -0.028em;
+  }
+  .display-md {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    letter-spacing: -0.022em;
+  }
+
+  /* The one green phrase in a headline. Swaps by surface. */
+  .em-green      { color: var(--accent-text); }
+  .on-dark .em-green, .em-green-dark { color: var(--accent); }
+
+  .label-caps {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Navigation. Sentence case, medium weight. Deliberately NOT
+     mono-uppercase — that reads as template. */
+  .nav-link {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+  }
+
+  .mono { font-family: var(--font-mono); }
+  .font-display { font-family: var(--font-display); }
+
+  .body-lg   { font-size: 1.0625rem; line-height: 1.6; color: var(--text-body); }
+  .body-base { font-size: 0.9375rem; line-height: 1.62; color: var(--text-body); }
+  .body-sm   { font-size: 0.875rem; line-height: 1.6;  color: var(--text-secondary); }
+  .body-xs   { font-size: 0.8125rem; line-height: 1.55; color: var(--text-muted); }
+
+  /* ── Buttons — 8px. Engineered, not pill. ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.875rem;
+    padding-inline: 1.375rem;
+    border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 560;
+    letter-spacing: -0.008em;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 200ms var(--ease-smooth),
+                border-color 200ms var(--ease-smooth),
+                color 200ms var(--ease-smooth),
+                box-shadow 200ms var(--ease-smooth);
+  }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  /* Primary CTA — accent fill, black label, diagonal cut.
+     The accent-700 boundary exists for WCAG 1.4.11: the 500 fill alone
+     is 2.97:1 against white — a hair under the 3:1 UI-component line. */
+  .btn-primary {
+    background: var(--cta-bg);
+    color: var(--cta-fg);
+    border-color: var(--color-accent-700);
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%,
+      var(--notch) 100%, 0 calc(100% - var(--notch))
+    );
+  }
+
+  /* Same shape, inverted — for the black header and dark bands. */
+  .btn-invert {
+    background: #FFFFFF;
+    color: var(--cta-bg);
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%,
+      var(--notch) 100%, 0 calc(100% - var(--notch))
+    );
+  }
+  .btn-invert:hover:not(:disabled) { background: var(--color-ink-100); }
+  .btn-invert svg { transition: color 200ms var(--ease-smooth); }
+  .btn-invert:hover:not(:disabled) svg { color: var(--cta-bg); }
+  .btn-primary:hover:not(:disabled) { background: var(--cta-bg-hover); }
+
+  .btn-secondary {
+    background: var(--foreground);
+    color: #FFFFFF;
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%,
+      var(--notch) 100%, 0 calc(100% - var(--notch))
+    );
+  }
+  .btn-secondary:hover:not(:disabled) { background: var(--color-ink-900); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--foreground);
+    border-color: var(--border-strong);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--foreground);
+    background: var(--bg-alt);
+  }
+
+  /* Ghost, for dark sections. */
+  .btn-on-dark {
+    background: transparent;
+    color: #FFFFFF;
+    border-color: var(--dark-ghost-border);
+  }
+  .btn-on-dark:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Surfaces ── */
+  .card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 220ms var(--ease-smooth),
+                box-shadow 220ms var(--ease-smooth),
+                transform 220ms var(--ease-smooth);
+  }
+  .card-hover:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  /* Card inside a dark section. */
+  .card-dark {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: var(--radius);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.6875rem;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+    background: var(--background);
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-body);
+  }
+  .chip-accent {
+    border-color: var(--border-tint);
+    background: var(--bg-tint);
+    color: var(--accent-text);
+  }
+
+  .field {
+    width: 100%;
+    height: 2.875rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--background);
+    color: var(--text-body);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    transition: border-color 180ms var(--ease-smooth), box-shadow 180ms var(--ease-smooth);
+  }
+  .field::placeholder { color: var(--text-muted); }
+  .field:focus {
+    outline: none;
+    border-color: var(--accent-text);
+    box-shadow: 0 0 0 3px rgba(95, 122, 0, 0.16);
+  }
+  textarea.field { height: auto; padding-block: 0.75rem; resize: vertical; }
+}
+
+@layer utilities {
+  /* The brand corner: a diagonal cut instead of a radius. Only for
+     FILLED elements — clip-path would eat a border on the diagonal. */
+  .notch {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%,
+      var(--notch) 100%, 0 calc(100% - var(--notch))
+    );
+  }
+  /* Mirrored, for elements that sit on the right of a layout. */
+  .notch-tr {
+    clip-path: polygon(
+      0 0, calc(100% - var(--notch)) 0, 100% var(--notch),
+      100% 100%, 0 100%
+    );
+  }
+
+  /* A bare diagonal rule, for section corners and dividers. */
+  .slash::after {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 1px;
+    background: var(--border-strong);
+    transform: rotate(-45deg);
+  }
+
+  /* Green keyline capping a dark band. */
+  .rule-agent {
+    background: linear-gradient(90deg,
+      transparent, var(--color-signal-500) 26%, var(--color-signal-400) 50%,
+      var(--color-signal-500) 74%, transparent);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(8, 10, 8, 0.022) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(8, 10, 8, 0.022) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Glow AROUND an active bot, never over it. */
+  .bot-glow { filter: drop-shadow(0 0 7px rgba(151, 189, 39, 0.45)); }
+
+  .animate-fade-up  { animation: fade-up 0.6s var(--ease-smooth) both; }
+  .animate-fade-in  { animation: fade-in 0.45s ease-out both; }
+  .animate-pulse-dot{ animation: pulse-dot 2s ease-in-out infinite; }
+  .animate-bot-wake { animation: bot-wake 9s ease-in-out infinite; }
+
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Marks a dark section so nested .eyebrow / .em-green swap automatically. */
+  .on-dark h1, .on-dark h2, .on-dark h3, .on-dark h4 { color: #FFFFFF; }
+  .on-dark .body-lg, .on-dark .body-base { color: var(--dark-text); }
+  .on-dark .body-sm, .on-dark .body-xs   { color: var(--color-ink-400); }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
