@@ -6,6 +6,7 @@ import { Container, ButtonLink } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Request received",
+  description: "Your bot plan request is in the queue — here is what happens next.",
   robots: { index: false, follow: false },
 };
 

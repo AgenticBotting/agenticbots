@@ -7,7 +7,7 @@ const pillar = getPillar("marketing");
 
 export const metadata: Metadata = {
   title: pillar?.headline,
-  description: pillar?.intro,
+  description: `${pillar?.headline} ${pillar?.menuBlurb}`,
   alternates: { canonical: "/marketing" },
 };
 

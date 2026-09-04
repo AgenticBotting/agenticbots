@@ -1,0 +1,29 @@
+# CI (Phase 10). Every gate here also runs locally:
+#   npm run lint · npx tsc --noEmit · node scripts/pseo-gate.mjs ·
+#   npm run build · node scripts/seo-checks.mjs
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: pSEO uniqueness gate
+        run: node scripts/pseo-gate.mjs
+      - name: Build (runs prebuild gate again)
+        run: npm run build
+      - name: SEO gates — title/meta uniqueness, one H1
+        run: node scripts/seo-checks.mjs
+      # Lighthouse budgets (LCP<2.0s mobile, JS<150KB, ≥95 all categories)
+      # run against a deployed preview URL — wire once Vercel is connected:
+      # - uses: treosh/lighthouse-ci-action with budgets.json

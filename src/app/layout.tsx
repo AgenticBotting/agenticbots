@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     template: "%s | AgenticBots",
   },
   description:
-    "We build and run the bots that find your customers and follow up until they buy. Paid media, SEO, content, email, outbound, inbound and CRM — handled continuously, for two-person shops and enterprise teams alike.",
+    "We build and run the bots that find your customers and follow up until they buy — ads, SEO, email, outbound and CRM, handled continuously.",
   keywords: [
     "agentic bots",
     "AI marketing automation",
