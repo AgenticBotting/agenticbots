@@ -45,8 +45,8 @@ export default function PlanPage() {
               <p className="eyebrow mb-5">Free · one business day</p>
               <h1 className="display-hero text-balance">Get your <span className="em-green">bot plan.</span></h1>
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                Five questions. We read every one, map your business against the thirteen
-                bots, and send back a written plan. No call required to get it.
+                Three clicks and two fields. We map your business against the thirteen
+                bots and send back a written plan. No call required to get it.
               </p>
 
               <ul className="mt-10 space-y-6">
