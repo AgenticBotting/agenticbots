@@ -10,3 +10,6 @@ export { ExitIntent } from "./ExitIntent";
 export { PlanCta } from "./PlanCta";
 export { BlogOptin } from "./BlogOptin";
 export { BotScrollList } from "./BotScrollList";
+export { ProofBar } from "./ProofBar";
+export { ProblemDiagram } from "./ProblemDiagram";
+export { SecurityBlock } from "./SecurityBlock";

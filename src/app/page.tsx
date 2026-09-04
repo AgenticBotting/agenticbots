@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Plug, Rocket, LineChart, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Reveal, SectionHeader, ButtonLink, BrandMark } from "@/components/ui";
-import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList } from "@/components/marketing";
+import { BotPlanForm, PipelineMockup, StatBand, FaqAccordion, PlanCta, BotScrollList, ProofBar, ProblemDiagram, SecurityBlock } from "@/components/marketing";
 import { CATALOG } from "@/lib/catalog";
 
 /* ───────────────────────────────  HERO  ─────────────────────────────── */
@@ -316,6 +316,8 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
+        <ProofBar />
+        <ProblemDiagram />
         <WhatABotDoes />
         <Pillars />
         <BotRoster />
@@ -329,6 +331,7 @@ export default function HomePage() {
           ]}
         />
         <HowItWorks />
+        <SecurityBlock />
         <Faq />
         <FinalCta />
       </main>

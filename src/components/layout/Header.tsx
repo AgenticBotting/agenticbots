@@ -282,14 +282,6 @@ export function Header() {
                 ))}
               </ul>
 
-              <button
-                type="button"
-                onClick={() => { setMobileOpen(false); openBotPlan("mobile-nav"); }}
-                className="btn btn-primary w-full mt-4"
-              >
-                Get your bot plan
-                <ArrowRight className="w-4 h-4" />
-              </button>
               <a
                 href="mailto:hello@agenticbots.dev"
                 className="mt-6 flex items-center gap-2 text-[14px] text-ink-300"
@@ -298,6 +290,17 @@ export function Header() {
                 hello@agenticbots.dev
               </a>
             </div>
+          </div>
+          {/* Thumb-zone CTA — pinned to the drawer bottom, always reachable. */}
+          <div className="sticky bottom-0 inset-x-0 bg-ink-950 border-t border-ink-700 px-5 py-4">
+            <button
+              type="button"
+              onClick={() => { setMobileOpen(false); openBotPlan("mobile-nav"); }}
+              className="btn btn-primary w-full"
+            >
+              Get your bot plan
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

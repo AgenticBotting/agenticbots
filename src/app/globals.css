@@ -362,6 +362,14 @@
     transform: translateY(-2px);
   }
 
+  /* A cell inside a gap-px grid — the hairline-grid card variant. */
+  .card-cell {
+    background: var(--background);
+    height: 100%;
+    transition: background-color 200ms var(--ease-smooth);
+  }
+  .card-cell:hover { background: var(--bg-alt); }
+
   /* Card inside a dark section. */
   .card-dark {
     background: var(--dark-card);
