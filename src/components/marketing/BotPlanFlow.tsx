@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X, ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { BOT_PLAN_EVENT } from "@/lib/lead-flow";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /**
@@ -38,6 +39,7 @@ export function BotPlanFlow() {
     function onOpen(e: Event) {
       const detail = (e as CustomEvent<{ source?: string }>).detail;
       setSource(detail?.source ?? "site");
+      track("plan_flow_opened", { source: detail?.source ?? "site" });
       setOpen(true);
       setStep(0);
       setPicks({});
@@ -66,6 +68,7 @@ export function BotPlanFlow() {
 
   function pick<K extends keyof Picks>(key: K, value: string) {
     setPicks((p) => ({ ...p, [key]: value }));
+    track("plan_flow_step_completed", { step, field: key, value, source });
     setStep((s) => s + 1);
   }
 
@@ -85,6 +88,7 @@ export function BotPlanFlow() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setError(data.error || "Something went wrong."); setState("error"); return; }
+      track("plan_flow_completed", { source, focus: picks.bot });
       setState("done");
     } catch {
       setError("Network error. Try again.");

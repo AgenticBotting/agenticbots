@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { ALL_CATEGORIES } from "@/lib/catalog";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /** The site's single conversion form. Five fields, no dark background. */
@@ -48,6 +49,7 @@ export function BotPlanForm({
         setState("error");
         return;
       }
+      track("plan_form_submitted", { source, focus: form.focus });
       setState("done");
     } catch {
       setError("Network error. Try again.");

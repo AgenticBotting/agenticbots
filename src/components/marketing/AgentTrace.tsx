@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 /**
  * The recorded agent trace — a timed, scrubbable replay of one real
@@ -93,8 +94,8 @@ export function AgentTrace() {
         <button
           type="button"
           onClick={() => {
-            if (done) { setTime(0); setPlaying(true); }
-            else setPlaying((p) => !p);
+            if (done) { setTime(0); setPlaying(true); track("trace_played", { replay: true }); }
+            else setPlaying((p) => { if (!p) track("trace_played", { replay: false }); return !p; });
           }}
           aria-label={done ? "Replay trace" : playing ? "Pause trace" : "Play trace"}
           className="flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 notch hover:bg-accent-400 transition-colors"
@@ -109,7 +110,7 @@ export function AgentTrace() {
           max={DURATION}
           step={0.1}
           value={time}
-          onChange={(e) => { setPlaying(false); setTime(Number(e.target.value)); }}
+          onChange={(e) => { setPlaying(false); setTime(Number(e.target.value)); track("trace_scrubbed", {}); }}
           aria-label="Scrub through the trace"
           className="flex-1 accent-[#97BD27] h-1"
         />

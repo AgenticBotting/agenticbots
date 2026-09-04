@@ -8,6 +8,7 @@ import { Logo, BotIndex } from "@/components/ui";
 import { CATALOG, categoryHref, type PillarSlug } from "@/lib/catalog";
 import { openBotPlan } from "@/lib/lead-flow";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
@@ -90,7 +91,7 @@ export function Header() {
             <nav className="hidden lg:flex justify-self-center items-center gap-9">
               <button
                 type="button"
-                onClick={() => (menuOpen ? closeMenu() : setMenuOpen(true))}
+                onClick={() => { if (menuOpen) { closeMenu(); } else { track("nav_mega_opened", {}); setMenuOpen(true); } }}
                 aria-expanded={menuOpen}
                 className={cn(
                   "nav-link inline-flex items-center gap-1.5 transition-colors",

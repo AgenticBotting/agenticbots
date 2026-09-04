@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { openBotPlan } from "@/lib/lead-flow";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,7 +29,7 @@ export function PlanCta({
   }[variant];
 
   return (
-    <button type="button" onClick={() => openBotPlan(source)} className={cn("btn", cls, className)}>
+    <button type="button" onClick={() => { track("cta_clicked", { source, label }); openBotPlan(source); }} className={cn("btn", cls, className)}>
       {label}
       <ArrowRight className="w-4 h-4" />
     </button>

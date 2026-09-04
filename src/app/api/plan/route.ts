@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { deliverPlanRequest } from "@/lib/notify";
+import { trackServer } from "@/lib/analytics";
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
         { status: 502 }
       );
     }
+    await trackServer("plan_form_submitted", { source, focus, converted: true });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[plan] unexpected failure", err);
