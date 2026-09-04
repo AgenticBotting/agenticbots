@@ -13,3 +13,5 @@ export { BotScrollList } from "./BotScrollList";
 export { ProofBar } from "./ProofBar";
 export { ProblemDiagram } from "./ProblemDiagram";
 export { SecurityBlock } from "./SecurityBlock";
+export { ReadingProgress } from "./ReadingProgress";
+export { PostToc } from "./PostToc";

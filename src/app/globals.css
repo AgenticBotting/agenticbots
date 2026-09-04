@@ -418,6 +418,61 @@
   textarea.field { height: auto; padding-block: 0.75rem; resize: vertical; }
 }
 
+@layer components {
+  /* ── Blog reading system (Phase 4) ──────────────────────────────
+     Long-form is its own type context: 19.5px/1.7 on a warm off-white,
+     68ch measure, headings bound to the text they introduce. */
+  .prose-blog {
+    font-size: 1.21875rem;      /* 19.5px */
+    line-height: 1.7;
+    color: #1A1A1A;
+    max-width: 68ch;
+  }
+  .prose-blog p { margin-block: 1.7rem 0; }
+  .prose-blog h2 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    letter-spacing: -0.028em;
+    margin-top: 3.4rem;          /* ≥2× the bottom margin */
+    margin-bottom: 1.2rem;
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--color-accent-500);
+    max-width: 26ch;
+  }
+  .prose-blog ul { margin-block: 1.7rem; }
+  .prose-blog li + li { margin-top: 0.85rem; }
+
+  .prose-surface { background: #FDFDFC; }
+
+  /* Callouts — accent-bordered, never boxed-and-shadowed. */
+  .callout {
+    border-left: 3px solid var(--callout-edge, var(--color-accent-500));
+    padding: 0.35rem 0 0.35rem 1.4rem;
+    margin-block: 2.2rem;
+  }
+  .callout-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--callout-edge, var(--accent-text));
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .callout-note    { --callout-edge: #626862; }
+  .callout-warning { --callout-edge: #B45309; }
+  .callout-insight { --callout-edge: var(--accent-text); }
+  .callout-result  { --callout-edge: var(--color-accent-500); }
+  .callout-result .callout-label { color: var(--accent-text); }
+
+  /* Full-bleed escape: visual matter breaks the 68ch column. */
+  .prose-wide {
+    width: min(56rem, calc(100vw - 2.5rem));
+    margin-inline: calc(50% - min(28rem, 50vw - 1.25rem));
+    margin-block: 2.6rem;
+  }
+}
+
 @layer utilities {
   /* The brand corner: a diagonal cut instead of a radius. Only for
      FILLED elements — clip-path would eat a border on the diagonal. */

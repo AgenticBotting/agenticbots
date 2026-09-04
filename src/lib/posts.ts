@@ -10,7 +10,9 @@ export type Block =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "quote"; text: string };
+  | { type: "quote"; text: string }
+  | { type: "callout"; variant: "note" | "warning" | "insight" | "result"; title?: string; text: string }
+  | { type: "stat"; value: string; label: string; detail?: string };
 
 export interface Post {
   slug: string;
@@ -41,6 +43,7 @@ export const POSTS: Post[] = [
         "Under an hour: you are one of two or three.",
         "Next morning: the job is often already booked with someone else.",
       ]},
+      { type: "stat", value: "391%", label: "higher contact rate when a lead is called back within five minutes versus thirty.", detail: "Lead response research is unusually consistent on this — the decay is minutes, not hours." },
       { type: "p", text: "None of this is new. What is new is that you no longer need a human sitting by the phone to win it." },
       { type: "h2", text: "Why the fix keeps not happening" },
       { type: "p", text: "Every owner knows they should respond faster. The reason they do not is not laziness — it is that the responsibility falls on a person who is also doing four other jobs. At 8pm on a Friday, that person is not going to answer, and no amount of process documentation changes it." },
@@ -53,6 +56,7 @@ export const POSTS: Post[] = [
         "Qualifying questions get asked while the person is still paying attention.",
         "The booking lands on a real calendar with the right buffers.",
       ]},
+      { type: "callout", variant: "result", text: "A speed-to-lead bot answers in under a minute, every time, at any hour — and by the time a human picks it up, the lead has been answered, qualified and often booked." },
       { type: "p", text: "The point is not that a bot sells better than your team. It is that a bot is awake at 8pm on a Friday, and your team is not." },
     ],
   },
@@ -108,6 +112,16 @@ export const POSTS: Post[] = [
     ],
   },
 ];
+
+/** Slugified h2s for the table of contents. */
+export function postHeadings(post: Post): { id: string; text: string }[] {
+  return post.body
+    .filter((b): b is Extract<Block, { type: "h2" }> => b.type === "h2")
+    .map((b) => ({
+      id: b.text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-"),
+      text: b.text,
+    }));
+}
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);
