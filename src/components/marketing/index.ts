@@ -27,3 +27,5 @@ export { CategoryVignette } from "./CategoryVignette";
 export { CityVignette } from "./CityVignette";
 export { AgentConsole, StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand } from "./GeoSections";
 export type { TriadItem, ZigRow } from "./GeoSections";
+export { PostOptin } from "./PostOptin";
+export { ShareRow } from "./ShareRow";

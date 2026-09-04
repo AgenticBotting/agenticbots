@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, BotFace } from "@/components/ui";
-import { BlogOptin, ReadingProgress, PostToc } from "@/components/marketing";
+import { BlogOptin, ReadingProgress, PostToc, PostOptin, ShareRow } from "@/components/marketing";
 import { POSTS, getPost, postHeadings, SORTED_POSTS, type Block } from "@/lib/posts";
 import { JsonLd, articleLd } from "@/components/JsonLd";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://agenticbots.dev";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -86,22 +88,6 @@ function Blocks({ body }: { body: Block[] }) {
   );
 }
 
-function AuthorCard() {
-  return (
-    <div className="mt-14 pt-8 border-t border-[var(--border)] flex items-center gap-4">
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-ink-950 notch">
-        <BotFace className="w-7 h-6 text-accent-500" />
-      </span>
-      <div>
-        <p className="text-[14.5px] font-semibold tracking-[-0.01em]">The AgenticBots team</p>
-        <p className="body-sm">
-          We build and run the bots. The writing is from what production actually taught us.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export default async function PostPage({ params }: Params) {
   const { slug } = await params;
   const post = getPost(slug);
@@ -109,6 +95,7 @@ export default async function PostPage({ params }: Params) {
 
   const headings = postHeadings(post);
   const more = SORTED_POSTS.filter((p) => p.slug !== slug).slice(0, 3);
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
 
   return (
     <>
@@ -138,6 +125,20 @@ export default async function PostPage({ params }: Params) {
               </div>
               <h1 className="display-hero text-balance">{post.title}</h1>
               <p className="body-lg mt-6 text-pretty">{post.excerpt}</p>
+
+              {/* Byline + share, then the inline email capture. */}
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-4">
+                <span className="flex items-center gap-2.5">
+                  <span className="flex h-8 w-8 items-center justify-center bg-ink-950 notch">
+                    <BotFace className="w-4 h-3.5 text-accent-500" />
+                  </span>
+                  <span className="text-[13.5px] font-semibold tracking-[-0.01em]">The AgenticBots team</span>
+                </span>
+                <span className="h-4 w-px bg-[var(--border)]" aria-hidden />
+                <ShareRow url={postUrl} title={post.title} variant="compact" />
+              </div>
+
+              <PostOptin source={`blog-hero-${post.slug}`} className="mt-8" />
             </div>
           </Container>
         </section>
@@ -145,13 +146,17 @@ export default async function PostPage({ params }: Params) {
         {/* TOC rail + centered reading column. Zero sidebars of any other kind. */}
         <section className="section-pad-sm border-b border-[var(--border)]">
           <Container>
-            <div className="lg:grid lg:grid-cols-[180px_minmax(0,1fr)_180px] lg:gap-10">
+            <div className="lg:grid lg:grid-cols-[180px_minmax(0,1fr)_270px] lg:gap-10 xl:gap-14">
               <PostToc items={headings} />
               <article className="prose-blog mx-auto">
                 <Blocks body={post.body} />
-                <AuthorCard />
+                <div className="mt-14 pt-8 border-t border-[var(--border)] flex flex-wrap items-center justify-center gap-6">
+                  <ShareRow url={postUrl} title={post.title} />
+                </div>
               </article>
-              <div aria-hidden="true" />
+              <div className="hidden lg:block">
+                <PostOptin source={`blog-rail-${post.slug}`} variant="card" className="sticky top-28" />
+              </div>
             </div>
           </Container>
         </section>
@@ -168,7 +173,7 @@ export default async function PostPage({ params }: Params) {
           <section className="section-pad-sm border-t border-[var(--border)]">
             <Container>
               <p className="eyebrow text-center mb-9">Keep reading</p>
-              <div className="mx-auto max-w-[980px] grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+              <div className={`mx-auto max-w-[980px] grid gap-px bg-[var(--border)] border border-[var(--border)] ${more.length === 1 ? "" : more.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                 {more.map((p) => (
                   <Link key={p.slug} href={`/blog/${p.slug}`} className="group card-cell p-7 flex flex-col">
                     <span className="body-xs">{p.category}</span>
