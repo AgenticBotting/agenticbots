@@ -6,6 +6,7 @@ import { BotPlanForm } from "./BotPlanForm";
 import { PlanCta } from "./PlanCta";
 import { StatBand } from "./StatBand";
 import { FaqAccordion } from "./FaqAccordion";
+import { CategoryVignette } from "./CategoryVignette";
 import { getPillar, categoryHref, type Category } from "@/lib/catalog";
 import { renderHeadline } from "@/lib/headline";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
@@ -76,6 +77,9 @@ export function CategoryPage({ category }: { category: Category }) {
               </Reveal>
 
               <Reveal delay={0.1}>
+                <div className="border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-4 mb-8">
+                  <CategoryVignette slug={category.slug} />
+                </div>
                 <div className="border-t-2 border-ink-950 pt-7">
                   <p className="eyebrow">What you get</p>
                   <p className="display-lg mt-4 text-balance">{category.outcome}</p>

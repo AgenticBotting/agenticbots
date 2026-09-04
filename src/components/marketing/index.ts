@@ -23,3 +23,5 @@ export { Timeline } from "./Timeline";
 export { AuditLogPanel } from "./AuditLogPanel";
 export { AgentField } from "./AgentField";
 export { VignetteAsk, VignetteBuild, VignetteBooked } from "./Vignettes";
+export { CategoryVignette } from "./CategoryVignette";
+export { CityVignette } from "./CityVignette";

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
-import { BotPlanForm, PlanCta, StatBand } from "@/components/marketing";
+import { BotPlanForm, PlanCta, StatBand, CityVignette } from "@/components/marketing";
 import { JsonLd, breadcrumbLd, serviceLd } from "@/components/JsonLd";
 import { CITIES, LOCAL_SERVICES, getState, getCity, nearbyCities, fmt } from "@/lib/geo/data";
 
@@ -74,7 +74,11 @@ export default async function CityMarketHub({ params }: Params) {
                 <div className="mt-8"><PlanCta source={`market-hub-${ct.slug}`} /></div>
               </div>
 
-              <div className="border-t-2 border-ink-950 pt-6">
+              <div>
+                <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3 mb-8">
+                  <CityVignette city={ct} />
+                </div>
+                <div className="border-t-2 border-ink-950 pt-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mb-5">
                   {ct.name} snapshot · estimates
                 </p>
@@ -92,6 +96,7 @@ export default async function CityMarketHub({ params }: Params) {
                     </div>
                   ))}
                 </dl>
+                </div>
               </div>
             </div>
           </Container>

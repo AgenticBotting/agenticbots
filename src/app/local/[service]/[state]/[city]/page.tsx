@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
-import { BotPlanForm, PlanCta, StatBand, FaqAccordion } from "@/components/marketing";
+import { BotPlanForm, PlanCta, StatBand, FaqAccordion, CityVignette } from "@/components/marketing";
 import { CITIES, LOCAL_SERVICES, getService, getState, getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { rotatedValueProp, rotatedCta } from "@/lib/geo/seo-rotation";
 import { getCategory } from "@/lib/catalog";
@@ -98,7 +98,11 @@ export default async function CityPage({ params }: Params) {
                 </div>
               </div>
 
-              <div className="border-t-2 border-ink-950 pt-6">
+              <div>
+                <div className="border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-3 mb-8">
+                  <CityVignette city={ct} />
+                </div>
+                <div className="border-t-2 border-ink-950 pt-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mb-5">
                   {ct.name} market snapshot · estimates
                 </p>
@@ -119,6 +123,7 @@ export default async function CityPage({ params }: Params) {
                 <p className="body-xs mt-4">
                   Public-source estimates, refreshed periodically — shown for orientation, not quoted as audit data.
                 </p>
+                </div>
               </div>
             </div>
           </Container>
