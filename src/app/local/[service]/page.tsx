@@ -191,7 +191,7 @@ export default async function ServiceHub({ params }: Params) {
           heading={`Get the ${svc.name.toLowerCase()} plan for your market.`}
           sub="Tell us what you sell and where you are. The plan comes back mapped to your market — free, one business day."
         >
-          <div className="max-w-[640px]">
+          <div>
             <BotPlanForm source={`local-hub-${svc.slug}-form`} defaultFocus={category?.name} />
           </div>
         </Section>

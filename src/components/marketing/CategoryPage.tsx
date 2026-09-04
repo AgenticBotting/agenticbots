@@ -77,7 +77,7 @@ export function CategoryPage({ category }: { category: Category }) {
               </Reveal>
 
               <Reveal delay={0.1}>
-                <div className="border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-4 mb-8">
+                <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-alt)] px-5 pt-6 pb-4 mb-8">
                   <CategoryVignette slug={category.slug} />
                 </div>
                 <div className="border-t-2 border-ink-950 pt-7">
@@ -251,7 +251,7 @@ export function CategoryPage({ category }: { category: Category }) {
                 All {pillar.name.toLowerCase()} bots
               </Link>
             </div>
-            <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+            <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
               {siblings.map((c) => (
                 <Link
                   key={c.slug}

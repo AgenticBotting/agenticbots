@@ -23,7 +23,7 @@ export default function ThanksPage() {
       <main>
         <Container className="py-20 sm:py-28">
           <div className="max-w-[54ch]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
+            <span className="flex h-11 w-11 items-center justify-center  bg-[var(--bg-tint)] rounded-[var(--radius)] border border-[var(--border-tint)] text-[var(--accent-text)]">
               <Check className="w-5 h-5" strokeWidth={2.5} />
             </span>
             <h1 className="display-hero mt-7 text-balance">Request <span className="em-green">received.</span></h1>
@@ -32,7 +32,7 @@ export default function ThanksPage() {
             </p>
           </div>
 
-          <ol className="mt-14 grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
+          <ol className="mt-14 grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame  overflow-hidden">
             {NEXT.map((s) => (
               <li key={s.n} className="bg-white p-7">
                 <span className="text-[12px] text-[var(--accent-text)] mono">

@@ -79,7 +79,7 @@ function HowSimple() {
       eyebrow="How it works"
       heading="Three steps. No jargon."
     >
-      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
         {SIMPLE_STEPS.map(({ n, t, d, Art }) => (
           <div key={n} className="card-cell flex flex-col">
             {/* The image slot from the wireframe — drawn, not photographed. */}
@@ -118,7 +118,7 @@ function BotRoster() {
         </Reveal>
 
         {/* The two pillars, one line each — the old two-card section, folded in. */}
-        <div className="mt-9 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] max-w-[860px]">
+        <div className="mt-9 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame max-w-[860px]">
           {CATALOG.map((p) => (
             <Link key={p.slug} href={`/${p.slug}`} className="group card-cell px-6 py-4 flex items-center justify-between gap-4">
               <span>
@@ -202,11 +202,11 @@ function FieldBand() {
           </h2>
         </div>
 
-        <div className="mt-10 border border-ink-700 bg-ink-950 px-4 pt-4 pb-2">
+        <div className="mt-10 rounded-[var(--radius)] border border-ink-700 bg-ink-950 px-4 pt-4 pb-2">
           <AgentField height={250} />
         </div>
 
-        <dl className="mt-8 grid gap-px sm:grid-cols-3 border border-ink-700 bg-ink-700">
+        <dl className="mt-8 grid gap-px sm:grid-cols-3 rounded-[var(--radius)] border border-ink-700 bg-ink-700">
           {[
             { value: "<60s", label: "First response to any lead, any hour" },
             { value: "24/7", label: "Nights, weekends and holidays covered" },
@@ -243,7 +243,7 @@ function Faq() {
           <div className="lg:sticky lg:top-32">
             <Reveal>
               <SectionHeader eyebrow="Questions" title="The things people ask first." />
-              <div className="mt-10 border border-[var(--border)] bg-[var(--bg-alt)] p-6 max-w-[380px]">
+              <div className="mt-10 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-alt)] p-6 max-w-[380px]">
                 <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)]">
                   Not answered here?
                 </p>
@@ -272,7 +272,7 @@ function PlanPreview() {
     { i: "10", n: "CRM Bot", why: "foundation for both", bar: "40%" },
   ];
   return (
-    <figure className="mt-10 max-w-[400px] border border-[var(--border)] bg-white" aria-hidden="true">
+    <figure className="mt-10 max-w-[400px] rounded-[var(--radius)] border border-[var(--border)] bg-white" aria-hidden="true">
       <div className="flex items-center justify-between px-5 h-10 border-b border-[var(--border)] bg-[var(--bg-alt)]">
         <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-secondary)]">your-bot-plan.pdf</span>
         <span className="mono text-[10px] text-[var(--text-muted)]">1 page</span>

@@ -52,13 +52,13 @@ export function PostOptin({
     return (
       <div className={cn("mx-auto max-w-[440px]", className)}>
         {state === "done" ? (
-          <p className="flex items-center justify-center gap-2 border border-accent-500 bg-accent-100 px-5 py-3 text-[14px] font-semibold text-[var(--accent-text)]">
+          <p className="flex items-center justify-center gap-2 rounded-[var(--radius)] border border-accent-500 bg-accent-100 px-5 py-3 text-[14px] font-semibold text-[var(--accent-text)]">
             <Check className="w-4 h-4" strokeWidth={3} />
             You&apos;re on the list.
           </p>
         ) : (
           <>
-            <form onSubmit={onSubmit} className="flex items-stretch border border-[var(--border-strong)] bg-white">
+            <form onSubmit={onSubmit} className="flex items-stretch rounded-[var(--radius)] border border-[var(--border-strong)] bg-white">
               <span className="flex items-center pl-4 text-[var(--text-muted)]">
                 <Mail className="w-4 h-4" />
               </span>
@@ -83,10 +83,10 @@ export function PostOptin({
   }
 
   return (
-    <aside className={cn("border border-[var(--border)] bg-[var(--bg-alt)] p-6", className)}>
+    <aside className={cn("rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg-alt)] p-6", className)}>
       {state === "done" ? (
         <>
-          <span className="mb-4 flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 notch">
+          <span className="mb-4 flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 rounded-[var(--radius-sm)]">
             <Check className="w-4.5 h-4.5" strokeWidth={3} />
           </span>
           <p className="display-md">You&apos;re on the list.</p>
@@ -94,7 +94,7 @@ export function PostOptin({
         </>
       ) : (
         <>
-          <span className="mb-4 flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 notch">
+          <span className="mb-4 flex h-9 w-9 items-center justify-center bg-accent-500 text-ink-950 rounded-[var(--radius-sm)]">
             <Mail className="w-4.5 h-4.5" />
           </span>
           <p className="display-md">Get more like this</p>

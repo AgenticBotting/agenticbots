@@ -43,7 +43,7 @@ export function ShareRow({
     { label: "Share on LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`, Icon: LinkedInMark },
   ];
 
-  const btn = "flex h-9 w-9 items-center justify-center border border-[var(--border)] bg-white text-[var(--text-secondary)] hover:border-ink-950 hover:text-[var(--foreground)] transition-colors";
+  const btn = "flex h-9 w-9 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-white text-[var(--text-secondary)] hover:border-ink-950 hover:text-[var(--foreground)] transition-colors";
 
   async function copy() {
     try {

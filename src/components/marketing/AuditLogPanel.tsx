@@ -12,7 +12,7 @@ const LOG = [
 
 export function AuditLogPanel() {
   return (
-    <div className="border border-ink-700 bg-ink-950 on-dark">
+    <div className="rounded-[var(--radius)] border border-ink-700 bg-ink-950 on-dark">
       <div className="flex items-center justify-between px-5 h-11 border-b border-ink-700">
         <span className="mono text-[11px] uppercase tracking-[0.11em] text-ink-300">audit.log</span>
         <span className="mono text-[10.5px] text-ink-500">every action · every reason</span>

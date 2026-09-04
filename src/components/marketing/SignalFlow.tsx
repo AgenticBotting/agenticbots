@@ -84,7 +84,7 @@ export function SignalFlow() {
       </svg>
 
       {/* The three-beat caption row — all that remains of the old prose. */}
-      <dl className="mt-8 grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+      <dl className="mt-8 grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
         {[
           ["01 · watches", "Your ads, inbox, forms, phone and CRM — every hour."],
           ["02 · acts", "Replies, books, bids and logs in seconds, by your rules."],

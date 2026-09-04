@@ -25,7 +25,7 @@ export function StatBand({
           <h2 className="display-xl text-balance">{title}</h2>
         </div>
 
-        <dl className="mt-11 grid gap-px sm:grid-cols-3 border border-ink-700 rounded-none overflow-hidden bg-ink-700">
+        <dl className="mt-11 grid gap-px sm:grid-cols-3 rounded-[var(--radius)] border border-ink-700  overflow-hidden bg-ink-700">
           {metrics.map((m) => (
             <div key={m.label} className="bg-ink-800 px-6 py-7">
               <dt className="text-[1.875rem] font-semibold tracking-[-0.035em] leading-none tabular-nums text-signal-500">

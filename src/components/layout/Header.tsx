@@ -135,7 +135,7 @@ export function Header() {
               <button
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
-                className="lg:hidden flex items-center justify-center w-11 h-11 rounded-none border border-ink-600 text-white"
+                className="lg:hidden flex items-center justify-center w-11 h-11  rounded-[var(--radius)] border border-ink-600 text-white"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -154,7 +154,7 @@ export function Header() {
                     <li key={p.slug} className="flex">
                       <button
                         onClick={() => setSelectedPillar(p.slug)}
-                        className="group w-full flex items-center justify-between gap-6 px-6 py-5 text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        className="group w-full flex items-center justify-between gap-6 px-6 py-5 text-left rounded-[var(--radius)] border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                       >
                         <span className="min-w-0">
                           <span className="block eyebrow mb-1.5">{p.tagline}</span>
@@ -182,7 +182,7 @@ export function Header() {
                       <Link
                         href={categoryHref(c)}
                         onClick={closeMenu}
-                        className="group w-full flex items-start gap-3 p-4 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        className="group w-full flex items-start gap-3 p-4 rounded-[var(--radius)] border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                       >
                         <BotIndex index={c.index} size="sm" tone="outline" />
                         <span className="min-w-0">
@@ -215,7 +215,7 @@ export function Header() {
                       <li key={region} className="flex">
                         <button
                           onClick={() => setSelectedRegion(region)}
-                          className="group w-full flex flex-col justify-between gap-8 p-5 min-h-[132px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          className="group w-full flex flex-col justify-between gap-8 p-5 min-h-[132px] text-left rounded-[var(--radius)] border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                         >
                           <span>
                             <span className="block display-lg">{region}</span>
@@ -239,7 +239,7 @@ export function Header() {
                     const cities = allCitiesInState(st.slug);
                     const top = cities.slice(0, 8);
                     return (
-                      <div key={st.slug} className="border border-[var(--border)] bg-white p-5">
+                      <div key={st.slug} className="rounded-[var(--radius)] border border-[var(--border)] bg-white p-5">
                         <Link
                           href={`/markets/${st.slug}`}
                           onClick={closeMenu}
@@ -300,7 +300,7 @@ export function Header() {
               <button
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
-                className="flex items-center justify-center w-11 h-11 rounded-none border border-ink-600 text-white"
+                className="flex items-center justify-center w-11 h-11  rounded-[var(--radius)] border border-ink-600 text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -428,7 +428,7 @@ function StepBack({ onBack, backLabel, eyebrow, title }: {
     <div className="flex items-center gap-6 mb-6 pb-4 border-b border-[var(--border)]">
       <button
         onClick={onBack}
-        className="px-4 py-2.5 border border-[var(--border-strong)] text-[13.5px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
+        className="px-4 py-2.5 rounded-[var(--radius)] border border-[var(--border-strong)] text-[13.5px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
       >
         ← {backLabel}
       </button>

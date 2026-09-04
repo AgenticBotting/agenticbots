@@ -145,9 +145,9 @@ export function BotPlanForm({
   };
 
   return (
-    <div ref={panelRef} tabIndex={-1} className={cn("border border-[var(--border-strong)] bg-white outline-none", className)}>
+    <div ref={panelRef} tabIndex={-1} className={cn("@container rounded-[var(--radius)] overflow-hidden border border-[var(--border-strong)] bg-white outline-none", className)}>
       {/* ── Console header: status, progress pips, answers so far ── */}
-      <div className="bg-ink-950 on-dark px-5 sm:px-7 py-4">
+      <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
           <p className="mono text-[10.5px] uppercase tracking-[0.13em] text-ink-300">
             Bot plan
@@ -175,7 +175,7 @@ export function BotPlanForm({
                 key={a.label}
                 type="button"
                 onClick={a.undo}
-                className="group inline-flex items-center gap-2 border border-ink-700 px-2.5 py-1 mono text-[10px] uppercase tracking-[0.1em] text-ink-300 hover:border-accent-500 hover:text-accent-400 transition-colors"
+                className="group inline-flex items-center gap-2 rounded-[var(--radius)] border border-ink-700 px-2.5 py-1 mono text-[10px] uppercase tracking-[0.1em] text-ink-300 hover:border-accent-500 hover:text-accent-400 transition-colors"
               >
                 {a.label}
                 <span className="text-ink-400 group-hover:text-accent-400">×</span>
@@ -187,10 +187,10 @@ export function BotPlanForm({
       <div className="h-px rule-agent" />
 
       {/* ── Body ── */}
-      <div className="p-6 sm:p-8">
+      <div className="p-6 sm:p-9 lg:p-11">
         {state === "done" ? (
           <div className="text-center py-6">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 notch">
+            <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 rounded-[var(--radius-sm)]">
               <Check className="w-6 h-6" strokeWidth={3} />
             </span>
             <h3 className="display-lg mt-5">Got it.</h3>
@@ -202,14 +202,14 @@ export function BotPlanForm({
         ) : (
           <>
             <div className="flex items-start justify-between gap-4">
-              <div>
+              <div className="max-w-[48ch]">
                 <p className="eyebrow">{QUESTION[current].eyebrow}</p>
-                <h3 className="display-lg mt-2.5">{QUESTION[current].ask}</h3>
+                <h3 className="display-xl mt-2.5">{QUESTION[current].ask}</h3>
               </div>
               {stepIndex > 0 && (
                 <button
                   type="button" onClick={back} aria-label="Back"
-                  className="shrink-0 flex items-center justify-center w-9 h-9 border border-[var(--border)] hover:border-ink-950 transition-colors"
+                  className="shrink-0 flex items-center justify-center w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] hover:border-ink-950 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
@@ -218,7 +218,10 @@ export function BotPlanForm({
 
             {options.length > 0 ? (
               <>
-                <div className="mt-7 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)]">
+                <div className={cn(
+                  "mt-8 grid gap-px bg-[var(--border)] border border-[var(--border)] grid-frame",
+                  options.length === 3 ? "@3xl:grid-cols-3" : "@lg:grid-cols-2 @3xl:grid-cols-3"
+                )}>
                   {options.map((o, i) => (
                     <button
                       key={o.value}
@@ -226,7 +229,7 @@ export function BotPlanForm({
                       onClick={() => choose(o.value)}
                       className={cn(
                         "group relative bg-white p-5 text-left transition-colors hover:bg-[var(--bg-tint)]",
-                        options.length % 2 === 1 && i === options.length - 1 && "sm:col-span-2"
+                        options.length === 4 && i === 3 && "@lg:col-span-2 @3xl:col-span-1"
                       )}
                     >
                       <span className="absolute left-0 top-0 h-full w-[3px] bg-accent-500 scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200" />
@@ -250,8 +253,8 @@ export function BotPlanForm({
                 </p>
               </>
             ) : (
-              <form onSubmit={onSubmit} className="mt-7">
-                <div className="grid sm:grid-cols-2 gap-4">
+              <form onSubmit={onSubmit} className="mt-8">
+                <div className="grid @lg:grid-cols-2 @3xl:grid-cols-3 gap-4">
                   <label className="block">
                     <span className="block mb-1.5 text-[13px] font-medium text-[var(--text-secondary)]">
                       Name <span className="text-[var(--accent-text)]">*</span>
@@ -270,27 +273,29 @@ export function BotPlanForm({
                       value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
                   </label>
+                  <label className="block">
+                    <span className="block mb-1.5 text-[13px] font-medium text-[var(--text-secondary)]">
+                      Anything specific? <span className="text-[var(--text-muted)]">Optional</span>
+                    </span>
+                    <input
+                      className="field" placeholder="e.g. 40 leads a month, we call back half"
+                      value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })}
+                    />
+                  </label>
                 </div>
-                <label className="block mt-4">
-                  <span className="block mb-1.5 text-[13px] font-medium text-[var(--text-secondary)]">
-                    Anything specific? <span className="text-[var(--text-muted)]">Optional</span>
-                  </span>
-                  <input
-                    className="field" placeholder="e.g. 40 leads a month, we call back half"
-                    value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })}
-                  />
-                </label>
 
                 {state === "error" && <p className="mt-4 text-[13.5px] text-red-600">{error}</p>}
 
-                <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full mt-6">
-                  {state === "sending"
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                    : <>Get my bot plan <ArrowRight className="w-4 h-4" /></>}
-                </button>
-                <p className="body-sm mt-4 text-center">
-                  One business day. No spam, no sales sequence you did not ask for.
-                </p>
+                <div className="mt-7 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                  <button type="submit" disabled={state === "sending"} className="btn btn-primary sm:min-w-[260px]">
+                    {state === "sending"
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
+                      : <>Get my bot plan <ArrowRight className="w-4 h-4" /></>}
+                  </button>
+                  <p className="body-sm">
+                    One business day. No spam, no sales sequence you did not ask for.
+                  </p>
+                </div>
               </form>
             )}
           </>

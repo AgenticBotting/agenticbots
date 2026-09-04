@@ -92,7 +92,7 @@ export function ProblemDiagram() {
       heading="The tools already exist. The wiring doesn't."
       sub="Every business already pays for the stack. What's missing is the layer that makes fourteen disconnected tools behave like one system."
     >
-      <div className="grid md:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)]">
+      <div className="grid md:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
         <figure className="card-cell p-7 flex flex-col">
           <figcaption className="mono text-[11px] uppercase tracking-[0.11em] text-[var(--text-muted)] mb-6">
             Today — 14 tools, point-to-point

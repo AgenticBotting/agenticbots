@@ -39,7 +39,7 @@ export function SecurityBlock() {
       heading="Autonomy you can audit."
       sub="Enterprise buyers should not have to take an agent vendor's word for anything. This is how the fleet is governed."
     >
-      <dl className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink-700 border border-ink-700">
+      <dl className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink-700 rounded-[var(--radius)] border border-ink-700">
         {ITEMS.map((it) => (
           <div key={it.t} className="bg-ink-800 p-7">
             <dt className="display-md text-white">{it.t}</dt>

@@ -45,7 +45,7 @@ export default function AboutPage() {
                 <SectionHeader eyebrow="How we operate" title="Four things we do not bend on." />
               </Reveal>
               <Reveal delay={0.08}>
-                <div className="grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
+                <div className="grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame  overflow-hidden">
                   {PRINCIPLES.map((p, i) => (
                     <div key={p.t} className="bg-white p-7">
                       <span
@@ -75,9 +75,7 @@ export default function AboutPage() {
 
         <section className="section-pad">
           <Container>
-            <div className="max-w-[560px] mx-auto">
-              <BotPlanForm source="about" />
-            </div>
+            <BotPlanForm source="about" />
           </Container>
         </section>
       </main>

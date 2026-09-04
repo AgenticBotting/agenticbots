@@ -102,7 +102,7 @@ export function Footer() {
         </div>
 
         {/* Optin strip */}
-        <div className="rounded-none border border-ink-700 bg-ink-800 px-6 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center gap-5 justify-between mb-10">
+        <div className="rounded-[var(--radius)] border border-ink-700 bg-ink-800 px-6 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center gap-5 justify-between mb-10">
           <div>
             <p className="display-md text-white">Get your bot plan — free.</p>
             <p className="text-[13.5px] text-ink-400 mt-1.5">

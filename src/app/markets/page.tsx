@@ -51,7 +51,7 @@ export default function MarketsIndex() {
                 const cities = allCitiesInState(st.slug);
                 return (
                   <Link key={st.slug} href={`/markets/${st.slug}`}
-                    className="group border border-[var(--border)] bg-white p-5 hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
+                    className="group rounded-[var(--radius)] border border-[var(--border)] bg-white p-5 hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
                     <span className="flex items-center justify-between gap-3">
                       <span className="display-md !text-[15px] group-hover:text-[var(--accent-text)] transition-colors">{st.name}</span>
                       <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />
@@ -67,7 +67,7 @@ export default function MarketsIndex() {
         ))}
 
         <Section variant="light" size="sm" eyebrow="By service" heading="Or start from the service.">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)] grid-frame">
             {LOCAL_SERVICES.map((s) => (
               <Link key={s.slug} href={`/local/${s.slug}`} className="group card-cell p-6">
                 <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>

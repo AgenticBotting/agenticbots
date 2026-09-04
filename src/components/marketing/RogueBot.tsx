@@ -29,7 +29,7 @@ export function RogueBot() {
     <div key={run} aria-hidden="true" className="fixed bottom-8 left-0 z-[95] pointer-events-none rogue-run">
       <div className="flex items-end gap-2">
         <BotFace className="w-14 h-11 text-accent-500 bot-glow" />
-        <span className="mono text-[10px] text-[var(--text-muted)] bg-white border border-[var(--border)] px-2 py-1 mb-1 whitespace-nowrap">
+        <span className="mono text-[10px] text-[var(--text-muted)] bg-white rounded-[var(--radius)] border border-[var(--border)] px-2 py-1 mb-1 whitespace-nowrap">
           unauthorized lap · logging incident INC-0042 · self-reported
         </span>
       </div>

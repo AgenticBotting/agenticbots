@@ -11,7 +11,7 @@
    Rules that hold everywhere:
      · Display weight is 600. Mass is not authority — heavy geometric
        type reads consumer, not infrastructure.
-     · Zero radius. Corners are square, or cut on a diagonal (.notch).
+     · Slight radius (6/5/4px) on every surface. Never pill, never soft.
      · One accent ramp, anchored #7FA200. Text-on-white uses
        --accent-text (#5F7A00) only; on-dark uses the 300/400 steps;
        labels on an accent fill are near-black, never white.
@@ -114,11 +114,12 @@
   --cta-fg: #080A08;
   --cta-bg-hover: var(--color-accent-400);
 
-  /* No rounding anywhere. The brand's corner is a diagonal cut, taken
-     straight off the logo's sloped left edge — see .notch. */
-  --radius: 0;
-  --radius-sm: 0;
-  --radius-xs: 0;
+  /* A slight radius throughout — enough to read modern, never enough to
+     look soft. The logo's diagonal still lives in the art (BotFace,
+     BotPattern) rather than in every corner on the page. */
+  --radius: 6px;
+  --radius-sm: 5px;
+  --radius-xs: 4px;
   --notch: 11px;
 
   /* One neutral grotesque across display, body and UI. Weight stays at
@@ -294,27 +295,19 @@
   }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  /* Primary CTA — accent fill, black label, diagonal cut.
+  /* Primary CTA — accent fill, black label.
      The accent-700 boundary exists for WCAG 1.4.11: the 500 fill alone
      is 2.97:1 against white — a hair under the 3:1 UI-component line. */
   .btn-primary {
     background: var(--cta-bg);
     color: var(--cta-fg);
     border-color: var(--color-accent-700);
-    clip-path: polygon(
-      0 0, 100% 0, 100% 100%,
-      var(--notch) 100%, 0 calc(100% - var(--notch))
-    );
   }
 
-  /* Same shape, inverted — for the black header and dark bands. */
+  /* Inverted — for the black header and dark bands. */
   .btn-invert {
     background: #FFFFFF;
     color: var(--cta-bg);
-    clip-path: polygon(
-      0 0, 100% 0, 100% 100%,
-      var(--notch) 100%, 0 calc(100% - var(--notch))
-    );
   }
   .btn-invert:hover:not(:disabled) { background: var(--color-ink-100); }
   .btn-invert svg { transition: color 200ms var(--ease-smooth); }
@@ -324,10 +317,6 @@
   .btn-secondary {
     background: var(--foreground);
     color: #FFFFFF;
-    clip-path: polygon(
-      0 0, 100% 0, 100% 100%,
-      var(--notch) 100%, 0 calc(100% - var(--notch))
-    );
   }
   .btn-secondary:hover:not(:disabled) { background: var(--color-ink-900); }
 
@@ -479,8 +468,17 @@
 }
 
 @layer utilities {
-  /* The brand corner: a diagonal cut instead of a radius. Only for
-     FILLED elements — clip-path would eat a border on the diagonal. */
+  /* Wraps a gap-px hairline grid so its outer corners take the radius
+     while the internal seams stay straight. */
+  .grid-frame {
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  /* The brand corner: a diagonal cut. Kept for the art and for badges
+     that deliberately echo the logo — never on buttons or cards, where
+     it would eat the radius. FILLED elements only: clip-path would cut
+     a border on the diagonal. */
   .notch {
     clip-path: polygon(
       0 0, 100% 0, 100% 100%,
