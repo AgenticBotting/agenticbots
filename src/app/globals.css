@@ -95,14 +95,19 @@
   --border: #E2E6E1;
   --border-strong: #C8CEC7;
 
-  /* Header — a deep green rather than the ink black, so the accent CTA
-     sits in its own family instead of against neutral. Both steps are on
-     the accent hue (123.6°). Measured against #7FA200: the main bar is
-     4.65:1 and the utility strip 5.55:1, comfortably past the 3:1 that
-     WCAG 1.4.11 asks of a UI boundary, and nav text clears 12:1 on both. */
-  --header-bg: #141B02;                   /* deep green, still clearly green */
-  --header-bar: #0E1302;                  /* the strip above it, deeper still */
-  --header-line: #313F14;                 /* hairline that reads on green */
+  /* Header — green rather than ink black, so the accent CTA sits in its
+     own family instead of against neutral.
+
+     Measured against the #7FA200 CTA fill, the main bar is 3.39:1 — past
+     the 3:1 WCAG 1.4.11 asks of a UI boundary, but with little to spare,
+     which is why the utility strip is a deeper step: at this lightness
+     the muted tagline colour would fail on the main bar (3.16:1), and on
+     the strip it clears 4.5:1. The accent-700 boundary border on
+     .btn-primary washes out here (1.78:1) and simply stops contributing;
+     the fill carries the boundary on its own. */
+  --header-bg: #124D00;
+  --header-bar: #0A2900;
+  --header-line: #2E6B14;
 
   /* Dark surfaces */
   --dark-bg: #0C0E0C;

@@ -89,7 +89,7 @@ export function Header() {
       <div className="hidden lg:block bg-[var(--header-bar)] border-b border-white/[0.06]">
         <div className="container-site">
           <div className="flex items-center justify-between h-9">
-            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-400">Agentic bots for growth</span>
+            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-300">Agentic bots for growth</span>
             <a
               href="mailto:hello@agenticbots.dev"
               className="inline-flex items-center gap-2 text-[13px] text-ink-400 hover:text-white transition-colors"
