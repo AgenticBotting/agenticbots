@@ -86,7 +86,7 @@ export function Header() {
   return (
     <div className="sticky top-0 z-50">
       {/* ── Utility bar ── */}
-      <div className="hidden lg:block bg-ink-950 border-b border-white/[0.06]">
+      <div className="hidden lg:block bg-[var(--header-bar)] border-b border-white/[0.06]">
         <div className="container-site">
           <div className="flex items-center justify-between h-9">
             <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-400">Agentic bots for growth</span>
@@ -102,7 +102,7 @@ export function Header() {
       </div>
 
       {/* ── Main bar ── */}
-      <header className={cn("bg-ink-900 transition-shadow duration-300", scrolled && "shadow-mega")}>
+      <header className={cn("bg-[var(--header-bg)] transition-shadow duration-300", scrolled && "shadow-mega")}>
         <div className="container-site">
           <div
             ref={navRef}
@@ -145,7 +145,7 @@ export function Header() {
               <button
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
-                className="lg:hidden flex items-center justify-center w-11 h-11 rounded-none border border-ink-600 text-white"
+                className="lg:hidden flex items-center justify-center w-11 h-11 border border-[var(--header-line)] text-white"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -308,7 +308,7 @@ export function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Site menu"
-          className="lg:hidden fixed inset-0 z-[60] bg-ink-950 overflow-y-auto animate-fade-in"
+          className="lg:hidden fixed inset-0 z-[60] bg-[var(--header-bg)] overflow-y-auto animate-fade-in"
         >
           <div className="container-site">
             <div className="flex items-center justify-between h-[76px]">
@@ -316,7 +316,7 @@ export function Header() {
               <button
                 onClick={closeMobile}
                 aria-label="Close menu"
-                className="flex items-center justify-center w-11 h-11 rounded-none border border-ink-600 text-white"
+                className="flex items-center justify-center w-11 h-11 border border-[var(--header-line)] text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -358,7 +358,7 @@ export function Header() {
 
               <ul className="py-4">
                 {NAV_LINKS.map((l) => (
-                  <li key={l.href} className="border-b border-ink-700">
+                  <li key={l.href} className="border-b border-[var(--header-line)]">
                     <Link
                       href={l.href}
                       onClick={() => setMobileOpen(false)}
@@ -380,7 +380,7 @@ export function Header() {
             </div>
           </div>
           {/* Thumb-zone CTA — pinned to the drawer bottom, always reachable. */}
-          <div className="sticky bottom-0 inset-x-0 bg-ink-950 border-t border-ink-700 px-5 py-4">
+          <div className="sticky bottom-0 inset-x-0 bg-[var(--header-bar)] border-t border-[var(--header-line)] px-5 py-4">
             <button
               type="button"
               onClick={() => { setMobileOpen(false); openBotPlan("mobile-nav"); }}
@@ -482,7 +482,7 @@ function MobileGroup({ id, open, onToggle, kicker, title, children }: {
   id: string; open: boolean; onToggle: () => void; kicker: string; title: string; children: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-ink-700" data-group={id}>
+    <div className="border-b border-[var(--header-line)]" data-group={id}>
       <button onClick={onToggle} aria-expanded={open} className="w-full flex items-center justify-between py-5 text-left">
         <span>
           <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-ink-400">{kicker}</span>

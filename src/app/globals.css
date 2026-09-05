@@ -95,6 +95,15 @@
   --border: #E2E6E1;
   --border-strong: #C8CEC7;
 
+  /* Header — a deep green rather than the ink black, so the accent CTA
+     sits in its own family instead of against neutral. Both steps are on
+     the accent hue (123.6°). Measured against #7FA200: the main bar is
+     4.65:1 and the utility strip 5.55:1, comfortably past the 3:1 that
+     WCAG 1.4.11 asks of a UI boundary, and nav text clears 12:1 on both. */
+  --header-bg: #141B02;                   /* deep green, still clearly green */
+  --header-bar: #0E1302;                  /* the strip above it, deeper still */
+  --header-line: #313F14;                 /* hairline that reads on green */
+
   /* Dark surfaces */
   --dark-bg: #0C0E0C;
   --dark-card: #181B18;

@@ -77,7 +77,7 @@ export function MarketSearch({
     <div className="relative">
       <div className={cn(
         "flex items-center gap-3 border px-4 h-12",
-        dark ? "border-ink-600 bg-ink-800" : "border-[var(--border-strong)] bg-white"
+        dark ? "border-[var(--header-line)] bg-white/[0.06]" : "border-[var(--border-strong)] bg-white"
       )}>
         <Search className={cn("w-4 h-4 shrink-0", dark ? "text-ink-400" : "text-[var(--text-muted)]")} />
         <input
@@ -114,7 +114,7 @@ export function MarketSearch({
       {hits.length > 0 && (
         <ul className={cn(
           "absolute inset-x-0 top-full z-10 border border-t-0 shadow-mega max-h-[320px] overflow-y-auto",
-          dark ? "border-ink-600 bg-ink-900" : "border-[var(--border-strong)] bg-white"
+          dark ? "border-[var(--header-line)] bg-[var(--header-bar)]" : "border-[var(--border-strong)] bg-white"
         )}>
           {hits.map((h) => (
             <li key={h.href}>
@@ -123,7 +123,7 @@ export function MarketSearch({
                 onClick={() => go(h)}
                 className={cn(
                   "group flex items-center justify-between gap-4 px-4 py-3 transition-colors",
-                  dark ? "hover:bg-ink-800" : "hover:bg-[var(--bg-alt)]"
+                  dark ? "hover:bg-white/[0.06]" : "hover:bg-[var(--bg-alt)]"
                 )}
               >
                 <span className="min-w-0 flex items-baseline gap-2.5">
@@ -140,7 +140,7 @@ export function MarketSearch({
       )}
       {q.trim().length >= 2 && hits.length === 0 && (
         <p className={cn("absolute inset-x-0 top-full z-10 border border-t-0 px-4 py-3 text-[13px] shadow-mega",
-          dark ? "border-ink-600 bg-ink-900 text-ink-400" : "border-[var(--border-strong)] bg-white text-[var(--text-secondary)]")}>
+          dark ? "border-[var(--header-line)] bg-[var(--header-bar)] text-ink-400" : "border-[var(--border-strong)] bg-white text-[var(--text-secondary)]")}>
           No match — we still cover it. Tell us where you are and we&apos;ll confirm on your free plan.
         </p>
       )}
