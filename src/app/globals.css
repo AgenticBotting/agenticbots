@@ -95,17 +95,17 @@
   --border: #E2E6E1;
   --border-strong: #C8CEC7;
 
-  /* Header — a muted olive green rather than ink black, so the accent CTA
-     sits in its own family instead of against neutral.
+  /* Header — green rather than ink black, so the accent CTA sits in its
+     own family instead of against neutral.
 
-     This tone holds everything at once: the #7FA200 CTA separates from
-     the bar at 4.86:1 (well past the 3:1 WCAG 1.4.11 asks of a UI
-     boundary), nav text runs 10.5:1, and even the muted tagline clears
-     4.5:1 — which a lighter green could not do. The strip above is a
-     deeper step of the same colour. */
-  --header-bg: #1E2E13;
-  --header-bar: #16220E;
-  --header-line: #3A4F26;
+     Measured: the #7FA200 CTA separates from the bar at 4.25:1, past the
+     3:1 WCAG 1.4.11 asks of a UI boundary and enough for the button to
+     still read as the brightest thing up there. Nav text runs 9.2:1. The
+     muted ink-400 would fail here (3.97:1), which is why the tagline sits
+     a step lighter and the strip above is a deeper green. */
+  --header-bg: #183B00;
+  --header-bar: #0F2800;
+  --header-line: #2F5C14;
 
   /* Dark surfaces */
   --dark-bg: #0C0E0C;
