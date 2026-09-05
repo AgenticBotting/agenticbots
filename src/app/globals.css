@@ -98,14 +98,13 @@
   /* Header — green rather than ink black, so the accent CTA sits in its
      own family instead of against neutral.
 
-     Measured: the #7FA200 CTA separates from the bar at 4.25:1, past the
-     3:1 WCAG 1.4.11 asks of a UI boundary and enough for the button to
-     still read as the brightest thing up there. Nav text runs 9.2:1. The
-     muted ink-400 would fail here (3.97:1), which is why the tagline sits
-     a step lighter and the strip above is a deeper green. */
-  --header-bg: #183B00;
-  --header-bar: #0F2800;
-  --header-line: #2F5C14;
+     The deepest of the greens tried, and the one that gives the CTA the
+     most room: it separates from the bar at 5.56:1, close to the 5.95:1
+     it had on the original near-black, while the bar still reads green.
+     Nav runs 12:1 and every label on the strip clears AA. */
+  --header-bg: #0F2400;
+  --header-bar: #0A1900;
+  --header-line: #2A4E12;
 
   /* Dark surfaces */
   --dark-bg: #0C0E0C;
