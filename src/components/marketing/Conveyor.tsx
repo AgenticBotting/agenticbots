@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LogoMask } from "@/components/ui";
-import { ALL_CATEGORIES, categoryHref } from "@/lib/catalog";
+import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 /**
@@ -148,7 +148,7 @@ export function BotConveyor() {
         key: `${c.pillar}-${c.slug}`,
         label: c.botName,
         meta: c.name,
-        href: categoryHref(c),
+        href: serviceHref(c),
       }))}
     />
   );

@@ -27,7 +27,7 @@ export interface Post {
 export const POSTS: Post[] = [
   {
     slug: "speed-to-lead-is-the-whole-game",
-    title: "Speed to lead is the whole game",
+    title: "Why the first five minutes decide who wins the job",
     excerpt:
       "Most businesses do not have a lead problem. They have a response-time problem, and it is costing them roughly half the customers they already paid to reach.",
     date: "2026-08-18",

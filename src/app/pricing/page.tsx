@@ -3,7 +3,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, ButtonLink } from "@/components/ui";
-import { BotPlanForm, FaqAccordion } from "@/components/marketing";
+import { BotPlanForm, FaqAccordion, BeforeAfterChart } from "@/components/marketing";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -162,6 +162,23 @@ export default function PricingPage() {
                 all of which your bot plan spells out before you commit to anything.
               </p>
             </Reveal>
+          </Container>
+        </section>
+
+        <section className="section-pad-sm border-b border-[var(--border)] bg-[var(--bg-alt)]">
+          <Container>
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
+              <Reveal>
+                <SectionHeader
+                  eyebrow="What the price buys"
+                  title="What changes, in the numbers you'd track anyway."
+                  copy="Illustrative — the shape a deployment is built toward, not a client's measured result."
+                />
+              </Reveal>
+              <Reveal delay={0.08}>
+                <BeforeAfterChart />
+              </Reveal>
+            </div>
           </Container>
         </section>
 

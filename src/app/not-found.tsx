@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, ButtonLink } from "@/components/ui";
-import { CATALOG, categoryHref } from "@/lib/catalog";
+import { CATALOG, serviceHref } from "@/lib/catalog";
 
 export default function NotFound() {
   return (
@@ -40,7 +40,7 @@ export default function NotFound() {
                   {pillar.categories.map((c) => (
                     <li key={c.slug}>
                       <Link
-                        href={categoryHref(c)}
+                        href={serviceHref(c)}
                         className="text-[14px] text-[var(--text-secondary)] hover:text-[var(--accent-text)] transition-colors"
                       >
                         {c.name}

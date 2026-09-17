@@ -9,7 +9,8 @@ import {
   BotFactory, StackStrip, StatSplit, JoinBand,
 } from "@/components/marketing";
 import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
-import { LOCAL_SERVICES, getCity, nearbyCities, fmt } from "@/lib/geo/data";
+import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
+import { ALL_SERVICES, serviceGeoHref } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 
 type Params = { params: Promise<{ state: string; city: string }> };
@@ -151,11 +152,11 @@ export default async function CityMarketHub({ params }: Params) {
 
         {/* All services × this city */}
         <Section variant="alt" eyebrow={`Services in ${rec.city}`} heading={`Every bot, deployed for ${rec.city}.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {LOCAL_SERVICES.map((s) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+            {ALL_SERVICES.map((s) => (
               <Link
                 key={s.slug}
-                href={`/local/${s.slug}/${st.slug}/${rec.city_slug}`}
+                href={serviceGeoHref(s, st.slug, rec.city_slug)}
                 className="group card-cell p-7"
               >
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{s.botName}</p>

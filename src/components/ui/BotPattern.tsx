@@ -108,10 +108,21 @@ const RATIO = 3.112;
 export function BotPattern({
   className,
   position = "right",
+  glow = true,
 }: {
   className?: string;
   /** Where the field stays densest as the section resizes. */
   position?: "right" | "center" | "left";
+  /** The "awake" marks' blurred glow. Off by default is never needed —
+      every section this ships in today is mostly-empty with copy on one
+      side, so the mask has somewhere to push the glow into. The footer
+      is the exception: four columns of text span nearly the full width,
+      so there is no empty zone, and the fixed-position marks land on
+      link text at whatever height the columns happen to run. Set false
+      there (or in any similarly dense section) to keep the ambient
+      field — dim and mid marks carry no filter and stay unaffected —
+      without the bright blur that only reads well over open space. */
+  glow?: boolean;
 }) {
   const origin =
     position === "right" ? "93% 40%" : position === "left" ? "12% 34%" : "50% 42%";
@@ -154,7 +165,7 @@ export function BotPattern({
                     : "text-bot-dim"
               }
               opacity={active ? 1 : m.s === 1 ? 1 : 0.92}
-              filter={active ? "url(#botGlow)" : undefined}
+              filter={active && glow ? "url(#botGlow)" : undefined}
             >
               <path fillRule="evenodd" clipRule="evenodd" d={BOT_PATH} fill="currentColor" />
             </g>

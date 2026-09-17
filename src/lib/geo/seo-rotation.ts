@@ -23,40 +23,18 @@ const CTA_BANK = [
   "One business day to a written plan for this market.",
 ];
 
-const VALUE_PROPS: Record<string, string[]> = {
-  ppc: [
-    "Search terms read daily, junk negatived before it burns a second day of budget",
-    "Budget follows booked work, not last quarter's assumptions",
-    "Creative variants rotate continuously instead of decaying for months",
-    "Every campaign tied to cost per booked job, not impressions",
-    "Bids move within hours of the data moving",
-  ],
-  seo: [
-    "The crawl runs weekly, so what breaks gets fixed while it is still cheap",
-    "Competitor coverage gaps mapped and closed in priority order",
-    "Local pages built to answer real searches, never to pad a count",
-    "Rankings tracked daily against the terms that actually book work",
-    "Technical debt caught on a schedule instead of at the annual audit",
-  ],
-  crm: [
-    "Every call, email and meeting logs itself against the right record",
-    "Stages advance on evidence — a proposal sent, a meeting held",
-    "Duplicates merge on a schedule with rules, not on a rainy Friday",
-    "Stalled deals surface before they quietly die",
-    "The forecast finally matches what the pipeline actually holds",
-  ],
-  "speed-to-lead": [
-    "Every inbound answered in under a minute, at 2pm or 2am",
-    "Missed calls get a text back before the caller dials a competitor",
-    "Qualified leads land on the calendar, not in a callback queue",
-    "Every lead scored on fit and urgency before a human touches it",
-    "Nights, weekends and holidays covered without an answering service",
-  ],
-};
-
-export function rotatedValueProp(serviceSlug: string, citySlug: string): string {
-  const bank = VALUE_PROPS[serviceSlug] ?? VALUE_PROPS.ppc;
-  return pick(bank, `${serviceSlug}:${citySlug}`);
+/* The bank lives on the service record. There is deliberately no
+   fallback: a service shipping without value props used to silently
+   inherit PPC's, which would have rendered ad-account copy on 8,316
+   pages for services that do not touch an ad account. Throw instead. */
+export function rotatedValueProp(
+  service: { slug: string; valueProps: string[] },
+  citySlug: string,
+): string {
+  if (!service.valueProps?.length) {
+    throw new Error(`seo-rotation: "${service.slug}" has no valueProps`);
+  }
+  return pick(service.valueProps, `${service.slug}:${citySlug}`);
 }
 
 export function rotatedCta(serviceSlug: string, citySlug: string): string {

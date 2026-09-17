@@ -40,11 +40,14 @@ export function CplDecayChart() {
         <text x={P} y={H - 8} fontSize="10" fontFamily="var(--font-mono)" fill="var(--text-muted)">wk 1</text>
         <text x={W - P} y={H - 8} textAnchor="end" fontSize="10" fontFamily="var(--font-mono)" fill="var(--text-muted)">wk 12</text>
       </svg>
-      <table className="sr-only">
+      {/* Wrapped rather than `sr-only` on the <table> itself: a table with
+          auto layout expands past the 1px sr-only width, so the "hidden"
+          data table pushes the whole document sideways. A div holds it. */}
+      <div className="sr-only"><table>
         <caption>Cost per lead by week</caption>
         <thead><tr><th>Week</th><th>Cost per lead</th></tr></thead>
         <tbody>{decay.map((v, i) => <tr key={i}><td>{i + 1}</td><td>${v}</td></tr>)}</tbody>
-      </table>
+      </table></div>
     </figure>
   );
 }
@@ -80,11 +83,11 @@ export function BeforeAfterChart() {
           </div>
         ))}
       </div>
-      <table className="sr-only">
+      <div className="sr-only"><table>
         <caption>Metrics before and after agent deployment</caption>
         <thead><tr><th>Metric</th><th>Before</th><th>After</th></tr></thead>
         <tbody>{pairs.map((p) => <tr key={p.label}><td>{p.label}</td><td>{p.before}{p.unit}</td><td>{p.after}{p.unit}</td></tr>)}</tbody>
-      </table>
+      </table></div>
     </figure>
   );
 }

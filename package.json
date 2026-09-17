@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prebuild": "node scripts/pseo-gate.mjs"
+    "prebuild": "node scripts/pseo-gate.mjs",
+    "postbuild": "node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs",
+    "gates": "npm run prebuild && node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.40.0",

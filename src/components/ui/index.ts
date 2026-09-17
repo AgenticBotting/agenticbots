@@ -10,3 +10,4 @@ export { BotPattern } from "./BotPattern";
 export { Section } from "./Section";
 export { MediaSlot } from "./MediaSlot";
 export { LogoMask } from "./LogoMask";
+export { CountUp } from "./CountUp";

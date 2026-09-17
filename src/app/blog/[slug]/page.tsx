@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Container, BotFace, MediaSlot } from "@/components/ui";
+import { Container, BotFace } from "@/components/ui";
 import { BlogOptin, ReadingProgress, PostToc, PostOptin, ShareRow } from "@/components/marketing";
 import { POSTS, getPost, postHeadings, SORTED_POSTS, type Block } from "@/lib/posts";
 import { JsonLd, articleLd } from "@/components/JsonLd";
@@ -140,15 +140,14 @@ export default async function PostPage({ params }: Params) {
 
               <PostOptin source={`blog-hero-${post.slug}`} className="mt-8" />
             </div>
-
-            <MediaSlot
-              id={`B-${post.slug}`}
-              ratio="21 / 9"
-              label={`Cover image — ${post.title}`}
-              spec="2100×900 · wide · one idea, literal not abstract. A phone screen, a whiteboard, a van, a dashboard."
-              className="mt-14"
-              priority
-            />
+            {/* No cover here on purpose — it stays a browsing aid on the
+                archive (the lead card and grid thumbnails), where it
+                helps someone scanning decide what to open. Once they've
+                clicked through, the generated card has done its job;
+                showing it again above the same title it already carried
+                is redundant, not reinforcing. Still generated and still
+                real — it's what social platforms pull in when this post
+                gets shared, via the same route. */}
           </Container>
         </section>
 

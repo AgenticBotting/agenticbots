@@ -7,6 +7,8 @@
  * hardcodes a service name or URL.
  */
 
+import { z } from "zod";
+
 export type PillarSlug = "marketing" | "sales";
 
 export interface Highlight { title: string; body: string }
@@ -418,7 +420,7 @@ const SALES: Category[] = [
       "Outbound dies at step three, when the person running it gets busy. Outbound Bot runs every sequence to completion across email, LinkedIn and phone, and sorts the replies as they come in.",
     capabilities: [
       "Multi-channel outreach sequences (email + LinkedIn + phone)",
-      "Inbox warm-up and deliverability",
+      "Inbox warm-up and sending-domain health",
       "Reply detection and sentiment sorting",
       "Meeting booking and calendar coordination",
       "Follow-up cadence management",
@@ -442,7 +444,7 @@ const SALES: Category[] = [
     ],
     contrast: [
       { today: "Sequences die at step three when the person running them gets busy.", after: "Every sequence runs to the last touch, across email, LinkedIn and phone." },
-      { today: "Volume goes up, deliverability falls over, the main domain gets burned.", after: "Separate domains, warmed properly, volume capped and monitored." },
+      { today: "Volume goes up, the sending domain gets burned, and the main domain goes with it.", after: "Separate sending domains, warmed properly, bounce rate capped and monitored." },
       { today: "Replies pile up in one inbox and get triaged whenever.", after: "Interested, not now, wrong person and unsubscribe are sorted automatically." },
     ],
     faqs: [
@@ -459,7 +461,7 @@ const SALES: Category[] = [
     botName: "Speed-to-Lead Bot",
     blurb: "Every call, form and chat answered in seconds, day or night.",
     outcome: "You stop losing leads to whoever called them back first.",
-    headline: "Five minutes is the whole game.",
+    headline: "The first to answer wins the job.",
     intro:
       "A lead that waits an hour is calling your competitor. Speed-to-Lead Bot answers every inbound within seconds, qualifies in real conversation, and books straight onto your calendar.",
     capabilities: [
@@ -724,4 +726,492 @@ export function getCategory(pillar: PillarSlug, slug: string): Category | undefi
 
 export function categoryHref(c: Category): string {
   return `/${c.pillar}/${c.slug}`;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SERVICE LAYER
+
+   The fields the /services template needs on top of the national copy
+   above. Kept as one keyed block rather than scattered through the 13
+   records so the whole set stays reviewable side by side — which is the
+   only way the `owns` disjointness below is auditable by a human.
+
+   `owns` / `excludes` are the cannibalization contract. A term may be
+   owned by exactly one service; excluded terms may appear at most twice
+   in a page body. scripts/topic-gate.mjs enforces both against the
+   rendered corpus. See docs/SERVICE-CONTENT-BLUEPRINT.md §1.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export interface ServiceMeta {
+  /** Flat, globally unique. Becomes /services/{serviceSlug}. */
+  serviceSlug: string;
+  /** The head term. `name` stays the taxonomy label for nav. */
+  serviceName: string;
+  /** One line under the H1. Short — it sits at display weight. */
+  hook: string;
+  /** The geo lede. Deliberately NOT `intro`: reusing the national
+      paragraph on 924 city pages is the doorway pattern we gate against. */
+  geoIntro: string;
+  implementationWeeks: number;
+  baseline: { metric: string; value: string }[];
+  /** Rotated per city by djb2. Five minimum, or the rotation repeats
+      visibly across a metro cluster. */
+  valueProps: string[];
+  owns: string[];
+  excludes: string[];
+}
+
+const SERVICE_META: Record<string, ServiceMeta> = {
+  "paid-media": {
+    serviceSlug: "agentic-ppc-management",
+    serviceName: "Agentic PPC",
+    hook: "Reviewed daily, not quarterly.",
+    geoIntro:
+      "An ad account managed by an agent reads every search term, every day, and moves budget while the human agencies are preparing next month's slide deck. Same platforms, radically shorter feedback loop.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Search-term review cadence", value: "daily" },
+      { metric: "Creative variants in rotation", value: "continuous" },
+      { metric: "Budget-shift latency", value: "<24h" },
+    ],
+    valueProps: [
+      "Search terms read daily, junk negatived before it burns a second day of budget",
+      "Budget follows booked work, not last quarter's assumptions",
+      "Creative variants rotate continuously instead of decaying for months",
+      "Every campaign tied to cost per booked job, not impressions",
+      "Bids move within hours of the data moving",
+    ],
+    owns: [
+      "search term report", "negative keyword", "quality score", "performance max",
+      "bid management", "budget pacing", "ad creative rotation", "cost per booked job",
+    ],
+    excludes: ["core web vitals", "keyword cluster", "lifecycle email", "activity logging"],
+  },
+
+  seo: {
+    serviceSlug: "agentic-seo",
+    serviceName: "Agentic SEO",
+    hook: "Maintenance, not a one-time audit.",
+    geoIntro:
+      "Rankings decay because nobody re-crawls, re-writes and re-links after the audit PDF lands. An agent runs the crawl on a schedule, fixes what broke, and closes coverage gaps while they are still cheap.",
+    implementationWeeks: 3,
+    baseline: [
+      { metric: "Technical crawl cadence", value: "weekly" },
+      { metric: "Rank tracking", value: "daily" },
+      { metric: "Content gap refresh", value: "monthly" },
+    ],
+    valueProps: [
+      "The crawl runs weekly, so what breaks gets fixed while it is still cheap",
+      "Competitor coverage gaps mapped and closed in priority order",
+      "Local pages built to answer real searches, never to pad a count",
+      "Rankings tracked daily against the terms that actually book work",
+      "Technical debt caught on a schedule instead of at the annual audit",
+    ],
+    owns: [
+      "core web vitals", "crawl budget", "technical audit", "keyword cluster",
+      "internal linking", "schema markup", "rank tracking", "content gap",
+    ],
+    excludes: ["bid management", "quality score", "sequence cadence", "proposal turnaround"],
+  },
+
+  content: {
+    serviceSlug: "agentic-content-marketing",
+    serviceName: "Agentic Content Marketing",
+    hook: "One idea, eight assets, every week.",
+    geoIntro:
+      "Publishing dies the week the person who volunteered gets busy. An agent works a running calendar, cuts every source piece into the formats each channel wants, and holds the cadence whether or not anyone remembers it is Tuesday.",
+    implementationWeeks: 3,
+    baseline: [
+      { metric: "Publishing cadence", value: "weekly" },
+      { metric: "Assets per source piece", value: "8+" },
+      { metric: "Voice profile applied", value: "everywhere" },
+    ],
+    valueProps: [
+      "A calendar that fills itself instead of emptying the week you get busy",
+      "One recorded idea becomes the post, the email, the clips and the captions",
+      "Your voice profile applied to every asset, so nothing reads like stock copy",
+      "Formats cut to what each channel actually rewards rather than one post reposted",
+      "A publishing cadence that holds through your busy season, not just January",
+      "Briefs written from live search demand, not from what someone felt like writing",
+    ],
+    owns: [
+      "editorial calendar", "content repurposing", "voice profile", "content brief",
+      "publishing cadence", "topic cluster", "asset variant", "long-form draft",
+    ],
+    excludes: ["bid management", "deliverability", "stage advancement", "commission calculation"],
+  },
+
+  email: {
+    serviceSlug: "agentic-email-marketing",
+    serviceName: "Agentic Email Marketing",
+    hook: "The follow-up that never forgets.",
+    geoIntro:
+      "Most revenue lost in email is not lost to bad copy, it is lost to sequences nobody ever built. An agent writes them, sends them, watches list health, and stops the moment a lead converts so nobody gets sold something they already bought.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Quotes left unfollowed", value: "0" },
+      { metric: "Sequence exit on conversion", value: "automatic" },
+      { metric: "Deliverability and list check", value: "weekly" },
+    ],
+    valueProps: [
+      "Every quote gets followed up, whether or not anyone remembers to do it",
+      "Sequences exit the moment a lead converts, so nobody is sold what they bought",
+      "Deliverability and sender reputation watched weekly, before the inbox stops trusting you",
+      "Lists segmented by what people actually did, not by when they were imported",
+      "Re-engagement and win-back running quietly against the people who went cold",
+      "Subject lines and send times tested continuously instead of guessed once",
+    ],
+    owns: [
+      "lifecycle email", "drip sequence", "deliverability", "sender reputation",
+      "list hygiene", "segmentation", "win-back", "abandoned quote",
+    ],
+    excludes: ["sequence cadence", "inbox warm-up", "ad creative rotation", "internal linking"],
+  },
+
+  cro: {
+    serviceSlug: "agentic-cro",
+    serviceName: "Agentic CRO",
+    hook: "The cheapest lead you already paid for.",
+    geoIntro:
+      "You are already buying the traffic. An agent watches where those visitors hesitate, builds the test, runs it to significance, and ships the winner instead of leaving three years of opinions unresolved in a spreadsheet.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Session and heatmap capture", value: "always on" },
+      { metric: "Significance before rollout", value: "per test" },
+      { metric: "Mobile treatment", value: "first" },
+    ],
+    valueProps: [
+      "More of the traffic you already pay for turns into calls and filled forms",
+      "Tests run to statistical significance before anything ships site-wide",
+      "Form fields that quietly lose people get found and cut",
+      "Mobile treated as the primary layout, because that is where the traffic is",
+      "Session capture shows the hesitation you cannot see in a conversion number",
+      "Render-blocking scripts on the money pages removed where they cost conversions",
+    ],
+    owns: [
+      "a/b test", "statistical significance", "form field abandonment", "session recording",
+      "heatmap", "landing page variant", "mobile conversion", "friction audit",
+    ],
+    excludes: ["crawl budget", "core web vitals", "revenue forecast", "sequence cadence"],
+  },
+
+  analytics: {
+    serviceSlug: "agentic-analytics",
+    serviceName: "Agentic Marketing Analytics",
+    hook: "One dashboard, not fifteen tabs.",
+    geoIntro:
+      "Most owners have more reporting than they have answers. An agent wires the tracking once, reconciles the numbers that disagree, and writes the weekly summary in plain language so the next decision is obvious.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Dashboards to check", value: "1" },
+      { metric: "Plain-language summary", value: "weekly" },
+      { metric: "Cost per booked job", value: "by channel" },
+    ],
+    valueProps: [
+      "One dashboard that answers what you spent and what it produced",
+      "A weekly summary written in plain language, not a wall of charts",
+      "Cost per booked job visible per channel, so the losing one is obvious",
+      "Tracking wired once and audited, so the numbers stop disagreeing",
+      "Funnel drop-off located and named, not left as a mystery in the middle",
+      "Attribution that survives someone calling instead of filling in the form",
+    ],
+    owns: [
+      "attribution model", "conversion tracking", "funnel drop-off", "channel reporting",
+      "utm taxonomy", "data reconciliation", "weekly summary", "cost per acquisition",
+    ],
+    excludes: ["ad creative rotation", "editorial calendar", "proposal turnaround", "renewal reminder"],
+  },
+
+  "lead-generation": {
+    serviceSlug: "agentic-lead-generation",
+    serviceName: "Agentic Lead Generation",
+    hook: "Stop selling to whoever answers.",
+    geoIntro:
+      "A list nobody scrubbed is a list nobody should call. An agent builds the profile from your closed-won, finds the accounts that match it, verifies every contact, and watches for the triggers that make a cold account warm.",
+    implementationWeeks: 3,
+    baseline: [
+      { metric: "Contact verification", value: "before outreach" },
+      { metric: "Intent and trigger monitoring", value: "continuous" },
+      { metric: "Documented ICP", value: "1" },
+    ],
+    valueProps: [
+      "A documented ideal customer profile everyone actually works from",
+      "Every contact verified before a single message goes out",
+      "Hiring, funding and expansion triggers watched so timing stops being luck",
+      "The addressable list built from your closed-won, not bought off a shelf",
+      "Records enriched with the firmographics that decide whether to bother",
+      "A standing list of qualified people, so nobody starts Monday from zero",
+    ],
+    owns: [
+      "ideal customer profile", "total addressable market", "contact verification",
+      "data enrichment", "intent signal", "buying trigger", "list building", "firmographic",
+    ],
+    excludes: ["sequence cadence", "inbox warm-up", "quality score", "renewal reminder"],
+  },
+
+  outbound: {
+    serviceSlug: "agentic-outbound-sdr",
+    serviceName: "Agentic Outbound SDR",
+    hook: "The cadence nobody forgets to run.",
+    geoIntro:
+      "Outbound does not fail on the first touch, it fails on the fifth that nobody sent. An agent runs the full multi-channel cadence, keeps the sending infrastructure healthy, and sorts the replies so a human only reads the ones worth answering.",
+    implementationWeeks: 3,
+    baseline: [
+      { metric: "Sequence steps actually sent", value: "every" },
+      { metric: "Reply triage", value: "automatic" },
+      { metric: "Sending infrastructure", value: "warmed" },
+    ],
+    valueProps: [
+      "Every step of the sequence actually goes out, including the fifth one",
+      "Sending domains warmed and separated so your main domain stays clean",
+      "Replies triaged by sentiment, so a human reads only what deserves reading",
+      "Multi-channel touches sequenced rather than fired all at once",
+      "Follow-up that continues on schedule through your busiest week",
+      "Bounce and spam signals watched before they cost you the whole domain",
+    ],
+    owns: [
+      "sequence cadence", "multi-channel touch", "inbox warm-up", "sending domain",
+      "reply triage", "sentiment sorting", "bounce rate", "outbound step",
+    ],
+    excludes: ["lifecycle email", "deliverability", "ideal customer profile", "internal linking"],
+  },
+
+  inbound: {
+    serviceSlug: "agentic-speed-to-lead",
+    serviceName: "Agentic Speed-to-Lead",
+    hook: "Under a minute, any hour.",
+    geoIntro:
+      "The first responder wins the job, and the decay is measured in minutes. An agent answers every call, form and chat within seconds, qualifies in real conversation, and books straight onto the calendar.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "First response", value: "<60s" },
+      { metric: "Coverage", value: "24/7" },
+      { metric: "Escalation to humans", value: "rule-based" },
+    ],
+    valueProps: [
+      "Every inbound answered in under a minute, at 2pm or 2am",
+      "Missed calls get a text back before the caller dials a competitor",
+      "Qualified leads land on the calendar, not in a callback queue",
+      "Every lead scored on fit and urgency before a human touches it",
+      "Nights, weekends and holidays covered without an answering service",
+    ],
+    owns: [
+      "first response time", "missed call text back", "after-hours coverage",
+      "live qualification", "instant booking", "speed to lead", "inbound routing", "call answering",
+    ],
+    excludes: ["sequence cadence", "ideal customer profile", "revenue forecast", "crawl budget"],
+  },
+
+  crm: {
+    serviceSlug: "agentic-crm-automation",
+    serviceName: "Agentic CRM Automation",
+    hook: "Records that update themselves.",
+    geoIntro:
+      "A CRM nobody updates is a reporting liability you pay monthly for. An agent logs every call, email and meeting against the right record, advances stages on evidence, and merges the duplicates nobody has time for.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Activity logging", value: "automatic" },
+      { metric: "Duplicate hygiene", value: "daily" },
+      { metric: "Stalled-deal alerts", value: "real-time" },
+    ],
+    valueProps: [
+      "Every call, email and meeting logs itself against the right record",
+      "Stages advance on evidence — a proposal sent, a meeting held",
+      "Duplicates merge on a schedule with rules, not on a rainy Friday",
+      "Stalled deals surface before they quietly die",
+      "The forecast finally matches what the pipeline actually holds",
+    ],
+    owns: [
+      "activity logging", "stage advancement", "duplicate merge", "record hygiene",
+      "stalled deal", "pipeline accuracy", "data entry", "contact record",
+    ],
+    excludes: ["revenue forecast", "commission calculation", "territory design", "bid management"],
+  },
+
+  enablement: {
+    serviceSlug: "agentic-proposal-automation",
+    serviceName: "Agentic Proposal Automation",
+    hook: "The proposal that goes out today.",
+    geoIntro:
+      "Most quotes lose to the calendar, not to the competitor. An agent assembles the proposal from live pricing the same day it is asked for, chases the signature, and keeps the answers your team needs current instead of two years stale.",
+    implementationWeeks: 2,
+    baseline: [
+      { metric: "Proposal turnaround", value: "same day" },
+      { metric: "Signature reminders", value: "automatic" },
+      { metric: "Battle cards", value: "current" },
+    ],
+    valueProps: [
+      "Proposals go out the day they are asked for, not the week after",
+      "Pricing pulled from one current source instead of last quarter's file",
+      "Signature chased automatically until it is signed or formally dead",
+      "Battle cards and objection answers kept current, not written once in 2022",
+      "Every quote logged back to the deal without anyone re-typing it",
+      "Terms and scope assembled consistently, so nothing gets promised twice",
+    ],
+    owns: [
+      "proposal turnaround", "quote assembly", "e-signature", "battle card",
+      "objection handling", "pricing table", "scope of work", "signature reminder",
+    ],
+    excludes: ["ad creative rotation", "crawl budget", "intent signal", "churn risk"],
+  },
+
+  "account-management": {
+    serviceSlug: "agentic-account-management",
+    serviceName: "Agentic Account Management",
+    hook: "The revenue you already won.",
+    geoIntro:
+      "Most businesses court hard and follow up never. An agent triggers onboarding the moment a deal closes, watches the usage signals that predict churn, and raises renewals and expansions well before the date sneaks up on anyone.",
+    implementationWeeks: 3,
+    baseline: [
+      { metric: "Onboarding trigger", value: "day 1" },
+      { metric: "Churn risk", value: "scored" },
+      { metric: "Renewal reminders", value: "ahead of date" },
+    ],
+    valueProps: [
+      "Onboarding starts the day the deal closes, not the week someone notices",
+      "Churn risk scored across every account, before the cancellation email",
+      "Renewals raised well ahead of the date rather than the week of",
+      "Expansion and upsell moments surfaced from real usage, not from a hunch",
+      "Customers followed up with after the sale, not only before it",
+      "Quiet accounts flagged while there is still a relationship to repair",
+    ],
+    owns: [
+      "onboarding trigger", "churn risk", "renewal reminder", "expansion revenue",
+      "customer health", "adoption signal", "upsell moment", "post-sale follow-up",
+    ],
+    excludes: ["sequence cadence", "keyword cluster", "proposal turnaround", "bid management"],
+  },
+
+  revops: {
+    serviceSlug: "agentic-revops",
+    serviceName: "Agentic RevOps",
+    hook: "The seams between your teams.",
+    geoIntro:
+      "Revenue leaks at the handoffs nobody owns. An agent keeps the forecast built on live pipeline behaviour, tracks the SLAs between marketing, sales and service, and calculates commission from closed-won without a spreadsheet argument.",
+    implementationWeeks: 4,
+    baseline: [
+      { metric: "Forecast refresh", value: "weekly" },
+      { metric: "Cross-team SLA", value: "tracked" },
+      { metric: "Commission calculation", value: "automatic" },
+    ],
+    valueProps: [
+      "A forecast built on live pipeline behaviour, not on end-of-quarter optimism",
+      "SLA compliance tracked between every team, so handoffs stop leaking",
+      "Commission calculated from closed-won without the monthly spreadsheet argument",
+      "Territories and quotas maintained as the team changes shape",
+      "The seams between marketing, sales and service made visible",
+      "Where deals get dropped named specifically, not blamed generally",
+    ],
+    owns: [
+      "revenue forecast", "territory design", "quota planning", "commission calculation",
+      "sla compliance", "handoff", "pipeline velocity", "revenue leak",
+    ],
+    excludes: ["activity logging", "ad creative rotation", "deliverability", "onboarding trigger"],
+  },
+};
+
+/* ── Assembly + validation ─────────────────────────────────────────────
+   Parsed at module load, so a bad record fails the build rather than the
+   SERP. The superRefine is the important half: it proves no two services
+   claim the same term, which is what stops the /marketing-vs-/local
+   duplication from quietly reappearing the next time a service is added. */
+
+export type Service = Category & ServiceMeta & { headlinePattern: string };
+
+const ServiceMetaSchema = z.object({
+  serviceSlug: z.string().regex(/^agentic-[a-z0-9-]+$/, "service slugs are agentic-prefixed"),
+  serviceName: z.string().min(2),
+  hook: z.string().min(10).max(48),
+  geoIntro: z.string().min(120),
+  implementationWeeks: z.number().int().min(1).max(8),
+  baseline: z.array(z.object({ metric: z.string().min(3), value: z.string().min(1) })).min(2),
+  valueProps: z.array(z.string().min(30)).min(5),
+  owns: z.array(z.string().min(3)).min(6),
+  excludes: z.array(z.string().min(3)).min(3),
+});
+
+/** seo-checks.mjs caps the rendered <title> at 70. The service routes set
+ *  `title.absolute`, so there is no " | AgenticBots" suffix to budget for;
+ *  the longest city label in cities-dataset.json is "Palm Beach Gardens, FL". */
+const LONGEST_CITY_LABEL = 22;
+const TITLE_CAP = 70;
+
+export const ALL_SERVICES: Service[] = (() => {
+  const rows = ALL_CATEGORIES.map((c) => {
+    const meta = SERVICE_META[c.slug];
+    if (!meta) throw new Error(`catalog: no SERVICE_META for "${c.slug}"`);
+    const parsed = ServiceMetaSchema.parse(meta);
+    return {
+      ...c,
+      ...parsed,
+      headlinePattern: `${parsed.serviceName} Company in {city}, {st}`,
+    };
+  });
+
+  /* Every term belongs to exactly one service. */
+  const claimed = new Map<string, string>();
+  for (const s of rows) {
+    for (const term of s.owns) {
+      const prior = claimed.get(term);
+      if (prior) {
+        throw new Error(
+          `catalog: "${term}" is owned by both "${prior}" and "${s.serviceSlug}". ` +
+            `One page per topic — reassign it (docs/SERVICE-CONTENT-BLUEPRINT.md §1).`
+        );
+      }
+      claimed.set(term, s.serviceSlug);
+    }
+  }
+
+  for (const s of rows) {
+    /* An exclude nobody owns is dead weight in the gate. */
+    for (const term of s.excludes) {
+      if (!claimed.has(term)) {
+        throw new Error(
+          `catalog: "${s.serviceSlug}" excludes "${term}", which no service owns. ` +
+            `Either own it somewhere or drop the exclusion.`
+        );
+      }
+      if (s.owns.includes(term)) {
+        throw new Error(`catalog: "${s.serviceSlug}" both owns and excludes "${term}".`);
+      }
+    }
+
+    /* Fail in milliseconds here rather than after a 13,700-page build. */
+    const titleLen = s.headlinePattern.replace("{city}, {st}", "").length + LONGEST_CITY_LABEL;
+    if (titleLen > TITLE_CAP) {
+      throw new Error(
+        `catalog: "${s.serviceSlug}" yields a ${titleLen}-char <title> in the longest US city ` +
+          `(cap ${TITLE_CAP}). Shorten serviceName.`
+      );
+    }
+  }
+
+  const slugs = new Set(rows.map((s) => s.serviceSlug));
+  if (slugs.size !== rows.length) throw new Error("catalog: duplicate serviceSlug");
+  return rows;
+})();
+
+export function getService(serviceSlug: string): Service | undefined {
+  return ALL_SERVICES.find((s) => s.serviceSlug === serviceSlug);
+}
+
+/** Resolve by the legacy catalog slug — used while consumers migrate. */
+export function getServiceByCategorySlug(slug: string): Service | undefined {
+  return ALL_SERVICES.find((s) => s.slug === slug);
+}
+
+/** The canonical URL for a service — the one place any link to one is
+ *  built. Accepts either a catalog record or a Service, so consumers that
+ *  iterate `pillar.categories` for the nav taxonomy keep working. */
+export function serviceHref(c: { slug: string }): string {
+  const svc = ALL_SERVICES.find((s) => s.slug === c.slug || s.serviceSlug === c.slug);
+  if (!svc) throw new Error(`catalog: no service for "${c.slug}"`);
+  return `/services/${svc.serviceSlug}`;
+}
+
+/** A service's geo child. */
+export function serviceGeoHref(c: { slug: string }, state: string, city?: string): string {
+  const base = serviceHref(c);
+  return city ? `${base}/${state}/${city}` : `${base}/${state}`;
 }

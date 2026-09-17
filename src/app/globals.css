@@ -230,6 +230,14 @@
 
   a { color: inherit; text-decoration: none; }
 
+  /* iOS and Android paint a translucent grey box over any tapped link or
+     button. On the logo it reads as if the artwork had been selected for
+     copying. Keyboard focus is unaffected — it shows through
+     :focus-visible below, which a touch tap does not trigger. */
+  a, button, [role="button"], input, select, textarea, summary, label {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   ::selection { background: var(--color-accent-300); color: var(--accent-ink); }
 
   :focus-visible {
@@ -256,6 +264,23 @@
     padding-inline: 1.25rem;
   }
   @media (min-width: 640px) { .container-site { padding-inline: 2rem; } }
+
+  /* Same gutters as container-site, no max-width cap — edge to edge.
+     The header's chrome (utility bar, main bar) uses this instead:
+     container-site's 1200px cap meant that at 1920px the logo and CTA
+     sat 360px in from the true viewport edges on both sides, which reads
+     as "everything bunched toward the center" rather than the
+     logo-hugs-left / CTA-hugs-right rhythm a reference nav bar like
+     Glia's has. Dense dropdown content (the mega-menu panels) stays on
+     container-site on purpose — a grid of link cards stretched across a
+     1920px screen would space out awkwardly; only the slim chrome row
+     wants the full width. */
+  .container-bleed {
+    width: 100%;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) { .container-bleed { padding-inline: 2rem; } }
+  @media (min-width: 1280px) { .container-bleed { padding-inline: 3rem; } }
 
   .section-pad    { padding-block: clamp(3.25rem, 6vw, 5.75rem); }
   .section-pad-sm { padding-block: clamp(2.25rem, 4vw, 3.5rem); }
@@ -654,6 +679,46 @@
   .text-pretty  { text-wrap: pretty; }
 }
 
+/* Compounding curve: the area wipes in left to right. Scroll-driven where
+   the browser supports it, so the draw tracks the reader rather than firing
+   off-screen on load; a plain load animation everywhere else. */
+@keyframes cc-wipe {
+  from { width: 0; }
+  to   { width: 900px; }
+}
+.cc-wipe {
+  width: 900px;
+  animation: cc-wipe 1.4s var(--ease-smooth) both;
+}
+/* A bot travelling the series path, banking into the curve. Slower than the
+   button orbit — this one is meant to be watched, not noticed. */
+@keyframes cc-crawl {
+  0%       { offset-distance: 0%;   opacity: 0; }
+  6%       { opacity: 1; }
+  92%      { opacity: 1; }
+  100%     { offset-distance: 100%; opacity: 0; }
+}
+.cc-crawler {
+  /* Without fill-box the <g>'s transform-origin is the centre of the whole
+     viewBox, so offset-path measures from there and the bot rides ~130px
+     below its own line. fill-box makes the origin the bot itself. */
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: cc-crawl 7s linear infinite;
+}
+@supports (animation-timeline: view()) {
+  .cc-wipe {
+    animation-timeline: view();
+    animation-range: entry 15% cover 50%;
+  }
+}
+/* Scroll-driven animations ignore duration, so the global reduce rule below
+   cannot switch this off on its own. Say it explicitly. */
+@media (prefers-reduced-motion: reduce) {
+  .cc-wipe { animation: none; width: 900px; }
+  .cc-crawler { animation: none; opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -661,4 +726,96 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* iOS Safari zooms the viewport whenever a focused control renders text
+   below 16px, which is what throws the market search off-centre and
+   leaves the page scrolled somewhere arbitrary. The fix is the font size,
+   not `maximum-scale=1` in the viewport meta — that would kill pinch-zoom
+   for everyone to paper over a typography problem.
+
+   Deliberately outside any @layer: unlayered rules outrank every layered
+   one, so this beats both `.field` (components) and Tailwind's own
+   `text-[14.5px]` (utilities) without a single !important. The designed
+   sizes still apply from sm up, where the zoom never fires. */
+@media (max-width: 639px), (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* ── Video poster: the standing preview shown until real footage exists.
+   It is motion rather than a still, because a play button that plays
+   nothing is a broken promise. ── */
+@keyframes vp-progress {
+  0%   { transform: scaleX(0); }
+  92%  { transform: scaleX(1); }
+  100% { transform: scaleX(1); }
+}
+@keyframes vp-travel {
+  0%   { transform: translateX(0) }
+  92%  { transform: translateX(calc(100% - 26px)) }
+  100% { transform: translateX(calc(100% - 26px)) }
+}
+@keyframes vp-line {
+  0%, 4%   { opacity: 0; transform: translateY(6px); }
+  12%, 92% { opacity: 1; transform: translateY(0); }
+  100%     { opacity: 1; transform: translateY(0); }
+}
+.vp-progress { transform-origin: left center; animation: vp-progress 9s linear infinite; }
+.vp-travel   { animation: vp-travel 9s linear infinite; }
+.vp-line     { opacity: 0; animation: vp-line 9s linear infinite; }
+
+@layer components {
+  /* Hero CTA pair. On a phone the two buttons share one row instead of
+     stacking; from sm up they return to natural width and full padding.
+     `.cta-row > .btn` is specificity 0,2,0 so it beats `.btn` in the same
+     layer without !important.
+
+     flex-wrap stays as the safety valve: under ~340px of content the two
+     labels genuinely cannot share a row, and stacking beats clipping. */
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cta-row > * { flex: 1 1 auto; }
+  .cta-row > .btn { padding-inline: 0.875rem; font-size: 13px; }
+
+  @media (min-width: 640px) {
+    .cta-row { gap: 1rem; }
+    .cta-row > * { flex: 0 0 auto; }
+    .cta-row > .btn { padding-inline: 1.375rem; font-size: 0.875rem; }
+  }
+}
+
+/* ── Fleet swarm — the status-board view of all thirteen bots. ── */
+@keyframes swarm-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+/* Two lines stacked in the same box, opposite phase, so it reads as one
+   line quietly swapping its own text — no JS, no layout shift.
+
+   step-end per keyframe (not the default ease) matters here: a normal
+   eased opacity tween spends real time at 0 < opacity < 1, and with two
+   lines occupying the exact same box that window is double-exposed,
+   garbled text — visible on real pages, not just a screenshot artifact.
+   step-end holds each value until the next stop, then jumps, so a line
+   is always either fully there or fully gone, never both at once. */
+@keyframes swarm-cycle {
+  0%   { opacity: 1; animation-timing-function: step-end; }
+  50%  { opacity: 0; animation-timing-function: step-end; }
+  100% { opacity: 1; }
+}
+.swarm-bot  { animation: swarm-bob 2.6s ease-in-out infinite; }
+.swarm-dot  { animation: pulse-dot 1.8s ease-in-out infinite; }
+.swarm-line { animation: swarm-cycle 7s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .swarm-bot, .swarm-dot, .swarm-line { animation: none; }
+  .swarm-line:nth-child(2) { display: none; }
 }

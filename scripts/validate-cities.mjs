@@ -12,7 +12,9 @@ const warn = [];
 
 if (d.states.length !== 51) errs.push(`states: ${d.states.length}, expected 51`);
 if (d.cities.length !== 924) errs.push(`cities: ${d.cities.length}, expected 924`);
-if (d.services.length !== 8) errs.push(`services: ${d.services.length}, expected 8`);
+// Services no longer live in the dataset (resolved Sept 9 2026) — the
+// taxonomy is src/lib/catalog.ts, gated by scripts/topic-gate.mjs.
+if ("services" in d) errs.push("dataset carries a services list; the catalog owns the taxonomy");
 
 const stateSlugs = new Set(d.states.map((s) => s.slug));
 const key = (c) => `${c.state_slug}/${c.city_slug}`;
@@ -54,7 +56,7 @@ const dupes = [...nameCount.entries()].filter(([, n]) => n > 1).length;
 const tiers = { 1: 0, 2: 0, 3: 0 };
 for (const c of d.cities) tiers[c.tier]++;
 
-console.log(`states ${d.states.length} · cities ${d.cities.length} · services ${d.services.length}`);
+console.log(`states ${d.states.length} · cities ${d.cities.length}`);
 console.log(`tiers: T1=${tiers[1]} T2=${tiers[2]} T3=${tiers[3]} (plan says 481/248/195)`);
 console.log(`surrounding refs: ${surrTotal} total, ${surrCross} cross-state, all resolve: ${errs.filter(e => e.includes("resolves nowhere")).length === 0}`);
 console.log(`city slugs shared across states (handled by /{state}/ segment): ${dupes}`);

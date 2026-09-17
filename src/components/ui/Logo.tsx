@@ -6,8 +6,11 @@ import { cn } from "@/lib/utils";
  * The wordmark. The source asset is white-on-transparent, so the light
  * variant is produced by inverting it rather than shipping a second file.
  */
-/** Cropped artwork aspect ratio (1970 x 263). */
-const LOGO_RATIO = 7.49;
+/** Intrinsic size of the cropped artwork. Passed to next/image as-is: a
+ *  hand-rounded ratio drifts from the ratio of the variant the optimizer
+ *  actually serves, which trips its dev-only aspect-ratio warning. */
+const LOGO_W = 1970;
+const LOGO_H = 263;
 
 export function Logo({
   variant = "light",
@@ -25,11 +28,26 @@ export function Logo({
     <Image
       src="/logo.png"
       alt="AgenticBots"
-      width={Math.round(height * LOGO_RATIO)}
-      height={height}
+      width={LOGO_W}
+      height={LOGO_H}
+      // Rendered width, so the optimizer still serves a small variant rather
+      // than a source-sized one.
+      sizes={`${Math.round((height * LOGO_W) / LOGO_H)}px`}
       priority
-      className={cn("w-auto", variant === "dark" && "invert")}
-      style={{ height }}
+      // `max-w-none` opts out of the preflight `img { max-width: 100% }`.
+      // At 7.5:1 the lockup is wide enough that a cramped header would
+      // otherwise clamp its width while the fixed height held — squashing
+      // the artwork rather than scaling it.
+      // The wordmark is chrome, not content: a long press should not offer
+      // to select or save it the way it would a photo in an article.
+      className={cn(
+        "max-w-none shrink-0 select-none [-webkit-touch-callout:none]",
+        variant === "dark" && "invert",
+      )}
+      // Callers can drive the height responsively by setting --logo-h on any
+      // ancestor; the `height` prop stays the default. `width` is set here
+      // rather than via `w-auto` so Next's aspect-ratio check can see it.
+      style={{ width: "auto", height: `var(--logo-h, ${height}px)` }}
     />
   );
 

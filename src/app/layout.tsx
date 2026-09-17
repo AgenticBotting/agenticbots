@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { BotPlanFlow, ExitIntent, RogueBot } from "@/components/marketing";
+import { BotPlanFlow, ExitIntent, RogueBot, ConsoleGreeting } from "@/components/marketing";
 import Script from "next/script";
 import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
 
@@ -78,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BotPlanFlow />
         <ExitIntent />
         <RogueBot />
+        <ConsoleGreeting />
         {process.env.NEXT_PUBLIC_UMAMI_URL && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
             defer

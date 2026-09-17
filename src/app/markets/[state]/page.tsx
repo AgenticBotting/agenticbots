@@ -7,7 +7,8 @@ import { Container, Section } from "@/components/ui";
 import { BotFactory } from "@/components/marketing";
 import { PlanCta } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
-import { LOCAL_SERVICES, getState as getEnrichedState, citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
+import { getState as getEnrichedState, citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
+import { ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 
 type Params = { params: Promise<{ state: string }> };
@@ -109,11 +110,11 @@ export default async function StateMarketPage({ params }: Params) {
         </Section>
 
         <Section variant="light" size="sm" eyebrow="Services" heading={`Every service, everywhere in ${st.name}.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {LOCAL_SERVICES.map((s) => {
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+            {ALL_SERVICES.map((s) => {
               const enriched = enrichedCitiesInState(state).length > 0;
               return (
-                <Link key={s.slug} href={enriched ? `/local/${s.slug}/${st.slug}` : `/local/${s.slug}`} className="group card-cell p-6">
+                <Link key={s.slug} href={enriched ? serviceGeoHref(s, st.slug) : serviceHref(s)} className="group card-cell p-6">
                   <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
                   <span className="mt-2 flex items-center gap-1.5 text-[12.5px] text-[var(--text-muted)]">
                     {s.botName}

@@ -1,4 +1,4 @@
-import { CitySchema, LocalServiceSchema, type City, type LocalService } from "./schema";
+import { CitySchema, type City } from "./schema";
 
 /**
  * Tier 0 — 12 metros, 4 services (48 city pages + hubs).
@@ -205,56 +205,10 @@ const CITIES_RAW = [
     localNote: "Minnesota-nice means buyers rarely say no — they just go quiet — so pipelines here fill with polite maybes that a disciplined follow-up cadence converts and everyone else miscounts as dead." },
 ];
 
-const SERVICES_RAW = [
-  { slug: "ppc", name: "Agentic PPC", catalogPillar: "marketing" as const, catalogSlug: "paid-media", botName: "Ads Bot",
-    headlinePattern: "Agentic PPC Company in {city}, {st}",
-    hook: "Reviewed daily, not quarterly.",
-    intro: "An ad account managed by an agent reads every search term, every day, and moves budget while the human agencies are preparing next month's slide deck. Same platforms, radically shorter feedback loop.",
-    implementationWeeks: 2,
-    baseline: [
-      { metric: "Search-term review cadence", value: "daily" },
-      { metric: "Creative variants in rotation", value: "continuous" },
-      { metric: "Budget-shift latency", value: "<24h" },
-    ] },
-  { slug: "seo", name: "Agentic SEO", catalogPillar: "marketing" as const, catalogSlug: "seo", botName: "SEO Bot",
-    headlinePattern: "Agentic SEO Company in {city}, {st}",
-    hook: "Maintenance, not a one-time audit.",
-    intro: "Rankings decay because nobody re-crawls, re-writes and re-links after the audit PDF lands. An agent runs the crawl on a schedule, fixes what broke, and closes coverage gaps while they are still cheap.",
-    implementationWeeks: 3,
-    baseline: [
-      { metric: "Technical crawl cadence", value: "weekly" },
-      { metric: "Rank tracking", value: "daily" },
-      { metric: "Content gap refresh", value: "monthly" },
-    ] },
-  { slug: "crm", name: "Agentic CRM", catalogPillar: "sales" as const, catalogSlug: "crm", botName: "CRM Bot",
-    headlinePattern: "Agentic CRM Automation Company in {city}, {st}",
-    hook: "Records that update themselves.",
-    intro: "A CRM nobody updates is a reporting liability you pay monthly for. An agent logs every call, email and meeting against the right record, advances stages on evidence, and merges the duplicates nobody has time for.",
-    implementationWeeks: 2,
-    baseline: [
-      { metric: "Activity logging", value: "automatic" },
-      { metric: "Duplicate hygiene", value: "daily" },
-      { metric: "Stalled-deal alerts", value: "real-time" },
-    ] },
-  { slug: "speed-to-lead", name: "Speed-to-Lead", catalogPillar: "sales" as const, catalogSlug: "inbound", botName: "Speed-to-Lead Bot",
-    headlinePattern: "AI Speed-to-Lead Company in {city}, {st}",
-    hook: "Under a minute, any hour.",
-    intro: "The first responder wins the job, and the decay is measured in minutes. An agent answers every call, form and chat within seconds, qualifies in real conversation, and books straight onto the calendar.",
-    implementationWeeks: 2,
-    baseline: [
-      { metric: "First response", value: "<60s" },
-      { metric: "Coverage", value: "24/7" },
-      { metric: "Escalation to humans", value: "rule-based" },
-    ] },
-];
-
-/* Parse at module load — a bad row fails the build, not the SERP. */
 export const CITIES: City[] = CITIES_RAW.map((c) => CitySchema.parse(c));
-export const LOCAL_SERVICES: LocalService[] = SERVICES_RAW.map((s) => LocalServiceSchema.parse(s));
 
 export const STATES = [...new Map(CITIES.map((c) => [c.stateSlug, { slug: c.stateSlug, name: c.stateName, abbr: c.stateAbbr }])).values()];
 
-export const getService = (slug: string) => LOCAL_SERVICES.find((s) => s.slug === slug);
 export const getState = (slug: string) => STATES.find((s) => s.slug === slug);
 export const getCity = (stateSlug: string, citySlug: string) =>
   CITIES.find((c) => c.stateSlug === stateSlug && c.slug === citySlug);

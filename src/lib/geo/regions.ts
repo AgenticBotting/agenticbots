@@ -23,6 +23,22 @@ export function regionOf(stateSlug: string): Region {
   return LOOKUP.get(stateSlug) ?? "Midwest";
 }
 
+/** Every region name is one word, so the slug is just the lowercase form. */
+export function regionSlug(region: Region): string {
+  return region.toLowerCase();
+}
+
+export function regionFromSlug(slug: string): Region | null {
+  return REGIONS.find((r) => regionSlug(r) === slug) ?? null;
+}
+
+/** The other four, in ring order — lets a region hub hand off to its
+ *  siblings without a trip back through the menu. */
+export function siblingRegions(region: Region): Region[] {
+  const i = REGIONS.indexOf(region);
+  return [...REGIONS.slice(i + 1), ...REGIONS.slice(0, i)];
+}
+
 export function groupByRegion<T extends { slug: string }>(states: T[]): { region: Region; states: T[] }[] {
   return REGIONS.map((region) => ({
     region,

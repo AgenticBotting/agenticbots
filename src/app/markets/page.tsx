@@ -6,9 +6,9 @@ import { Container, Section } from "@/components/ui";
 import { BotFactory } from "@/components/marketing";
 import { PlanCta } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
-import { LOCAL_SERVICES } from "@/lib/geo/data";
+import { ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { ALL_STATES, ALL_CITIES, allCitiesInState } from "@/lib/geo/dataset";
-import { groupByRegion } from "@/lib/geo/regions";
+import { groupByRegion, regionSlug } from "@/lib/geo/regions";
 
 export const metadata: Metadata = {
   title: "Markets we serve",
@@ -51,6 +51,15 @@ export default function MarketsIndex() {
             size="sm"
             eyebrow={<span className="inline-flex items-center gap-2"><MapPin className="w-3 h-3" />{region}</span>}
             heading={`${region} markets.`}
+            cta={
+              <Link
+                href={`/markets/region/${regionSlug(region)}`}
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all"
+              >
+                All {region} markets
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            }
           >
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {states.map((st) => {
@@ -73,9 +82,9 @@ export default function MarketsIndex() {
         ))}
 
         <Section variant="light" size="sm" eyebrow="By service" heading="Or start from the service.">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {LOCAL_SERVICES.map((s) => (
-              <Link key={s.slug} href={`/local/${s.slug}`} className="group card-cell p-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+            {ALL_SERVICES.map((s) => (
+              <Link key={s.slug} href={serviceHref(s)} className="group card-cell p-6">
                 <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
                 <span className="block body-xs mt-2">{s.botName} · every market</span>
               </Link>

@@ -7,23 +7,44 @@
 > Phase-A gate — dataset currently validates clean (tiers exactly 481/248/195,
 > all 4,496 surrounding refs resolve; DC legitimately has none).
 >
-> **⚠️ OPEN DECISION — two different 8-service lists ship in these files:**
-> `cities-dataset.json` defines *agentic-ppc, agentic-seo, ai-sdr-agents,
-> agentic-crm, ai-lead-generation, agentic-cro, ai-marketing-automation,
-> ai-revops* (H1s say "Company"), while `SERVICE-CONTENT-BLUEPRINT.md` §1
-> restructures into *marketing-firm parent + ppc-management / seo / email +
-> google-ads / linkedin-ads / facebook-ads / local-seo* (H1s say "Firm") with
-> owns/excludes cannibalization gates. These produce different 7,392-page URL
-> sets. **Do not mass-generate until one list is chosen.** The blueprint reads
-> as the newer thinking; the dataset's `h1_pattern`s match the older list.
+> **✅ DECISION RESOLVED — Sept 9 2026.** The competing 8-service lists are gone.
+> The one true list is **`src/lib/catalog.ts`: 13 services**, every slug
+> `agentic-`prefixed, flat at `/services/{slug}`. The decoy `services[]` key has
+> been deleted from `cities-dataset.json`; `SERVICE-CONTENT-BLUEPRINT.md` §1's
+> owns/excludes contract was kept and is now **implemented**, not aspirational
+> (see below). `pillar` survives as a grouping field for the Bots menu tabs but
+> no longer appears in any URL.
 >
-> **Migration map (current live → plan target):** `/local/{service}/{state}/{city}`
-> → `/services/{service}/{state}/{city}` and `/markets/{state}[/{city}]` →
-> `/locations/{state}[/{city}]`; nothing is deployed or indexed, so slugs can
-> move freely until launch. Live pages already follow the blueprint's H1
-> discipline (exact "… Company in {City}, {ST}" pattern in H1 + title, flavor
-> line demoted to a kicker). Release schedule, crawl-budget rules, lastmod-from-
-> content-hash, and the link-graph invariants come from the plan doc verbatim.
+> **Slugs:** agentic-ppc-management · agentic-seo · agentic-content-marketing ·
+> agentic-email-marketing · agentic-cro · agentic-analytics ·
+> agentic-lead-generation · agentic-outbound-sdr · agentic-speed-to-lead ·
+> agentic-crm-automation · agentic-proposal-automation ·
+> agentic-account-management · agentic-revops
+>
+> **Migration completed:** `/marketing/{category}` and `/sales/{category}` (13
+> pages) and the whole `/local/**` tree (3,904 pages) now 308 into
+> `/services/**` via `src/lib/redirects.mjs` — 22 rules, shared verbatim with
+> the build gate. `CategoryPage.tsx` is retired; the `/local` template is the
+> single service template. `/marketing` and `/sales` survive as pillar hubs
+> because they aggregate rather than duplicate. `/markets/*` → `/locations/*`
+> remains unstarted and is the only route rename still outstanding.
+>
+> **Cannibalization defense (blueprint §1, now real):**
+> `owns[]`/`excludes[]` live on every service record. Disjointness is enforced
+> at module load in `catalog.ts` — a service cannot ship claiming a term another
+> service owns, and the build throws with the offending pair named.
+> `scripts/topic-gate.mjs` enforces the rest against the rendered corpus: one
+> indexable page per (topic, scope), an excludes budget of 2, a non-empty owns
+> check on hubs, retired-URL and redirect-shadow assertions, and per-topic
+> canonical scoping. It also reports entity coverage per hub — currently 8 of 13
+> cover under half their target entity set, which is the standing content
+> backlog, not a build failure.
+>
+> **Scale:** 13,689 prerendered pages; **521 indexable** (13 hubs + 195 state +
+> 312 city + 1 informational blog). Everything else is `noindex, follow` behind
+> `isEnriched()` and excluded from both sitemap segments. All four gates
+> (`pseo-gate`, `link-integrity`, `seo-checks`, `topic-gate`) are wired to
+> pre/postbuild — `npm run gates` runs them against an existing build.
 
 
 ## Data model

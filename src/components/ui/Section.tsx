@@ -49,6 +49,10 @@ export function Section({
       data-section={id}
       className={cn(
         "relative border-b border-[var(--border)]",
+        // An anchored section is a jump target, and the header is sticky —
+        // without this the eyebrow and heading land underneath it. Matches
+        // the header: 76px on mobile, 36px utility bar + 84px bar at lg.
+        id && "scroll-mt-[92px] lg:scroll-mt-[136px]",
         variant === "dark" && "border-ink-700",
         VARIANT[variant],
         size === "sm" ? "section-pad-sm" : "section-pad",

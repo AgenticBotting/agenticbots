@@ -65,7 +65,14 @@ export function PostOptin({
               <input
                 required type="email" value={email} autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Get new posts — enter your email"
+                /* Shorter than the marketing copy this used to carry
+                   ("Get new posts — enter your email") — that string
+                   truncated behind the Subscribe button at ~184px, the
+                   input's real width once the row hits a phone screen.
+                   The fuller pitch lives in the heading copy around this
+                   component instead; the placeholder just needs to say
+                   what the field is. */
+                placeholder="Your email"
                 aria-label="Email address"
                 className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[14px] outline-none placeholder:text-[var(--text-muted)]"
               />

@@ -5,7 +5,7 @@ import { PlanCta } from "./PlanCta";
 import { Container, Reveal, SectionHeader, BotIndex, BrandMark } from "@/components/ui";
 import { BotPlanForm } from "./BotPlanForm";
 import { StatBand } from "./StatBand";
-import { categoryHref, type Pillar } from "@/lib/catalog";
+import { serviceHref, type Pillar } from "@/lib/catalog";
 import { renderHeadline } from "@/lib/headline";
 
 export function PillarPage({ pillar }: { pillar: Pillar }) {
@@ -27,7 +27,7 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
               <p className="eyebrow mb-5">{pillar.tagline}</p>
               <h1 className="display-hero max-w-[18ch] text-balance">{renderHeadline(pillar.headline)}</h1>
               <p className="body-lg mt-6 max-w-[56ch] text-pretty">{pillar.intro}</p>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
+              <div className="mt-9 cta-row">
                 <PlanCta source={`pillar-${pillar.slug}`} />
                 <Link
                   href={`/${other}`}
@@ -56,7 +56,7 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
               {pillar.categories.map((c, i) => (
                 <Reveal key={c.slug} delay={Math.min(i, 6) * 0.05}>
                   <Link
-                    href={categoryHref(c)}
+                    href={serviceHref(c)}
                     className="group bg-white h-full p-7 flex flex-col hover:bg-[var(--bg-alt)] transition-colors"
                   >
                     <BotIndex index={c.index} size="sm" tone="outline" />

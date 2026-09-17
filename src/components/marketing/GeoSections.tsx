@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metric } from "@/lib/catalog";
-import { Container, BotPattern } from "@/components/ui";
+import { Container, BotPattern, CountUp } from "@/components/ui";
 import { PlanCta } from "./PlanCta";
 import { cn } from "@/lib/utils";
 
@@ -164,7 +164,7 @@ export function StatSplit({
             {stats.slice(0, 4).map((s) => (
               <div key={s.label} className="bg-white p-7 sm:p-8">
                 <dt className="text-[2rem] font-semibold tracking-[-0.035em] leading-none tabular-nums">
-                  {s.value}
+                  <CountUp value={s.value} />
                 </dt>
                 <dd className="mt-3 text-[13px] leading-snug text-[var(--text-secondary)]">{s.label}</dd>
               </div>

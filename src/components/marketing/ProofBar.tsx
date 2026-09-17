@@ -10,6 +10,8 @@
  * Swap in verified numbers when the first client reports them, and the
  * eyebrow changes from "built to do" to "does".
  */
+import { CountUp } from "@/components/ui";
+
 const PROOF = [
   { v: "38", unit: "%", l: "More jobs booked", sub: "Inside the first 60 days" },
   { v: "41", unit: "s", l: "To the first reply", sub: "Any hour, any day" },
@@ -30,11 +32,20 @@ export function ProofBar() {
 
         <dl className="mt-9 grid grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border-y border-[var(--border)]">
           {PROOF.map((p) => (
-            <div key={p.l} className="bg-[var(--bg-alt)] py-8 pr-6 lg:pl-8 first:lg:pl-0">
+            /* The left padding used to be lg-only, so on the 2-up mobile grid
+               there was none — column one read fine against the container edge
+               but column two sat flush on the divider. Pad the even cells on
+               mobile; at lg the first cell still runs flush so the numerals
+               line up with the eyebrow above them. */
+            <div
+              key={p.l}
+              className="bg-[var(--bg-alt)] py-8 pl-0 pr-5 even:pl-5 lg:pl-8 lg:pr-6 lg:first:pl-0"
+            >
               <dt className="flex items-baseline">
-                <span className="text-[clamp(2.5rem,4.4vw,3.5rem)] font-semibold tracking-[-0.045em] leading-[0.9] tabular-nums text-[var(--foreground)]">
-                  {p.v}
-                </span>
+                <CountUp
+                  value={p.v}
+                  className="text-[clamp(2.5rem,4.4vw,3.5rem)] font-semibold tracking-[-0.045em] leading-[0.9] tabular-nums text-[var(--foreground)]"
+                />
                 {p.unit && (
                   <span className="text-[clamp(1.4rem,2.2vw,1.9rem)] font-semibold tracking-[-0.03em] leading-none text-[var(--accent-text)]">
                     {p.unit}

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui";
-import { CATALOG, categoryHref } from "@/lib/catalog";
+import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { SORTED_POSTS } from "@/lib/posts";
-import { CITIES, LOCAL_SERVICES, STATES, citiesInState } from "@/lib/geo/data";
+import { CITIES, STATES, citiesInState } from "@/lib/geo/data";
 
 export const metadata: Metadata = {
   title: "Site map",
@@ -31,7 +31,7 @@ export default function SiteMapPage() {
                   <ul className="mt-2 space-y-1.5">
                     {p.categories.map((c) => (
                       <li key={c.slug}>
-                        <Link href={categoryHref(c)} className="text-[13.5px] text-[var(--text-secondary)] hover:text-[var(--accent-text)]">
+                        <Link href={serviceHref(c)} className="text-[13.5px] text-[var(--text-secondary)] hover:text-[var(--accent-text)]">
                           {c.botName} — {c.name}
                         </Link>
                       </li>
@@ -62,20 +62,27 @@ export default function SiteMapPage() {
 
             <div>
               <h2 className="display-md border-b border-[var(--border)] pb-2 mb-4">Local services</h2>
-              {LOCAL_SERVICES.map((s) => (
-                <div key={s.slug} className="mb-5">
-                  <Link href={`/local/${s.slug}`} className="text-[14px] font-semibold hover:text-[var(--accent-text)]">{s.name}</Link>
-                  <ul className="mt-2 space-y-1">
-                    {CITIES.map((c) => (
-                      <li key={c.slug}>
-                        <Link href={`/local/${s.slug}/${c.stateSlug}/${c.slug}`} className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--accent-text)]">
-                          {s.name} in {c.name}, {c.stateAbbr}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              {/* Hubs once and metros once — the cross product would be
+                  13 x 24 = 312 links on a single page. */}
+              <ul className="mb-6 space-y-1">
+                {ALL_SERVICES.map((s) => (
+                  <li key={s.serviceSlug}>
+                    <Link href={serviceHref(s)} className="text-[14px] font-semibold hover:text-[var(--accent-text)]">
+                      {s.serviceName}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mb-2 label-caps text-[var(--text-muted)]">Focus metros</p>
+              <ul className="space-y-1">
+                {CITIES.map((c) => (
+                  <li key={c.slug}>
+                    <Link href={`/markets/${c.stateSlug}/${c.slug}`} className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--accent-text)]">
+                      {c.name}, {c.stateAbbr}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div>

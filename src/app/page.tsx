@@ -30,7 +30,7 @@ function Hero() {
               keep your ads and CRM working — every hour, including the ones you
               are asleep for.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-8 cta-row">
               <BotOrbit>
                 <PlanCta source="home-hero" />
               </BotOrbit>
@@ -400,35 +400,51 @@ const VOICES = [
   { id: "V-03", role: "VP Growth, services platform", place: "Awaiting first client quote" },
 ];
 
+/* Three empty dashed avatar plates read as an unfinished site — the
+   opposite of what an honesty section should do. Nothing here was
+   invented before and nothing is invented now; this just says the true
+   thing once, confidently, in the same console language as
+   AuditLogPanel, instead of three placeholder holes in the page. */
 function Voices() {
   return (
-    <Section
-      variant="light"
-      eyebrow="In their words"
-      heading="The part we cannot write ourselves."
-      sub="These slots stay empty until real clients fill them. Nothing here is invented."
-    >
-      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-        {VOICES.map((v) => (
-          <div key={v.id} className="card-cell p-7">
-            <MediaSlot
-              id={v.id}
-              ratio="1 / 1"
-              label="Client headshot"
-              spec="800×800 · square · real person, plain background, eyes to camera."
-              className="w-20"
-            />
-            <p className="body-base mt-5 text-[var(--text-muted)] italic">
-              &ldquo;Quote goes here — one specific thing that changed, in their words, with a number
-              they are willing to stand behind.&rdquo;
-            </p>
-            <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)] mt-5">
-              {v.role} · {v.place}
+    <section className="border-b border-ink-700 bg-ink-950 on-dark">
+      <Container className="section-pad-sm">
+        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-center">
+          <div>
+            <p className="eyebrow-dark mb-4">In their words</p>
+            <h2 className="display-xl text-balance">
+              The part we will not write <span className="em-green-dark">ourselves.</span>
+            </h2>
+            <p className="body-lg mt-5 max-w-[46ch] text-ink-300">
+              No client quotes yet, and nothing invented to fill the gap while we wait. The
+              first one that lands here goes up unedited, with a number attached.
             </p>
           </div>
-        ))}
-      </div>
-    </Section>
+
+          <div className="border border-ink-700 bg-ink-900">
+            <div className="flex items-center justify-between gap-4 border-b border-ink-700 px-5 h-11">
+              <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-ink-300">
+                Client log
+              </span>
+              <span className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.1em] text-ink-400">
+                <span className="h-1.5 w-1.5 bg-[var(--color-accent-400)] animate-pulse-dot" />
+                Awaiting first entry
+              </span>
+            </div>
+            <ul className="px-5 py-4 space-y-3">
+              {VOICES.map((v, i) => (
+                <li key={v.id} className="flex items-baseline justify-between gap-4 border-b border-ink-800 pb-3 last:border-b-0 last:pb-0">
+                  <span className="text-[13.5px] text-ink-300">{v.role}</span>
+                  <span className="mono text-[10.5px] uppercase tracking-[0.08em] text-ink-500 shrink-0">
+                    {i === 0 ? "next slot open" : "queued"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }
 

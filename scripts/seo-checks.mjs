@@ -18,19 +18,26 @@ const pages = [];
   }
 })(ROOT);
 
+/* A regex capture out of a 322 KB page is a V8 *sliced string* that keeps
+   the whole parent alive. Retaining 12,700 of them in the maps below held
+   ~4 GB and OOM'd the gate once the corpus grew past the /local era.
+   Round-tripping through a Buffer yields a fresh, flat copy that lets the
+   page body be collected. */
+const flat = (s) => Buffer.from(s, "utf8").toString("utf8");
+
 const errors = [];
 const titles = new Map();
 const descs = new Map();
 
 for (const p of pages) {
   const html = readFileSync(p, "utf8");
-  const route = p.slice(ROOT.length, -5);
+  const route = flat(p.slice(ROOT.length, -5));
   if (route.includes("_not-found") || route.includes("_global-error") || route.includes("/design")) continue;
 
-  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
-  const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
+  const title = flat(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "");
+  const desc = flat(html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "");
   const h1s = (html.match(/<h1[\s>]/g) || []).length;
-  const canon = html.match(/rel="canonical" href="([^"]*)"/)?.[1] ?? "";
+  const canon = flat(html.match(/rel="canonical" href="([^"]*)"/)?.[1] ?? "");
 
   if (!title) errors.push(`${route}: missing <title>`);
   else {

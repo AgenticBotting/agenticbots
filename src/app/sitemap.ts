@@ -1,20 +1,34 @@
 import { statSync } from "node:fs";
 import { join } from "node:path";
 import type { MetadataRoute } from "next";
-import { CATALOG, categoryHref } from "@/lib/catalog";
+import { CATALOG, ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
 import { SORTED_POSTS } from "@/lib/posts";
-import { CITIES, LOCAL_SERVICES, STATES } from "@/lib/geo/data";
+import { CITIES, STATES } from "@/lib/geo/data";
+import { REGIONS, regionSlug } from "@/lib/geo/regions";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://agenticbots.dev";
 
-/* Local pages are generated from the geo dataset, so their content only
-   moves when that file does. Read once at module load. */
-const CONTENT_MTIME = (() => {
+/* Page content moves when either source moves: service copy lives in
+   catalog.ts, the metro data in geo/data.ts. Keying off only the latter
+   meant a catalog edit never bumped lastmod. Read once at module load. */
+function mtimeOf(literalPath: string): number {
   try {
-    return statSync(join(process.cwd(), "src/lib/geo/data.ts")).mtime;
+    return statSync(literalPath).mtime.getTime();
   } catch {
-    return new Date();
+    return 0;
   }
+}
+
+/* Literal join arguments on purpose: a computed path here makes Turbopack
+   trace the entire project into the server bundle ("Dynamic filesystem
+   access causes tracing of the whole project"), which at 13k pages is a
+   deployment-size problem rather than a warning. */
+const CONTENT_MTIME = (() => {
+  const stamps = [
+    mtimeOf(join(process.cwd(), "src/lib/catalog.ts")),
+    mtimeOf(join(process.cwd(), "src/lib/geo/data.ts")),
+  ].filter(Boolean);
+  return stamps.length ? new Date(Math.max(...stamps)) : new Date();
 })();
 
 /**
@@ -53,21 +67,25 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
 
   const id = segmentId(await (props as { id: Promise<{ __metadata_id__?: string }> | number }).id);
   if (id === 1) {
-    const hubs: MetadataRoute.Sitemap = LOCAL_SERVICES.map((s) => ({
-      url: `${BASE}/local/${s.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.7,
+    const hubs: MetadataRoute.Sitemap = ALL_SERVICES.map((s) => ({
+      url: `${BASE}${serviceHref(s)}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8,
     }));
-    const states: MetadataRoute.Sitemap = LOCAL_SERVICES.flatMap((s) =>
+    const states: MetadataRoute.Sitemap = ALL_SERVICES.flatMap((s) =>
       STATES.map((st) => ({
-        url: `${BASE}/local/${s.slug}/${st.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.6,
+        url: `${BASE}${serviceGeoHref(s, st.slug)}`, lastModified: now, changeFrequency: "monthly", priority: 0.6,
       }))
     );
-    const cities: MetadataRoute.Sitemap = LOCAL_SERVICES.flatMap((s) =>
+    const cities: MetadataRoute.Sitemap = ALL_SERVICES.flatMap((s) =>
       CITIES.map((c) => ({
-        url: `${BASE}/local/${s.slug}/${c.stateSlug}/${c.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.65,
+        url: `${BASE}${serviceGeoHref(s, c.stateSlug, c.slug)}`, lastModified: now, changeFrequency: "monthly", priority: 0.65,
       }))
     );
     const marketHubs: MetadataRoute.Sitemap = [
       { url: `${BASE}/markets`, lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+      ...REGIONS.map((r) => ({
+        url: `${BASE}/markets/region/${regionSlug(r)}`, lastModified: now,
+        changeFrequency: "monthly" as const, priority: 0.7,
+      })),
       ...STATES.map((st) => ({
         url: `${BASE}/markets/${st.slug}`, lastModified: now,
         changeFrequency: "monthly" as const, priority: 0.65,
@@ -96,12 +114,12 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
   const pillars: MetadataRoute.Sitemap = CATALOG.map((p) => ({
     url: `${BASE}/${p.slug}`, lastModified: now, changeFrequency: "weekly", priority: 0.9,
   }));
-  const categories: MetadataRoute.Sitemap = CATALOG.flatMap((p) => p.categories).map((c) => ({
-    url: `${BASE}${categoryHref(c)}`, lastModified: now, changeFrequency: "monthly", priority: 0.85,
-  }));
+  const servicesIndex: MetadataRoute.Sitemap = [
+    { url: `${BASE}/services`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+  ];
   const posts: MetadataRoute.Sitemap = SORTED_POSTS.map((p) => ({
     url: `${BASE}/blog/${p.slug}`, lastModified: new Date(p.date), changeFrequency: "monthly", priority: 0.6,
   }));
 
-  return [...statics, ...pillars, ...categories, ...posts];
+  return [...statics, ...pillars, ...servicesIndex, ...posts];
 }

@@ -3,7 +3,7 @@ import { Search, Plug, Rocket, RefreshCw } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader } from "@/components/ui";
-import { BotPlanForm, StatBand, FaqAccordion, PlanCta, Timeline, AuditLogPanel } from "@/components/marketing";
+import { BotPlanForm, StatBand, FaqAccordion, PlanCta, Timeline, AuditLogPanel, ProblemDiagram } from "@/components/marketing";
 
 export const metadata: Metadata = {
   title: "How it works",
@@ -99,6 +99,8 @@ export default function HowItWorksPage() {
             </Reveal>
           </Container>
         </section>
+
+        <ProblemDiagram />
 
         <section className="section-pad-sm border-b border-[var(--border)]">
           <Container>

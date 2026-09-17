@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Check, Download, Loader2 } from "lucide-react";
-import { MediaSlot } from "@/components/ui";
+import { LogoMask } from "@/components/ui";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -65,12 +65,35 @@ export function LeadMagnet({
     <section className={cn("border-b border-[var(--border)]", className)}>
       <div className="container-site section-pad">
         <div className="grid lg:grid-cols-[0.7fr_1.3fr] gap-10 lg:gap-16 items-center">
-          <MediaSlot
-            id="G-01"
-            ratio="3 / 4"
-            label="Guide cover — Introduction to Agentic Bots"
-            spec="1200×1600 · portrait · the cover as it will look as a PDF thumbnail. Title set in Geist 600, black on white, AB mark bottom-left."
-          />
+          {/* The cover, drawn rather than reserved. The slot brief specified
+              it exactly — 3:4 portrait, title in the display face, black on
+              white, mark bottom-left — and a spec that precise is a thing to
+              build, not a plate to hold space for. Swap in a real PDF
+              thumbnail later and nothing else moves. */}
+          <div
+            className="relative border border-[var(--border-strong)] bg-white shadow-lift select-none"
+            style={{ aspectRatio: "3 / 4" }}
+            aria-hidden="true"
+          >
+            <div className="absolute inset-0 flex flex-col p-6 sm:p-7">
+              <span className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-text)]">
+                AgenticBots · Field guide
+              </span>
+              <span className="mt-auto block display-xl leading-[1.08] tracking-[-0.035em]">
+                Introduction to agentic bots and AI&nbsp;agents.
+              </span>
+              <span className="mt-4 block h-px w-14 bg-accent-500" />
+              <span className="mt-4 block text-[12.5px] leading-snug text-[var(--text-secondary)]">
+                What they do, what they cost, and which jobs to hand over first.
+              </span>
+              <span className="mt-6 flex items-center justify-between gap-3">
+                <LogoMask art="mark" height={18} className="text-ink-950" />
+                <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                  PDF · 18 pages
+                </span>
+              </span>
+            </div>
+          </div>
 
           <div>
             <p className="eyebrow mb-4">Free guide · no call required</p>

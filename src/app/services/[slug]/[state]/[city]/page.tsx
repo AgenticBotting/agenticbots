@@ -8,37 +8,38 @@ import {
   BotPlanForm, PlanCta, FaqAccordion, CityVignette,
   AgentConsole, StackStrip, StatSplit, ZigZag, JoinBand, TaskConveyor,
 } from "@/components/marketing";
-import { LOCAL_SERVICES, getService, getCity, nearbyCities, fmt } from "@/lib/geo/data";
+import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
+import { ALL_SERVICES, getService, serviceHref, type Service } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 import { rotatedValueProp, rotatedCta } from "@/lib/geo/seo-rotation";
-import { getCategory } from "@/lib/catalog";
-import type { PillarSlug } from "@/lib/catalog";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 
-type Params = { params: Promise<{ service: string; state: string; city: string }> };
+type Params = { params: Promise<{ slug: string; state: string; city: string }> };
 
 export function generateStaticParams() {
   /* Every service × every city in the national dataset — the internal
      links from city hubs land on a real service+city variation for all
      924 markets, not just the enriched set. */
-  return LOCAL_SERVICES.flatMap((s) =>
-    ALL_CITIES.map((c) => ({ service: s.slug, state: c.state_slug, city: c.city_slug }))
+  return ALL_SERVICES.flatMap((s) =>
+    ALL_CITIES.map((c) => ({ slug: s.serviceSlug, state: c.state_slug, city: c.city_slug }))
   );
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { service, state, city } = await params;
-  const svc = getService(service);
+  const { slug, state, city } = await params;
+  const svc = getService(slug);
   const rec = getDatasetCity(state, city);
   if (!svc || !rec) return {};
   const enriched = isEnriched(state, city);
   const ct = enriched ? getCity(state, city) : undefined;
   return {
-    title: `${svc.name} Company in ${rec.city}, ${rec.state_abbr}`,
+    /* absolute: at 13 services x 924 cities the " | AgenticBots" suffix
+       pushed the longest combinations past the 70-char cap. */
+    title: { absolute: `${svc.serviceName} Company in ${rec.city}, ${rec.state_abbr}` },
     description: ct
-      ? `${svc.name} for ${ct.name} businesses — agent systems that run continuously across a ${fmt.format(ct.businessCount)}-business metro. First system live in ~${svc.implementationWeeks} weeks.`
-      : `${svc.name} for ${rec.city}, ${rec.state_abbr} businesses — ${svc.botName} runs continuously across the ${rec.metro} metro, live in ~${svc.implementationWeeks} weeks.`,
-    alternates: { canonical: `/local/${service}/${state}/${city}` },
+      ? `${svc.serviceName} for ${ct.name} businesses — agent systems that run continuously across a ${fmt.format(ct.businessCount)}-business metro. First system live in ~${svc.implementationWeeks} weeks.`
+      : `${svc.serviceName} for ${rec.city}, ${rec.state_abbr} businesses — ${svc.botName} runs continuously across the ${rec.metro} metro, live in ~${svc.implementationWeeks} weeks.`,
+    alternates: { canonical: `/services/${slug}/${state}/${city}` },
     /* Structural markets stay out of the index until enriched —
        release schedule, docs/PROGRAMMATIC-SEO-PLAN.md §6. */
     ...(enriched ? {} : { robots: { index: false, follow: true } }),
@@ -46,8 +47,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function CityPage({ params }: Params) {
-  const { service, state, city } = await params;
-  const svc = getService(service);
+  const { slug, state, city } = await params;
+  const svc = getService(slug);
   const st = getDatasetState(state);
   const rec = getDatasetCity(state, city);
   if (!svc || !st || !rec) notFound();
@@ -58,8 +59,7 @@ export default async function CityPage({ params }: Params) {
 
   const ct = getCity(state, city);
   if (!ct) notFound();
-
-  const category = getCategory(svc.catalogPillar as PillarSlug, svc.catalogSlug);
+  const category = svc;
   const near = nearbyCities(ct, 6);
   const dominant = ct.industries[0];
 
@@ -67,19 +67,19 @@ export default async function CityPage({ params }: Params) {
      the hand-written local note, and a dominant-industry scenario. */
   const faqs = [
     { q: `Do you work with ${ct.name} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely. ${ct.name} is in ${ct.timezone.replace("America/", "").replace("_", " ")} time and every sequence is scheduled against your local hours, not ours.` },
-    { q: `How competitive is ${svc.name.toLowerCase()} in ${ct.name}?`, a: `${ct.name}'s local market is ${ct.competition}. Local-service CPCs in this metro typically run $${ct.cpcBand[0]}–$${ct.cpcBand[1]} (estimated band), which is exactly why the follow-up side of the funnel — the part that costs nothing per click — is usually the cheaper win.` },
+    { q: `How competitive is ${svc.serviceName.toLowerCase()} in ${ct.name}?`, a: `${ct.name}'s local market is ${ct.competition}. Local-service CPCs in this metro typically run $${ct.cpcBand[0]}–$${ct.cpcBand[1]} (estimated band), which is exactly why the follow-up side of the funnel — the part that costs nothing per click — is usually the cheaper win.` },
     { q: `How fast can this go live for a ${dominant} business?`, a: `The typical build is ~${svc.implementationWeeks} weeks to a first system in monitored mode. ${dominant[0].toUpperCase() + dominant.slice(1)} intake flows are common in ${ct.name} and rarely need custom work.` },
   ];
 
   return (
     <>
       <JsonLd data={[
-        serviceLd({ name: `${svc.name} in ${ct.name}, ${ct.stateAbbr}`, description: svc.intro, path: `/local/${svc.slug}/${st.slug}/${ct.slug}`, areaServed: `${ct.name}, ${ct.stateName}` }),
+        serviceLd({ name: `${svc.serviceName} in ${ct.name}, ${ct.stateAbbr}`, description: svc.intro, path: `/services/${svc.serviceSlug}/${st.slug}/${ct.slug}`, areaServed: `${ct.name}, ${ct.stateName}` }),
         breadcrumbLd([
           { name: "Home", path: "/" },
-          { name: svc.name, path: `/local/${svc.slug}` },
-          { name: st.name, path: `/local/${svc.slug}/${st.slug}` },
-          { name: ct.name, path: `/local/${svc.slug}/${st.slug}/${ct.slug}` },
+          { name: svc.serviceName, path: `/services/${svc.serviceSlug}` },
+          { name: st.name, path: `/services/${svc.serviceSlug}/${st.slug}` },
+          { name: ct.name, path: `/services/${svc.serviceSlug}/${st.slug}/${ct.slug}` },
         ]),
         faqLd(faqs),
       ]} />
@@ -90,15 +90,15 @@ export default async function CityPage({ params }: Params) {
           <Container className="pt-12 pb-16">
             <nav className="mb-10 flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--text-muted)]">
               <Link href="/" className="hover:text-[var(--foreground)]">Home</Link><span>/</span>
-              <Link href={`/local/${svc.slug}`} className="hover:text-[var(--foreground)]">{svc.name}</Link><span>/</span>
-              <Link href={`/local/${svc.slug}/${st.slug}`} className="hover:text-[var(--foreground)]">{st.name}</Link><span>/</span>
+              <Link href={`/services/${svc.serviceSlug}`} className="hover:text-[var(--foreground)]">{svc.serviceName}</Link><span>/</span>
+              <Link href={`/services/${svc.serviceSlug}/${st.slug}`} className="hover:text-[var(--foreground)]">{st.name}</Link><span>/</span>
               <span className="text-[var(--text-body)]">{ct.name}</span>
             </nav>
 
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">
-                  {svc.name} <span className="eyebrow-dim">· {ct.name}, {ct.stateAbbr}</span>
+                  {svc.serviceName} <span className="eyebrow-dim">· {ct.name}, {ct.stateAbbr}</span>
                 </p>
                 <h1 className="display-hero max-w-[24ch] text-balance">
                   {svc.headlinePattern.replace("{city}", ct.name).replace("{st}", ct.stateAbbr)}
@@ -106,13 +106,13 @@ export default async function CityPage({ params }: Params) {
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
                 <p className="body-lg mt-5 max-w-[54ch]">{svc.intro}</p>
                 <p className="body-base mt-4 max-w-[54ch]">
-                  <span className="font-semibold text-[var(--accent-text)]">{rotatedValueProp(svc.slug, ct.slug)}</span>
+                  <span className="font-semibold text-[var(--accent-text)]">{rotatedValueProp(svc, ct.slug)}</span>
                   {" — "}from {ct.districts[0]} to {ct.districts[ct.districts.length - 1]}, wherever your {ct.name} customers are.
                 </p>
-                <div className="mt-8 flex flex-wrap gap-4">
+                <div className="mt-8 cta-row">
                   <PlanCta source={`local-${svc.slug}-${ct.slug}`} />
                   {category && (
-                    <Link href={`/${category.pillar}/${category.slug}`} className="btn btn-outline">
+                    <Link href={serviceHref(svc)} className="btn btn-outline">
                       How {svc.botName} works
                     </Link>
                   )}
@@ -175,8 +175,8 @@ export default async function CityPage({ params }: Params) {
             heading={<>Same {ct.name} business. <span className="em-green">Different week.</span></>}
             botName={svc.botName}
             rows={category.contrast.map((c, i) => ({
-              label: `${svc.botName} · ${ct.name} · ${category.highlights[i]?.title ?? svc.name}`,
-              title: category.highlights[i]?.title ?? svc.name,
+              label: `${svc.botName} · ${ct.name} · ${category.highlights[i]?.title ?? svc.serviceName}`,
+              title: category.highlights[i]?.title ?? svc.serviceName,
               today: c.today,
               after: c.after,
             }))}
@@ -213,7 +213,7 @@ export default async function CityPage({ params }: Params) {
         {/* ── Big-number stat split. ── */}
         <StatSplit
           eyebrow="The complete system"
-          heading={<>{svc.name} for {ct.name} — <span className="em-green">end to end.</span></>}
+          heading={<>{svc.serviceName} for {ct.name} — <span className="em-green">end to end.</span></>}
           body={`${category?.outcome ?? svc.hook} ${svc.botName} runs the whole loop for your ${ct.name} business — built, monitored and tuned continuously, on ${ct.timezone.replace("America/", "").replace("_", " ")} hours, inside the accounts you already own.`}
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
@@ -229,11 +229,11 @@ export default async function CityPage({ params }: Params) {
         <Section variant="light" size="sm" eyebrow={`Also running in ${ct.name}`}
           heading={`Other bots ${ct.name} businesses deploy.`}>
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {LOCAL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
-              <Link key={o.slug} href={`/local/${o.slug}/${st.slug}/${ct.slug}`} className="group card-cell p-6">
+            {ALL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
+              <Link key={o.slug} href={`/services/${o.serviceSlug}/${st.slug}/${ct.slug}`} className="group card-cell p-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
-                  {o.name} in {ct.name}
+                  {o.serviceName} in {ct.name}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
                   Open
@@ -253,11 +253,11 @@ export default async function CityPage({ params }: Params) {
         <Section variant="alt" size="sm" eyebrow="Nearby markets">
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {near.map((n) => (
-              <Link key={n.slug} href={`/local/${svc.slug}/${n.stateSlug}/${n.slug}`}
+              <Link key={n.slug} href={`/services/${svc.serviceSlug}/${n.stateSlug}/${n.slug}`}
                 className="group card-cell p-6 flex items-center justify-between gap-4">
                 <span>
                   <span className="block display-md">{n.name}, {n.stateAbbr}</span>
-                  <span className="block body-xs mt-1">{svc.name}</span>
+                  <span className="block body-xs mt-1">{svc.serviceName}</span>
                 </span>
                 <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />
               </Link>
@@ -265,12 +265,12 @@ export default async function CityPage({ params }: Params) {
           </div>
         </Section>
 
-        <Section variant="light" eyebrow="Questions" heading={`${svc.name} in ${ct.name}, specifically.`}>
+        <Section variant="light" eyebrow="Questions" heading={`${svc.serviceName} in ${ct.name}, specifically.`}>
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
         <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
+          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.serviceName.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${ct.name} market, not a template.`}
           source={`local-${svc.slug}-${ct.slug}-joinband`}
         />
@@ -290,14 +290,14 @@ export default async function CityPage({ params }: Params) {
 
 /* ─────────────────────  Structural market variant  ───────────────────── */
 
-import type { LocalService } from "@/lib/geo/schema";
+
 import type { DatasetCity, DatasetState } from "@/lib/geo/dataset";
 import { rotatedValueProp as rvp, rotatedCta as rcta } from "@/lib/geo/seo-rotation";
 
 function StructuralCityService({ svc, st, rec }: {
-  svc: LocalService; st: DatasetState; rec: DatasetCity;
+  svc: Service; st: DatasetState; rec: DatasetCity;
 }) {
-  const category = getCategory(svc.catalogPillar as PillarSlug, svc.catalogSlug);
+  const category = svc;
   const surrounding = rec.surrounding
     .filter((s0) => ALL_CITIES.some((x) => x.city_slug === s0.slug && x.state_slug === rec.state_slug))
     .slice(0, 5);
@@ -306,7 +306,7 @@ function StructuralCityService({ svc, st, rec }: {
 
   const faqs = [
     { q: `Do you serve ${rec.city} remotely?`, a: `Yes — ${svc.botName} runs inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro, on your local hours.` },
-    { q: `How fast can ${svc.name.toLowerCase()} go live in ${rec.city}?`, a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
+    { q: `How fast can ${svc.serviceName.toLowerCase()} go live in ${rec.city}?`, a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
     { q: `What does it cost?`, a: `A one-time build fee, then a monthly fee to run and tune — no per-seat pricing, no percentage of ad spend, no lock-in. The free plan comes back with numbers for your situation.` },
   ];
 
@@ -314,16 +314,16 @@ function StructuralCityService({ svc, st, rec }: {
     <>
       <JsonLd data={[
         serviceLd({
-          name: `${svc.name} in ${rec.city}, ${rec.state_abbr}`,
+          name: `${svc.serviceName} in ${rec.city}, ${rec.state_abbr}`,
           description: svc.intro,
-          path: `/local/${svc.slug}/${st.slug}/${rec.city_slug}`,
+          path: `/services/${svc.serviceSlug}/${st.slug}/${rec.city_slug}`,
           areaServed: `${rec.city}, ${rec.state}`,
         }),
         breadcrumbLd([
           { name: "Home", path: "/" },
-          { name: svc.name, path: `/local/${svc.slug}` },
-          { name: st.name, path: `/local/${svc.slug}/${st.slug}` },
-          { name: rec.city, path: `/local/${svc.slug}/${st.slug}/${rec.city_slug}` },
+          { name: svc.serviceName, path: `/services/${svc.serviceSlug}` },
+          { name: st.name, path: `/services/${svc.serviceSlug}/${st.slug}` },
+          { name: rec.city, path: `/services/${svc.serviceSlug}/${st.slug}/${rec.city_slug}` },
         ]),
         faqLd(faqs),
       ]} />
@@ -334,15 +334,15 @@ function StructuralCityService({ svc, st, rec }: {
           <Container className="pt-12 pb-16">
             <nav className="mb-10 flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--text-muted)]">
               <Link href="/" className="hover:text-[var(--foreground)]">Home</Link><span>/</span>
-              <Link href={`/local/${svc.slug}`} className="hover:text-[var(--foreground)]">{svc.name}</Link><span>/</span>
-              <Link href={`/local/${svc.slug}/${st.slug}`} className="hover:text-[var(--foreground)]">{st.name}</Link><span>/</span>
+              <Link href={`/services/${svc.serviceSlug}`} className="hover:text-[var(--foreground)]">{svc.serviceName}</Link><span>/</span>
+              <Link href={`/services/${svc.serviceSlug}/${st.slug}`} className="hover:text-[var(--foreground)]">{st.name}</Link><span>/</span>
               <span className="text-[var(--text-body)]">{rec.city}</span>
             </nav>
 
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">
-                  {svc.name} <span className="eyebrow-dim">· {rec.city}, {rec.state_abbr} · {rec.metro} metro</span>
+                  {svc.serviceName} <span className="eyebrow-dim">· {rec.city}, {rec.state_abbr} · {rec.metro} metro</span>
                 </p>
                 <h1 className="display-hero max-w-[24ch] text-balance">
                   {svc.headlinePattern.replace("{city}", rec.city).replace("{st}", rec.state_abbr)}
@@ -350,13 +350,13 @@ function StructuralCityService({ svc, st, rec }: {
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
                 <p className="body-lg mt-5 max-w-[54ch]">{svc.intro}</p>
                 <p className="body-base mt-4 max-w-[54ch]">
-                  <span className="font-semibold text-[var(--accent-text)]">{rvp(svc.slug, rec.city_slug)}</span>
+                  <span className="font-semibold text-[var(--accent-text)]">{rvp(svc, rec.city_slug)}</span>
                   {" — "}deployed remotely for {rec.city} businesses, wired into the tools you already use.
                 </p>
-                <div className="mt-8 flex flex-wrap gap-4">
+                <div className="mt-8 cta-row">
                   <PlanCta source={`local-${svc.slug}-${rec.city_slug}`} />
                   {category && (
-                    <Link href={`/${category.pillar}/${category.slug}`} className="btn btn-outline">
+                    <Link href={serviceHref(svc)} className="btn btn-outline">
                       How {svc.botName} works
                     </Link>
                   )}
@@ -396,8 +396,8 @@ function StructuralCityService({ svc, st, rec }: {
             heading={<>Same {rec.city} business. <span className="em-green">Different week.</span></>}
             botName={svc.botName}
             rows={category.contrast.map((c, i) => ({
-              label: `${svc.botName} · ${rec.city} · ${category.highlights[i]?.title ?? svc.name}`,
-              title: category.highlights[i]?.title ?? svc.name,
+              label: `${svc.botName} · ${rec.city} · ${category.highlights[i]?.title ?? svc.serviceName}`,
+              title: category.highlights[i]?.title ?? svc.serviceName,
               today: c.today,
               after: c.after,
             }))}
@@ -419,12 +419,12 @@ function StructuralCityService({ svc, st, rec }: {
               {surrounding.length > 0 && (
                 <div className="mt-7 flex flex-wrap gap-3">
                   {surrounding.map((n) => (
-                    <Link key={n.slug} href={`/local/${svc.slug}/${st.slug}/${n.slug}`}
+                    <Link key={n.slug} href={`/services/${svc.serviceSlug}/${st.slug}/${n.slug}`}
                       className="chip !py-2.5 !px-4 hover:border-ink-950 transition-colors">
-                      {svc.name} in {n.city}
+                      {svc.serviceName} in {n.city}
                     </Link>
                   ))}
-                  <Link href={`/local/${svc.slug}/${st.slug}`} className="chip chip-accent !py-2.5 !px-4">
+                  <Link href={`/services/${svc.serviceSlug}/${st.slug}`} className="chip chip-accent !py-2.5 !px-4">
                     All {st.name} markets →
                   </Link>
                 </div>
@@ -436,7 +436,7 @@ function StructuralCityService({ svc, st, rec }: {
         {/* ── Big-number stat split. ── */}
         <StatSplit
           eyebrow="The complete system"
-          heading={<>{svc.name} for {rec.city} — <span className="em-green">end to end.</span></>}
+          heading={<>{svc.serviceName} for {rec.city} — <span className="em-green">end to end.</span></>}
           body={`${category?.outcome ?? svc.hook} ${svc.botName} runs the whole loop for your ${rec.city} business — built, monitored and tuned continuously, inside the accounts you already own.`}
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
@@ -451,11 +451,11 @@ function StructuralCityService({ svc, st, rec }: {
         <Section variant="light" size="sm" eyebrow={`Also running in ${rec.city}`}
           heading={`Other bots ${rec.city} businesses deploy.`}>
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {LOCAL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
-              <Link key={o.slug} href={`/local/${o.slug}/${st.slug}/${rec.city_slug}`} className="group card-cell p-6">
+            {ALL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
+              <Link key={o.slug} href={`/services/${o.serviceSlug}/${st.slug}/${rec.city_slug}`} className="group card-cell p-6">
                 <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
-                  {o.name} in {rec.city}
+                  {o.serviceName} in {rec.city}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
                   Open
@@ -472,12 +472,12 @@ function StructuralCityService({ svc, st, rec }: {
           </p>
         </Section>
 
-        <Section variant="alt" eyebrow="Questions" heading={`${svc.name} in ${rec.city}, specifically.`}>
+        <Section variant="alt" eyebrow="Questions" heading={`${svc.serviceName} in ${rec.city}, specifically.`}>
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
         <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.name.replace(/^Agentic /, "")} tasks.</span></>}
+          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.serviceName.replace(/^Agentic /, "")} tasks.</span></>}
           sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
           source={`local-${svc.slug}-${rec.city_slug}-joinband`}
         />
