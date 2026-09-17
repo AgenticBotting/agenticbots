@@ -19,7 +19,7 @@ export default function TermsPage() {
         ]},
         { h: "What we publish here", p: [
           "Content on this site is provided for general information. Pricing shown is a starting point, not a quote, and does not constitute an offer. Scope and price for any engagement are set in a written agreement.",
-          "Case examples and metrics describe outcomes we have seen. They are not a prediction or guarantee of your results.",
+          "Metrics, charts and consoles on this site describe what a deployment is built to do and are labelled as targets or illustrations. They are not client results and not a prediction or guarantee of your results.",
         ]},
         { h: "Services", p: [
           "Work we perform is governed by a signed statement of work covering scope, fees, timelines, ownership and termination. Nothing on this page overrides it.",
