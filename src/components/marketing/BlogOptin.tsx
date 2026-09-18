@@ -2,13 +2,20 @@
 
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
-import { BotPattern } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 /**
- * Centered lead-gen block for the blog. Sits inline in the reading column
- * rather than in a sidebar, so it works at every width and reads as part
- * of the article instead of an ad rail.
+ * The fuller lead-gen ask on the blog — end of a post and foot of the index.
+ *
+ * Deliberately quiet: a light hairline card rather than the dark
+ * pattern-backed slab it used to be. The reading surface is white, so a
+ * black block with a bot field behind the headline competed with the
+ * article instead of closing it. What carries the block now is structure —
+ * one rule above the eyebrow, one bordered input group, and the only
+ * saturated thing on screen being the button.
+ *
+ * The fields sit in a single bordered group (stacked on mobile, side by
+ * side from sm) so the whole thing reads as one control, not a form.
  */
 export function BlogOptin({
   source = "blog",
@@ -43,50 +50,62 @@ export function BlogOptin({
   return (
     <aside
       className={cn(
-        "relative overflow-hidden bg-ink-950 on-dark px-7 py-10 sm:px-12 sm:py-14 text-center",
+        "border border-[var(--border)] bg-[var(--bg-alt)] px-6 py-12 sm:px-10 sm:py-14 text-center",
         className
       )}
     >
-      <BotPattern className="absolute inset-0 opacity-70" position="center" />
-
-      <div className="relative mx-auto max-w-[46ch]">
+      <div className="mx-auto max-w-[52ch]">
         {state === "done" ? (
           <>
-            <span className="mx-auto mb-5 flex h-11 w-11 items-center justify-center notch bg-signal-500 text-ink-950">
-              <Check className="w-5 h-5" strokeWidth={3} />
+            <span className="mx-auto mb-5 flex h-10 w-10 items-center justify-center notch bg-accent-500 text-ink-950">
+              <Check className="w-4.5 h-4.5" strokeWidth={3} />
             </span>
             <h3 role="status" className="display-lg">You&apos;re on the list.</h3>
-            <p className="body-base mt-3">
-              Your bot plan lands within one business day.
-            </p>
+            <p className="body-sm mt-2">Your bot plan lands within one business day.</p>
           </>
         ) : (
           <>
-            <p className="eyebrow">Free · one business day</p>
-            <h3 className="display-xl mt-4 text-balance">
-              Where is your business <span className="em-green">losing customers?</span>
+            {/* A short rule instead of a colored eyebrow: the label stays
+                metadata-quiet and the block still opens with a mark. */}
+            <span aria-hidden className="mx-auto mb-5 block h-px w-10 bg-[var(--border-strong)]" />
+            <p className="eyebrow eyebrow-dim">Free · one business day</p>
+
+            <h3 className="display-lg mt-3 text-balance">
+              Where is your business losing customers?
             </h3>
-            <p className="body-base mt-4">
+            <p className="body-sm mt-3 text-pretty">
               Tell us what you sell. We map every point between a lead arriving and a
               job closing where people drop out, and name the bots that fix it.
             </p>
 
-            <form onSubmit={onSubmit} className="mt-8 mx-auto max-w-[420px] space-y-3">
-              <input
-                className="field text-center" required placeholder="Your name" aria-label="Your name" autoComplete="name"
-                value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-              <input
-                className="field text-center" required type="email" placeholder="Work email" aria-label="Work email" autoComplete="email"
-                value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-              {state === "error" && <p role="alert" className="text-[13.5px] text-[var(--color-danger-dark)]">{error}</p>}
-              <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full">
+            <form onSubmit={onSubmit} className="mx-auto mt-7 max-w-[460px]">
+              <div className="flex flex-col border border-[var(--border-strong)] bg-[var(--background)] sm:flex-row focus-within:border-[var(--accent-text)]">
+                <input
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[14.5px] outline-none placeholder:text-[var(--text-muted)]"
+                  required placeholder="Your name" aria-label="Your name" autoComplete="name"
+                  value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+                {/* One hairline between the two fields — horizontal while
+                    stacked, vertical once they sit side by side. */}
+                <span aria-hidden className="h-px w-full bg-[var(--border)] sm:h-auto sm:w-px" />
+                <input
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[14.5px] outline-none placeholder:text-[var(--text-muted)]"
+                  required type="email" placeholder="Work email" aria-label="Work email" autoComplete="email"
+                  value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </div>
+
+              <button type="submit" disabled={state === "sending"} className="btn btn-primary mt-3 w-full">
                 {state === "sending"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
                   : <>Get my bot plan <ArrowRight className="w-4 h-4" /></>}
               </button>
+
+              {state === "error" && (
+                <p role="alert" className="mt-3 text-[13px] text-[var(--color-danger)]">{error}</p>
+              )}
             </form>
+
             <p className="body-xs mt-4">No spam. Unsubscribe any time.</p>
           </>
         )}
