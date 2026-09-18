@@ -562,6 +562,18 @@
     margin-inline: calc(50% - min(28rem, 50vw - 1.25rem));
     margin-block: 2.6rem;
   }
+  /* From lg the post is a three-column grid (TOC rail · article · optin
+     card), so the viewport-wide escape above reaches 896px into a 574px
+     column and slides under both rails. The sticky TOC is positioned, so
+     it paints over the panel and the two sets of text collide. Inside the
+     grid the breakout is the column itself — the rules still run edge to
+     edge of the measure, which is all the escape was ever for. */
+  @media (min-width: 1024px) {
+    .prose-wide {
+      width: 100%;
+      margin-inline: 0;
+    }
+  }
 }
 
 @layer utilities {
