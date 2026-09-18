@@ -18,13 +18,13 @@ export default function BlogIndexPage() {
       <main>
         {/* Centered masthead */}
         <section className="border-b border-[var(--border)]">
-          <Container className="py-16 sm:py-20">
+          <Container className="py-10 sm:py-14">
             <div className="mx-auto max-w-[52ch] text-center">
-              <p className="eyebrow mb-5">Writing</p>
+              <p className="eyebrow mb-4">Writing</p>
               <h1 className="display-hero text-balance">
                 No hype, <span className="em-green">no hedging.</span>
               </h1>
-              <p className="body-lg mt-6 text-pretty">
+              <p className="body-base mt-4 text-pretty">
                 What we have actually seen work across marketing and sales automation,
                 including the parts vendors leave out.
               </p>
@@ -33,7 +33,7 @@ export default function BlogIndexPage() {
                   reading. Same PostOptin bar the post pages already use,
                   one email field, posts to the same lead endpoint as
                   everything else. */}
-              <PostOptin source="blog-index-hero" variant="bar" className="mt-8" />
+              <PostOptin source="blog-index-hero" variant="bar" className="mt-6" />
             </div>
           </Container>
         </section>

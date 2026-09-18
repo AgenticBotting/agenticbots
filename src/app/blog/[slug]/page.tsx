@@ -105,7 +105,7 @@ export default async function PostPage({ params }: Params) {
       <main className="prose-surface">
         {/* Centered masthead */}
         <section className="border-b border-[var(--border)]">
-          <Container className="py-14 sm:py-16">
+          <Container className="py-10 sm:py-12">
             <div className="mx-auto max-w-[62ch] text-center">
               <Link
                 href="/blog"
@@ -124,10 +124,10 @@ export default async function PostPage({ params }: Params) {
                 </span>
               </div>
               <h1 className="display-hero text-balance">{post.title}</h1>
-              <p className="body-lg mt-6 text-pretty">{post.excerpt}</p>
+              <p className="body-base mt-4 text-pretty">{post.excerpt}</p>
 
               {/* Byline + share, then the inline email capture. */}
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-4">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-4">
                 <span className="flex items-center gap-2.5">
                   <span className="flex h-8 w-8 items-center justify-center bg-ink-950 notch">
                     <BotFace className="w-4 h-3.5 text-accent-500" />
@@ -138,7 +138,7 @@ export default async function PostPage({ params }: Params) {
                 <ShareRow url={postUrl} title={post.title} variant="compact" />
               </div>
 
-              <PostOptin source={`blog-hero-${post.slug}`} className="mt-8" />
+              <PostOptin source={`blog-hero-${post.slug}`} className="mt-6" />
             </div>
             {/* No cover here on purpose — it stays a browsing aid on the
                 archive (the lead card and grid thumbnails), where it
