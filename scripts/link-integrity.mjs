@@ -86,7 +86,30 @@ if (existsSync(SITEMAP_DIR)) {
   }
 }
 
-/* ── 3. internal hrefs ⊆ prerendered ── */
+/* ── 3. internal hrefs ⊆ routes that exist ── */
+/*
+ * "Exists" is not the same as "prerendered". Almost every page here is
+ * static, but the course portal, login and checkout are server-rendered
+ * per request because they read a session — they are real destinations
+ * with no .html on disk. Reading the route manifest keeps the gate
+ * honest about the difference instead of calling a working page broken.
+ *
+ * Dynamic segments become patterns, so /course/portal/[lesson] matches
+ * /course/portal/first-call without the gate needing to know the slugs.
+ */
+const dynamicPatterns = [];
+const MANIFEST = ".next/app-path-routes-manifest.json";
+if (existsSync(MANIFEST)) {
+  for (const route of Object.values(JSON.parse(readFileSync(MANIFEST, "utf8")))) {
+    if (typeof route !== "string" || !route.startsWith("/")) continue;
+    if (routes.has(route)) continue;
+    dynamicPatterns.push(
+      new RegExp("^" + route.replace(/\[\[?\.\.\.[^\]]+\]\]?/g, ".+").replace(/\[[^\]]+\]/g, "[^/]+") + "$")
+    );
+  }
+}
+const servedDynamically = (href) => dynamicPatterns.some((re) => re.test(href));
+
 /* Anchors only — <link> preloads and asset URLs are not page routes. */
 const ANCHOR = /<a\b[^>]*\shref="(\/[^"#?]*)"/g;
 const IGNORE = /^(\/_next\/|\/api\/|\/sitemap|\/robots|\/manifest)/;
@@ -97,7 +120,7 @@ for (const r of routes) {
   const html = readFileSync(file, "utf8");
   for (const m of html.matchAll(ANCHOR)) {
     const href = m[1].replace(/\/$/, "") || "/";
-    if (IGNORE.test(href) || routes.has(href)) continue;
+    if (IGNORE.test(href) || routes.has(href) || servedDynamically(href)) continue;
     if (!broken.has(href)) broken.set(href, new Set());
     broken.get(href).add(r);
   }
@@ -115,6 +138,6 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `link-integrity PASS: ${routes.size} prerendered routes — every enriched metro joins the dataset, ` +
-  `every sitemap URL resolves, every internal link resolves.`
+  `link-integrity PASS: ${routes.size} prerendered routes + ${dynamicPatterns.length} dynamic — ` +
+  `every enriched metro joins the dataset, every sitemap URL resolves, every internal link resolves.`
 );

@@ -2,6 +2,7 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 import type { MetadataRoute } from "next";
 import { CATALOG, ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
+import { ALL_LESSONS } from "@/lib/course";
 import { SORTED_POSTS } from "@/lib/posts";
 import { CITIES, STATES } from "@/lib/geo/data";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
@@ -106,6 +107,15 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
     { url: `${BASE}/about`, changeFrequency: "yearly", priority: 0.5 },
     { url: `${BASE}/contact`, changeFrequency: "yearly", priority: 0.6 },
     { url: `${BASE}/blog`, changeFrequency: "weekly", priority: 0.7 },
+    /* The course landing page and its free lessons. The portal, checkout
+       and login are noindex — they have nothing to rank for and would
+       outrank the page that actually sells it. */
+    { url: `${BASE}/course`, changeFrequency: "weekly", priority: 0.8 },
+    ...ALL_LESSONS.filter((l) => l.free).map((l) => ({
+      url: `${BASE}/course/${l.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/terms`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/site-map`, changeFrequency: "monthly", priority: 0.3 },
