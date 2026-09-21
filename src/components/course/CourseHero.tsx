@@ -37,65 +37,71 @@ export function CourseHero({
 }) {
   return (
     <section id="course-hero" className="border-b border-[var(--border)]">
-      <Container className="py-12 sm:py-16">
-        <div className="mx-auto max-w-[760px] text-center">
-          <p className="eyebrow">
-            Course · <span className="eyebrow-dim">{lessons} lessons · {hours} hours · ${price}</span>
-          </p>
-          <h1 className="display-hero mt-4 text-balance">
-            Fire the retainer. <span className="em-green">Run the ads from your terminal.</span>
-          </h1>
-          <p className="body-lg mt-5 mx-auto max-w-[60ch] text-pretty">
-            Watch the whole thing in three minutes: authenticate against the Google Ads API, build
-            a campaign from a file, and let Claude Code do the daily review an account manager
-            charges $1,500 a month for.
-          </p>
-        </div>
+      <Container className="py-10 sm:py-14">
+        {/* Split, not stacked. A centred hero with the video under the
+            copy pushes the buy button off the first screen on a laptop —
+            and a sales page whose CTA needs a scroll to find is one that
+            asks for commitment before it offers the option. */}
+        <div className="grid lg:grid-cols-[0.92fr_1.08fr] gap-8 lg:gap-12 items-center">
+          <div className="min-w-0">
+            <p className="eyebrow">
+              Course · <span className="eyebrow-dim">{lessons} lessons · {hours} hours · ${price}</span>
+            </p>
+            <h1 className="display-hero mt-3.5 max-w-[16ch] text-balance">
+              Fire the retainer. <span className="em-green">Run the ads from your terminal.</span>
+            </h1>
+            <p className="body-lg mt-4 max-w-[52ch] text-pretty">
+              Authenticate against the Google Ads API, build campaigns from a file, and let
+              Claude Code do the daily review an account manager charges $1,500 a month for.
+            </p>
 
-        {/* The video. Wider than the copy above it, so it reads as the
-            main event rather than an illustration of the headline. */}
-        <div className="mx-auto max-w-[980px] mt-8">
-          {src ? (
-            <div className="border border-[var(--border-strong)] bg-[var(--color-ink-950)] overflow-hidden">
-              <video
-                controls
-                preload="metadata"
-                poster={poster}
-                className="block w-full h-auto"
-                style={{ aspectRatio: "16 / 9" }}
-              >
-                <source src={src} />
-                Your browser cannot play this video.
-              </video>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link href="/course/checkout" className="btn btn-primary">
+                Get the course — ${price} <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/course/why-the-api" className="btn btn-outline">
+                Read lesson one free
+              </Link>
             </div>
-          ) : (
-            <VideoStandIn />
-          )}
-        </div>
 
-        {/* Buy, immediately under the video — the moment conviction is
-            highest is the moment the button has to be there. */}
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/course/checkout" className="btn btn-primary">
-            Get the course — ${price} <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link href="/course/why-the-api" className="btn btn-outline">
-            Read lesson one free
-          </Link>
-        </div>
+            <ul className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+              {[
+                "One payment, lifetime access",
+                "Node and Python",
+                "30-day refund",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-1.5 body-xs">
+                  <Check className="w-3.5 h-3.5 text-[var(--accent-text)]" strokeWidth={2.5} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          {[
-            "One payment, lifetime access",
-            "Node and Python",
-            "30-day refund, no forms",
-          ].map((item) => (
-            <li key={item} className="flex items-center gap-1.5 body-xs">
-              <Check className="w-3.5 h-3.5 text-[var(--accent-text)]" strokeWidth={2.5} />
-              {item}
-            </li>
-          ))}
-        </ul>
+          {/* The video sits beside the offer rather than beneath it, so
+              both are on the first screen. */}
+          <div className="min-w-0">
+            {src ? (
+              <div className="border border-[var(--border-strong)] bg-[var(--color-ink-950)] overflow-hidden">
+                <video
+                  controls
+                  preload="metadata"
+                  poster={poster}
+                  className="block w-full h-auto"
+                  style={{ aspectRatio: "16 / 9" }}
+                >
+                  <source src={src} />
+                  Your browser cannot play this video.
+                </video>
+              </div>
+            ) : (
+              <VideoStandIn />
+            )}
+            <p className="body-xs mt-2.5 text-center">
+              The three-minute tour — every module, start to finish.
+            </p>
+          </div>
+        </div>
       </Container>
     </section>
   );
@@ -122,8 +128,8 @@ function VideoStandIn() {
       </div>
 
       <div
-        className="grid sm:grid-cols-[auto_minmax(0,1fr)] gap-6 sm:gap-10 items-center px-5 sm:px-10 py-8 sm:py-12"
-        style={{ minHeight: "min(40vw, 330px)" }}
+        className="grid sm:grid-cols-[auto_minmax(0,1fr)] gap-5 sm:gap-8 items-center px-5 sm:px-8 py-7 sm:py-9"
+        style={{ minHeight: "min(34vw, 300px)" }}
       >
         <span className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center border border-[var(--color-ink-600)] mx-auto">
           <Play className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--color-accent-400)]" strokeWidth={1.5} />
