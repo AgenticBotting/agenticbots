@@ -7,10 +7,14 @@ import { ArrowRight } from "lucide-react";
 /**
  * The sticky buy bar.
  *
- * Appears once the hero's buy button has scrolled away and hides again
- * at the footer CTA, so there is never a moment mid-page where someone
- * has decided and has to hunt for the button — and never two buy buttons
- * on screen at once, which reads as desperate.
+ * Appears once the whole hero has scrolled away and hides again at the
+ * closing CTA, so there is never a moment mid-page where someone has
+ * decided and has to hunt for the button — and never two buy buttons on
+ * screen at once, which reads as desperate.
+ *
+ * The sentinel is the hero SECTION rather than its button: with the
+ * button sitting under a video it starts below the fold, and watching it
+ * would pop the bar up before anyone had scrolled at all.
  *
  * Uses an IntersectionObserver on the hero rather than a scroll listener:
  * no work on every frame, and it stays correct at any viewport height.
@@ -19,7 +23,7 @@ export function BuyBar({ price }: { price: string }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const hero = document.getElementById("buy-hero");
+    const hero = document.getElementById("course-hero");
     const closer = document.getElementById("buy-closer");
     if (!hero) return;
 

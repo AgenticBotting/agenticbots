@@ -6,6 +6,9 @@ import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, ButtonLink } from "@/components/ui";
 import { FaqAccordion } from "@/components/marketing";
 import { TerminalDemo } from "@/components/course/TerminalDemo";
+import { CourseHero } from "@/components/course/CourseHero";
+import { ZRow } from "@/components/course/ZRow";
+import { CostChart, ConfigScene, ReportScene, GuardrailScene, RepoScene } from "@/components/course/CourseArt";
 import { BuyBar } from "@/components/course/BuyBar";
 import { Prose } from "@/components/course/Prose";
 import { COURSE, MODULES, COURSE_STATS, FAQS } from "@/lib/course";
@@ -46,14 +49,6 @@ export const metadata: Metadata = {
 };
 
 const ASSET_ICON = { video: Play, repo: FileCode, template: FileText, checklist: ListChecks } as const;
-
-/** What the $49 replaces, at what those things actually cost. */
-const ALTERNATIVES = [
-  { label: "Agency retainer", price: "$1,500–3,000", unit: "/mo", note: "Reviewed monthly, if you are lucky" },
-  { label: "Freelance monthly audit", price: "$400–800", unit: "/mo", note: "A spreadsheet, once a month" },
-  { label: "Doing it yourself", price: "~5 hrs", unit: "/wk", note: "The review that never happens on a busy week" },
-  { label: "This course", price: `$${PRICE}`, unit: " once", note: "Yours, running daily, forever", highlight: true },
-];
 
 /** The offer, itemised. */
 const INCLUDED = [
@@ -96,100 +91,84 @@ export default function CoursePage() {
       <Header />
 
       <main>
-        {/* ── Hook ─────────────────────────────────────────────── */}
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-12 sm:py-16">
-            <div className="grid lg:grid-cols-[minmax(0,1fr)_470px] gap-10 lg:gap-14 items-center">
-              {/* min-w-0 on both: the terminal is a scroll container, and
-                  without it its content's min-content width sets the
-                  column and pushes the whole page sideways on a phone. */}
-              <Reveal className="min-w-0">
-                <p className="eyebrow">
-                  Course ·{" "}
-                  <span className="eyebrow-dim">
-                    {COURSE_STATS.lessons} lessons · {Math.round(COURSE_STATS.minutes / 60)} hours · ${PRICE}
-                  </span>
-                </p>
+        <CourseHero
+          price={PRICE}
+          lessons={COURSE_STATS.lessons}
+          hours={Math.round(COURSE_STATS.minutes / 60)}
+        />
 
-                <h1 className="display-hero mt-4 max-w-[17ch] text-balance">
-                  Fire the retainer. <span className="em-green">Run the ads from your terminal.</span>
-                </h1>
+        {/* ── The Z ───────────────────────────────────────────────
+            Four bands, each one a module's artefact and the argument
+            for it, sides alternating, every one ending in a link. */}
 
-                <p className="body-lg mt-5 max-w-[54ch] text-pretty">
-                  Authenticate against the Google Ads API, build campaigns from a file you can
-                  version control, and let Claude Code do the daily review an account manager
-                  charges $1,500 a month for — with guardrails that make it safe to leave running.
-                </p>
+        <ZRow
+          tint
+          eyebrow="The maths"
+          title={<>What this work costs you <span className="em-green">right now</span></>}
+          body="The daily review is the job, and it is the part everyone outsources. These are the going rates for having somebody else do it — and what it costs to own the thing that does it instead."
+          points={[
+            "Pays for itself the first time it catches a wasted search term",
+            "The session on this page found $63 of waste in one day",
+            "No retainer, no notice period, no monthly invoice",
+          ]}
+          art={<CostChart />}
+          cta={{ href: "/course/checkout", label: `Get it for $${PRICE}` }}
+        />
 
-                <ul className="mt-6 space-y-2">
-                  {[
-                    "Every script working, in Node and Python",
-                    "Two lessons free — read them before you decide",
-                    "30-day refund, no forms, no questions",
-                  ].map((item) => (
-                    <li key={item} className="flex gap-2.5 text-[15px] leading-snug">
-                      <Check className="w-4 h-4 mt-0.5 shrink-0 text-[var(--accent-text)]" strokeWidth={2.5} />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+        <ZRow
+          flip
+          eyebrow="Module 02"
+          title={<>Your account, as a file you can <span className="em-green">version control</span></>}
+          body="Describe the campaign once — budget, locations, ad groups, keywords, ads — and build it with one command. Change the file, run it again, and the account follows. Delete a keyword in a diff instead of hunting for it in the interface."
+          points={[
+            "Batched creates, with a validate-only run that spends nothing",
+            "Naming conventions that make the later automation possible",
+            "Rebuild the same structure across thirty accounts in a loop",
+          ]}
+          art={<ConfigScene />}
+          cta={{ href: "/course/developer-token", label: "Read a lesson free", quiet: true }}
+        />
 
-                <div id="buy-hero" className="mt-7 flex flex-wrap items-center gap-3">
-                  <ButtonLink href="/course/checkout" variant="primary">
-                    Get the course — ${PRICE} <ArrowRight className="w-4 h-4" />
-                  </ButtonLink>
-                  <Link href="/course/why-the-api" className="btn btn-outline">
-                    Read lesson one free
-                  </Link>
-                </div>
-                <p className="body-xs mt-3">One payment · lifetime access · updates included</p>
-              </Reveal>
+        <ZRow
+          tint
+          eyebrow="Module 03"
+          title={<>Yesterday, explained <span className="em-green">before you open the laptop</span></>}
+          body="Spend, calls, cost per call and what actually changed — written in plain English by Claude Code, not assembled by you from four dashboard tabs. It arrives at six in the morning whether you remember to ask for it or not."
+          points={[
+            "GAQL queries that return the numbers that mean something",
+            "Offline conversion imports, so it optimises to booked work",
+            "One email, no dashboard to log into",
+          ]}
+          art={<ReportScene />}
+          cta={{ href: "/course/checkout", label: `Get the course — $${PRICE}` }}
+        />
 
-              {/* Proof before the pitch: the thing you build, on the first
-                  screen, before anyone has been asked for money. */}
-              <Reveal delay={0.08} className="min-w-0">
-                <TerminalDemo />
-                <p className="body-xs mt-2.5 text-center">
-                  Output from the module 04 script. You build this in week one.
-                </p>
-              </Reveal>
-            </div>
-          </Container>
-        </section>
+        <ZRow
+          eyebrow="Module 04"
+          title={<>The daily review, done <span className="em-green">whether you do it or not</span></>}
+          body="Claude Code reads every search term from yesterday, tells you which ones are waste and why, and applies the negatives. Budget follows what converts. Ad variants test continuously. This is the retainer, replaced."
+          points={[
+            "Search-term review with the reasoning attached, every morning",
+            "Budget moved between campaigns inside limits you set",
+            "New ad variants tested against your current best",
+          ]}
+          art={<TerminalDemo />}
+          cta={{ href: "/course/checkout", label: `Get the course — $${PRICE}` }}
+        />
 
-        {/* ── Stakes ──────────────────────────────────────────── */}
-        <section className="border-b border-[var(--border)] bg-[var(--bg-alt)]">
-          <Container className="section-pad-sm">
-            <SectionHeader
-              eyebrow="The maths"
-              title="What this work costs you today"
-              copy="The daily review is the job. These are the going rates for having somebody else do it."
-            />
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)] border border-[var(--border)]">
-              {ALTERNATIVES.map((item) => (
-                <div
-                  key={item.label}
-                  className={
-                    item.highlight
-                      ? "bg-[var(--bg-tint)] p-5 border-l-2 border-l-[var(--color-accent-500)]"
-                      : "bg-[var(--background)] p-5"
-                  }
-                >
-                  <p className="eyebrow">{item.label}</p>
-                  <p className="mt-2.5 flex items-baseline gap-0.5">
-                    <span className="text-[26px] font-semibold tracking-[-0.04em] leading-none">{item.price}</span>
-                    <span className="body-sm">{item.unit}</span>
-                  </p>
-                  <p className="body-sm mt-2 text-pretty">{item.note}</p>
-                </div>
-              ))}
-            </div>
-            <p className="body-sm mt-4 max-w-[72ch]">
-              It pays for itself the first time it catches a wasted search term. The session above
-              found $63 of waste in one day, on one account.
-            </p>
-          </Container>
-        </section>
+        <ZRow
+          flip
+          eyebrow="Module 05"
+          title={<>Guardrails, so you can actually <span className="em-green">leave it running</span></>}
+          body="Limits live in your code, not in a prompt — that distinction is the whole difference between automation you trust and automation you babysit. Safe changes apply themselves; anything expensive queues for a thirty-second review."
+          points={[
+            "Hard caps an agent cannot cross, whatever it decides",
+            "An approval queue for the changes that should need a human",
+            "Every action logged with its reasoning, reviewable later",
+          ]}
+          art={<GuardrailScene />}
+          cta={{ href: "/course/checkout", label: "Start building today" }}
+        />
 
         {/* ── Outcome ─────────────────────────────────────────── */}
         <section className="border-b border-[var(--border)]">
@@ -327,6 +306,9 @@ export default function CoursePage() {
             <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 lg:gap-14 items-start">
               <div>
                 <SectionHeader eyebrow="Everything included" title={`What $${PRICE} buys`} align="left" />
+                <div className="mt-6">
+                  <RepoScene />
+                </div>
                 <ul className="mt-6 divide-y divide-[var(--border)] border-y border-[var(--border)]">
                   {INCLUDED.map((item) => (
                     <li key={item.thing} className="flex gap-3 py-3.5">
