@@ -1,7 +1,7 @@
 import { requirePortalPage } from "@/server/auth/guard";
 import { can } from "@/server/auth/policy";
 import { portalData } from "@/server/views/portal";
-import { ApprovalCard, SectionHead } from "@/components/platform/portal";
+import { ApprovalList, SectionHead } from "@/components/platform/portal";
 
 export const metadata = { title: "Approvals" };
 
@@ -18,12 +18,12 @@ export default async function ApprovalsPage() {
       <section className="pf-section">
         <SectionHead title={pending.length ? `Waiting for you (${pending.length})` : "Nothing waiting for you"} />
         {pending.length === 0 && <p className="pf-muted">When a Bot prepares something that leaves your business — an email, a post, an ad change — it will wait here for you.</p>}
-        {pending.map((a) => <ApprovalCard key={a.id} a={a} readOnly={preview} canDecide={canDecide} />)}
+        {pending.length > 0 && <ApprovalList items={pending} readOnly={preview} canDecide={canDecide} />}
       </section>
       {past.length > 0 && (
         <section className="pf-section">
           <SectionHead title="Decided" />
-          {past.map((a) => <ApprovalCard key={a.id} a={a} readOnly canDecide={false} />)}
+          <ApprovalList items={past} readOnly canDecide={false} />
         </section>
       )}
     </>

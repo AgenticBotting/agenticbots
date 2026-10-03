@@ -177,6 +177,39 @@ export async function seedDemo(r: Repository): Promise<void> {
     [24, 1, b.seo, "SEO Bot found 9 content opportunities.", [["seo_opportunities_found", 9]]],
     [27, 3, b.reactivation, "Reactivation Bot identified 31 past customers due for inspections.", [["customers_identified", 31]]],
   ];
+  // Steady day-to-day history since onboarding (~8 weeks ago), so charts have
+  // a real shape: weekday rhythm, a ramp-up while Bots were tuned, and noise.
+  // Deterministic, so every demo reset looks the same.
+  let seed = 0x5eed;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 2 ** 32;
+  };
+  const taken = new Set(acts.map(([d, , bot]) => `${bot?.id}:${d}`));
+  // Spread the hand-written headline days out a little less spikily.
+  for (const a of acts) if (a[4]) a[4] = a[4].map(([k, v]) => [k, Math.max(1, Math.round(v * 0.6))] as [ResultMetric, number]);
+  const cadence: [Bot, number, string, (n: number) => string, [ResultMetric, number][]][] = [
+    [b.prospecting, 0.9, "prospecting", (n) => `Prospecting Bot researched ${n} companies.`, [["prospects_researched", 1], ["qualified_opportunities", 0.28]]],
+    [b.seo, 0.7, "seo", (n) => `SEO Bot found ${n} local-search opportunities.`, [["seo_opportunities_found", 1]]],
+    [b.reviews, 0.75, "reviews", (n) => `Reviews Bot prepared ${n} review requests.`, [["reviews_requested", 1]]],
+    [b.outbound, 0.8, "outbound", (n) => `Outbound Bot prepared ${n} follow-ups.`, [["followups_prepared", 1]]],
+    [b.crm, 0.85, "crm", (n) => `CRM Bot updated ${n} opportunity records.`, [["crm_records_updated", 1]]],
+    [b.ads, 0.6, "ads", (n) => `Ads Bot flagged ${n} search terms wasting budget.`, [["ad_issues_detected", 1]]],
+    [b.reactivation, 0.4, "reactivation", (n) => `Reactivation Bot identified ${n} past customers for follow-up.`, [["customers_identified", 1]]],
+  ];
+  const base: Record<string, number> = { prospecting: 9, seo: 3, reviews: 4, outbound: 4, crm: 5, ads: 2, reactivation: 6 };
+  for (let d = 1; d <= 56; d++) {
+    const weekday = new Date(Date.now() - d * DAY).getUTCDay();
+    const weekend = weekday === 0 || weekday === 6;
+    const ramp = Math.min(1, 0.6 + ((56 - d) / 56) * 0.55);
+    for (const [bot, p, key, text, metrics] of cadence) {
+      if (taken.has(`${bot.id}:${d}`)) continue;
+      if (rand() > p * (weekend ? 0.3 : 1)) continue;
+      const n = Math.max(1, Math.round(base[key] * ramp * (0.75 + rand() * 0.5)));
+      acts.push([d, 1 + Math.floor(rand() * 9), bot, text(n), metrics.map(([k, f]) => [k, Math.max(f === 1 ? 1 : 0, Math.round(n * f))] as [ResultMetric, number]).filter(([, v]) => v > 0)]);
+    }
+    if (weekday === 1) acts.push([d, 2, b.analytics, "Analytics Bot delivered the weekly channel summary."]);
+  }
   for (const [d, h, bot, text, metrics] of acts) {
     tx.insert("activity_events", {
       orgId: acme.id, at: ago(d, h), botId: bot?.id, text, visibility: "client", demo: true,
@@ -258,6 +291,22 @@ export async function seedDemo(r: Repository): Promise<void> {
       orgId: bot.orgId, botId: bot.id, kind: "deliverable", category, title, explanation, expectedImpact: impact, risk: category === "ad_change" ? "medium" : "low",
       preview, status: "pending", audience: "client", requestedAt: ago(0, hoursAgo), expiresAt: new Date(Date.now() + 5 * DAY).toISOString(), requestId, createdAt: ago(0, hoursAgo),
     });
+  // Decided in the last few weeks (history for reports).
+  const decided: [Bot, "external_send" | "publish" | "ad_change" | "crm_update", string, number, number, "approved" | "denied"][] = [
+    [b.ads, "ad_change", "Add 4 negative keywords to the Residential campaign", 18, 3.5, "approved"],
+    [b.outbound, "external_send", "Send 9 follow-ups for September estimates", 14, 1.2, "approved"],
+    [b.reviews, "external_send", "Send 11 review requests", 9, 6, "approved"],
+    [b.content, "publish", "Publish the 'Hurricane season roof check' post", 7, 20, "denied"],
+    [b.crm, "crm_update", "Close 6 stale opportunities as lost", 4, 2.4, "approved"],
+  ];
+  for (const [bot, category, title, daysAgo, waitH, status] of decided) {
+    const at = ago(daysAgo);
+    tx.insert("approvals", {
+      orgId: bot.orgId, botId: bot.id, kind: "deliverable", category, title, explanation: title, expectedImpact: title, risk: "low",
+      status, audience: "client", requestedAt: at, resolvedAt: new Date(Date.parse(at) + waitH * 3_600_000).toISOString(),
+      resolvedBy: owner.id, createdAt: at,
+    });
+  }
   mkApproval(b.outbound, "external_send", "Send 12 follow-up emails for open estimates",
     "Outbound Bot drafted short follow-ups for estimates sent 2–6 weeks ago that have no reply.",
     "12 emails will be sent from your Gmail over the next two business days. Replies are routed to you.",

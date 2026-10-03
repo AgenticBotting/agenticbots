@@ -78,3 +78,10 @@ export function titleCase(s: string): string {
 export function shortId(id: string | undefined): string {
   return id ? id.slice(0, 8) : "—";
 }
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** "2026-09-14" → "Sep 14". Formatted by hand so server and browser render the same text. */
+export function shortDate(iso: string): string {
+  const [, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return `${MONTHS[(m || 1) - 1]} ${d}`;
+}

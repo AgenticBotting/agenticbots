@@ -241,6 +241,173 @@ a.pf-stat:hover { background: var(--bg-alt); }
 .pf-approval .preview { white-space: pre-wrap; background: var(--bg-alt); border-left: 3px solid var(--color-accent-500); padding: 12px 14px; font-size: 14px; color: var(--text-body); }
 .pf-approval-actions { display: flex; gap: 10px; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-alt); flex-wrap: wrap; }
 
+/* ══════════════════ Portal dashboard: charts, decisions, Bots ══════════════════
+   Charts draw in the accent ramp only: a pastel 50–200 wash under a 600
+   line, the prior period as a quiet ink-300 reference. Text stays in ink. */
+.pf-dash-head { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: space-between; }
+.pf-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; margin-left: 10px; vertical-align: 2px; font-size: 12px; font-weight: 700; background: var(--color-accent-500); color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.pf-empty { border: 1px dashed var(--border-strong); padding: 18px 20px; color: var(--text-secondary); font-size: 14px; }
+.pf-note { margin-top: 10px; font-size: 12.5px; color: var(--text-muted); }
+.pf-card { border: 1px solid var(--border); padding: 18px 20px 20px; background: #fff; }
+.pf-card .pf-section-head { margin-bottom: 14px; }
+.pf-dash-split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 0 32px; align-items: start; }
+.pf-dash-split.even { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+@media (max-width: 960px) { .pf-dash-split, .pf-dash-split.even { grid-template-columns: 1fr; } }
+
+/* Metric explorer — the tabs ARE the KPI row. */
+.pf-explorer { border: 1px solid var(--border); background: #fff; }
+.pf-explorer-empty { padding: 28px 24px; color: var(--text-secondary); }
+.pf-explorer-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-bottom: 1px solid var(--border); background: var(--bg-alt); }
+.pf-explorer-tab {
+  position: relative; display: grid; gap: 4px; align-content: start; text-align: left; padding: 16px 18px 14px;
+  background: transparent; border: 0; border-right: 1px solid var(--border); cursor: pointer; color: var(--text-secondary);
+  transition: background-color 120ms ease;
+}
+.pf-explorer-tab:last-child { border-right: 0; }
+.pf-explorer-tab:hover { background: #fff; }
+.pf-explorer-tab[aria-selected="true"] { background: #fff; color: var(--foreground); }
+.pf-explorer-tab[aria-selected="true"]::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 3px; background: var(--color-accent-500); }
+.pf-explorer-tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: #fff; }
+.pf-explorer-tab:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -2px; }
+.pf-explorer-tab .l { font-size: 12.5px; font-weight: 500; line-height: 1.3; }
+.pf-explorer-tab .v { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -0.04em; line-height: 1.05; color: var(--foreground); }
+.pf-explorer-tab .d { font-size: 12px; color: var(--text-muted); }
+.pf-explorer-tab .d.up { color: var(--accent-text); font-weight: 600; }
+.pf-explorer-tab .d.up::before { content: "▲ "; font-size: 9px; }
+.pf-explorer-tab .d.down::before { content: "▼ "; font-size: 9px; }
+.pf-explorer-panel { padding: 18px 20px 14px; }
+.pf-explorer-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; margin-bottom: 6px; }
+.pf-explorer-meta h3 { font-size: 15px; letter-spacing: -0.015em; color: var(--foreground); }
+.pf-legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--text-secondary); }
+.pf-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.pf-legend .key, .pf-tooltip .key { display: inline-block; width: 14px; height: 2px; background: var(--color-accent-600); border-radius: 1px; }
+.pf-legend .key.prev, .pf-tooltip .key.prev { background: var(--color-ink-300); }
+.pf-explorer-tab.more { cursor: pointer; }
+.pf-explorer-tab.more.on { background: #fff; color: var(--foreground); }
+.pf-explorer-tab.more.on::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 3px; background: var(--color-accent-500); }
+.pf-explorer-tab .v.muted { color: var(--text-muted); }
+.pf-explorer-tab.more select { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.pf-explorer-tab.more:focus-within { outline: 2px solid var(--accent-text); outline-offset: -2px; }
+.pf-explorer-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+.pf-seg { display: inline-flex; border: 1px solid var(--border-strong); }
+.pf-seg button { padding: 4px 10px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); background: #fff; border: 0; cursor: pointer; }
+.pf-seg button + button { border-left: 1px solid var(--border-strong); }
+.pf-seg button[aria-pressed="true"] { background: var(--color-accent-50); color: var(--foreground); }
+.pf-seg button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -2px; }
+.pf-table-toggle { margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--accent-text); background: none; border: 0; padding: 4px 0; cursor: pointer; }
+.pf-table-toggle:hover { text-decoration: underline; }
+
+/* Area chart */
+.pf-chart { position: relative; width: 100%; outline: none; }
+.pf-chart:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 4px; }
+.pf-chart svg { display: block; overflow: visible; }
+.pf-chart .pf-grid { stroke: var(--color-ink-100); stroke-width: 1; }
+.pf-chart .pf-axis { stroke: var(--border-strong); stroke-width: 1; }
+.pf-chart .pf-tick { font-size: 11.5px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+.pf-chart .pf-line { fill: none; stroke: var(--color-accent-600); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.pf-chart .pf-line-prev { fill: none; stroke: var(--color-ink-300); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.pf-chart .pf-dot { fill: var(--color-accent-600); stroke: #fff; stroke-width: 2; }
+.pf-chart .pf-dot-prev { fill: var(--color-ink-300); stroke: #fff; stroke-width: 2; }
+.pf-chart .pf-crosshair { stroke: var(--color-ink-450); stroke-width: 1; }
+.pf-chart .pf-chart-reveal { transform-origin: left; animation: pf-reveal 900ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes pf-reveal { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .pf-chart .pf-chart-reveal { animation: none; } }
+.pf-tooltip {
+  position: absolute; pointer-events: none; z-index: 5; min-width: 168px; padding: 9px 12px; background: #fff;
+  border: 1px solid var(--border-strong); box-shadow: 0 6px 18px rgba(8, 10, 8, 0.08); font-size: 12.5px; color: var(--text-secondary);
+}
+.pf-tooltip .d { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
+.pf-tooltip .row { display: flex; align-items: center; gap: 8px; }
+.pf-tooltip .row b { font-size: 15px; color: var(--foreground); font-variant-numeric: tabular-nums; }
+.pf-tooltip .row.muted b { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+
+/* Column chart (weekly) */
+.pf-columns { display: flex; align-items: stretch; gap: 6px; padding-top: 18px; }
+.pf-columns .col { flex: 1; display: grid; grid-template-rows: 1fr auto; gap: 6px; min-width: 0; outline: none; cursor: default; }
+.pf-columns .slot { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-bottom: 1px solid var(--border-strong); }
+.pf-columns .bar { display: block; width: 100%; max-width: 24px; min-height: 2px; background: var(--color-accent-200); border-radius: 4px 4px 0 0; transition: background-color 120ms ease; }
+.pf-columns .col.current .bar { background: var(--color-accent-500); }
+.pf-columns .col.on .bar, .pf-columns .col:focus-visible .bar { background: var(--color-accent-400); }
+.pf-columns .col:focus-visible .x { color: var(--foreground); font-weight: 600; }
+.pf-columns .cap { font-size: 12px; font-weight: 600; color: var(--foreground); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.pf-columns .x { font-size: 11px; color: var(--text-muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+
+/* Work by Bot */
+.pf-barlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.pf-barlist li { display: grid; grid-template-columns: auto minmax(120px, 1.1fr) minmax(60px, 1fr) auto; gap: 12px; align-items: center; }
+.pf-barlist .n { font-size: 14px; font-weight: 600; color: var(--foreground); line-height: 1.25; }
+.pf-barlist .m { font-size: 12.5px; color: var(--text-muted); }
+.pf-barlist .track { height: 10px; background: var(--color-ink-50); }
+.pf-barlist .track span { display: block; height: 100%; background: var(--color-accent-300); border-radius: 0 4px 4px 0; }
+.pf-barlist .val { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; text-align: right; }
+.pf-barlist .val b { font-size: 14px; color: var(--foreground); font-variant-numeric: tabular-nums; }
+
+/* KPI tiles + meters (reports) */
+.pf-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.pf-kpi { background: #fff; padding: 18px 18px 16px; display: grid; gap: 6px; align-content: start; }
+.pf-kpi .l { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
+.pf-kpi .v { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -0.04em; line-height: 1.05; color: var(--foreground); }
+.pf-kpi .s { font-size: 12.5px; color: var(--text-muted); line-height: 1.4; }
+.pf-meter { height: 6px; background: var(--color-accent-50); margin: 4px 0 2px; }
+.pf-meter span { display: block; height: 100%; background: var(--color-accent-500); }
+.pf-change.up { color: var(--accent-text); font-weight: 600; }
+.pf-change.down { color: var(--text-secondary); }
+
+/* Range control */
+.pf-range { display: inline-flex; border: 1px solid var(--border-strong); background: #fff; }
+.pf-range a { padding: 8px 14px; font-size: 13.5px; font-weight: 600; color: var(--text-secondary); border-right: 1px solid var(--border-strong); }
+.pf-range a:last-child { border-right: 0; }
+.pf-range a:hover { color: var(--foreground); background: var(--bg-alt); }
+.pf-range a[aria-current="page"] { background: var(--header-bg); color: #fff; }
+
+/* Decision queue */
+.pf-ap-list { border: 1px solid var(--border); background: #fff; container-type: inline-size; }
+.pf-ap { display: grid; grid-template-columns: minmax(0, 1fr); border-bottom: 1px solid var(--border); }
+.pf-ap:last-child { border-bottom: 0; }
+.pf-ap-main { padding: 16px 18px; display: grid; gap: 9px; min-width: 0; }
+.pf-ap-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.pf-ap h3 { font-size: 15.5px; letter-spacing: -0.015em; line-height: 1.3; color: var(--foreground); }
+.pf-ap-meta { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 3px; font-size: 12.5px; color: var(--text-muted); }
+.pf-ap-meta span:first-child { color: var(--text-secondary); font-weight: 500; }
+.pf-ap-why { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.pf-ap-impact { display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: 13.5px; color: var(--text-body); padding: 8px 10px; background: var(--color-accent-50); border-left: 2px solid var(--color-accent-500); }
+.pf-ap-impact .k { font-weight: 600; color: var(--foreground); white-space: nowrap; }
+.pf-ap-preview summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent-text); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.pf-ap-preview summary::-webkit-details-marker { display: none; }
+.pf-ap-preview summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform 120ms ease; }
+.pf-ap-preview[open] summary::before { transform: rotate(45deg); }
+.pf-ap-preview .body { margin-top: 8px; white-space: pre-wrap; background: var(--bg-alt); border: 1px solid var(--border); padding: 12px 14px; font-size: 13.5px; color: var(--text-body); }
+.pf-ap-actions { display: flex; gap: 8px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--bg-alt); }
+.pf-ap-actions form { flex: 1 1 0; }
+.pf-ap.decided .pf-ap-actions { background: #fff; }
+.pf-ap.decided .pf-ap-main { padding-block: 12px; }
+@container (min-width: 620px) {
+  .pf-ap { grid-template-columns: minmax(0, 1fr) 168px; }
+  .pf-ap-actions { flex-direction: column; align-items: stretch; justify-content: center; border-top: 0; border-left: 1px solid var(--border); padding: 16px; }
+  .pf-ap-actions form { flex: none; }
+}
+
+/* Bot tiles: name, status, one number, one trend */
+/* Hairlines drawn by each tile's own ring, so an unfilled last row stays white. */
+.pf-bot-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(206px, 1fr)); gap: 1px; padding: 1px; background: #fff; }
+.pf-bot-tile { box-shadow: 0 0 0 1px var(--border); background: #fff; padding: 14px 16px 12px; display: grid; gap: 10px; align-content: start; }
+.pf-bot-tile .top { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
+.pf-bot-tile .top .pf-index, .pf-bot-tile .top > span:first-child { grid-row: 1 / span 2; }
+.pf-bot-tile .name { font-size: 14px; font-weight: 600; color: var(--foreground); line-height: 1.2; }
+.pf-bot-tile .pf-status { font-size: 12px; }
+.pf-bot-tile .fig { display: grid; gap: 1px; }
+.pf-bot-tile .fig .v { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: var(--foreground); }
+.pf-bot-tile .fig .l { font-size: 12.5px; color: var(--text-muted); }
+.pf-bot-tile .foot { font-size: 12px; color: var(--text-muted); }
+.pf-spark { display: block; }
+.pf-spark .wash { fill: var(--color-accent-100); opacity: 0.8; }
+.pf-spark .ln { fill: none; stroke: var(--color-accent-600); stroke-width: 1.5; stroke-linejoin: round; }
+.pf-spark .flat { stroke: var(--color-ink-200); stroke-width: 1.5; }
+
+.pf-feed.compact li { padding: 10px 0; gap: 12px; }
+.pf-feed.compact .t { font-size: 13.5px; line-height: 1.4; }
+.pf-feed.compact time { font-size: 12px; }
+
 .pf-ask { border: 1px solid var(--foreground); padding: 20px; display: grid; gap: 12px; background: #fff; }
 .pf-ask textarea.field { min-height: 92px; font-size: 15px; }
 
@@ -254,6 +421,12 @@ a.pf-stat:hover { background: var(--bg-alt); }
   .pf-result .l { font-size: 13px; }
   .pf-feed li { grid-template-columns: auto 1fr; }
   .pf-feed time { grid-column: 2; }
+  .pf-explorer-tabs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(150px, 46%); overflow-x: auto; scroll-snap-type: x mandatory; }
+  .pf-explorer-tab { scroll-snap-align: start; }
+  .pf-explorer-tab .v { font-size: 26px; }
+  .pf-explorer-panel { padding: 14px 12px 10px; }
+  .pf-barlist li { grid-template-columns: auto 1fr auto; }
+  .pf-barlist .track { grid-column: 2 / -1; }
   .pf-mobile-tabs {
     display: grid; grid-template-columns: repeat(6, 1fr); position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
     background: var(--header-bg); border-top: 1px solid var(--header-line); padding-bottom: env(safe-area-inset-bottom);
