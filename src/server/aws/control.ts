@@ -187,6 +187,25 @@ export function awsControl(): AwsControl {
   return cached;
 }
 
+/** Poll an SSM lifecycle command until it finishes (or the budget runs out). */
+export async function waitForCommand(
+  aws: AwsControl,
+  cmd: CommandResult,
+  instanceId: string,
+  budgetMs = 240_000,
+  pollMs = 5_000,
+): Promise<CommandResult> {
+  if (cmd.status !== "pending" && cmd.status !== "in_progress") return cmd;
+  const deadline = Date.now() + budgetMs;
+  let last = cmd;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, pollMs));
+    last = await aws.getCommand(cmd.commandId, instanceId);
+    if (last.status !== "pending" && last.status !== "in_progress") return last;
+  }
+  return last;
+}
+
 /** Infra mutation guard used by the provisioning CLI. */
 export function assertCloudChangesAllowed(what: string): void {
   if (!cloudChangesAllowed()) {

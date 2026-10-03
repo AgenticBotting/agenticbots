@@ -3,6 +3,10 @@
 Read top to bottom once. Each part says **what**, **where**, and **how to
 check it worked**. You do not need Stripe or any card processor.
 
+> **Doing the first AWS staging test?** Follow
+> [runbooks/FIRST_STAGING_TEST.md](runbooks/FIRST_STAGING_TEST.md) instead —
+> it is the staging-specific, step-by-step version of Parts 1–6.
+
 ---
 
 ## Part 0 — Try it first (no accounts needed)
@@ -161,7 +165,7 @@ dashboard; Vercel → Logs show `/api/internal/sync` returning 200 each minute.
 4. Put them in your shell when provisioning (never in Vercel):
    `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`.
 
-The CLI creates, per client: a tunnel, `<tenant>.runtime.agenticbots.dev`,
+The CLI creates, per client: a tunnel, `<tenant>.<RUNTIME_DOMAIN>`,
 and an Access application that only accepts AgenticBots' service token.
 
 ---

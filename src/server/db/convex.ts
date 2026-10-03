@@ -4,6 +4,7 @@ import { anyApi } from "convex/server";
 import type { TableName, Tables } from "@/lib/platform/types";
 import { assertOpAllowed, matches, sortRows, type ListQuery, type Op, type Repository } from "./repository";
 import { conflict, unavailable } from "@/server/errors";
+import { platformMode } from "@/server/env";
 
 /**
  * Production store: the Convex deployment the site already uses.
@@ -16,6 +17,11 @@ export class ConvexRepository implements Repository {
 
   constructor(url = process.env.CONVEX_URL ?? process.env.NEXT_PUBLIC_CONVEX_URL, secret = process.env.PLATFORM_SERVER_SECRET) {
     if (!url) throw unavailable("Platform database is not configured (CONVEX_URL).");
+    // Staging must name its own database explicitly — never inherit the
+    // public (production) Convex URL by accident.
+    if (platformMode() === "staging" && !process.env.CONVEX_URL) {
+      throw unavailable("Staging requires CONVEX_URL set to the staging Convex deployment.");
+    }
     if (!secret || secret.length < 32) throw unavailable("Platform database secret is not configured.");
     this.client = new ConvexHttpClient(url);
     this.secret = secret;

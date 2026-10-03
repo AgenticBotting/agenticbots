@@ -7,8 +7,11 @@
 # suspension, upgrades and instance replacement.
 
 locals {
-  name          = "agenticbots-${var.tenant_id}"
-  secret_prefix = "agenticbots/${var.environment}/tenants/${var.tenant_id}"
+  # Staging secrets are deleted immediately so a test client can be
+  # re-created under the same id; production keeps the 30-day safety net.
+  secret_recovery_days = var.environment == "staging" ? 0 : 30
+  name                 = "agenticbots-${var.tenant_id}"
+  secret_prefix        = "agenticbots/${var.environment}/tenants/${var.tenant_id}"
   tags = merge(var.tags, {
     "agenticbots:managed" = "true"
     "agenticbots:tenant"  = var.tenant_id
@@ -24,10 +27,39 @@ data "aws_ssm_parameter" "al2023" {
 }
 
 # ───────────── KMS: one key per tenant (EBS + secrets) ─────────────
+data "aws_iam_policy_document" "kms" {
+  statement {
+    sid       = "AccountAdministersKeyViaIam"
+    actions   = ["kms:*"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+  # CloudWatch Logs can only encrypt a log group with a key whose POLICY
+  # (not IAM) allows it — scoped to this tenant's log group.
+  statement {
+    sid       = "CloudWatchLogsForThisTenant"
+    actions   = ["kms:Encrypt*", "kms:Decrypt*", "kms:ReEncrypt*", "kms:GenerateDataKey*", "kms:Describe*"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/agenticbots/${var.environment}/${var.tenant_id}"]
+    }
+  }
+}
+
 resource "aws_kms_key" "tenant" {
   description             = "${local.name} data + secrets"
   enable_key_rotation     = true
   deletion_window_in_days = 30
+  policy                  = data.aws_iam_policy_document.kms.json
   tags                    = local.tags
 }
 
@@ -38,25 +70,28 @@ resource "aws_kms_alias" "tenant" {
 
 # ───────────── Secrets Manager: paths only; values are set by the CLI / instance ─────────────
 resource "aws_secretsmanager_secret" "runtime" {
-  name        = "${local.secret_prefix}/runtime"
-  description = "Runtime endpoint + private connectivity credentials for ${var.tenant_id}"
-  kms_key_id  = aws_kms_key.tenant.arn
-  tags        = local.tags
+  name                    = "${local.secret_prefix}/runtime"
+  description             = "Runtime endpoint + private connectivity credentials for ${var.tenant_id}"
+  kms_key_id              = aws_kms_key.tenant.arn
+  recovery_window_in_days = local.secret_recovery_days
+  tags                    = local.tags
 }
 
 resource "aws_secretsmanager_secret" "profile" {
-  for_each    = toset(var.bot_profiles)
-  name        = "${local.secret_prefix}/profiles/${each.key}"
-  description = "Runtime API key for the ${each.key} Bot of ${var.tenant_id}. Unique per profile; never reused."
-  kms_key_id  = aws_kms_key.tenant.arn
-  tags        = merge(local.tags, { "agenticbots:profile" = each.key })
+  for_each                = toset(var.bot_profiles)
+  name                    = "${local.secret_prefix}/profiles/${each.key}"
+  description             = "Runtime API key for the ${each.key} Bot of ${var.tenant_id}. Unique per profile; never reused."
+  kms_key_id              = aws_kms_key.tenant.arn
+  recovery_window_in_days = local.secret_recovery_days
+  tags                    = merge(local.tags, { "agenticbots:profile" = each.key })
 }
 
 resource "aws_secretsmanager_secret" "provider" {
-  name        = "${local.secret_prefix}/providers"
-  description = "Model provider keys for ${var.tenant_id}"
-  kms_key_id  = aws_kms_key.tenant.arn
-  tags        = local.tags
+  name                    = "${local.secret_prefix}/providers"
+  description             = "Model provider keys for ${var.tenant_id}"
+  kms_key_id              = aws_kms_key.tenant.arn
+  recovery_window_in_days = local.secret_recovery_days
+  tags                    = local.tags
 }
 
 # ───────────── IAM: the instance may read/write ONLY its own tenant's secrets ─────────────
@@ -90,21 +125,44 @@ data "aws_iam_policy_document" "tenant" {
   statement {
     sid       = "OwnTenantSecretsOnly"
     actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.secret_prefix}/*"]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.secret_prefix}/*"]
   }
   statement {
     sid       = "OwnKmsKey"
     actions   = ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey*", "kms:DescribeKey"]
     resources = [aws_kms_key.tenant.arn]
   }
+  # Manual backups (lifecycle.sh backup-now). CreateSnapshot is authorized
+  # against the source volume (existing tags) AND the new snapshot (tags in
+  # the request), so each side gets its own condition.
   statement {
-    sid       = "ManualSnapshotOwnVolume"
-    actions   = ["ec2:CreateSnapshot", "ec2:CreateTags"]
-    resources = ["*"]
+    sid       = "SnapshotOwnVolume"
+    actions   = ["ec2:CreateSnapshot"]
+    resources = ["arn:aws:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:volume/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/agenticbots:tenant"
       values   = [var.tenant_id]
+    }
+  }
+  statement {
+    sid       = "CreateTaggedSnapshot"
+    actions   = ["ec2:CreateSnapshot"]
+    resources = ["arn:aws:ec2:${data.aws_region.current.region}::snapshot/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/agenticbots:tenant"
+      values   = [var.tenant_id]
+    }
+  }
+  statement {
+    sid       = "TagOnSnapshotCreate"
+    actions   = ["ec2:CreateTags"]
+    resources = ["arn:aws:ec2:${data.aws_region.current.region}::snapshot/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:CreateAction"
+      values   = ["CreateSnapshot"]
     }
   }
   statement {
@@ -194,11 +252,13 @@ resource "aws_instance" "runtime" {
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
     tenant_id       = var.tenant_id
     environment     = var.environment
-    region          = data.aws_region.current.name
+    region          = data.aws_region.current.region
     engine_image    = var.engine_image
     bundle_version  = var.runtime_bundle_version
     artifact_bucket = var.artifact_bucket
     profiles        = join(" ", var.bot_profiles)
+    model_provider  = var.default_model_provider
+    model           = var.default_model
     secret_prefix   = local.secret_prefix
   })
   user_data_replace_on_change = false
@@ -218,7 +278,7 @@ resource "aws_ebs_volume" "data" {
   type              = "gp3"
   encrypted         = true
   kms_key_id        = aws_kms_key.tenant.arn
-  tags              = merge(local.tags, { Name = "${local.name}-data", "agenticbots:backup" = "daily" })
+  tags              = merge(local.tags, { Name = "${local.name}-data", "agenticbots:backup" = "daily-${var.environment}" })
 
   lifecycle {
     prevent_destroy = true # client state. Destroy is a separate, confirmed procedure.
@@ -263,7 +323,8 @@ resource "aws_cloudwatch_metric_alarm" "disk" {
   evaluation_periods  = 2
   threshold           = 85
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "breaching"
-  alarm_actions       = var.alarm_topic_arn == "" ? [] : [var.alarm_topic_arn]
-  tags                = local.tags
+  # No data during first boot / while suspended is not a full disk.
+  treat_missing_data = "notBreaching"
+  alarm_actions      = var.alarm_topic_arn == "" ? [] : [var.alarm_topic_arn]
+  tags               = local.tags
 }

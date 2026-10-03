@@ -1,5 +1,7 @@
 # Engine configuration applied to every AgenticBots Bot profile.
 # lifecycle.sh merges this into <data>/engine/profiles/<profile>/config.yaml.
+# The model block is added by lifecycle.sh from runtime.env
+# (DEFAULT_MODEL_PROVIDER / DEFAULT_MODEL).
 
 agent:
   # Least capability: no shell and no code execution unless an operator
@@ -16,8 +18,3 @@ approvals:
   unattended_mode: deny
   cron_mode: deny
   timeout: 300
-
-gateway:
-  multiplex_profiles: true
-  api_server:
-    max_concurrent_runs: 4

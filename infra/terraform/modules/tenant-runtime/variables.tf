@@ -9,7 +9,10 @@ variable "tenant_id" {
 variable "environment" {
   description = "prod or staging — part of every secret path."
   type        = string
-  default     = "prod"
+  validation {
+    condition     = contains(["staging", "prod"], var.environment)
+    error_message = "environment must be staging or prod."
+  }
 }
 variable "instance_type" {
   type    = string
@@ -35,6 +38,23 @@ variable "engine_image" {
   validation {
     condition     = can(regex("@sha256:[a-f0-9]{64}$", var.engine_image))
     error_message = "engine_image must be pinned by digest (…@sha256:<64 hex>). Never deploy a floating tag."
+  }
+}
+variable "default_model_provider" {
+  description = "Model provider for every Bot profile on this runtime (key must be in the providers secret)."
+  type        = string
+  default     = "openrouter"
+  validation {
+    condition     = can(regex("^[a-z0-9._-]{2,40}$", var.default_model_provider))
+    error_message = "default_model_provider: lowercase provider id."
+  }
+}
+variable "default_model" {
+  description = "Default model id, e.g. anthropic/claude-sonnet-4.6 for OpenRouter."
+  type        = string
+  validation {
+    condition     = can(regex("^[A-Za-z0-9._:/@-]{2,120}$", var.default_model))
+    error_message = "default_model: a provider model id without spaces."
   }
 }
 variable "runtime_bundle_version" {

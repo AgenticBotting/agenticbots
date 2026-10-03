@@ -9,6 +9,7 @@
 #
 # ENGINE_IMAGE must be pinned by digest (…@sha256:…) — see
 # docs/research/HERMES_INTEGRATION.md. lifecycle.sh refuses floating tags.
+# The tunnel image is pinned by digest too.
 
 name: agenticbots
 
@@ -51,7 +52,7 @@ services:
       options: { max-size: "20m", max-file: "5" }
 
   cloudflared:
-    image: ${TUNNEL_IMAGE:-cloudflare/cloudflared:2025.9.1}
+    image: ${TUNNEL_IMAGE:-cloudflare/cloudflared:2025.9.1@sha256:4604b477520dc8322af5427da68b44f0bf814938e9d2e4814f2249ee4b03ffdf}
     container_name: agb-tunnel
     restart: unless-stopped
     command: ["tunnel", "--no-autoupdate", "run"]

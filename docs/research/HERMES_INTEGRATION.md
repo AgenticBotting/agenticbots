@@ -12,8 +12,8 @@ Researched from the upstream source on **2026-10-03** (clone of
 | License | MIT (Copyright © 2025 Nous Research) — see `THIRD_PARTY_NOTICES.md` |
 | Pinned tag | **`v2026.9.24`** |
 | Pinned commit | `f97608f178d1ffeca59860195ab7da295f7c8e5f` |
-| Image | `nousresearch/hermes-agent:v2026.9.24@sha256:<digest>` |
-| Image digest | **Resolve once and record here** — Docker Hub was not reachable from the build sandbox. Run `docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24` and copy the `Digest:` line into `terraform.tfvars` (`default_engine_image`). Terraform and `lifecycle.sh` both refuse an image that is not pinned by digest. |
+| Image | `nousresearch/hermes-agent:v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7` |
+| Image digest | `sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7` — multi-arch index digest of the `v2026.9.24` tag, read from Docker Hub on 2026-10-03 (amd64 manifest `sha256:2fd023ef…ea283`). Re-check before production with `docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24`. Terraform and `lifecycle.sh` both refuse an image that is not pinned by digest. |
 
 ## How AgenticBots maps onto the engine
 
@@ -54,7 +54,7 @@ handled in `hermes-mappers.ts` only — never by branching elsewhere.
 
 1. Browser → AgenticBots only (session cookie). The browser never receives
    a runtime URL, key or port.
-2. AgenticBots server → `https://<tenant>.runtime.agenticbots.dev` through a
+2. AgenticBots server → `https://<tenant>.<RUNTIME_DOMAIN>` (a Cloudflare zone apex) through a
    **Cloudflare Tunnel** (outbound-only from the EC2; the instance has no
    inbound security-group rules). The hostname is protected by **Cloudflare
    Access** with a service token (`CF-Access-Client-Id/Secret`).
@@ -108,7 +108,7 @@ click can never send twice). Both kinds share one approvals table.
   contract test verifies it.
 - The SSE buffer is consume-once: a run nobody streams has its per-tool
   events dropped after 5 minutes. Status, output, usage and approvals are
-  still reconciled by polling (`/api/internal/sync` every minute).
+  still reconciled by polling (on every run view, and by `/api/internal/sync`).
 - Session list/messages response shapes are read defensively
   (`sessions | data | array`).
 - Per-request `model`/`provider` overrides are honored on `/v1/runs`

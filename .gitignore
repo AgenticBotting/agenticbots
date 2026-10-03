@@ -49,3 +49,4 @@ next-env.d.ts
 /infra/terraform/**/*.tfstate*
 /dist/
 !.env.example
+!.env.staging.example

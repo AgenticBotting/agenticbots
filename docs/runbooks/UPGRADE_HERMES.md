@@ -2,6 +2,16 @@
 
 Never deploy `latest`. Never upgrade every client at once.
 
+> **Known gap (see docs/DEPLOYMENT_READINESS_AUDIT.md, item 26).** An
+> existing runtime reads its engine image from `/opt/agenticbots/runtime.env`,
+> which is written once at first boot, and Terraform deliberately ignores
+> `user_data` changes. So changing `engine_image` in Terraform alone does
+> **not** upgrade a running client. Until an `upgrade-engine` lifecycle
+> action exists, do steps 4/11/12 by editing `ENGINE_IMAGE=` in
+> `/opt/agenticbots/runtime.env` through Session Manager, then
+> `/opt/agenticbots/bin/lifecycle.sh restart-runtime none` — and also update
+> Terraform so a replaced instance boots the same image.
+
 1. **Review upstream** — read the release notes/changelog between the pinned
    tag (`docs/research/HERMES_INTEGRATION.md`) and the candidate. Look for:
    API server changes (`/v1/runs`, events, approval, jobs, sessions), auth

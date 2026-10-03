@@ -4,7 +4,7 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
-import { awsControl } from "@/server/aws/control";
+import { awsControl, waitForCommand } from "@/server/aws/control";
 import { botRuntime } from "@/server/runtime";
 import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { conflict, invalid, notFound } from "@/server/errors";
@@ -194,9 +194,24 @@ export async function provisionBot(r: Repository, actor: Actor, orgId: string, t
   await tx.commit();
 
   try {
-    await awsControl().runLifecycle(runtime.id, runtime.instanceId ?? "demo", "deploy-bot", { profile: type.runtimeProfile });
+    const aws = awsControl();
+    const instanceId = runtime.instanceId ?? "demo";
+    const cmd = await waitForCommand(aws, await aws.runLifecycle(runtime.id, instanceId, "deploy-bot", { profile: type.runtimeProfile }), instanceId);
+    if (cmd.status !== "success") {
+      throw new Error(`deploy-bot ${cmd.status}${cmd.output ? `: ${cmd.output.slice(-300)}` : ""}`);
+    }
     // Health validation: the new Bot must answer with its own credentials.
-    await botRuntime(runtime, bot).getBot();
+    // The engine may still be reloading for a few seconds.
+    const rt = botRuntime(runtime, bot);
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await rt.getBot();
+        break;
+      } catch (e) {
+        if (attempt >= 6) throw e;
+        await new Promise((res) => setTimeout(res, isDemo() ? 0 : 10_000));
+      }
+    }
     const tx2 = new Tx(r);
     bot = tx2.patch("bots", bot, { status: "active", credentialStatus: "present" });
     tx2.insert("deployment_events", {

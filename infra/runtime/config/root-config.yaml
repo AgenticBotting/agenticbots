@@ -1,0 +1,22 @@
+# Engine configuration for the runtime's DEFAULT profile (the host gateway).
+# lifecycle.sh merges this into <data>/engine/config.yaml on every start.
+# The default profile runs no AgenticBots work itself; it hosts the API
+# listener that serves every Bot profile under /p/<profile>/.
+
+gateway:
+  # One listener for every Bot profile, each behind its own key. Explicit,
+  # so the gateway never falls back to serving the default profile only.
+  multiplex_profiles: true
+  api_server:
+    max_concurrent_runs: 4
+
+agent:
+  disabled_toolsets:
+    - terminal
+    - code_execution
+
+approvals:
+  mode: manual
+  unattended_mode: deny
+  cron_mode: deny
+  timeout: 300

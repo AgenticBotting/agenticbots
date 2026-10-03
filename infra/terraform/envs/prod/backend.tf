@@ -1,5 +1,5 @@
-# Remote state. Create the bucket + lock table once (docs/BEGINNER_SETUP.md,
-# step "Terraform state"), then fill in the names below.
+# Remote state. Create the state bucket once (docs/runbooks/FIRST_STAGING_TEST.md
+# step "Terraform state"), then put its name below.
 terraform {
   backend "s3" {
     bucket       = "REPLACE-agenticbots-tfstate"

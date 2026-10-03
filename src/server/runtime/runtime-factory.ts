@@ -52,6 +52,8 @@ export function runtimeProviderLabel(provider: RuntimeProvider): string {
 
 interface EndpointSecret {
   baseUrl: string;
+  /** Key for runtime-level calls (health, capabilities). Bots use their own. */
+  defaultProfileKey?: string;
   /** Private-connectivity service token. */
   accessClientId?: string;
   accessClientSecret?: string;
@@ -93,8 +95,9 @@ export async function resolveRuntimeConnection(
   if (!runtime.endpointRef) throw new RuntimeUnavailableError("Runtime endpoint is not registered");
   const aws = awsControl();
   const ep = await aws.getSecretJson<EndpointSecret>(runtime.endpointRef);
-  const keyRef = bot?.credentialRef ?? `${runtime.endpointRef.replace(/\/runtime$/, "")}/profiles/default`;
-  const { apiKey } = await aws.getSecretJson<{ apiKey: string }>(keyRef);
+  // Bot calls use that Bot's own key; runtime-level calls use the default key.
+  const keyRef = bot?.credentialRef ?? (bot ? `${runtime.endpointRef.replace(/\/runtime$/, "")}/profiles/${bot.runtimeProfile}` : undefined);
+  const apiKey = keyRef ? (await aws.getSecretJson<{ apiKey: string }>(keyRef)).apiKey : ep.defaultProfileKey;
   if (!ep.baseUrl || !apiKey) throw new RuntimeAuthenticationError("Runtime credentials incomplete");
   return {
     ...base,

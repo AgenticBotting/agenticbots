@@ -21,6 +21,11 @@ variable "environment" {
   default = "prod"
 }
 variable "lifecycle_document_arn" { type = string }
+variable "existing_oidc_provider_arn" {
+  description = "Reuse an existing Vercel OIDC provider (one per issuer URL per AWS account). Empty = create it."
+  type        = string
+  default     = ""
+}
 variable "tags" {
   type    = map(string)
   default = {}
@@ -30,10 +35,12 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  issuer = "oidc.vercel.com/${var.vercel_team_slug}"
+  issuer            = "oidc.vercel.com/${var.vercel_team_slug}"
+  oidc_provider_arn = var.existing_oidc_provider_arn != "" ? var.existing_oidc_provider_arn : aws_iam_openid_connect_provider.vercel[0].arn
 }
 
 resource "aws_iam_openid_connect_provider" "vercel" {
+  count          = var.existing_oidc_provider_arn == "" ? 1 : 0
   url            = "https://${local.issuer}"
   client_id_list = ["https://vercel.com/${var.vercel_team_slug}"]
   tags           = var.tags
@@ -44,7 +51,7 @@ data "aws_iam_policy_document" "trust" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.vercel.arn]
+      identifiers = [local.oidc_provider_arn]
     }
     condition {
       test     = "StringEquals"
@@ -80,7 +87,7 @@ data "aws_iam_policy_document" "permissions" {
   statement {
     sid       = "OnManagedRuntimesOnly"
     actions   = ["ssm:SendCommand"]
-    resources = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"]
+    resources = ["arn:aws:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/agenticbots:managed"
@@ -95,7 +102,7 @@ data "aws_iam_policy_document" "permissions" {
   statement {
     sid       = "ReadTenantSecrets"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*"]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*"]
   }
   statement {
     sid       = "DecryptTenantSecrets"
@@ -104,7 +111,7 @@ data "aws_iam_policy_document" "permissions" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+      values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
     }
     condition {
       test     = "StringEquals"
@@ -126,3 +133,4 @@ resource "aws_iam_role_policy" "permissions" {
 }
 
 output "role_arn" { value = aws_iam_role.control_plane.arn }
+output "oidc_provider_arn" { value = local.oidc_provider_arn }

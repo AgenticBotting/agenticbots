@@ -28,12 +28,12 @@ inherited → add tags `agenticbots:tenant=<tenant id>`,
    (you should see `config.yaml`, `profiles/`, `state.db`).
 
 ## 3b. Replacement instance (instance is broken)
-1. `cd infra/terraform/envs/prod && terraform apply -replace='module.tenant["<tenant id>"].aws_instance.runtime'`
+1. `cd infra/terraform/envs/prod && terraform apply -replace='module.stack.module.tenant["<tenant id>"].aws_instance.runtime'`
    — creates a fresh instance; the data volume is protected and kept.
 2. If the old data volume is damaged, attach the restored volume instead
    (step 3a.2–3a.4) and update Terraform state:
-   `terraform state rm 'module.tenant["<id>"].aws_ebs_volume.data'` then
-   `terraform import 'module.tenant["<id>"].aws_ebs_volume.data' <new vol id>`.
+   `terraform state rm 'module.stack.module.tenant["<id>"].aws_ebs_volume.data'` then
+   `terraform import 'module.stack.module.tenant["<id>"].aws_ebs_volume.data' <new vol id>`.
 3. First boot mounts the volume (label `agb-data`) and starts the runtime.
 
 ## 4. Start the runtime

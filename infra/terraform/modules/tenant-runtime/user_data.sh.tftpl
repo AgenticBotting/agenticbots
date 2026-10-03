@@ -20,7 +20,7 @@ systemctl enable --now docker
 
 # ── Persistent data volume (the only place runtime state lives) ──
 DEV=""
-for i in $(seq 1 60); do
+for _ in $(seq 1 60); do
   for cand in /dev/sdf /dev/xvdf /dev/nvme1n1; do [ -b "$cand" ] && DEV=$cand && break; done
   [ -n "$DEV" ] && break; sleep 5
 done
@@ -45,12 +45,15 @@ SECRET_PREFIX=$SECRET_PREFIX
 ENGINE_IMAGE=${engine_image}
 AGB_DATA_DIR=$DATA_DIR
 BOT_PROFILES="${profiles}"
+DEFAULT_MODEL_PROVIDER=${model_provider}
+DEFAULT_MODEL=${model}
 ENV
 chmod 600 /opt/agenticbots/runtime.env
 
 # ── Disk metric for the platform's disk alarm ──
 cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'CW'
 { "metrics": { "namespace": "AgenticBots/Runtime", "append_dimensions": { "InstanceId": "$${aws:InstanceId}" },
+  "aggregation_dimensions": [["InstanceId"]],
   "metrics_collected": { "disk": { "measurement": ["used_percent"], "resources": ["/opt/agenticbots/data"], "metrics_collection_interval": 300 } } } }
 CW
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json || true

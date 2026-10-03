@@ -1,8 +1,21 @@
 # Copy to terraform.tfvars (git-ignored) and fill in.
-region               = "us-east-1"
-vercel_team_slug     = "your-team"
-vercel_project_name  = "agenticbots"
-artifact_bucket      = "agenticbots-prod-artifacts-REPLACE"
-alarm_email          = "ops@agenticbots.dev"
-# Resolve the digest with: docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24
-default_engine_image = "nousresearch/hermes-agent:v2026.9.24@sha256:REPLACE_WITH_64_HEX_DIGEST_FROM_IMAGETOOLS_INSPECT_0000000000"
+region              = "us-east-1"
+# Vercel → Settings → General → "Team URL" / slug. For a personal (Hobby)
+# account this is the scope shown in the dashboard URL, e.g. lot-sealers-projects.
+vercel_team_slug    = "lot-sealers-projects"
+vercel_project_name = "agenticbots"
+# Globally unique S3 bucket name for runtime bundles.
+artifact_bucket     = "agenticbots-prod-artifacts-REPLACE"
+alarm_email         = ""
+# Only if another AgenticBots environment in this SAME AWS account was applied
+# first: paste its `vercel_oidc_provider_arn` output here.
+existing_vercel_oidc_provider_arn = ""
+# Pinned by digest (multi-arch index digest of the v2026.9.24 tag, read from
+# Docker Hub on 2026-10-03). Re-check with:
+#   docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24
+default_engine_image = "nousresearch/hermes-agent:v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7"
+# Default model for every Bot on this environment's runtimes. The provider's
+# API key goes into Secrets Manager (npm run ops -- tenant:set-provider-key),
+# never here. Copy a model id from https://openrouter.ai/models
+default_model_provider = "openrouter"
+default_model          = "anthropic/claude-sonnet-4.6"
