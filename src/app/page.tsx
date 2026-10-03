@@ -5,7 +5,7 @@ import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, Section, MediaSlot } from "@/components/ui";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
-import { BotFactory, FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, LeadInbox, StepScorecard, StepConnected, StepBooked } from "@/components/marketing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -70,7 +70,7 @@ function Hero() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <BotFactory />
+            <LeadInbox />
           </Reveal>
         </div>
       </Container>
@@ -81,9 +81,9 @@ function Hero() {
 /* ─────────────────────────  THREE PLAIN STEPS  ──────────────────────── */
 
 const SIMPLE_STEPS = [
-  { n: "01", t: "We secret-shop your leads", d: "We call after hours, fill out your form and time the reply. You get a scorecard showing exactly where jobs slip away.", Art: VignetteAsk },
-  { n: "02", t: "We install the system", d: "Wired into your phone line, website forms, calendar and CRM. Live in 14 days, monitored from day one.", Art: VignetteBuild },
-  { n: "03", t: "Every lead gets worked", d: "Answered in under a minute, followed up until it books, and reported to you every month.", Art: VignetteBooked },
+  { n: "01", t: "We secret-shop your leads", d: "We call after hours, fill out your form and time the reply. You get a scorecard showing exactly where jobs slip away.", Art: StepScorecard },
+  { n: "02", t: "We install the system", d: "Wired into your phone line, website forms, calendar and CRM. Live in 14 days, monitored from day one.", Art: StepConnected },
+  { n: "03", t: "Every lead gets worked", d: "Answered in under a minute, followed up until it books, and reported to you every month.", Art: StepBooked },
 ];
 
 function HowSimple() {
@@ -98,7 +98,7 @@ function HowSimple() {
         {SIMPLE_STEPS.map(({ n, t, d, Art }) => (
           <div key={n} className="card-cell flex flex-col">
             {/* The image slot from the wireframe — drawn, not photographed. */}
-            <div className="border-b border-[var(--border)] bg-[var(--bg-alt)] px-4 pt-5 pb-3">
+            <div className="border-b border-[var(--border)] bg-[var(--bg-alt)] p-5">
               <Art />
             </div>
             <div className="p-7">

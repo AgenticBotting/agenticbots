@@ -210,7 +210,7 @@ export default async function CityPage({ params }: Params) {
           heading={`What we would actually change in ${ct.name}.`}
         >
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+            <div>
               <CityVignette name={ct.name} stateAbbr={ct.stateAbbr} labels={ct.districts} />
             </div>
             <div className="space-y-8">
@@ -440,7 +440,7 @@ function StructuralCityService({ svc, st, rec }: {
         {/* ── Coverage: the metro vignette + surrounding markets, same service. ── */}
         <Section variant="alt" eyebrow="Coverage" heading={`The ${rec.metro} metro, covered.`}>
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="border border-[var(--border)] bg-white px-5 pt-6 pb-3">
+            <div>
               <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
             </div>
             <div>

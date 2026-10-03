@@ -6,7 +6,7 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import { ArrowRight } from "lucide-react";
 import {
-  AuditForm, PlanCta, FaqAccordion, BotFactory, SecurityBlock, CplDecayChart, PipelineMockup,
+  AuditForm, PlanCta, FaqAccordion, SecurityBlock, ActivityLog,
   StackStrip, StatSplit, FeatureTriad, ZigZag, TaskConveyor, OfferVisual,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
@@ -18,13 +18,6 @@ import { getOffer } from "@/lib/offers";
 import { renderHeadline } from "@/lib/headline";
 
 type Params = { params: Promise<{ slug: string }> };
-
-/* Offers with a proof chart of their own get it in the "how it runs"
-   section; everyone else gets their own factory scene. */
-const HOW_GRAPHIC: Record<string, () => React.ReactNode> = {
-  "agentic-ppc-management": () => <CplDecayChart />,
-  "agentic-speed-to-lead": () => <PipelineMockup />,
-};
 
 export function generateStaticParams() {
   return ALL_SERVICES.map((s) => ({ slug: s.serviceSlug }));
@@ -136,7 +129,12 @@ export default async function ServiceHub({ params }: Params) {
                 ))}
               </ol>
             </div>
-            {HOW_GRAPHIC[svc.serviceSlug]?.() ?? <BotFactory stations={svc.stations} title={`${svc.botName}, going to work`} />}
+            <ActivityLog
+              title={svc.botName}
+              crumb="Sample account"
+              rows={offer?.feed(["Riverside", "Oak Park"]) ?? svc.stations.map((st, i) => ({ t: `${(i + 1) * 9}m`, body: st.label }))}
+              summary={svc.metrics.slice(0, 3).map((m) => ({ label: m.label.length > 28 ? m.label.slice(0, 26) + "…" : m.label, value: m.value }))}
+            />
           </div>
         </Section>
 

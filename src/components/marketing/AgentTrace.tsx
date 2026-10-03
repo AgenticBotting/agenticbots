@@ -94,9 +94,9 @@ export function AgentTrace() {
   const done = effTime >= DURATION;
 
   return (
-    <div className="border border-ink-700 bg-ink-950 on-dark">
+    <div className="border border-[var(--border)] bg-white shadow-lift">
       {/* Transport */}
-      <div className="flex items-center gap-4 px-5 h-14 border-b border-ink-700">
+      <div className="flex items-center gap-4 px-5 h-14 border-b border-[var(--border)]">
         <button
           type="button"
           onClick={() => {
@@ -121,7 +121,7 @@ export function AgentTrace() {
           className="flex-1 h-[3px]"
           style={{ accentColor: "var(--color-accent-400)" }}
         />
-        <span className="mono text-[11px] tabular-nums text-ink-400 shrink-0">
+        <span className="mono text-[11px] tabular-nums text-[var(--text-muted)] shrink-0">
           {time.toFixed(1)}s / {DURATION}s
         </span>
       </div>
@@ -134,30 +134,30 @@ export function AgentTrace() {
           aria-live="polite"
           className={cn(
             "h-[340px] overflow-y-auto px-5 py-4 space-y-2.5 scroll-smooth",
-            untouched && "opacity-[0.28] overflow-hidden"
+            false
           )}
         >
         {visible.map((s) => (
           <li key={s.t} className={cn("grid grid-cols-[52px_1fr] gap-3", !reduced && !untouched && "animate-fade-up")}>
-            <span className="mono text-[11px] tabular-nums text-ink-400 pt-0.5">
+            <span className="mono text-[11px] tabular-nums text-[var(--text-muted)] pt-0.5">
               +{s.t.toFixed(1)}s
             </span>
             <div>
               {s.kind === "reasoning" ? (
-                <p className="text-[13px] leading-relaxed text-ink-300 italic border-l border-ink-600 pl-3">
+                <p className="text-[13px] leading-relaxed text-[var(--text-body)] italic border-l-2 border-[var(--border-strong)] pl-3">
                   {s.label}
                 </p>
               ) : s.kind === "result" ? (
-                <div className="border border-accent-500/40 bg-accent-500/[0.07] px-4 py-3">
-                  <p className="text-[13.5px] font-semibold text-accent-300">{s.label}</p>
-                  {s.detail && <p className="text-[12.5px] text-ink-300 mt-1">{s.detail}</p>}
+                <div className="border border-[var(--border-tint)] bg-[var(--bg-tint)] px-4 py-3">
+                  <p className="text-[13.5px] font-semibold text-[var(--accent-text)]">{s.label}</p>
+                  {s.detail && <p className="text-[12.5px] text-[var(--text-body)] mt-1">{s.detail}</p>}
                 </div>
               ) : (
                 <>
                   <p className="mono text-[12.5px]">
-                    <span className={s.kind === "tool" ? "text-accent-400" : "text-ink-200"}>{s.label}</span>
+                    <span className={s.kind === "tool" ? "text-[var(--accent-text)]" : "text-[var(--foreground)]"}>{s.label}</span>
                   </p>
-                  {s.detail && <p className="text-[12.5px] text-ink-400 mt-0.5">{s.detail}</p>}
+                  {s.detail && <p className="text-[12.5px] text-[var(--text-muted)] mt-0.5">{s.detail}</p>}
                 </>
               )}
             </div>
@@ -165,28 +165,13 @@ export function AgentTrace() {
         ))}
         </ol>
 
-        {untouched && (
-          <button
-            type="button"
-            onClick={() => { setPlaying(true); track("trace_played", { replay: false }); }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-4 group"
-            aria-label="Play the trace"
-          >
-            <span className="flex h-16 w-16 items-center justify-center notch bg-accent-500 text-ink-950 transition-transform group-hover:scale-105">
-              <Play className="w-7 h-7 ml-0.5" strokeWidth={2.5} />
-            </span>
-            <span className="mono text-[11px] uppercase tracking-[0.12em] text-ink-200">
-              Play the trace · 14s
-            </span>
-          </button>
-        )}
       </div>
 
-      <div className="px-5 py-3 border-t border-ink-700 flex items-center justify-between gap-4">
-        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-ink-400">
+      <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between gap-4">
+        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
           Simulated trace · how a booking actually runs
         </span>
-        <span className="mono text-[10.5px] text-ink-400">{SPEED_LABEL}</span>
+        <span className="mono text-[10.5px] text-[var(--text-muted)]">{SPEED_LABEL}</span>
       </div>
     </div>
   );

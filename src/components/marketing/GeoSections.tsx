@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { Metric } from "@/lib/catalog";
 import { Container, BotPattern, CountUp } from "@/components/ui";
 import { PlanCta } from "./PlanCta";
-import { cn } from "@/lib/utils";
+import { ActivityLog } from "./ProductUI";
+import { Check } from "lucide-react";
 
 /**
  * Wireframe section library (conversion anatomy pass, Sept 2026).
@@ -80,40 +81,12 @@ export function AgentConsole({
   const rows = (feed ?? FEED[key] ?? FALLBACK_FEED)(p);
 
   return (
-    <div className="relative pb-16">
-      <div className="border border-[var(--border-strong)] bg-white">
-        <div className="flex items-center justify-between gap-4 px-5 py-3.5 border-b border-[var(--border)]">
-          <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-secondary)] truncate">
-            {botName}{cityName ? ` · ${cityName}` : ""}
-          </p>
-          <span className="flex items-center gap-2 shrink-0">
-            <span className="h-1.5 w-1.5 bg-accent-500" />
-            <span className="mono text-[9.5px] uppercase tracking-[0.14em] text-[var(--accent-text)]">Running</span>
-          </span>
-        </div>
-        <ul>
-          {rows.map((r) => (
-            <li key={r.t} className="flex items-baseline gap-4 px-5 py-3.5 border-b border-[var(--border)] last:border-b-0">
-              <span className="mono text-[10px] tabular-nums text-[var(--text-muted)] w-8 shrink-0 text-right">{r.t}</span>
-              <span className="text-[13.5px] leading-snug text-[var(--text-body)]">{r.body}</span>
-              <svg viewBox="0 0 12 12" className="w-3 h-3 shrink-0 self-center ml-auto" aria-hidden>
-                <path d="M2 6.5 5 9.5 10 3" fill="none" stroke="var(--color-accent-600)" strokeWidth="1.8" />
-              </svg>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Floating metric card — the wireframes' overlapping stat chip. */}
-      <div className="absolute bottom-2 right-0 border border-ink-950 bg-ink-950 on-dark px-6 py-4 max-w-[240px]">
-        <p className="text-[1.6rem] font-semibold tracking-[-0.035em] leading-none tabular-nums text-signal-500">{stat.value}</p>
-        <p className="mt-2 text-[11.5px] leading-snug text-ink-300">{stat.label}</p>
-      </div>
-
-      <p className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)] mt-3 max-w-[calc(100%-256px)]">
-        Illustrative console — every real action is logged and reviewable
-      </p>
-    </div>
+    <ActivityLog
+      title={botName}
+      crumb={cityName}
+      rows={rows}
+      summary={[{ label: stat.label.length > 30 ? stat.label.slice(0, 28) + "…" : stat.label, value: stat.value }, { label: "Status", value: "Live" }]}
+    />
   );
 }
 
@@ -248,56 +221,6 @@ export function FeatureTriad({
 
 /* ──────────────────────────── Zig-zag ────────────────────────────── */
 
-/** Deterministic mini mockups for the zig-zag media slots. */
-function MiniPanel({ variant, label }: { variant: 0 | 1 | 2; label: string }) {
-  return (
-    <div className="border border-[var(--border-strong)] bg-white">
-      <div className="px-5 py-3 border-b border-[var(--border)]">
-        <p className="mono text-[10px] uppercase tracking-[0.11em] text-[var(--text-secondary)] truncate">{label}</p>
-      </div>
-      <div className="p-5">
-        {variant === 0 && (
-          <ul className="space-y-3">
-            {["Reviewed", "Adjusted", "Reported"].map((s, i) => (
-              <li key={s} className="flex items-center gap-3">
-                <svg viewBox="0 0 12 12" className="w-3.5 h-3.5 shrink-0" aria-hidden>
-                  <rect x="0.5" y="0.5" width="11" height="11" fill="none" stroke="var(--color-accent-600)" />
-                  <path d="M3 6.5 5.2 8.8 9 3.5" fill="none" stroke="var(--color-accent-600)" strokeWidth="1.6" />
-                </svg>
-                <span className="h-2 bg-ink-100" style={{ width: `${74 - i * 16}%` }} />
-                <span className="mono text-[9.5px] text-[var(--text-muted)] ml-auto">{s}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {variant === 1 && (
-          <svg viewBox="0 0 260 96" className="w-full" aria-hidden>
-            {[26, 38, 34, 52, 58, 72, 68, 84].map((h, i) => (
-              <rect key={i} x={i * 33 + 2} y={96 - h} width="22" height={h}
-                fill={i >= 5 ? "var(--color-accent-500)" : "var(--color-ink-100)"} />
-            ))}
-          </svg>
-        )}
-        {variant === 2 && (
-          <div className="grid grid-cols-3 gap-3">
-            {[["New", 3], ["Working", 2], ["Booked", 3]].map(([t, n]) => (
-              <div key={t as string}>
-                <p className="mono text-[9px] uppercase tracking-[0.1em] text-[var(--text-muted)] mb-2">{t}</p>
-                <div className="space-y-1.5">
-                  {Array.from({ length: n as number }).map((_, i) => (
-                    <div key={i} className={cn("h-5 border border-[var(--border)]",
-                      t === "Booked" ? "bg-accent-100 border-accent-500" : "bg-[var(--bg-alt)]")} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export interface ZigRow {
   label: string;
   title: string;
@@ -324,23 +247,24 @@ export function ZigZag({
           <p className="eyebrow mb-4">{eyebrow}</p>
           <h2 className="display-xl text-balance">{heading}</h2>
         </div>
-        <div className="mt-14 space-y-16 lg:space-y-20">
-          {rows.map((r, i) => (
-            <div key={r.title} className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
-              <div className={cn(i % 2 === 1 && "lg:order-2")}>
-                <MiniPanel variant={(i % 3) as 0 | 1 | 2} label={r.label} />
-              </div>
-              <div className={cn(i % 2 === 1 && "lg:order-1")}>
-                <p className="mono text-[11px] tracking-[0.08em] text-[var(--accent-text)]">0{i + 1}</p>
-                <p className="display-lg mt-3 text-balance">{r.title}</p>
-                <p className="body-base mt-4">
-                  <span className="font-semibold text-[var(--text-muted)]">Today: </span>{r.today}
-                </p>
-                <p className="body-base mt-3 !text-[var(--foreground)]">
-                  <span className="font-semibold text-[var(--accent-text)]">With {botName}: </span>
-                  <span className="font-medium">{r.after}</span>
-                </p>
-              </div>
+        {/* A straight before/after table. Honest, scannable, and the same
+            shape on every page — no illustrative mockups standing in for proof. */}
+        <div className="mt-12 border border-[var(--border-strong)] bg-white">
+          <div className="hidden md:grid grid-cols-[0.8fr_1fr_1fr] border-b border-[var(--border)] bg-[var(--bg-alt)] text-[12px] font-semibold text-[var(--text-secondary)]">
+            <span className="px-6 py-3">What changes</span>
+            <span className="px-6 py-3 border-l border-[var(--border)]">Today</span>
+            <span className="px-6 py-3 border-l border-[var(--border)] text-[var(--accent-text)]">With {botName}</span>
+          </div>
+          {rows.map((r) => (
+            <div key={r.title} className="grid md:grid-cols-[0.8fr_1fr_1fr] border-b border-[var(--border)] last:border-b-0">
+              <p className="px-6 pt-5 md:py-5 display-md">{r.title}</p>
+              <p className="px-6 pt-2 md:py-5 md:border-l border-[var(--border)] text-[14px] leading-relaxed text-[var(--text-secondary)]">
+                <span className="md:hidden font-semibold">Today: </span>{r.today}
+              </p>
+              <p className="px-6 pt-2 pb-5 md:py-5 md:border-l border-[var(--border)] text-[14px] leading-relaxed text-[var(--foreground)] flex gap-2.5">
+                <Check className="w-4 h-4 mt-[3px] shrink-0 text-[var(--accent-text)]" strokeWidth={2.5} />
+                <span>{r.after}</span>
+              </p>
             </div>
           ))}
         </div>

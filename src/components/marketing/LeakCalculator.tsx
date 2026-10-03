@@ -77,11 +77,11 @@ export function LeakCalculator() {
         <dl className="mt-7 grid grid-cols-2 gap-px bg-ink-700 border border-ink-700">
           <div className="bg-ink-900 px-4 py-4">
             <dt className="mono text-[10px] uppercase tracking-[0.1em] text-ink-400">Leads going cold</dt>
-            <dd className="mt-1.5 text-[1.5rem] font-semibold tabular-nums">{Math.round(lostLeads)}<span className="text-[13px] text-ink-400 font-normal"> /mo</span></dd>
+            <dd className="mt-1.5 text-[1.5rem] font-semibold tabular-nums text-white">{Math.round(lostLeads)}<span className="text-[13px] text-ink-400 font-normal"> /mo</span></dd>
           </div>
           <div className="bg-ink-900 px-4 py-4">
             <dt className="mono text-[10px] uppercase tracking-[0.1em] text-ink-400">Jobs that implies</dt>
-            <dd className="mt-1.5 text-[1.5rem] font-semibold tabular-nums">{lostJobs.toFixed(1)}<span className="text-[13px] text-ink-400 font-normal"> /mo</span></dd>
+            <dd className="mt-1.5 text-[1.5rem] font-semibold tabular-nums text-white">{lostJobs.toFixed(1)}<span className="text-[13px] text-ink-400 font-normal"> /mo</span></dd>
           </div>
         </dl>
 
