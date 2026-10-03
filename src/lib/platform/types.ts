@@ -96,7 +96,9 @@ export interface Organization extends Base {
 
 /* ─────────────────────────────── Bots ─────────────────────────────── */
 
-export type BotStatus = "provisioning" | "active" | "working" | "monitoring" | "disabled" | "error";
+/** Stored Bot status. "provisioning" is AgenticBots lifecycle; the rest is
+ *  the neutral vocabulary every runtime adapter reports in. */
+export type BotStatus = "provisioning" | "active" | "working" | "idle" | "disabled" | "offline" | "degraded";
 
 export interface Bot extends Tenanted {
   typeKey: BotTypeKey;
@@ -137,8 +139,11 @@ export interface SkillAssignment extends Tenanted {
 
 export type RuntimeHealth = "healthy" | "degraded" | "offline" | "stopped" | "unknown";
 
+/** Which runtime implementation serves a client. See src/server/runtime/runtime-factory.ts. */
+export type RuntimeProvider = "demo" | "hermes";
+
 export interface Runtime extends Tenanted {
-  kind: "demo" | "hermes";
+  provider: RuntimeProvider;
   region: string;
   instanceId?: string;
   instanceType: string;
@@ -236,7 +241,7 @@ export interface RunEvent extends Tenanted {
   /** Operator line — sanitized but technical. */
   operatorText: string;
   /** Operator-only technical detail. Already redacted. */
-  technical?: { action?: string; durationS?: number; error?: boolean; rawEvent?: string };
+  technical?: { action?: string; durationS?: number; error?: boolean; sourceEvent?: string };
 }
 
 export interface Conversation extends Tenanted {
@@ -311,7 +316,7 @@ export interface Approval extends Tenanted {
   resolvedAt?: ISODate;
   resolutionNote?: string;
   /** Runtime approval request id. Operator-only. */
-  runtimeRequestId?: string;
+  runtimeApprovalId?: string;
 }
 
 /* ───────────────────────────── Requests ───────────────────────────── */
@@ -345,6 +350,8 @@ export interface WorkRequest extends Tenanted {
 
 /* ──────────────────────────── Automations ─────────────────────────── */
 
+export type AutomationStatus = "active" | "paused" | "failed";
+
 export interface AutomationJob extends Tenanted {
   botId: ID;
   name: string;
@@ -353,8 +360,8 @@ export interface AutomationJob extends Tenanted {
   schedule: string;
   /** Plain-English schedule shown to clients ("Weekdays at 7:00 AM"). */
   scheduleLabel: string;
-  status: "active" | "paused" | "failing";
-  runtimeJobId?: string;
+  status: AutomationStatus;
+  runtimeAutomationId?: string;
   lastRunAt?: ISODate;
   lastStatus?: "succeeded" | "failed";
   nextRunAt?: ISODate;

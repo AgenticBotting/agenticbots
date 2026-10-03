@@ -35,8 +35,20 @@ Researched from the upstream source on **2026-10-03** (clone of
 | Capabilities | `GET /v1/capabilities` | Checked before relying on runs/events/stop/approval/sessions |
 | Disable a Bot | `hermes -p <p> gateway stop` → writes `<profile>/gateway.parked` | Native "park": stops the profile's adapters and cron ticks without stopping the host or deleting anything; `gateway start` unparks |
 
-Implementation: `src/server/runtime/hermes/{client,adapter}.ts`. Everything
-above that boundary uses AgenticBots words.
+Implementation (the only application code that knows Hermes):
+
+| File | Responsibility |
+|---|---|
+| `src/server/runtime/hermes/HermesRuntimeAdapter.ts` | Implements the neutral `RuntimeAdapter` |
+| `hermes-client.ts` | HTTP + SSE transport, timeouts |
+| `hermes-auth.ts` | `/p/<profile>/` routing, per-profile bearer key, tunnel service-token headers |
+| `hermes-types.ts` | Wire shapes of the pinned version |
+| `hermes-mappers.ts` | Hermes → AgenticBots statuses, events (`tool.started` → `bot.action.started`, …), usage, jobs → Automations, sessions → Conversations; field aliases across versions |
+| `hermes-errors.ts` | HTTP failures → `RunNotFoundError`, `BotNotFoundError`, `RuntimeAuthenticationError`, `RuntimeUnavailableError`, `ProviderUnavailableError`, `ApprovalRequiredError`, … |
+
+Everything above that boundary uses AgenticBots words (see "Runtime
+translator layer" in docs/ARCHITECTURE.md). Version differences are
+handled in `hermes-mappers.ts` only — never by branching elsewhere.
 
 ## Authentication model (defense in depth)
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { clientSafe, leaksRuntime, redactSecrets } from "@/server/redact";
-import { CLIENT_ERROR_MESSAGES, RuntimeError, sanitizeRuntimeError } from "@/server/runtime/errors";
+import { CLIENT_ERROR_MESSAGES, RuntimeError, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { translateAction, translateEvent } from "@/server/runtime/translate";
 
 describe("redaction and sanitization", () => {
@@ -30,7 +30,7 @@ describe("redaction and sanitization", () => {
     expect(translateAction("browser_navigate").client).toBe("Reviewing source");
     expect(translateAction("mcp_hubspot_update_contact").client).toBe("Checking CRM");
     expect(translateAction("terminal").client).toBe("Processing data");
-    expect(translateEvent({ type: "run.completed", raw: "run.completed", at: "" })?.clientText).toBe("Task complete");
-    expect(translateEvent({ type: "other", raw: "message.delta", at: "" })).toBeNull();
+    expect(translateEvent({ type: "bot.run.completed", sourceEvent: "x", at: "" })?.clientText).toBe("Task complete");
+    expect(translateEvent({ type: "bot.other", sourceEvent: "x", at: "" })).toBeNull();
   });
 });

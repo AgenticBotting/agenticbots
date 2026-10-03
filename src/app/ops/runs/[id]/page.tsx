@@ -10,6 +10,7 @@ import { ActionButton, ActionForm, ConfirmAction, SubmitButton } from "@/compone
 import { LiveRun } from "@/components/platform/LiveRun";
 import { compact, dateTime, duration, num, usd } from "@/lib/platform/format";
 import * as A from "../../actions";
+import { runtimeProviderLabel } from "@/server/runtime";
 
 export const metadata = { title: "Run" };
 
@@ -82,7 +83,7 @@ export default async function RunDetail({ params }: { params: Promise<{ id: stri
               ["Correlation ID", <span key="c" className="pf-mono">{run.correlationId}</span>],
               ["Runtime run ID", <span key="rr" className="pf-mono">{run.runtimeRunId ?? "—"}</span>],
               ["Runtime session", <span key="rs" className="pf-mono">{run.conversationId ?? "—"}</span>],
-              ["Runtime", runtime ? <span key="rt">{runtime.kind === "hermes" ? "Hermes" : "Demo"} {runtime.engineVersion} · profile <span className="pf-mono">{bot?.runtimeProfile}</span></span> : "—"],
+              ["Runtime", runtime ? <span key="rt">{runtimeProviderLabel(runtime.provider)} {runtime.engineVersion} · profile <span className="pf-mono">{bot?.runtimeProfile}</span></span> : "—"],
               ["Idempotency key", <span key="k" className="pf-mono">{run.idempotencyKey}</span>],
               ["Started", dateTime(run.startedAt ?? run.createdAt)],
               ["Ended", dateTime(run.endedAt)],

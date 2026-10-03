@@ -89,7 +89,7 @@ export default async function OpsDashboard() {
             <dl className="pf-kv">
               <dt>Past due</dt><dd>{d.pastDue.length ? d.pastDue.map((o) => <div key={o.id}><Link className="underline" href={`/ops/clients/${o.id}?tab=billing`}>{o.name}</Link></div>) : "None"}</dd>
               <dt>Suspended</dt><dd>{d.suspended.length ? d.suspended.map((o) => <div key={o.id}><Link className="underline" href={`/ops/clients/${o.id}`}>{o.name}</Link></div>) : "None"}</dd>
-              <dt>Failing automations</dt><dd><Link className="underline" href="/ops/automations?status=failing">{d.failingAutomations}</Link></dd>
+              <dt>Failing automations</dt><dd><Link className="underline" href="/ops/automations?status=failed">{d.failingAutomations}</Link></dd>
               <dt>Provider problems</dt><dd>{d.providerProblems.length || "None"}</dd>
             </dl>
           </Panel>

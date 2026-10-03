@@ -13,8 +13,11 @@ Never deploy `latest`. Never upgrade every client at once.
    `tenants.auto.tfvars.json` to `…:<tag>@sha256:<digest>`, plan, apply,
    restart the runtime.
 5. **Run contract tests** — `npm run test:hermes-contract` against staging.
-6. **Review API changes** — update `src/server/runtime/hermes/*` and the
-   adapter unit tests if any contract moved. Run `npm test`.
+6. **Review API changes** — update only `src/server/runtime/hermes/*`
+   (field changes go in `hermes-mappers.ts`; new failure shapes in
+   `hermes-errors.ts`), plus `tests/support/fake-hermes.ts` and
+   `tests/unit/hermes-adapter.test.ts`. Run `npm test` — the shared
+   adapter contract must still pass unchanged.
 7. **Review data changes** — confirm sessions, memory, skills and jobs are
    intact on staging (open a Bot → runtime details; list automations).
 8. **Update the pin** — `RUNTIME_ENGINE_VERSION`, `default_engine_image`, and

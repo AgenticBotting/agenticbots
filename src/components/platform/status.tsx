@@ -6,7 +6,7 @@ export type Tone = "good" | "live" | "watch" | "bad" | "quiet";
 const TONES: Record<string, Tone> = {
   // generic
   active: "good", healthy: "good", connected: "good", completed: "good", paid: "good", approved: "good", resolved: "good",
-  deployed: "good", succeeded: "good", ok: "good", present: "good", operational: "good", monitoring: "good", success: "good",
+  deployed: "good", succeeded: "good", ok: "good", present: "good", operational: "good", monitoring: "good", idle: "good", success: "good",
   working: "live", running: "live", in_progress: "live", queued: "live", provisioning: "live", updating: "live", started: "live",
   pending: "watch", waiting_for_approval: "watch", due: "watch", partially_paid: "watch", degraded: "watch", needs_attention: "watch",
   reviewing: "watch", waiting_on_client: "watch", submitted: "watch", onboarding: "watch", investigating: "watch", upcoming: "watch",

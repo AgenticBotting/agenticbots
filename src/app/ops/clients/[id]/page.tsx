@@ -15,6 +15,7 @@ import { money, usd, compact, dateTime } from "@/lib/platform/format";
 import { NoteBox } from "@/components/platform/NoteBox";
 import { AutomationForm } from "@/components/platform/forms";
 import * as A from "../../actions";
+import { runtimeProviderLabel } from "@/server/runtime";
 
 export const metadata = { title: "Client" };
 
@@ -156,7 +157,7 @@ export default async function ClientDetail({ params, searchParams }: { params: P
                     ["Server", <span key="s">{runtime.ec2State ?? "unknown"} <span className="pf-muted pf-small">{runtime.instanceType}</span></span>],
                     ["Private connectivity", <Status key="t" value={runtime.tunnel} />],
                     ["Last heartbeat", <When key="w" iso={runtime.lastHeartbeatAt} />],
-                    ["Automations", jobs.some((j) => j.status === "failing") ? <Status key="f" value="failing" label={`${jobs.filter((j) => j.status === "failing").length} failing`} /> : `${jobs.length} healthy`],
+                    ["Automations", jobs.some((j) => j.status === "failed") ? <Status key="f" value="failed" label={`${jobs.filter((j) => j.status === "failed").length} failing`} /> : `${jobs.length} healthy`],
                     ["Integrations", integrations.some((i) => i.status === "needs_attention") ? <Status key="i" value="needs_attention" /> : `${integrations.filter((i) => i.status === "connected").length} connected`],
                   ]} />
                 ) : <Empty title="No runtime record" />}
@@ -246,7 +247,7 @@ export default async function ClientDetail({ params, searchParams }: { params: P
         <div className="pf-grid pf-grid-2">
           <Panel title="Runtime">
             <KV rows={[
-              ["Engine", <span key="e">{runtime.kind === "demo" ? "Demo runtime" : "Hermes Agent"} <span className="pf-mono">{runtime.engineVersion}</span></span>],
+              ["Engine", <span key="e">{runtimeProviderLabel(runtime.provider)} <span className="pf-mono">{runtime.engineVersion}</span></span>],
               ["Image digest", <span key="d" className="pf-mono">{runtime.engineDigest ?? "not pinned yet"}</span>],
               ["Runtime bundle", runtime.runtimeVersion],
               ["Region", runtime.region],

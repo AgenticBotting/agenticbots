@@ -20,7 +20,7 @@ export default async function AutomationsPage({ searchParams }: { searchParams: 
   return (
     <>
       <PageHead title="Automations" description="Scheduled Bot work, managed by AgenticBots. Clients see the results as activity." />
-      <FilterLinks current={sp.status ?? ""} items={[{ key: "", label: "All", href: "/ops/automations" }, { key: "active", label: "Active", href: "/ops/automations?status=active" }, { key: "failing", label: "Failing", href: "/ops/automations?status=failing" }, { key: "paused", label: "Paused", href: "/ops/automations?status=paused" }]} />
+      <FilterLinks current={sp.status ?? ""} items={[{ key: "", label: "All", href: "/ops/automations" }, { key: "active", label: "Active", href: "/ops/automations?status=active" }, { key: "failed", label: "Failing", href: "/ops/automations?status=failed" }, { key: "paused", label: "Paused", href: "/ops/automations?status=paused" }]} />
       <div className="pf-grid">
         <Panel flush>
           <AutomationsTable jobs={jobs} names={{ orgs: L.orgs, bots: L.bots }} actions={(j) => (

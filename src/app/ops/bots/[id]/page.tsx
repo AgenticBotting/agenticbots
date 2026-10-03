@@ -74,11 +74,11 @@ export default async function BotDetail({ params, searchParams }: { params: Prom
           {tech.ok ? (
             <div className="pf-grid pf-grid-2">
               <KV rows={[
-                ["Engine", tech.engine === "hermes" ? "Hermes Agent (multi-profile gateway)" : "Demo runtime"],
+                ["Engine", tech.engine],
                 ["Profile", <span key="p" className="pf-mono">{tech.profile}</span>],
-                ["Profile reachable", tech.reachable ? "Yes" : "No"],
+                ["Runtime reports", <Status key="rs" value={tech.runtimeStatus} />],
                 ["Credential", <span key="c" className="pf-mono">{bot.credentialRef}</span>],
-                ["Capabilities", Object.entries(tech.caps.raw).filter(([, v]) => v).map(([k]) => k).join(", ")],
+                ["Capabilities", Object.entries(tech.caps.reported).filter(([, v]) => v).map(([k]) => k).join(", ")],
               ]} />
               <div>
                 <div className="pf-small pf-muted mb-1">Toolsets</div>

@@ -117,7 +117,7 @@ export async function opsDashboard(r: Repository, actor: Actor): Promise<OpsDash
     disconnectedIntegrations: v(integrations).filter((i) => i.status === "needs_attention" || i.status === "disconnected"),
     pastDue: vOrgs.filter((o) => invoices.some((i) => i.orgId === o.id && deriveInvoiceStatus(i, today) === "past_due")),
     suspended: vOrgs.filter((o) => o.status === "suspended"),
-    failingAutomations: v(jobs).filter((j) => j.status === "failing").length,
+    failingAutomations: v(jobs).filter((j) => j.status === "failed").length,
     providerProblems: openInc.filter((i) => i.type === "provider_failure" || i.type === "run_failure_spike"),
     recentDeployments: v(deployments).slice(0, 5).map((d) => ({ at: d.createdAt, detail: `${d.kind.replace(/_/g, " ")} — ${d.detail}`, status: d.status, orgName: orgNames.get(d.orgId) ?? "" })),
     usageThisMonth: {

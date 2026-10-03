@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { AppError } from "@/server/errors";
 import { correlationId } from "@/server/ids";
 import { redactSecrets } from "@/server/redact";
-import { RuntimeError, sanitizeRuntimeError } from "@/server/runtime/errors";
+import { RuntimeError, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 
 /**
  * JSON route wrapper. Every route handler goes through this so that errors

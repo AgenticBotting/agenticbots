@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { DemoRuntimeAdapter, demoState } from "@/server/runtime/demo/adapter";
+import { DemoRuntimeAdapter, demoState } from "@/server/runtime/demo/DemoRuntimeAdapter";
 import { wait } from "../support/fixtures";
 
-const t = { runtimeId: "rt-demo", profile: "outbound", baseUrl: "demo://", apiKey: "demo", extraHeaders: {} };
+const t = { provider: "demo" as const, runtimeId: "rt-demo", runtimeProfile: "outbound", endpoint: "demo://", credentials: { apiKey: "demo" } };
 
 describe("DemoRuntimeAdapter", () => {
   const a = new DemoRuntimeAdapter();
@@ -14,10 +14,10 @@ describe("DemoRuntimeAdapter", () => {
   it("parks write tasks for approval, resumes when approved", async () => {
     const { runtimeRunId } = await a.startBotRun(t, { task: "Send follow-up emails", idempotencyKey: "k-0002-bbbb", correlationId: "c" });
     demoState().runs.get(runtimeRunId)!.startedAt -= 8000;
-    expect((await a.getRun(t, runtimeRunId)).status).toBe("waiting_for_approval");
-    await a.approveRun(t, runtimeRunId);
+    expect((await a.getBotRun(t, runtimeRunId)).status).toBe("waiting_for_approval");
+    await a.approveBotRun(t, runtimeRunId);
     demoState().runs.get(runtimeRunId)!.approvalAt! -= 3000;
-    expect((await a.getRun(t, runtimeRunId)).status).toBe("completed");
+    expect((await a.getBotRun(t, runtimeRunId)).status).toBe("completed");
   });
   it("a stopped runtime refuses work (suspension)", async () => {
     demoState().stopped.add("rt-stopped");

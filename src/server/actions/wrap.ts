@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { AppError } from "@/server/errors";
 import { correlationId } from "@/server/ids";
 import { redactSecrets } from "@/server/redact";
-import { RuntimeError, sanitizeRuntimeError } from "@/server/runtime/errors";
+import { RuntimeError, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 
 export interface ActionState {
   ok?: boolean;

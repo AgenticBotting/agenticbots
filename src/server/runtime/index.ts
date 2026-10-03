@@ -1,69 +1,111 @@
 import "server-only";
 import type { Bot, Runtime } from "@/lib/platform/types";
-import type { RuntimeAdapter, RuntimeTarget } from "./adapter";
-import { DemoRuntimeAdapter } from "./demo/adapter";
-import { HermesRuntimeAdapter } from "./hermes/adapter";
-import { awsControl } from "@/server/aws/control";
-import { isDemo } from "@/server/env";
-import { RuntimeError } from "./errors";
+import type { Repository } from "@/server/db/repository";
+import type { RuntimeAdapter } from "./RuntimeAdapter";
+import type {
+  AutomationConfig,
+  BotRunEvent,
+  RuntimeConnection,
+  StartBotRunInput,
+} from "./runtime-types";
+import { getRuntimeAdapter, resolveRuntimeConnection, runtimeProviderLabel } from "./runtime-factory";
+import { BotNotFoundError, RuntimeUnavailableError } from "./runtime-errors";
 
 /**
- * Picks the adapter for a runtime record and resolves where to reach it.
- * Demo mode always uses the demo adapter — even if a record claims to be a
- * real runtime — so a demo can never call out.
+ * BotRuntime — the application's only entry point to Bot execution.
+ *
+ *   CLIENT / OPERATOR UI → AGENTICBOTS SERVER → BotRuntime → RuntimeAdapter → engine
+ *
+ * Callers hand over AgenticBots records (or ids); BotRuntime resolves the
+ * server-side mapping (provider, runtime profile, secret references) and
+ * picks the adapter. Runtime-side ids it returns (runtimeRunId, …) are
+ * opaque mapping values to store on AgenticBots records, never to show.
  */
-const demo = new DemoRuntimeAdapter();
-const hermes = new HermesRuntimeAdapter();
+export class BotRuntime {
+  private readonly adapter: RuntimeAdapter;
+  private conn?: Promise<RuntimeConnection>;
 
-export function adapterFor(runtime: Pick<Runtime, "kind">): RuntimeAdapter {
-  if (isDemo() || runtime.kind === "demo") return demo;
-  return hermes;
-}
-
-export function demoAdapter(): DemoRuntimeAdapter {
-  return demo;
-}
-
-interface EndpointSecret {
-  baseUrl: string;
-  /** Private-connectivity service token (Cloudflare Access). */
-  accessClientId?: string;
-  accessClientSecret?: string;
-}
-
-/** Development / staging override: one JSON blob instead of Secrets Manager.
- *  RUNTIME_DEV_TARGETS='{"<runtimeId>":{"baseUrl":"http://127.0.0.1:8642","keys":{"seo":"..."}}}' */
-function devTargets(): Record<string, { baseUrl: string; keys: Record<string, string> }> | null {
-  const raw = process.env.RUNTIME_DEV_TARGETS;
-  if (!raw || process.env.PLATFORM_ENV === "production") return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+  constructor(
+    private readonly runtime: Runtime,
+    private readonly bot?: Pick<Bot, "runtimeProfile" | "credentialRef">,
+  ) {
+    this.adapter = getRuntimeAdapter(runtime.provider);
   }
+
+  /** Which provider actually serves this Bot (operator diagnostics). */
+  get provider() {
+    return this.adapter.provider;
+  }
+  get providerLabel() {
+    return runtimeProviderLabel(this.adapter.provider);
+  }
+  /** True when event history can be re-read (no live stream needed). */
+  get supportsEventReplay() {
+    return this.adapter.traits.eventReplay;
+  }
+
+  private c(): Promise<RuntimeConnection> {
+    this.conn ??= resolveRuntimeConnection(this.runtime, this.bot);
+    // A failed resolution must not be cached for later calls.
+    this.conn.catch(() => (this.conn = undefined));
+    return this.conn;
+  }
+
+  /* Runtime */
+  async getHealth() { return this.adapter.getHealth(await this.c()); }
+  async getDetailedHealth() { return this.adapter.getDetailedHealth(await this.c()); }
+  async listBots(runtimeProfiles: string[]) { return this.adapter.listBots(await this.c(), runtimeProfiles); }
+
+  /* Bot */
+  async getBot() { return this.adapter.getBot(await this.c()); }
+  async getBotCapabilities() { return this.adapter.getBotCapabilities(await this.c()); }
+  async listBotSkills() { return this.adapter.listBotSkills(await this.c()); }
+  async listBotToolsets() { return this.adapter.listBotToolsets(await this.c()); }
+
+  /* Bot Runs */
+  async startBotRun(input: StartBotRunInput) { return this.adapter.startBotRun(await this.c(), input); }
+  async getBotRun(runtimeRunId: string) { return this.adapter.getBotRun(await this.c(), runtimeRunId); }
+  async stopBotRun(runtimeRunId: string) { return this.adapter.stopBotRun(await this.c(), runtimeRunId); }
+  async listBotRunEvents(runtimeRunId: string) { return this.adapter.listBotRunEvents(await this.c(), runtimeRunId); }
+  async *streamBotRunEvents(runtimeRunId: string, signal?: AbortSignal): AsyncIterable<BotRunEvent> {
+    yield* this.adapter.streamBotRunEvents(await this.c(), runtimeRunId, signal);
+  }
+  async approveBotRun(runtimeRunId: string, approvalId?: string) { return this.adapter.approveBotRun(await this.c(), runtimeRunId, approvalId); }
+  async denyBotRun(runtimeRunId: string, approvalId?: string) { return this.adapter.denyBotRun(await this.c(), runtimeRunId, approvalId); }
+
+  /* Conversations */
+  async listConversations() { return this.adapter.listConversations(await this.c()); }
+  async createConversation(title: string) { return this.adapter.createConversation(await this.c(), title); }
+  async getConversation(runtimeConversationId: string) { return this.adapter.getConversation(await this.c(), runtimeConversationId); }
+
+  /* Automations */
+  async listAutomations() { return this.adapter.listAutomations(await this.c()); }
+  async createAutomation(config: AutomationConfig) { return this.adapter.createAutomation(await this.c(), config); }
+  async updateAutomation(runtimeAutomationId: string, config: Partial<AutomationConfig>) { return this.adapter.updateAutomation(await this.c(), runtimeAutomationId, config); }
+  async pauseAutomation(runtimeAutomationId: string) { return this.adapter.pauseAutomation(await this.c(), runtimeAutomationId); }
+  async resumeAutomation(runtimeAutomationId: string) { return this.adapter.resumeAutomation(await this.c(), runtimeAutomationId); }
+  async runAutomationNow(runtimeAutomationId: string) { return this.adapter.runAutomationNow(await this.c(), runtimeAutomationId); }
+  async deleteAutomation(runtimeAutomationId: string) { return this.adapter.deleteAutomation(await this.c(), runtimeAutomationId); }
 }
 
-export async function resolveTarget(runtime: Runtime, bot?: Pick<Bot, "runtimeProfile" | "credentialRef">): Promise<RuntimeTarget> {
-  if (isDemo() || runtime.kind === "demo") {
-    return { runtimeId: runtime.id, profile: bot?.runtimeProfile, baseUrl: "demo://runtime", apiKey: "demo", extraHeaders: {} };
-  }
-  const dev = devTargets()?.[runtime.id];
-  if (dev) {
-    const profile = bot?.runtimeProfile ?? "default";
-    const apiKey = dev.keys[profile] ?? dev.keys.default;
-    if (!apiKey) throw new RuntimeError("runtime_auth", `No dev key for profile ${profile}`);
-    return { runtimeId: runtime.id, profile: bot?.runtimeProfile, baseUrl: dev.baseUrl, apiKey, extraHeaders: {} };
-  }
-  if (!runtime.endpointRef) throw new RuntimeError("runtime_unreachable", "Runtime endpoint is not registered");
-  const aws = awsControl();
-  const ep = await aws.getSecretJson<EndpointSecret>(runtime.endpointRef);
-  const keyRef = bot?.credentialRef ?? `${runtime.endpointRef.replace(/\/runtime$/, "")}/profiles/default`;
-  const { apiKey } = await aws.getSecretJson<{ apiKey: string }>(keyRef);
-  if (!ep.baseUrl || !apiKey) throw new RuntimeError("runtime_auth", "Runtime credentials incomplete");
-  const extraHeaders: Record<string, string> = {};
-  if (ep.accessClientId && ep.accessClientSecret) {
-    extraHeaders["CF-Access-Client-Id"] = ep.accessClientId;
-    extraHeaders["CF-Access-Client-Secret"] = ep.accessClientSecret;
-  }
-  return { runtimeId: runtime.id, profile: bot?.runtimeProfile, baseUrl: ep.baseUrl, apiKey, extraHeaders };
+/** Runtime-level handle (health, listing Bots). */
+export function runtimeFor(runtime: Runtime): BotRuntime {
+  return new BotRuntime(runtime);
 }
+
+/** Bot-level handle from records the caller already loaded. */
+export function botRuntime(runtime: Runtime, bot: Pick<Bot, "runtimeProfile" | "credentialRef">): BotRuntime {
+  return new BotRuntime(runtime, bot);
+}
+
+/** Bot-level handle from an AgenticBots Bot id. */
+export async function botRuntimeById(r: Repository, botId: string): Promise<BotRuntime> {
+  const bot = await r.get("bots", botId);
+  if (!bot) throw new BotNotFoundError("Unknown Bot");
+  const runtime = await r.get("runtimes", bot.runtimeId);
+  if (!runtime) throw new RuntimeUnavailableError("Bot has no runtime");
+  return new BotRuntime(runtime, bot);
+}
+
+export { defaultRuntimeProvider, runtimeProviderLabel } from "./runtime-factory";
+export * from "./runtime-types";

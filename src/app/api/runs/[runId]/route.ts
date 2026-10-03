@@ -4,7 +4,7 @@ import { currentActor } from "@/server/auth/session";
 import { can } from "@/server/auth/policy";
 import { syncRun, isActive } from "@/server/services/runs";
 import { clientSafe } from "@/server/redact";
-import { CLIENT_ERROR_MESSAGES } from "@/server/runtime/errors";
+import { CLIENT_ERROR_MESSAGES } from "@/server/runtime/runtime-errors";
 import { notFound, unauthenticated } from "@/server/errors";
 
 /** GET /api/runs/:runId — polling fallback for the event stream. */

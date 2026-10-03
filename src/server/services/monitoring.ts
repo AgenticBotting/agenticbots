@@ -4,8 +4,8 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
 import { awsControl } from "@/server/aws/control";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { runtimeFor } from "@/server/runtime";
+import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { notFound } from "@/server/errors";
 import { clearIncident, raiseIncident } from "./incidents";
 import { SYSTEM, type ActorRef } from "./common";
@@ -22,7 +22,7 @@ export async function refreshRuntimeHealth(r: Repository, runtimeId: string, by:
   if (!runtime) throw notFound("Runtime");
   const correlationId = newCorrelationId();
   const aws = awsControl();
-  const adapter = adapterFor(runtime);
+  const rt = runtimeFor(runtime);
   const patch: Partial<Runtime> = { lastHeartbeatAt: nowIso() };
 
   if (runtime.instanceId) {
@@ -36,13 +36,12 @@ export async function refreshRuntimeHealth(r: Repository, runtimeId: string, by:
   }
 
   try {
-    const target = await resolveTarget(runtime);
-    const health = await adapter.getDetailedHealth(target);
+    const health = await rt.getDetailedHealth();
     patch.health = health.status;
     patch.ready = health.ready;
     patch.tunnel = "connected";
     if (health.ready) {
-      const caps = await adapter.getCapabilities(target);
+      const caps = await rt.getBotCapabilities();
       patch.capabilities = { runs: caps.runs, runEvents: caps.runEvents, runStop: caps.runStop, runApproval: caps.runApproval, conversations: caps.conversations, automations: caps.automations };
     }
     if (health.diskFreePct !== undefined && patch.diskUsedPct === undefined) patch.diskUsedPct = 100 - health.diskFreePct;

@@ -7,8 +7,8 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime } from "@/server/runtime";
+import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { awsControl } from "@/server/aws/control";
 import { conflict, invalid, notFound } from "@/server/errors";
 import { isDemo } from "@/server/env";
@@ -71,7 +71,7 @@ export async function checkIntegration(r: Repository, actor: Actor, integrationI
       status = "needs_attention";
     } else {
       try {
-        const sets = await adapterFor(runtime).listToolsets(await resolveTarget(runtime, bot));
+        const sets = await botRuntime(runtime, bot).listBotToolsets();
         const found = sets.find((t) => t.name === toolset);
         if (found?.enabled && found.tools.length > 0) {
           status = "connected";

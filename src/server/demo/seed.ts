@@ -1,5 +1,5 @@
 import "server-only";
-import type { Bot, BotStatus, Organization, PaymentMethod, ResultMetric, Runtime } from "@/lib/platform/types";
+import type { AutomationStatus, Bot, BotStatus, Organization, PaymentMethod, ResultMetric, Runtime } from "@/lib/platform/types";
 import type { BotTypeKey } from "@/config/bot-catalog";
 import { botTypeOrThrow } from "@/config/bot-catalog";
 import { getSkill } from "@/config/skills";
@@ -7,7 +7,7 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import { hashPassword } from "@/server/auth/password";
 import { correlationId } from "@/server/ids";
-import { demoState } from "@/server/runtime/demo/adapter";
+import { demoState } from "@/server/runtime/demo/DemoRuntimeAdapter";
 import { estimateCost } from "@/server/services/usage";
 import { describeSchedule } from "@/server/services/automations";
 import { addDays, todayStr } from "@/server/billing/domain";
@@ -84,7 +84,7 @@ export async function seedDemo(r: Repository): Promise<void> {
   /* ── Runtimes ── */
   const mkRuntime = (org: Organization, suspended = false): Runtime =>
     tx.insert("runtimes", {
-      orgId: org.id, kind: "demo", region: "us-east-1", instanceId: `i-0demo${org.slug.replace(/[^a-z]/g, "").slice(0, 8)}`, instanceType: "t3.medium",
+      orgId: org.id, provider: "demo", region: "us-east-1", instanceId: `i-0demo${org.slug.replace(/[^a-z]/g, "").slice(0, 8)}`, instanceType: "t3.medium",
       ec2State: "running", health: suspended ? "stopped" : "healthy", ready: !suspended, runtimeVersion: "1.0.0", engineVersion: "v2026.9.24",
       engineDigest: "sha256:pinned-at-deploy", endpointRef: `agenticbots/demo/tenants/${org.tenantId}/runtime`, diskUsedPct: suspended ? 41 : 29,
       lastHeartbeatAt: ago(0, 0.05), tunnel: suspended ? "down" : "connected", backup: { lastSnapshotAt: ago(0, 6), status: "ok", retentionDays: 30 },
@@ -115,7 +115,7 @@ export async function seedDemo(r: Repository): Promise<void> {
     return bot;
   };
   const b = {
-    ads: mkBot(acme, acmeRt, "ads", "monitoring", "Identified 6 irrelevant search terms."),
+    ads: mkBot(acme, acmeRt, "ads", "idle", "Identified 6 irrelevant search terms."),
     seo: mkBot(acme, acmeRt, "seo", "active", "Found 14 local-search content opportunities."),
     reviews: mkBot(acme, acmeRt, "reviews", "active", "Prepared 17 review requests."),
     prospecting: mkBot(acme, acmeRt, "prospecting", "active", "Qualified 31 commercial-property prospects."),
@@ -272,21 +272,21 @@ export async function seedDemo(r: Repository): Promise<void> {
     "roofing jobs hiring · diy roof patch · roof shingles wholesale · roofing school · free roof inspection scam · roofing calculator", 1);
 
   /* ── Automations ── */
-  const mkJob = (bot: Bot, name: string, schedule: string, prompt: string, status: "active" | "paused" | "failing" = "active", failures = 0, lastError?: string) => {
+  const mkJob = (bot: Bot, name: string, schedule: string, prompt: string, status: AutomationStatus = "active", failures = 0, lastError?: string) => {
     const job = tx.insert("automation_jobs", {
       orgId: bot.orgId, botId: bot.id, name, prompt, schedule, scheduleLabel: describeSchedule(schedule), status,
-      runtimeJobId: `demo_job_${name.toLowerCase().replace(/[^a-z]+/g, "_").slice(0, 24)}`,
+      runtimeAutomationId: `demo_auto_${name.toLowerCase().replace(/[^a-z]+/g, "_").slice(0, 24)}`,
       lastRunAt: ago(0, 6), lastStatus: failures > 0 ? "failed" : "succeeded", nextRunAt: new Date(Date.now() + 18 * 3600_000).toISOString(),
       consecutiveFailures: failures, lastError, trigger: "schedule",
     });
-    demoState().jobs.set(job.runtimeJobId!, { runtimeJobId: job.runtimeJobId!, name, schedule, enabled: status !== "paused", profile: bot.runtimeProfile, prompt });
+    demoState().jobs.set(job.runtimeAutomationId!, { runtimeAutomationId: job.runtimeAutomationId!, name, schedule, status, profile: bot.runtimeProfile, prompt });
     return job;
   };
   mkJob(b.ads, "Daily search-term review", "0 7 * * 1-5", "Review yesterday's search terms; propose negatives for approval.");
   mkJob(b.seo, "Weekly local SEO crawl", "0 6 * * 1", "Crawl the site, check rankings for target terms, list content opportunities.");
   mkJob(b.reviews, "Review requests after completed jobs", "every 6h", "Find jobs completed since last run and prepare review requests for approval.");
   mkJob(b.analytics, "Monday performance summary", "0 8 * * 1", "Summarize last week by channel from connected sources only. No estimates.");
-  mkJob(b.crm, "Nightly CRM hygiene sweep", "0 23 * * *", "Find stale stages, duplicates and missing next steps; update with approval rules.", "failing", 2, "Model provider overloaded (529) on last two runs.");
+  mkJob(b.crm, "Nightly CRM hygiene sweep", "0 23 * * *", "Find stale stages, duplicates and missing next steps; update with approval rules.", "failed", 2, "Model provider overloaded (529) on last two runs.");
   mkJob(b.content, "Weekly content draft", "0 9 * * 2", "Draft one project story from recent job notes.", "paused");
 
   /* ── Usage rollups (this month) ── */

@@ -28,7 +28,7 @@ export function clientBotStatus(b: Pick<Bot, "status">, orgSuspended: boolean): 
   switch (b.status) {
     case "working":
       return "Working";
-    case "monitoring":
+    case "idle":
       return "Monitoring";
     case "active":
       return "Active";
@@ -36,7 +36,8 @@ export function clientBotStatus(b: Pick<Bot, "status">, orgSuspended: boolean): 
       return "Paused";
     case "provisioning":
       return "Setting up";
-    case "error":
+    case "offline":
+    case "degraded":
       return "Needs attention";
   }
 }

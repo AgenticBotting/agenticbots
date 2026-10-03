@@ -8,6 +8,7 @@ import { ActionButton, ActionForm, ConfirmAction, SubmitButton } from "@/compone
 import { billingProvider } from "@/server/billing/service";
 import { FUTURE_PROVIDERS } from "@/server/billing/provider";
 import * as A from "../actions";
+import { defaultRuntimeProvider, runtimeProviderLabel } from "@/server/runtime";
 
 export const metadata = { title: "Settings" };
 
@@ -25,7 +26,7 @@ export default async function SettingsPage() {
           <KV rows={[
             ["Mode", <Status key="m" value={platformMode() === "production" ? "active" : "pending"} label={platformMode()} />],
             ["Database", isDemo() ? "Built-in demo store (resets on reset)" : "Convex"],
-            ["Runtime adapter", isDemo() ? "Demo runtime — never calls out" : "Hermes runtime adapter"],
+            ["Runtime adapter", isDemo() ? "Demo runtime — never calls out" : runtimeProviderLabel(defaultRuntimeProvider())],
             ["Billing provider", billingProvider().displayName],
             ["Future billing adapters", FUTURE_PROVIDERS.join(", ")],
             ["Default grace period", `${billingDefaults.graceDays} days`],

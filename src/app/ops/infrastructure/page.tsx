@@ -6,6 +6,7 @@ import { PageHead, Panel, Table, When, Empty, Bar } from "@/components/platform/
 import { Status } from "@/components/platform/status";
 import { ActionButton, ConfirmAction } from "@/components/platform/actions";
 import * as A from "../actions";
+import { runtimeProviderLabel } from "@/server/runtime";
 
 export const metadata = { title: "Infrastructure" };
 
@@ -34,7 +35,7 @@ export default async function InfrastructurePage() {
                 <td><Status value={rt.tunnel} /></td>
                 <td><Status value={rt.backup.status} /><div className="pf-small"><When iso={rt.backup.lastSnapshotAt} /></div></td>
                 <td><When iso={rt.lastRestartAt} /></td>
-                <td className="pf-small">{rt.runtimeVersion}<div className="pf-mono pf-muted">{rt.kind === "hermes" ? "hermes " : "demo "}{rt.engineVersion}</div></td>
+                <td className="pf-small">{rt.runtimeVersion}<div className="pf-mono pf-muted">{runtimeProviderLabel(rt.provider)} {rt.engineVersion}</div></td>
                 <td><Status value={rt.deploymentState} /></td>
                 <td>
                   <div className="flex flex-col gap-1.5">

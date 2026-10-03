@@ -4,14 +4,14 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime } from "@/server/runtime";
+import { isRuntimeNotFound, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { conflict, invalid, notFound } from "@/server/errors";
 import { redactSecrets } from "@/server/redact";
 import { assertExecutable, audit, getOrgFor, getScoped } from "./common";
 import { raiseIncident } from "./incidents";
 
-/** 5-field cron, or the engine's shorthand ("every 2h", "30m"). */
+/** 5-field cron, or an interval shorthand ("every 2h", "30m"). */
 const CRON = /^(\S+\s+){4}\S+$/;
 const SHORTHAND = /^(every\s+)?\d+\s*(m|h|d|min|mins|minutes|hours|days)$/i;
 
@@ -46,7 +46,7 @@ async function ctx(r: Repository, botId: string) {
   if (!bot) throw notFound("Bot");
   const runtime = await r.get("runtimes", bot.runtimeId);
   if (!runtime) throw notFound("Runtime");
-  return { bot, runtime, adapter: adapterFor(runtime), target: await resolveTarget(runtime, bot) };
+  return { bot, runtime, rt: botRuntime(runtime, bot) };
 }
 
 export async function createAutomation(
@@ -60,14 +60,14 @@ export async function createAutomation(
   if (!name || name.length > 120) throw invalid("Give the automation a name under 120 characters.");
   if (input.prompt.trim().length < 5) throw invalid("Describe what the Bot should do.");
   const schedule = validateSchedule(input.schedule);
-  const { bot, adapter, target } = await ctx(r, input.botId);
+  const { bot, rt } = await ctx(r, input.botId);
   if (bot.orgId !== org.id) throw notFound("Bot");
   const correlationId = newCorrelationId();
   const skills = (await r.list("skill_assignments", { orgId: org.id, where: { botId: bot.id } })).filter((s) => !s.removedAt).map((s) => s.skillKey);
-  let runtimeJobId: string | undefined;
+  let runtimeAutomationId: string | undefined;
   try {
-    const job = await adapter.createAutomation(target, { name, prompt: input.prompt.trim(), schedule, skills });
-    runtimeJobId = job.runtimeJobId;
+    const job = await rt.createAutomation({ name, prompt: input.prompt.trim(), schedule, skills });
+    runtimeAutomationId = job.runtimeAutomationId;
   } catch (e) {
     throw conflict(`The runtime did not accept the automation: ${sanitizeRuntimeError(e, correlationId).operator}`);
   }
@@ -80,7 +80,7 @@ export async function createAutomation(
     schedule,
     scheduleLabel: describeSchedule(schedule),
     status: "active",
-    runtimeJobId,
+    runtimeAutomationId,
     consecutiveFailures: 0,
     trigger: input.trigger ?? "schedule",
   });
@@ -96,17 +96,17 @@ export async function automationAction(r: Repository, actor: Actor, jobId: strin
   const org = await r.get("organizations", job.orgId);
   if (!org) throw notFound();
   if (action === "run" || action === "resume") assertExecutable(org);
-  const { adapter, target } = await ctx(r, job.botId);
+  const { rt } = await ctx(r, job.botId);
   const correlationId = newCorrelationId();
-  if (job.runtimeJobId) {
+  if (job.runtimeAutomationId) {
     try {
-      if (action === "pause") await adapter.pauseAutomation(target, job.runtimeJobId);
-      if (action === "resume") await adapter.resumeAutomation(target, job.runtimeJobId);
-      if (action === "run") await adapter.runAutomationNow(target, job.runtimeJobId);
-      if (action === "delete") await adapter.deleteAutomation(target, job.runtimeJobId);
+      if (action === "pause") await rt.pauseAutomation(job.runtimeAutomationId);
+      if (action === "resume") await rt.resumeAutomation(job.runtimeAutomationId);
+      if (action === "run") await rt.runAutomationNow(job.runtimeAutomationId);
+      if (action === "delete") await rt.deleteAutomation(job.runtimeAutomationId);
     } catch (e) {
       const s = sanitizeRuntimeError(e, correlationId);
-      if (!(action === "delete" && s.code === "runtime_not_found")) throw conflict(`Runtime refused: ${s.operator}`);
+      if (!(action === "delete" && isRuntimeNotFound(e))) throw conflict(`Runtime refused: ${s.operator}`);
     }
   }
   const tx = new Tx(r);
@@ -128,12 +128,12 @@ export async function updateAutomation(r: Repository, actor: Actor, jobId: strin
   if (input.botId && input.botId !== job.botId) {
     const bot = await r.get("bots", input.botId);
     if (!bot || bot.orgId !== job.orgId) throw notFound("Bot");
-    // Moving a job between Bots = recreate on the new profile.
+    // Moving an Automation between Bots = recreate it on the new Bot.
     await automationAction(r, actor, job.id, "delete");
     return createAutomation(r, actor, { orgId: job.orgId, botId: input.botId, name: input.name ?? job.name, prompt: input.prompt ?? job.prompt, schedule: schedule ?? job.schedule, trigger: job.trigger });
   }
-  const { adapter, target } = await ctx(r, job.botId);
-  if (job.runtimeJobId) await adapter.updateAutomation(target, job.runtimeJobId, { name: input.name, prompt: input.prompt, schedule });
+  const { rt } = await ctx(r, job.botId);
+  if (job.runtimeAutomationId) await rt.updateAutomation(job.runtimeAutomationId, { name: input.name, prompt: input.prompt, schedule });
   const tx = new Tx(r);
   const next = tx.patch("automation_jobs", job, {
     ...(input.name ? { name: input.name.trim() } : {}),
@@ -153,24 +153,24 @@ export async function syncAutomations(r: Repository, orgId: string): Promise<voi
   for (const [botId, list] of byBot) {
     let remote;
     try {
-      const { adapter, target } = await ctx(r, botId);
-      remote = await adapter.listAutomations(target);
+      const { rt } = await ctx(r, botId);
+      remote = await rt.listAutomations();
     } catch {
       continue;
     }
     for (const job of list) {
-      const rj = remote.find((x) => x.runtimeJobId === job.runtimeJobId);
+      const rj = remote.find((x) => x.runtimeAutomationId === job.runtimeAutomationId);
       if (!rj) continue;
-      const failed = rj.lastStatus === "failed" && rj.lastRunAt !== job.lastRunAt;
-      const consecutiveFailures = failed ? job.consecutiveFailures + 1 : rj.lastStatus === "succeeded" ? 0 : job.consecutiveFailures;
+      const failed = rj.lastResult === "failed" && rj.lastRunAt !== job.lastRunAt;
+      const consecutiveFailures = failed ? job.consecutiveFailures + 1 : rj.lastResult === "succeeded" ? 0 : job.consecutiveFailures;
       const tx = new Tx(r);
       tx.patch("automation_jobs", job, {
         lastRunAt: rj.lastRunAt,
-        lastStatus: rj.lastStatus,
+        lastStatus: rj.lastResult,
         nextRunAt: rj.nextRunAt,
         lastError: rj.lastError ? redactSecrets(rj.lastError, 400) : undefined,
         consecutiveFailures,
-        status: job.status === "paused" ? "paused" : consecutiveFailures >= 2 ? "failing" : "active",
+        status: job.status === "paused" ? "paused" : consecutiveFailures >= 2 ? "failed" : "active",
       });
       await tx.commit();
       if (consecutiveFailures >= 2) {

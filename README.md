@@ -70,8 +70,10 @@ Diagrams: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** · Decisions:
 
 The current runtime engine is Hermes Agent (pinned; see
 [docs/research/HERMES_INTEGRATION.md](docs/research/HERMES_INTEGRATION.md)).
-It is infrastructure — all engine-specific code sits behind
-`src/server/runtime/adapter.ts` and clients never see it.
+It is infrastructure — all engine-specific code sits in
+`src/server/runtime/hermes/` behind the neutral `RuntimeAdapter` and the
+`BotRuntime` facade (`src/server/runtime`), and clients never see it. See
+"Runtime translator layer" in docs/ARCHITECTURE.md.
 
 ## Folder structure
 

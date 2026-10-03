@@ -1,11 +1,13 @@
 import "server-only";
-import type { RuntimeEvent } from "./adapter";
+import type { BotRunEvent } from "./runtime-types";
 import { clientSafe, redactSecrets } from "@/server/redact";
 
 /**
  * Event translation registry.
  *
- * Engine events are technical ("web_search", "terminal", "mcp_hubspot_
+ * Second translation step. Adapters already turned engine events into
+ * normalized bot.* events; this turns those into audience-separated lines.
+ * Action names are still technical ("web_search", "terminal", "mcp_hubspot_
  * update_contact"). Clients see business language; operators see the
  * sanitized technical line. To teach the platform a new action, add a row
  * here — order matters, first match wins.
@@ -45,19 +47,19 @@ export interface TranslatedEvent {
   kind: "lifecycle" | "action" | "message" | "approval" | "error" | "usage";
   clientText?: string;
   operatorText: string;
-  technical?: { action?: string; durationS?: number; error?: boolean; rawEvent?: string };
+  technical?: { action?: string; durationS?: number; error?: boolean; sourceEvent?: string };
 }
 
 /** Turn one runtime event into stored, audience-separated lines. Returns
  *  null for high-volume noise (token deltas) that is not worth storing. */
-export function translateEvent(e: RuntimeEvent): TranslatedEvent | null {
-  const technical = { action: e.action, durationS: e.durationS, error: e.error, rawEvent: e.raw };
+export function translateEvent(e: BotRunEvent): TranslatedEvent | null {
+  const technical = { action: e.action, durationS: e.durationS, error: e.error, sourceEvent: e.sourceEvent };
   switch (e.type) {
-    case "run.queued":
+    case "bot.run.queued":
       return { kind: "lifecycle", clientText: "Queued", operatorText: "Run queued", technical };
-    case "run.started":
+    case "bot.run.started":
       return { kind: "lifecycle", clientText: "Started", operatorText: "Run started", technical };
-    case "action.started": {
+    case "bot.action.started": {
       const t = translateAction(e.action);
       return {
         kind: "action",
@@ -66,7 +68,7 @@ export function translateEvent(e: RuntimeEvent): TranslatedEvent | null {
         technical,
       };
     }
-    case "action.completed": {
+    case "bot.action.completed": {
       const t = translateAction(e.action);
       const d = e.durationS !== undefined ? ` (${e.durationS.toFixed(1)}s)` : "";
       return {
@@ -77,31 +79,31 @@ export function translateEvent(e: RuntimeEvent): TranslatedEvent | null {
         technical,
       };
     }
-    case "message":
+    case "bot.message":
       return e.text
         ? { kind: "message", operatorText: `Note: ${redactSecrets(e.text, 300)}`, technical }
         : null;
-    case "approval.requested":
+    case "bot.approval.requested":
       return {
         kind: "approval",
         clientText: "Waiting for approval",
         operatorText: `Approval requested — ${redactSecrets(e.approval?.description ?? "", 200)}`,
         technical,
       };
-    case "approval.resolved":
+    case "bot.approval.resolved":
       return { kind: "approval", clientText: "Approval recorded", operatorText: "Approval resolved", technical };
-    case "run.completed":
+    case "bot.run.completed":
       return { kind: "lifecycle", clientText: "Task complete", operatorText: "Run completed", technical };
-    case "run.failed":
+    case "bot.run.failed":
       return {
         kind: "error",
         clientText: "Task could not be completed.",
         operatorText: `Run failed${e.text ? ` — ${redactSecrets(e.text, 300)}` : ""}`,
         technical,
       };
-    case "run.cancelled":
+    case "bot.run.cancelled":
       return { kind: "lifecycle", clientText: "Stopped", operatorText: "Run cancelled", technical };
-    case "run.interrupted":
+    case "bot.run.interrupted":
       return { kind: "error", clientText: "Paused — will be retried", operatorText: "Run interrupted (runtime restart or shutdown)", technical };
     default:
       return null;

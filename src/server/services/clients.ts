@@ -5,8 +5,8 @@ import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
 import { awsControl } from "@/server/aws/control";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime } from "@/server/runtime";
+import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { conflict, invalid } from "@/server/errors";
 import { redactSecrets } from "@/server/redact";
 import { audit, getOrgFor, refOf } from "./common";
@@ -61,7 +61,7 @@ export async function suspendClient(
     const bot = await r.get("bots", run.botId);
     const runtime = runtimes.find((x) => x.id === bot?.runtimeId);
     if (bot && runtime && run.runtimeRunId) {
-      await adapterFor(runtime).stopRun(await resolveTarget(runtime, bot), run.runtimeRunId).catch(() => undefined);
+      await botRuntime(runtime, bot).stopBotRun(run.runtimeRunId).catch(() => undefined);
     }
   }
 

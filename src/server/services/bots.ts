@@ -5,8 +5,8 @@ import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
 import { awsControl } from "@/server/aws/control";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime } from "@/server/runtime";
+import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { conflict, invalid, notFound } from "@/server/errors";
 import { redactSecrets } from "@/server/redact";
 import { botTypeOrThrow, isBotTypeKey } from "@/config/bot-catalog";
@@ -17,7 +17,7 @@ import { isDemo } from "@/server/env";
 async function lifecycleForBot(r: Repository, bot: Bot, action: "park-bot" | "unpark-bot" | "deploy-bot") {
   const runtime = await r.get("runtimes", bot.runtimeId);
   if (!runtime) throw notFound("Runtime");
-  if (!runtime.instanceId && runtime.kind !== "demo" && !isDemo()) {
+  if (!runtime.instanceId && runtime.provider !== "demo" && !isDemo()) {
     throw conflict("This client's runtime is not provisioned yet.");
   }
   return awsControl().runLifecycle(runtime.id, runtime.instanceId ?? "demo", action, { profile: bot.runtimeProfile });
@@ -195,9 +195,8 @@ export async function provisionBot(r: Repository, actor: Actor, orgId: string, t
 
   try {
     await awsControl().runLifecycle(runtime.id, runtime.instanceId ?? "demo", "deploy-bot", { profile: type.runtimeProfile });
-    // Health validation: the new profile must answer with its own key.
-    const target = await resolveTarget(runtime, bot);
-    await adapterFor(runtime).getBot(target);
+    // Health validation: the new Bot must answer with its own credentials.
+    await botRuntime(runtime, bot).getBot();
     const tx2 = new Tx(r);
     bot = tx2.patch("bots", bot, { status: "active", credentialStatus: "present" });
     tx2.insert("deployment_events", {
@@ -208,7 +207,7 @@ export async function provisionBot(r: Repository, actor: Actor, orgId: string, t
   } catch (e) {
     const s = sanitizeRuntimeError(e, correlationId);
     const tx2 = new Tx(r);
-    bot = tx2.patch("bots", bot, { status: "error", errorState: { code: s.code, message: s.operator, at: nowIso(), correlationId } });
+    bot = tx2.patch("bots", bot, { status: "degraded", errorState: { code: s.code, message: s.operator, at: nowIso(), correlationId } });
     tx2.insert("deployment_events", {
       orgId, runtimeId: runtime.id, kind: "deploy_bot", status: "failed",
       detail: s.operator, actorId: actor.user.id, correlationId,
@@ -223,14 +222,14 @@ export async function createConversation(r: Repository, actor: Actor, botId: str
   const bot = await getScoped(r, "bots", botId, actor, "ops.runs.control");
   const runtime = await r.get("runtimes", bot.runtimeId);
   if (!runtime) throw notFound("Runtime");
-  const conv = await adapterFor(runtime).createConversation(await resolveTarget(runtime, bot), title || "Operator test");
+  const conv = await botRuntime(runtime, bot).createConversation(title || "Operator test");
   const tx = new Tx(r);
   const c = tx.insert("conversations", {
     orgId: bot.orgId,
     botId: bot.id,
     userId: actor.user.id,
     title: title || "Operator test",
-    runtimeSessionId: conv.runtimeId,
+    runtimeSessionId: conv.runtimeConversationId,
   });
   audit(tx, actor, { action: "conversation.create", orgId: bot.orgId, targetType: "conversation", targetId: c.id, correlationId: newCorrelationId() });
   await tx.commit();
@@ -242,19 +241,19 @@ export async function runtimeDetails(r: Repository, actor: Actor, botId: string)
   const bot = await getScoped(r, "bots", botId, actor, "ops.view");
   const runtime = await r.get("runtimes", bot.runtimeId);
   if (!runtime) throw notFound("Runtime");
-  const adapter = adapterFor(runtime);
+  const rt = botRuntime(runtime, bot);
+  const engine = rt.providerLabel;
   const correlationId = newCorrelationId();
   try {
-    const target = await resolveTarget(runtime, bot);
     const [caps, skills, toolsets, botInfo] = await Promise.all([
-      adapter.getCapabilities(target),
-      adapter.listSkills(target).catch(() => []),
-      adapter.listToolsets(target).catch(() => []),
-      adapter.getBot(target).catch(() => undefined),
+      rt.getBotCapabilities(),
+      rt.listBotSkills().catch(() => []),
+      rt.listBotToolsets().catch(() => []),
+      rt.getBot().catch(() => undefined),
     ]);
-    return { ok: true as const, engine: adapter.kind, profile: bot.runtimeProfile, caps, skills, toolsets, reachable: !!botInfo?.reachable };
+    return { ok: true as const, engine, profile: bot.runtimeProfile, caps, skills, toolsets, runtimeStatus: botInfo?.status ?? ("offline" as const), reachable: !!botInfo };
   } catch (e) {
     const s = sanitizeRuntimeError(e, correlationId);
-    return { ok: false as const, engine: adapter.kind, profile: bot.runtimeProfile, error: s.operator, correlationId };
+    return { ok: false as const, engine, profile: bot.runtimeProfile, error: s.operator, correlationId };
   }
 }

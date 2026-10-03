@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { HermesRuntimeAdapter } from "@/server/runtime/hermes/adapter";
-import type { RuntimeTarget } from "@/server/runtime/adapter";
+import { HermesRuntimeAdapter } from "@/server/runtime/hermes/HermesRuntimeAdapter";
+import type { RuntimeConnection } from "@/server/runtime/runtime-types";
 
 /**
  * Live, NON-DESTRUCTIVE contract test against a real runtime. Catches
@@ -18,14 +18,16 @@ const url = process.env.HERMES_CONTRACT_URL;
 const key = process.env.HERMES_CONTRACT_KEY;
 const configured = !!url && !!key;
 
-const target: RuntimeTarget = {
+const target: RuntimeConnection = {
+  provider: "hermes",
   runtimeId: "contract",
-  profile: process.env.HERMES_CONTRACT_PROFILE,
-  baseUrl: url ?? "",
-  apiKey: key ?? "",
-  extraHeaders: process.env.HERMES_CONTRACT_ACCESS_ID
-    ? { "CF-Access-Client-Id": process.env.HERMES_CONTRACT_ACCESS_ID, "CF-Access-Client-Secret": process.env.HERMES_CONTRACT_ACCESS_SECRET ?? "" }
-    : {},
+  runtimeProfile: process.env.HERMES_CONTRACT_PROFILE,
+  endpoint: url ?? "",
+  credentials: {
+    apiKey: key ?? "",
+    accessClientId: process.env.HERMES_CONTRACT_ACCESS_ID,
+    accessClientSecret: process.env.HERMES_CONTRACT_ACCESS_SECRET,
+  },
 };
 
 describe.skipIf(!configured)("runtime contract (live)", () => {
@@ -36,13 +38,13 @@ describe.skipIf(!configured)("runtime contract (live)", () => {
     expect(["healthy", "degraded"]).toContain(d.status);
   });
   it("capabilities advertise the features AgenticBots relies on", async () => {
-    const c = await a.getCapabilities(target);
+    const c = await a.getBotCapabilities(target);
     expect(c).toMatchObject({ runs: true, runEvents: true, runStop: true });
   });
   it("conversation create + read", async () => {
     const c = await a.createConversation(target, "agenticbots contract test");
-    expect(c.runtimeId).toBeTruthy();
-    expect((await a.getConversation(target, c.runtimeId)).runtimeId).toBe(c.runtimeId);
+    expect(c.runtimeConversationId).toBeTruthy();
+    expect((await a.getConversation(target, c.runtimeConversationId)).runtimeConversationId).toBe(c.runtimeConversationId);
   });
   it("run → completion, idempotent replay", async () => {
     const key = `contract-${Date.now()}`;
@@ -51,18 +53,18 @@ describe.skipIf(!configured)("runtime contract (live)", () => {
     const replay = await a.startBotRun(target, input);
     expect(replay.runtimeRunId).toBe(first.runtimeRunId);
     expect(replay.replayed).toBe(true);
-    let state = await a.getRun(target, first.runtimeRunId);
+    let state = await a.getBotRun(target, first.runtimeRunId);
     for (let i = 0; i < 60 && ["queued", "running"].includes(state.status); i++) {
       await new Promise((r) => setTimeout(r, 2000));
-      state = await a.getRun(target, first.runtimeRunId);
+      state = await a.getBotRun(target, first.runtimeRunId);
     }
     expect(state.status).toBe("completed");
     expect(state.usage?.inputTokens ?? 0).toBeGreaterThan(0);
   });
   it("jobs, skills and toolsets list", async () => {
     expect(Array.isArray(await a.listAutomations(target))).toBe(true);
-    expect(Array.isArray(await a.listSkills(target))).toBe(true);
-    expect(Array.isArray(await a.listToolsets(target))).toBe(true);
+    expect(Array.isArray(await a.listBotSkills(target))).toBe(true);
+    expect(Array.isArray(await a.listBotToolsets(target))).toBe(true);
   });
 });
 

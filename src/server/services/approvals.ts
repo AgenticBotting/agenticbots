@@ -4,8 +4,8 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import { can, type Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
-import { adapterFor, resolveTarget } from "@/server/runtime";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime } from "@/server/runtime";
+import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { conflict, notFound } from "@/server/errors";
 import { redactSecrets } from "@/server/redact";
 import { assertExecutable, audit } from "./common";
@@ -48,10 +48,9 @@ export async function resolveApproval(
     const runtime = await r.get("runtimes", bot.runtimeId);
     if (run?.runtimeRunId && runtime) {
       try {
-        const target = await resolveTarget(runtime, bot);
-        const adapter = adapterFor(runtime);
-        if (decision === "approve") await adapter.approveRun(target, run.runtimeRunId, approval.runtimeRequestId);
-        else await adapter.denyRun(target, run.runtimeRunId, approval.runtimeRequestId);
+        const rt = botRuntime(runtime, bot);
+        if (decision === "approve") await rt.approveBotRun(run.runtimeRunId, approval.runtimeApprovalId);
+        else await rt.denyBotRun(run.runtimeRunId, approval.runtimeApprovalId);
       } catch (e) {
         const s = sanitizeRuntimeError(e, correlationId);
         throw conflict(s.client === "Task could not be completed." ? "The run could not be resumed. AgenticBots has been notified." : s.client);
@@ -116,8 +115,8 @@ export async function expireApprovals(r: Repository): Promise<number> {
       const [run, bot] = await Promise.all([r.get("runs", a.runId), r.get("bots", a.botId)]);
       const runtime = bot ? await r.get("runtimes", bot.runtimeId) : null;
       if (run?.runtimeRunId && bot && runtime) {
-        await adapterFor(runtime)
-          .denyRun(await resolveTarget(runtime, bot), run.runtimeRunId, a.runtimeRequestId)
+        await botRuntime(runtime, bot)
+          .denyBotRun(run.runtimeRunId, a.runtimeApprovalId)
           .catch(() => undefined);
       }
     }

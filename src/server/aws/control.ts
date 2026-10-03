@@ -1,7 +1,7 @@
 import "server-only";
 import { isDemo, assertLive, cloudChangesAllowed } from "@/server/env";
-import { demoState } from "@/server/runtime/demo/adapter";
-import { RuntimeError } from "@/server/runtime/errors";
+import { demoState } from "@/server/runtime/demo/DemoRuntimeAdapter";
+import { RuntimeError } from "@/server/runtime/runtime-errors";
 
 /**
  * AWS control plane for client runtimes.

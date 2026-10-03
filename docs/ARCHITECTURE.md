@@ -123,13 +123,67 @@ flowchart LR
 Bot types live in `src/config/bot-catalog.ts` (derived from the website's
 catalog). Instances live in the `bots` table.
 
+## 5a. Runtime translator layer
+
+```
+CLIENT / OPERATOR UI  →  AGENTICBOTS SERVER  →  BotRuntime  →  RuntimeAdapter  →  engine
+ (pages, API routes)      (services, views)     (facade)      (Demo | Hermes)
+```
+
+The rest of AgenticBots never knows how the engine works. It calls
+`botRuntime(runtime, bot).startBotRun(…)`, `.getBotRun(…)`,
+`.approveBotRun(…)`, `runtimeFor(runtime).getDetailedHealth()` and so on;
+the facade resolves the server-side mapping and picks the adapter.
+
+| Layer | Files | Knows about |
+|---|---|---|
+| Facade | `runtime/index.ts` | AgenticBots records → connection; nothing engine-specific |
+| Interface | `RuntimeAdapter.ts`, `runtime-types.ts` | Neutral vocabulary only |
+| Errors | `runtime-errors.ts` | `RuntimeUnavailableError`, `RuntimeAuthenticationError`, `BotNotFoundError`, `RunNotFoundError`, `RunFailedError`, `ApprovalRequiredError`, `ProviderUnavailableError`, `CapabilityUnavailableError` (+ request/resource variants); `sanitizeRuntimeError()` turns them into fixed client sentences |
+| Factory | `runtime-factory.ts` | `getRuntimeAdapter(provider)`, `resolveRuntimeConnection()`; demo mode always wins |
+| Hermes | `hermes/HermesRuntimeAdapter.ts`, `hermes-client.ts`, `hermes-auth.ts`, `hermes-types.ts`, `hermes-mappers.ts`, `hermes-errors.ts` | URLs, `/p/<profile>/` routing, keys, tunnel headers, payloads, status strings, event names, version differences |
+| Demo | `demo/DemoRuntimeAdapter.ts` | A timeline; no network |
+
+**Neutral vocabulary.** Bot status: `active · working · idle · disabled ·
+offline · degraded` (+ `provisioning`, which is AgenticBots lifecycle).
+Run status: `queued · running · waiting_for_approval · completed · failed ·
+cancelled · interrupted`. Automation status: `active · paused · failed`.
+Events: `bot.run.queued`, `bot.run.started`, `bot.action.started`,
+`bot.action.completed`, `bot.message`, `bot.approval.requested`,
+`bot.approval.resolved`, `bot.run.completed|failed|cancelled|interrupted`.
+`translate.ts` then turns `bot.action.started {action: "web_search"}` into
+"Researching" for clients.
+
+**Identifiers.** AgenticBots ids are the primary keys. Runtime-side ids are
+opaque, server-only mapping fields: `Runtime.provider` + `endpointRef`,
+`Bot.runtimeProfile` + `credentialRef`, `Run.runtimeRunId`,
+`Conversation.runtimeSessionId`, `AutomationJob.runtimeAutomationId`,
+`Approval.runtimeApprovalId`. Client projections in `src/server/views`
+never include them.
+
+**Adding a runtime.** Implement `RuntimeAdapter` in its own folder,
+register it in `runtime-factory.ts`, add the value to `RuntimeProvider`, and
+run the shared contract (`tests/contract/runtime-adapter.contract.ts`)
+against it. Nothing above the facade changes.
+
+**Enforcement.**
+- ESLint `no-restricted-imports` (`eslint.config.mjs`): only
+  `src/server/runtime/**` may import adapter internals; UI components may
+  not import the runtime at all.
+- `tests/security/runtime-boundary.test.ts`: the engine's name, endpoints,
+  port and headers appear nowhere outside the runtime layer (plus the
+  redaction deny-list and the provider union).
+- `tests/unit/runtime-adapter-contract.test.ts`: the same engine-neutral
+  contract runs against the demo adapter and the Hermes adapter (via an
+  in-process fake server, `tests/support/fake-hermes.ts`).
+
 ## 6. Bot Run lifecycle
 
 ```mermaid
 stateDiagram-v2
   [*] --> queued: startRun (idempotency key)
   queued --> running: runtime accepted
-  running --> waiting_for_approval: approval.request
+  running --> waiting_for_approval: bot.approval.requested
   waiting_for_approval --> running: approved
   waiting_for_approval --> completed: denied (nothing sent)
   running --> completed
@@ -265,10 +319,12 @@ flowchart TB
 | Bot catalog / skills / integrations config | `src/config/*` |
 | Storage (memory for demo/tests, Convex for prod) | `src/server/db/*`, `convex/platform.ts` |
 | Auth, sessions, roles, permissions | `src/server/auth/*` |
-| Runtime abstraction | `src/server/runtime/adapter.ts` |
+| Runtime facade (the only entry point) | `src/server/runtime/index.ts` (`BotRuntime`) |
+| Neutral runtime interface / types / errors | `src/server/runtime/RuntimeAdapter.ts`, `runtime-types.ts`, `runtime-errors.ts` |
+| Adapter selection + connection resolution | `src/server/runtime/runtime-factory.ts` |
 | Engine-specific code (isolated) | `src/server/runtime/hermes/*` |
-| Demo runtime | `src/server/runtime/demo/adapter.ts` |
-| Event translation / error sanitization | `src/server/runtime/translate.ts`, `errors.ts` |
+| Demo runtime | `src/server/runtime/demo/DemoRuntimeAdapter.ts` |
+| Event → client/operator text | `src/server/runtime/translate.ts` |
 | Services | `src/server/services/*` |
 | Billing domain + providers | `src/server/billing/*` (`providers/manual.ts`) |
 | AWS control (OIDC) | `src/server/aws/control.ts` |

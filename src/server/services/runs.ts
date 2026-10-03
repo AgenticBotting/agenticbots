@@ -5,9 +5,8 @@ import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
-import { adapterFor, demoAdapter, resolveTarget } from "@/server/runtime";
-import type { RuntimeEvent } from "@/server/runtime/adapter";
-import { sanitizeRuntimeError } from "@/server/runtime/errors";
+import { botRuntime, TERMINAL_EVENT_TYPES, type BotEventType, type BotRunEvent, type RuntimeApproval } from "@/server/runtime";
+import { isRuntimeNotFound, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { translateEvent } from "@/server/runtime/translate";
 import { clientSafe, redactSecrets } from "@/server/redact";
 import { conflict, invalid, notFound } from "@/server/errors";
@@ -84,14 +83,14 @@ export async function startRun(r: Repository, actor: Actor | ActorRef, input: St
   await tx.commit();
 
   try {
-    const target = await resolveTarget(runtime, bot);
+    const rt = botRuntime(runtime, bot);
     let conversationRuntimeId: string | undefined;
     if (input.conversationId) {
       const conv = await r.get("conversations", input.conversationId);
       if (!conv || conv.orgId !== org.id || conv.botId !== bot.id) throw notFound("Conversation");
       conversationRuntimeId = conv.runtimeSessionId;
     }
-    const res = await adapterFor(runtime).startBotRun(target, {
+    const res = await rt.startBotRun({
       task,
       instructions: input.instructions ?? bot.instructions,
       conversationRuntimeId,
@@ -136,24 +135,22 @@ export async function startRun(r: Repository, actor: Actor | ActorRef, input: St
 
 /** Bring one run up to date with the runtime: status, events, usage,
  *  approvals. Idempotent; safe to call from page loads, SSE and the sync job. */
-export async function syncRun(r: Repository, runId: string, events?: RuntimeEvent[]): Promise<Run> {
+export async function syncRun(r: Repository, runId: string, events?: BotRunEvent[]): Promise<Run> {
   let run = await r.get("runs", runId);
   if (!run) throw notFound("Run");
   if (isTerminal(run.status) || !run.runtimeRunId) return run;
   const { bot, org, runtime } = await loadContext(r, run.botId);
-  const adapter = adapterFor(runtime);
+  const rt = botRuntime(runtime, bot);
 
   let state;
   try {
-    const target = await resolveTarget(runtime, bot);
-    state = await adapter.getRun(target, run.runtimeRunId);
-    if (!events && adapter.kind === "demo") events = demoAdapter().eventsSoFar(run.runtimeRunId);
+    state = await rt.getBotRun(run.runtimeRunId);
+    if (!events && rt.supportsEventReplay) events = await rt.listBotRunEvents(run.runtimeRunId);
   } catch (e) {
-    const s = sanitizeRuntimeError(e, run.correlationId);
     const tx = new Tx(r);
     tx.patch("runs", run, { lastSyncedAt: nowIso() });
     await tx.commit();
-    if (s.code === "runtime_not_found") {
+    if (isRuntimeNotFound(e)) {
       return finalize(r, run, bot, org, runtime, { status: "interrupted", error: "Runtime no longer knows this run (restart?)" });
     }
     return run;
@@ -187,15 +184,15 @@ export async function syncRun(r: Repository, runId: string, events?: RuntimeEven
 
 /**
  * Store translated events with monotonically increasing sequence numbers.
- *   snapshot: `events` is the run's full history so far (demo runtime) —
+ *   snapshot: `events` is the run's full history so far (runtimes that
+ *             support event replay) —
  *             anything at or below the cursor was already stored.
- *   append:   `events` are new deliveries from a live stream (the real
- *             runtime's event stream is consume-once).
+ *   append:   `events` are new deliveries from a consume-once live stream.
  */
 export async function ingestEvents(
   r: Repository,
   run: Run,
-  events: RuntimeEvent[],
+  events: BotRunEvent[],
   mode: "snapshot" | "append" = "snapshot",
 ): Promise<Run> {
   const fresh = mode === "snapshot" ? events.slice(run.eventCursor) : events;
@@ -226,7 +223,7 @@ async function ensureRuntimeApproval(
   r: Repository,
   run: Run,
   bot: Bot,
-  pending: { requestId?: string; description: string; detail?: string },
+  pending: RuntimeApproval,
 ): Promise<void> {
   const open = (await r.list("approvals", { orgId: run.orgId, where: { runId: run.id } })).find((a) => a.status === "pending");
   if (open) return;
@@ -251,7 +248,7 @@ async function ensureRuntimeApproval(
     audience: sendsExternally ? "client" : "operator",
     requestedAt: nowIso(),
     expiresAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-    runtimeRequestId: pending.requestId,
+    runtimeApprovalId: pending.approvalId,
   });
   tx.patch("runs", run, { approvalState: "pending", status: "waiting_for_approval" });
   await tx.commit();
@@ -371,10 +368,9 @@ export async function stopRun(r: Repository, actor: Actor, runId: string): Promi
   const correlationId = newCorrelationId();
   if (run.runtimeRunId) {
     try {
-      await adapterFor(runtime).stopRun(await resolveTarget(runtime, bot), run.runtimeRunId);
+      await botRuntime(runtime, bot).stopBotRun(run.runtimeRunId);
     } catch (e) {
-      const s = sanitizeRuntimeError(e, correlationId);
-      if (s.code !== "runtime_not_found") throw e;
+      if (!isRuntimeNotFound(e)) throw e;
     }
   }
   const tx = new Tx(r);
@@ -411,30 +407,31 @@ export async function setRunNotes(r: Repository, actor: Actor, runId: string, no
 }
 
 /**
- * Pull new events for a live run for up to `budgetMs`. Demo runtime: the
- * full history is replayed and de-duplicated by cursor. Real runtime: its
- * event stream is consume-once, so events are appended as they arrive and
- * the run's status is reconciled by polling at the end.
+ * Pull new events for a live run for up to `budgetMs`. Runtimes with event
+ * replay: the full history is re-read and de-duplicated by cursor. Others:
+ * the event stream is consume-once, so events are appended as they arrive
+ * and the run's status is reconciled by polling at the end.
  */
+const FLUSH_ON: readonly BotEventType[] = [...TERMINAL_EVENT_TYPES, "bot.approval.requested"];
+
 export async function pumpRun(r: Repository, runId: string, budgetMs = 20_000, signal?: AbortSignal): Promise<Run> {
   let run = await r.get("runs", runId);
   if (!run) throw notFound("Run");
   if (isTerminal(run.status) || !run.runtimeRunId) return run;
   const { bot, runtime } = await loadContext(r, run.botId);
-  const adapter = adapterFor(runtime);
-  if (adapter.kind === "demo") return syncRun(r, runId);
+  const rt = botRuntime(runtime, bot);
+  if (rt.supportsEventReplay) return syncRun(r, runId);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), budgetMs);
   signal?.addEventListener("abort", () => ctrl.abort());
-  const buffer: RuntimeEvent[] = [];
+  const buffer: BotRunEvent[] = [];
   try {
-    const target = await resolveTarget(runtime, bot);
-    for await (const e of adapter.streamRunEvents(target, run.runtimeRunId, ctrl.signal)) {
+    for await (const e of rt.streamBotRunEvents(run.runtimeRunId, ctrl.signal)) {
       buffer.push(e);
-      if (buffer.length >= 10 || ["run.completed", "run.failed", "run.cancelled", "approval.requested"].includes(e.type)) {
+      if (buffer.length >= 10 || FLUSH_ON.includes(e.type)) {
         run = await ingestEvents(r, run, buffer.splice(0), "append");
       }
-      if (["run.completed", "run.failed", "run.cancelled", "run.interrupted"].includes(e.type)) break;
+      if (TERMINAL_EVENT_TYPES.includes(e.type)) break;
     }
   } catch {
     // Stream dropped: status polling below still reconciles the run.

@@ -9,6 +9,7 @@ import { conflict, invalid, notFound } from "@/server/errors";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { platformMode } from "@/server/env";
 import { assertPermission, audit, SYSTEM } from "./common";
+import { defaultRuntimeProvider } from "@/server/runtime";
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i;
 const normEmail = (e: string) => e.trim().toLowerCase();
@@ -63,7 +64,7 @@ export async function createClientOrg(
   const envPath = env === "production" ? "prod" : env;
   tx.insert("runtimes", {
     orgId: org.id,
-    kind: mode === "demo" ? "demo" : "hermes",
+    provider: mode === "demo" ? "demo" : defaultRuntimeProvider(),
     region: input.region ?? process.env.AWS_REGION ?? "us-east-1",
     instanceType,
     health: mode === "demo" ? "healthy" : "unknown",
