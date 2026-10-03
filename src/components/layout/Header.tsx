@@ -19,6 +19,7 @@ import { track } from "@/lib/analytics";
 const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Founding clients", href: "/#founding" },
   { label: "Blog", href: "/blog" },
 ];
 
@@ -179,8 +180,6 @@ export function Header() {
                 silently wrapping "Service areas" onto two lines the way
                 it did earlier. */}
             <nav className="hidden lg:flex shrink-0 items-center gap-8 whitespace-nowrap">
-              <MenuTrigger label="Bots" open={openMenu === "bots"} onClick={() => toggleMenu("bots")} />
-              <MenuTrigger label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -215,14 +214,14 @@ export function Header() {
                   covers this. */}
               <div className="hidden sm:block">
                 <BotOrbit tone="text-accent-500" eyes="text-ink-950">
-                  <button
-                    type="button"
-                    onClick={() => { closeMenu(); openBotPlan("header"); }}
+                  <Link
+                    href="/#audit"
+                    onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
                     className="btn btn-primary h-11"
                   >
-                    Get your bot plan
+                    Get your free audit
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </BotOrbit>
               </div>
 
@@ -250,13 +249,13 @@ export function Header() {
                   override it without !important. */}
               <div className="sm:hidden">
                 <BotOrbit tone="text-accent-500" eyes="text-ink-950">
-                  <button
-                    type="button"
-                    onClick={() => { closeMenu(); openBotPlan("header-mobile"); }}
+                  <Link
+                    href="/#audit"
+                    onClick={() => { closeMenu(); track("cta_clicked", { source: "header-mobile", label: "audit" }); }}
                     className="btn btn-primary h-11 px-3 text-[12.5px]"
                   >
-                    See What’s Possible
-                  </button>
+                    Free audit
+                  </Link>
                 </BotOrbit>
               </div>
               <button
@@ -431,80 +430,6 @@ export function Header() {
             </div>
 
             <div className="pb-16 pt-4">
-              {CATALOG.map((p) => (
-                <MobileGroup
-                  key={p.slug}
-                  id={p.slug}
-                  open={mobileGroup === p.slug}
-                  onToggle={() => setMobileGroup(mobileGroup === p.slug ? null : p.slug)}
-                  kicker={p.tagline}
-                  title={p.name}
-                >
-                  {p.categories.map((c) => (
-                    <MobileRow key={c.slug} href={serviceHref(c)} onGo={closeMobile} boxed>
-                      {c.botName}
-                    </MobileRow>
-                  ))}
-                </MobileGroup>
-              ))}
-
-              <MobileGroup
-                id="areas"
-                open={mobileGroup === "areas"}
-                onToggle={() => {
-                  setMobileRegion(null);
-                  setMobileGroup(mobileGroup === "areas" ? null : "areas");
-                }}
-                kicker="Where we deploy"
-                title="Service areas"
-              >
-                {regionMobile === null ? (
-                  <>
-                    <li className="pb-3"><MarketSearch onNavigate={closeMobile} /></li>
-                    <MobileRow href="/markets" onGo={closeMobile} boxed>All markets</MobileRow>
-                    {regions.map(({ region, states }) => (
-                      <MobileDrill key={region} onClick={() => setMobileRegion(region)} meta={`${states.length} states`} boxed>
-                        {region}
-                      </MobileDrill>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <li className="pb-1">
-                      <button
-                        type="button"
-                        onClick={() => setMobileRegion(null)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-[var(--border-strong)] text-[13px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
-                      >
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        All regions
-                      </button>
-                    </li>
-                    {regionMobile.states.map((st) => (
-                      <MobileRow
-                        key={st.slug}
-                        href={`/markets/${st.slug}`}
-                        onGo={closeMobile}
-                        meta={`${allCitiesInState(st.slug).length} cities`}
-                        boxed
-                      >
-                        {st.name}
-                      </MobileRow>
-                    ))}
-                    <li className="pt-2">
-                      <Link
-                        href={`/markets/region/${regionSlug(regionMobile.region)}`}
-                        onClick={closeMobile}
-                        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all"
-                      >
-                        View all {regionMobile.region} markets
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </MobileGroup>
-
               <ul className="py-5 space-y-2">
                 {NAV_LINKS.map((l) => (
                   <MobileRow key={l.href} href={l.href} onGo={closeMobile} boxed strong>
@@ -524,14 +449,14 @@ export function Header() {
           </div>
           {/* Thumb-zone CTA — pinned to the drawer bottom, always reachable. */}
           <div className="sticky bottom-0 inset-x-0 bg-white border-t border-[var(--border)] px-5 py-4">
-            <button
-              type="button"
-              onClick={() => { setMobileOpen(false); openBotPlan("mobile-nav"); }}
+            <Link
+              href="/#audit"
+              onClick={closeMobile}
               className="btn btn-primary w-full"
             >
-              Get your bot plan
+              Get your free audit
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
             <Link
               href="/contact"
               onClick={closeMobile}

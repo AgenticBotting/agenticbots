@@ -3,9 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
-import { Container, Reveal, SectionHeader, BrandMark, Section, MediaSlot } from "@/components/ui";
-import { BotPlanForm, BotFactory, FaqAccordion, PlanCta, BotOrbit, BotConveyor, ProofBar, VideoSection, LeadMagnet, AgentTrace, AgentField, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
-import { CATALOG } from "@/lib/catalog";
+import { Container, Reveal, SectionHeader, Section, MediaSlot } from "@/components/ui";
+import { BotFactory, FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -20,26 +19,29 @@ function Hero() {
         <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-12 lg:gap-20 items-center">
           <Reveal>
             <p className="eyebrow mb-6">
-              Marketing + sales <span className="eyebrow-dim">· run by bots, watched by you</span>
+              For contractors <span className="eyebrow-dim">· residential and commercial</span>
             </p>
             <h1 className="display-hero max-w-[16ch] text-balance">
-              Agentic bots get you customers.
+              Every lead answered in 60 seconds.
             </h1>
             <p className="body-lg mt-5 max-w-[48ch] text-pretty">
-              We build bots that answer every lead, follow up on every quote, and
-              keep your ads and CRM working — every hour, including the ones you
-              are asleep for.
+              Our bots text back every call, form and quote request in under a
+              minute, follow up until the job is booked, and log it all to your
+              CRM — nights and weekends included. Installed in 14 days.
             </p>
             <div className="mt-8 cta-row">
               <BotOrbit>
-                <PlanCta source="home-hero" />
+                <a href="#audit" className="btn btn-primary">
+                  Get my free lead leak audit
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               </BotOrbit>
-              <Link
-                href="/how-it-works"
+              <a
+                href="#demo"
                 className="text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
               >
-                See how it works
-              </Link>
+                Watch a bot book a job
+              </a>
             </div>
             <dl className="mt-9 pt-8 border-t border-[var(--border)] grid grid-cols-3 gap-6 max-w-[520px]">
               {[
@@ -78,9 +80,9 @@ function Hero() {
 /* ─────────────────────────  THREE PLAIN STEPS  ──────────────────────── */
 
 const SIMPLE_STEPS = [
-  { n: "01", t: "Tell us what's stuck", d: "Two minutes. You get a free written plan back in one business day — no call, no pressure.", Art: VignetteAsk },
-  { n: "02", t: "We build your bots", d: "Wired into the tools you already use. First one is working in about two weeks.", Art: VignetteBuild },
-  { n: "03", t: "Customers stop slipping through", d: "Every call answered, every quote followed up, day and night. You see everything it does.", Art: VignetteBooked },
+  { n: "01", t: "We secret-shop your leads", d: "We call after hours, fill out your form and time the reply. You get a scorecard showing exactly where jobs slip away.", Art: VignetteAsk },
+  { n: "02", t: "We install the system", d: "Wired into your phone line, website forms, calendar and CRM. Live in 14 days, monitored from day one.", Art: VignetteBuild },
+  { n: "03", t: "Every lead gets worked", d: "Answered in under a minute, followed up until it books, and reported to you every month.", Art: VignetteBooked },
 ];
 
 function HowSimple() {
@@ -110,51 +112,6 @@ function HowSimple() {
   );
 }
 
-/* ─────────────────────────────  BOT INDEX  ──────────────────────────── */
-
-function BotRoster() {
-  return (
-    <section className="relative section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]">
-      {/* Watermark clips in its own layer — overflow-hidden on the section
-          itself would break the roster's position:sticky panel. */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <BrandMark className="-right-24 top-10" size={560} />
-      </div>
-      <Container className="relative">
-        <Reveal>
-          <SectionHeader
-            eyebrow="The full roster"
-            title="Thirteen bots. Yours starts with one."
-            copy="Some get you found. Some make sure nobody slips through. Start with the one that fixes what hurts most."
-          />
-        </Reveal>
-
-        {/* The fleet in one glance. The full catalog lives on the pillar
-            pages below — the homepage should not try to be an index. */}
-        <div className="mt-12 -mx-5 sm:-mx-8">
-          <BotConveyor />
-        </div>
-        {/* The two pillars, one line each — the old two-card section, folded in. */}
-        <div className="mt-12 grid sm:grid-cols-2 gap-px bg-[var(--border)] border border-[var(--border)] max-w-[860px]">
-          {CATALOG.map((p) => (
-            <Link key={p.slug} href={`/${p.slug}`} className="group card-cell px-6 py-4 flex items-center justify-between gap-4">
-              <span>
-                <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--accent-text)]">{p.tagline}</span>
-                <span className="block display-md group-hover:text-[var(--accent-text)] transition-colors">
-                  {p.name} <span className="text-[var(--text-muted)] font-normal">· {p.categories.length} bots</span>
-                </span>
-              </span>
-              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          ))}
-        </div>
-
-      </Container>
-    </section>
-  );
-}
-
-
 /* ─────────────────────────  LIVE DEMO + RESULTS  ───────────────────── */
 
 function DemoSection() {
@@ -172,9 +129,9 @@ function DemoSection() {
               <p className="eyebrow mb-4">
                 See a bot run <span className="eyebrow-dim">· simulated, step for step</span>
               </p>
-              <h2 className="display-xl text-balance">Watch how a bot handles a lead.</h2>
+              <h2 className="display-xl text-balance">Watch a missed call become a booked job.</h2>
               <p className="body-lg mt-5 max-w-[40ch]">
-                Tool calls and reasoning visible, scrubbable, at ~10× real time.
+                A real booking flow, step by step, at ~10× real time. Every action is logged where you can see it.
               </p>
               <ol className="mt-9 border-t border-[var(--border)]">
                 {WATCH.map((x) => (
@@ -198,55 +155,15 @@ function DemoSection() {
   );
 }
 
-/* ───────────────────────────  HOW IT WORKS  ─────────────────────────── */
-
-/* ─────────────────────────────  THE FIELD  ─────────────────────────── */
-
-function FieldBand() {
-  return (
-    <section className="bg-ink-900 on-dark border-b border-ink-700">
-      <div className="h-px rule-agent opacity-60" />
-      <Container className="section-pad-sm">
-        <div className="max-w-[52ch]">
-          <p className="eyebrow mb-4">
-            What &ldquo;every hour&rdquo; looks like <span className="eyebrow-dim">· live</span>
-          </p>
-          <h2 className="display-xl text-balance">
-            Hundreds of little jobs, done the moment they appear.
-          </h2>
-        </div>
-
-        <div className="mt-10 border border-ink-700 bg-ink-950 px-4 pt-4 pb-2">
-          <AgentField height={250} />
-        </div>
-
-        <dl className="mt-8 grid gap-px sm:grid-cols-3 border border-ink-700 bg-ink-700">
-          {[
-            { value: "<60s", label: "First response to any lead, any hour" },
-            { value: "24/7", label: "Nights, weekends and holidays covered" },
-            { value: "0", label: "Leads that go unfollowed because someone got busy" },
-          ].map((m) => (
-            <div key={m.label} className="bg-ink-800 px-6 py-6">
-              <dt className="text-[1.75rem] font-semibold tracking-[-0.035em] leading-none tabular-nums text-accent-400">
-                {m.value}
-              </dt>
-              <dd className="mt-2.5 text-[13.5px] leading-snug text-ink-300">{m.label}</dd>
-            </div>
-          ))}
-        </dl>
-      </Container>
-    </section>
-  );
-}
-
 /* ──────────────────────────────  FAQ  ───────────────────────────────── */
 
 const HOME_FAQ = [
-  { q: "What exactly am I buying?", a: "A set of bots built around how your business actually works, wired into the tools you already pay for, and run continuously. Not software you have to configure on a weekend — a system we build, launch and keep tuned." },
+  { q: "What exactly am I buying?", a: "A speed-to-lead system built around how your business runs: every call, form and quote request answered in under a minute, followed up until it books, and logged to your CRM. We build it, run it and keep it tuned. Not software you configure on a weekend." },
+  { q: "What does it cost?", a: "Setup is a one-time fee, then a monthly retainer that covers monitoring, tuning and a monthly results report. Systems start at $2,500 a month. Your audit shows what the leak is worth first, so you can judge the math before you spend anything." },
   { q: "Do I have to replace my current tools?", a: "No. Bots plug into the CRM, calendar, phone system, ad accounts and email platform you already use. Replacing your stack is almost never the right first move." },
   { q: "How fast does something go live?", a: "The audit takes a few days. The first bot is typically live in monitored mode inside two weeks, and fully autonomous a couple of weeks after that." },
-  { q: "Are we too small — or too big — for this?", a: "Neither. A two-truck contractor and a 400-person sales organisation lose customers the same way: nobody answered fast enough and nobody followed up. Small teams usually see the faster lift because there is nobody covering nights. Large teams see the bigger number, because the leak is multiplied across every rep." },
-  { q: "Who owns everything you build?", a: "You do. The accounts, the data, the sequences, the automations. If we part ways, it all stays with you and keeps running." },
+  { q: "Is my business a fit?", a: "It works best for residential and commercial contractors getting at least 25 new leads a month with jobs worth $1,000 or more. Below that, the system costs more than the leak. The audit tells you which side of that line you are on." },
+  { q: "Who owns what?", a: "You own your customers, your data, your phone numbers and your ad accounts, always. We run the operating system on top of them. If you leave, your contacts and history export to you in full." },
 ];
 
 function Faq() {
@@ -279,63 +196,26 @@ function Faq() {
 
 /* ────────────────────────────  FINAL CTA  ───────────────────────────── */
 
-function PlanPreview() {
-  const ROWS = [
-    { i: "09", n: "Speed-to-Lead Bot", why: "worst leak first", bar: "82%" },
-    { i: "01", n: "Ads Bot", why: "wasted spend", bar: "58%" },
-    { i: "10", n: "CRM Bot", why: "foundation for both", bar: "40%" },
-  ];
-  return (
-    <figure className="mt-10 max-w-[400px] border border-[var(--border)] bg-white" aria-hidden="true">
-      <div className="flex items-center justify-between px-5 h-10 border-b border-[var(--border)] bg-[var(--bg-alt)]">
-        <span className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-secondary)]">your-bot-plan.pdf</span>
-        <span className="mono text-[10px] text-[var(--text-muted)]">1 page</span>
-      </div>
-      <div className="px-5 py-4">
-        <p className="text-[13px] font-semibold tracking-[-0.01em]">Build order — by what it&apos;s worth</p>
-        <ul className="mt-3 space-y-2.5">
-          {ROWS.map((r) => (
-            <li key={r.i} className="grid grid-cols-[24px_1fr] gap-2.5 items-center">
-              <span className="mono text-[10.5px] tabular-nums text-[var(--text-muted)]">{r.i}</span>
-              <span>
-                <span className="flex items-baseline justify-between gap-3">
-                  <span className="text-[12.5px] font-medium">{r.n}</span>
-                  <span className="mono text-[10px] text-[var(--text-muted)]">{r.why}</span>
-                </span>
-                <span className="mt-1 block h-[5px] bg-[var(--bg-alt)]">
-                  <span className="block h-full bg-accent-500" style={{ width: r.bar }} />
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <figcaption className="px-5 py-2.5 border-t border-[var(--border)] mono text-[10px] text-[var(--text-muted)]">
-        sample layout · yours is built from your numbers
-      </figcaption>
-    </figure>
-  );
-}
-
 function FinalCta() {
   return (
-    <section className="section-pad">
+    <section id="audit" className="section-pad scroll-mt-28">
       <Container>
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
           <Reveal>
-            <p className="eyebrow mb-4">Start here</p>
+            <p className="eyebrow mb-4">Free lead leak audit</p>
             <h2 className="display-xl text-balance">
-              Tell us where it is leaking. We will map the bots that plug it.
+              Find out how many jobs you are losing before you hear the phone ring.
             </h2>
             <p className="body-lg mt-5 max-w-[46ch]">
-              You get a written plan: which bots, in what order, wired to what, and what
-              each one is worth. Free, and yours to keep even if you build it yourself.
+              We test your business the way a new customer would: an after-hours call, a
+              website form, a quote request. Then we send you a short scorecard with your real
+              response times and what they are costing you.
             </p>
             <ul className="mt-8 space-y-3">
               {[
-                "One business day turnaround",
-                "No call required to get the plan",
-                "No obligation, no sales sequence",
+                "Scorecard back in two business days",
+                "No call required to get it",
+                "Yours to keep, whether or not we work together",
               ].map((t) => (
                 <li key={t} className="flex items-center gap-3 text-[14.5px] text-[var(--text-secondary)]">
                   <Check className="w-4 h-4 text-[var(--accent-text)]" strokeWidth={2.5} />
@@ -343,10 +223,9 @@ function FinalCta() {
                 </li>
               ))}
             </ul>
-            <PlanPreview />
           </Reveal>
           <Reveal delay={0.08}>
-            <BotPlanForm source="home-final" />
+            <AuditForm source="home-final" />
           </Reveal>
         </div>
       </Container>
@@ -357,16 +236,27 @@ function FinalCta() {
 /* ────────────────────────────────────────────────────────────────────── */
 
 
+/* ────────────────────────────  CALCULATOR  ─────────────────────────── */
+
+function Calculator() {
+  return (
+    <Section
+      id="calculator"
+      variant="light"
+      eyebrow="Lead leak calculator"
+      heading={<>What slow replies <span className="em-green">cost you.</span></>}
+      sub="Most contractors call back when they get a minute. By then the customer has called someone else. Put in your numbers."
+    >
+      <LeakCalculator />
+    </Section>
+  );
+}
+
 /* ──────────────────────────  WHO THIS IS FOR  ───────────────────────── */
 
-/* The site sells to a plumber and to a VP of growth. Nothing on the page
-   showed either of them. Faces and job sites do the work that another
-   paragraph of copy cannot. */
-const TRADES = [
-  { id: "W-01", label: "Home-service crew on a job", spec: "1200×1500 · vertical · real crew, real van, natural light. No stock handshakes.", who: "Home services", eg: "Plumbing · HVAC · roofing · electrical" },
-  { id: "W-02", label: "Owner on the phone in a truck", spec: "1200×1500 · vertical · the moment a lead comes in and nobody can answer.", who: "Owner-operators", eg: "The person who is also doing four other jobs" },
-  { id: "W-03", label: "Ops lead at a desk, two screens", spec: "1200×1500 · vertical · CRM visible but unreadable. Focus on the person.", who: "Multi-location", eg: "Franchise groups · regional operators" },
-  { id: "W-04", label: "Marketing lead presenting", spec: "1200×1500 · vertical · a meeting, not a boardroom cliché.", who: "In-house teams", eg: "The growth lead who needs headcount they cannot hire" },
+const WHO = [
+  { id: "W-01", label: "Residential crew at a customer's home", spec: "1600×1200 · horizontal · real crew, real truck, natural light. No stock handshakes.", who: "Residential contractors", eg: "Roofing · HVAC · plumbing · electrical · remodeling", d: "Homeowners call three companies and hire whoever answers first. Your bot is first, every time." },
+  { id: "W-02", label: "Commercial estimator on a job site", spec: "1600×1200 · horizontal · hard hat, plans, a phone in hand.", who: "Commercial contractors", eg: "GCs · specialty trades · facilities services", d: "Bid requests, follow-ups and RFQs worked the same day, so no project goes cold waiting on an estimator." },
 ];
 
 function WhoFor() {
@@ -374,15 +264,16 @@ function WhoFor() {
     <Section
       variant="alt"
       eyebrow="Who this is for"
-      heading={<>Built for the people <span className="em-green">answering the phone.</span></>}
-      sub="Whether you run three trucks or three regions, the failure is the same: leads arrive faster than anyone can work them."
+      heading={<>Built for contractors <span className="em-green">who are on the job.</span></>}
+      sub="You can't answer the phone from a roof or a job walk. That's exactly when leads come in."
     >
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        {TRADES.map((t) => (
+      <div className="grid sm:grid-cols-2 gap-8 max-w-[920px]">
+        {WHO.map((t) => (
           <div key={t.id}>
-            <MediaSlot id={t.id} ratio="4 / 5" label={t.label} spec={t.spec} />
-            <p className="display-md mt-4">{t.who}</p>
-            <p className="body-sm mt-1.5">{t.eg}</p>
+            <MediaSlot id={t.id} ratio="4 / 3" label={t.label} spec={t.spec} />
+            <p className="display-lg mt-5">{t.who}</p>
+            <p className="mono text-[11px] uppercase tracking-[0.08em] text-[var(--accent-text)] mt-1.5">{t.eg}</p>
+            <p className="body-base mt-3 max-w-[44ch]">{t.d}</p>
           </div>
         ))}
       </div>
@@ -390,59 +281,95 @@ function WhoFor() {
   );
 }
 
-/* ───────────────────────────  IN THEIR WORDS  ───────────────────────── */
+/* ──────────────────────────  FOUNDING CLIENTS  ──────────────────────── */
 
-/* The audit's biggest conversion gap and the biggest design gap have the
-   same fix: real people. Copy stays empty until real quotes exist. */
-const VOICES = [
-  { id: "V-01", role: "Owner, plumbing company", place: "Awaiting first client quote" },
-  { id: "V-02", role: "Marketing lead, HVAC group", place: "Awaiting first client quote" },
-  { id: "V-03", role: "VP Growth, services platform", place: "Awaiting first client quote" },
-];
-
-/* Three empty dashed avatar plates read as an unfinished site — the
-   opposite of what an honesty section should do. Nothing here was
-   invented before and nothing is invented now; this just says the true
-   thing once, confidently, in the same console language as
-   AuditLogPanel, instead of three placeholder holes in the page. */
-function Voices() {
+function FoundingClients() {
   return (
-    <section className="border-b border-ink-700 bg-ink-950 on-dark">
+    <section id="founding" className="border-b border-ink-700 bg-ink-950 on-dark scroll-mt-28">
       <Container className="section-pad-sm">
-        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-10 lg:gap-16 items-center">
           <div>
-            <p className="eyebrow-dark mb-4">In their words</p>
+            <p className="eyebrow-dark mb-4">Founding clients</p>
             <h2 className="display-xl text-balance">
-              The part we will not write <span className="em-green-dark">ourselves.</span>
+              Three spots. <span className="em-green-dark">Reduced setup.</span>
             </h2>
             <p className="body-lg mt-5 max-w-[46ch] text-ink-300">
-              No client quotes yet, and nothing invented to fill the gap while we wait. The
-              first one that lands here goes up unedited, with a number attached.
+              We&apos;re taking on our first three contractors at a reduced setup fee. In return, we
+              publish your before-and-after numbers as a case study. Same system, same monthly
+              price, same guarantee.
             </p>
+            <a href="#audit" className="btn btn-on-dark mt-8">
+              Start with the free audit <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
 
           <div className="border border-ink-700 bg-ink-900">
             <div className="flex items-center justify-between gap-4 border-b border-ink-700 px-5 h-11">
-              <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-ink-300">
-                Client log
-              </span>
+              <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-ink-300">Founding spots</span>
               <span className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.1em] text-ink-400">
                 <span className="h-1.5 w-1.5 bg-[var(--color-accent-400)] animate-pulse-dot" />
-                Awaiting first entry
+                3 of 3 open
               </span>
             </div>
             <ul className="px-5 py-4 space-y-3">
-              {VOICES.map((v, i) => (
-                <li key={v.id} className="flex items-baseline justify-between gap-4 border-b border-ink-800 pb-3 last:border-b-0 last:pb-0">
-                  <span className="text-[13.5px] text-ink-300">{v.role}</span>
-                  <span className="mono text-[10.5px] uppercase tracking-[0.08em] text-ink-500 shrink-0">
-                    {i === 0 ? "next slot open" : "queued"}
-                  </span>
+              {[
+                ["Reduced setup fee", "Founding rate"],
+                ["Monthly retainer", "Standard"],
+                ["Booked-appointment guarantee", "Included"],
+                ["Published case study", "Required"],
+              ].map(([k, v]) => (
+                <li key={k} className="flex items-baseline justify-between gap-4 border-b border-ink-800 pb-3 last:border-b-0 last:pb-0">
+                  <span className="text-[14px] text-ink-200">{k}</span>
+                  <span className="mono text-[10.5px] uppercase tracking-[0.08em] text-accent-400 shrink-0">{v}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ────────────────────────────  PRICING ANCHOR  ───────────────────────── */
+
+function PricingAnchor() {
+  return (
+    <section className="section-pad-sm border-b border-[var(--border)] bg-[var(--bg-alt)]">
+      <Container>
+        <div className="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+          <div>
+            <p className="eyebrow mb-3">Pricing</p>
+            <p className="display-xl text-balance max-w-[24ch]">
+              Systems start at <span className="em-green">$2,500 a month.</span>
+            </p>
+            <p className="body-base mt-4 max-w-[58ch]">
+              One-time setup, then a monthly retainer for monitoring, tuning and reporting. If the
+              system doesn&apos;t hit the booked-appointment target we agree on, your first month is on us.
+            </p>
+          </div>
+          <Link href="/pricing" className="btn btn-outline">
+            See pricing <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ────────────────────────────  FULL SYSTEM  ─────────────────────────── */
+
+function FullSystem() {
+  return (
+    <section className="border-t border-[var(--border)]">
+      <Container className="py-8 flex flex-wrap items-center justify-between gap-4">
+        <p className="body-sm max-w-[62ch]">
+          Speed-to-lead is where we start. Once it&apos;s running, clients add ads, reviews,
+          reactivation and reporting.
+        </p>
+        <Link href="/services" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all">
+          See the full system <ArrowRight className="w-4 h-4" />
+        </Link>
       </Container>
     </section>
   );
@@ -455,20 +382,15 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
-        <ProofBar />
-        <HowSimple />
-        <VideoSection
-          heading={<>Ninety seconds, <span className="em-green">start to booked.</span></>}
-          sub="One missed call, handled end to end. No slides, no diagrams — just the thing running."
-        />
-        <WhoFor />
-        <BotRoster />
         <DemoSection />
-        <FieldBand />
-        <Voices />
-        <LeadMagnet source="home" />
+        <Calculator />
+        <HowSimple />
+        <WhoFor />
+        <FoundingClients />
+        <PricingAnchor />
         <Faq />
         <FinalCta />
+        <FullSystem />
       </main>
       <Footer />
     </>

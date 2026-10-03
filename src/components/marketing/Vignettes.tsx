@@ -17,7 +17,7 @@ export function VignetteAsk() {
     <svg viewBox="0 0 320 168" className={frame} aria-hidden="true">
       {/* your message — centered on the same axis as the plan */}
       <rect x="16" y="53" width="128" height="62" fill="var(--background)" stroke="var(--border-strong)" />
-      <text x="28" y="71" fontSize="8.5" fontFamily="var(--font-mono)" fill="var(--text-muted)">YOU, IN 2 MINUTES</text>
+      <text x="28" y="71" fontSize="8.5" fontFamily="var(--font-mono)" fill="var(--text-muted)">WE TEST YOUR LEADS</text>
       <rect x="28" y="80" width="98" height="6" fill="var(--color-ink-100)" />
       <rect x="28" y="92" width="74" height="6" fill="var(--color-ink-100)" />
       <rect x="28" y="104" width="58" height="6" fill="var(--color-ink-100)" />
@@ -27,14 +27,14 @@ export function VignetteAsk() {
       {/* the plan back */}
       <rect x="192" y="38" width="112" height="92" fill="var(--background)" stroke="var(--border-strong)" />
       <rect x="192" y="38" width="112" height="18" fill="var(--bg-tint)" />
-      <text x="204" y="50" fontSize="8.5" fontFamily="var(--font-mono)" fill="var(--accent-text)">YOUR-BOT-PLAN.PDF</text>
+      <text x="204" y="50" fontSize="8.5" fontFamily="var(--font-mono)" fill="var(--accent-text)">YOUR-LEAK-AUDIT</text>
       {[66, 84, 102].map((y, i) => (
         <g key={y}>
           <rect x="204" y={y} width="9" height="9" fill="var(--color-accent-500)" opacity={1 - i * 0.28} />
           <rect x="220" y={y + 1.5} width={68 - i * 14} height="6" fill="var(--color-ink-100)" />
         </g>
       ))}
-      <text x="204" y="123" fontSize="7.5" fontFamily="var(--font-mono)" fill="var(--text-muted)">BACK IN 1 BUSINESS DAY</text>
+      <text x="204" y="123" fontSize="7.5" fontFamily="var(--font-mono)" fill="var(--text-muted)">BACK IN 2 BUSINESS DAYS</text>
     </svg>
   );
 }
@@ -42,10 +42,10 @@ export function VignetteAsk() {
 /** Step 2 — the bot at the center of everything you offer. */
 export function VignetteBuild() {
   const left = [
-    { t: "PPC", y: 32 }, { t: "SEO", y: 84 }, { t: "SMS", y: 136 },
+    { t: "Calls", y: 32 }, { t: "Forms", y: 84 }, { t: "SMS", y: 136 },
   ];
   const right = [
-    { t: "Email", y: 32 }, { t: "CRM", y: 84 }, { t: "Pages", y: 136 },
+    { t: "CRM", y: 32 }, { t: "Calendar", y: 84 }, { t: "Email", y: 136 },
   ];
   return (
     <svg viewBox="0 0 320 168" className={frame} aria-hidden="true">

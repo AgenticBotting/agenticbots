@@ -34,3 +34,5 @@ export { CompoundingCurve } from "./CompoundingCurve";
 export { FleetSwarm } from "./FleetSwarm";
 export { ConsoleGreeting } from "./ConsoleGreeting";
 export { BlogArchive } from "./BlogArchive";
+export { AuditForm } from "./AuditForm";
+export { LeakCalculator } from "./LeakCalculator";
