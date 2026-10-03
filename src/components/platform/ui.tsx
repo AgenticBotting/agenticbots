@@ -181,14 +181,16 @@ export function Tabs({ items, current }: { items: { href: string; label: string;
   );
 }
 
-export function FilterLinks({ items, current }: { items: { href: string; label: string; key: string }[]; current: string }) {
+export function FilterLinks({ items, current, trailing }: { items: { href: string; label: string; key: string; count?: number }[]; current: string; trailing?: React.ReactNode }) {
   return (
     <div className="pf-filters" role="group" aria-label="Filter">
       {items.map((i) => (
         <Link key={i.key} href={i.href} className="pf-chiplink" aria-current={i.key === current ? "true" : undefined}>
           {i.label}
+          {i.count !== undefined && <span className="c">{i.count}</span>}
         </Link>
       ))}
+      {trailing && <div className="ml-auto">{trailing}</div>}
     </div>
   );
 }

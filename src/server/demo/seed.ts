@@ -284,6 +284,22 @@ export async function seedDemo(r: Repository): Promise<void> {
   mkRun(b.outbound, "Draft follow-ups for open estimates", 1, "completed", 9, 26400, 5200, "Prepared 12 follow-ups for approval.");
   mkRun(b.analytics, "Weekly channel summary", 3, "completed", 11, 39000, 4800, "Delivered the weekly summary. Attribution limited to connected sources.");
   mkRun(bb.seo, "Weekly crawl", 1, "completed", 18, 44000, 5000, "Crawled 212 pages, repaired 3 broken links.");
+  // Two weeks of routine runs so the operator charts show a working fleet.
+  const routine: [Bot, string][] = [
+    [b.ads, "Daily search-term review"], [b.prospecting, "Research and qualify commercial prospects"], [b.crm, "CRM hygiene sweep"],
+    [b.reviews, "Prepare review requests for completed jobs"], [b.outbound, "Draft follow-ups for open estimates"], [b.seo, "Local search opportunity scan"],
+    [bb.seo, "Weekly crawl"], [bb.reviews, "Prepare review requests"], [cb.crm, "Pipeline cleanup"],
+  ];
+  for (let d = 2; d <= 13; d++) {
+    const weekend = [0, 6].includes(new Date(Date.now() - d * DAY).getUTCDay());
+    for (const [bot, task] of routine) {
+      if (bot.orgId === coastal.id && d < 7) continue; // suspended this week
+      if (rand() > (weekend ? 0.25 : 0.7)) continue;
+      const fail = rand() < 0.06;
+      const inTok = 9000 + Math.round(rand() * 40000);
+      mkRun(bot, task, d + rand() * 0.6, fail ? "failed" : "completed", 2 + Math.round(rand() * 18), inTok, Math.round(inTok * 0.12), fail ? undefined : "Routine work completed.", fail ? "provider_failure: upstream timeout" : undefined);
+    }
+  }
 
   /* ── Approvals ── */
   const mkApproval = (bot: Bot, category: "external_send" | "publish" | "ad_change" | "crm_update", title: string, explanation: string, impact: string, preview: string, hoursAgo: number, requestId?: string) =>

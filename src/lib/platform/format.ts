@@ -85,3 +85,8 @@ export function shortDate(iso: string): string {
   const [, m, d] = iso.slice(0, 10).split("-").map(Number);
   return `${MONTHS[(m || 1) - 1]} ${d}`;
 }
+
+/** ISO timestamp `days` days before now. */
+export function isoDaysAgo(days: number): string {
+  return new Date(Date.now() - days * 86_400_000).toISOString();
+}

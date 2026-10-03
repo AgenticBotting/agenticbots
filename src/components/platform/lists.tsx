@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Fragment } from "react";
+import { Avatar } from "./viz";
 import type {
   Approval, AuditLog, AutomationJob, Bot, Incident, Integration, Invoice, Run, WorkRequest,
 } from "@/lib/platform/types";
@@ -32,20 +34,40 @@ export function RunsTable({ runs, names, showClient = true }: { runs: Run[]; nam
   );
 }
 
-export function BotsTable({ bots, names, showClient = true, runs }: { bots: Bot[]; names: Names; showClient?: boolean; runs?: Map<string, Run> }) {
+export function BotsTable({ bots, names, showClient = true, runs, groupByClient = false }: { bots: Bot[]; names: Names; showClient?: boolean; runs?: Map<string, Run>; groupByClient?: boolean }) {
+  const row = (b: Bot) => (
+    <tr key={b.id}>
+      <td><BotName typeKey={b.typeKey} name={b.name} href={`/ops/bots/${b.id}`} /></td>
+      {showClient && !groupByClient && <td>{names.orgs?.get(b.orgId)}</td>}
+      <td>
+        <Status value={b.status} />
+        {b.errorState && <div className="pf-small text-[var(--color-danger)] mt-0.5" title={b.errorState.message}>{b.errorState.code.replace(/_/g, " ")}</div>}
+      </td>
+      <td>{b.currentRunId ? <Link className="pf-small font-semibold text-[var(--accent-text)] hover:underline pf-trunc inline-block max-w-[240px]" href={`/ops/runs/${b.currentRunId}`}>{runs?.get(b.currentRunId)?.task ?? "Open run"}</Link> : <span className="pf-muted">Idle</span>}</td>
+      <td><span className="pf-chip-model" title={`${b.provider}/${b.model}`}>{b.model}</span></td>
+      <td className="num">{b.integrationIds.length || <span className="pf-muted">0</span>}</td>
+      <td><When iso={b.lastActivityAt} /></td>
+    </tr>
+  );
+  const head = ["Bot", ...(showClient && !groupByClient ? ["Client"] : []), "Status", "Current run", "Model", "Integrations", "Last activity"];
+  if (!groupByClient) {
+    return <Table head={head} empty={<Empty title="No Bots deployed" />}>{bots.map(row)}</Table>;
+  }
+  const groups = new Map<string, Bot[]>();
+  for (const b of bots) groups.set(b.orgId, [...(groups.get(b.orgId) ?? []), b]);
   return (
-    <Table head={["Bot", ...(showClient ? ["Client"] : []), "Status", "Current run", "Model", "Integrations", "Last activity", "Error"]} empty={<Empty title="No Bots deployed" />}>
-      {bots.map((b) => (
-        <tr key={b.id}>
-          <td><BotName typeKey={b.typeKey} name={b.name} href={`/ops/bots/${b.id}`} /></td>
-          {showClient && <td>{names.orgs?.get(b.orgId)}</td>}
-          <td><Status value={b.status} /></td>
-          <td>{b.currentRunId ? <Link className="underline pf-small" href={`/ops/runs/${b.currentRunId}`}>{runs?.get(b.currentRunId)?.task.slice(0, 40) ?? "Open run"}</Link> : <span className="pf-muted">—</span>}</td>
-          <td className="pf-small">{b.provider}/<span className="pf-mono">{b.model}</span></td>
-          <td className="num">{b.integrationIds.length}</td>
-          <td><When iso={b.lastActivityAt} /></td>
-          <td className="pf-small">{b.errorState ? <span className="text-[var(--color-danger)]">{b.errorState.code}</span> : <span className="pf-muted">—</span>}</td>
-        </tr>
+    <Table head={head} empty={<Empty title="No Bots deployed" />}>
+      {[...groups.entries()].map(([orgId, list]) => (
+        <Fragment key={orgId}>
+          <tr className="group">
+            <td colSpan={head.length}>
+              <Avatar name={names.orgs?.get(orgId) ?? ""} size="sm" />
+              <Link href={`/ops/clients/${orgId}?tab=bots`} className="hover:underline">{names.orgs?.get(orgId)}</Link>
+              <span className="pf-muted font-normal ml-2">{list.filter((b) => b.status !== "disabled").length} of {list.length} on</span>
+            </td>
+          </tr>
+          {list.map(row)}
+        </Fragment>
       ))}
     </Table>
   );
@@ -95,7 +117,7 @@ export function IntegrationsTable({ items, names, showClient = true, actions }: 
     <Table head={["Integration", ...(showClient ? ["Client"] : []), "Status", "Credential", "Bots with access", "Last check", ""]} empty={<Empty title="No integrations" />}>
       {items.map((i) => (
         <tr key={i.id}>
-          <td><strong className="text-[var(--foreground)]">{i.displayName}</strong><div className="pf-small pf-muted">{i.provider}{i.metadata.toolset ? ` · tool connection “${i.metadata.toolset}”` : ""}</div>{i.lastError && <div className="pf-small text-[var(--color-danger)]">{i.lastError}</div>}</td>
+          <td><strong className="text-[var(--foreground)]">{i.displayName}</strong><div className="pf-small pf-muted">{i.provider}{i.metadata.toolset ? `, tool connection “${i.metadata.toolset}”` : ""}</div>{i.lastError && <div className="pf-small text-[var(--color-danger)]">{i.lastError}</div>}</td>
           {showClient && <td>{names.orgs?.get(i.orgId)}</td>}
           <td><Status value={i.status} />{i.verifiedBy && i.status === "connected" && <div className="pf-small pf-muted">verified by {i.verifiedBy}</div>}</td>
           <td className="pf-small">{i.secretRef ? <span className="pf-mono">{i.secretRef.split("/").slice(-2).join("/")}</span> : <span className="pf-muted">none</span>}</td>
@@ -135,7 +157,7 @@ export function ApprovalsTable({ approvals, names, showClient = true, actions }:
         const bot = names.bots?.get(a.botId);
         return (
           <tr key={a.id}>
-            <td><strong className="text-[var(--foreground)]">{a.title}</strong><div className="pf-small pf-muted">{titleCase(a.category)} · {a.kind === "runtime" ? "run is paused" : "prepared work"}</div>{a.runId && <Link className="pf-small underline" href={`/ops/runs/${a.runId}`}>Open run</Link>}</td>
+            <td><strong className="text-[var(--foreground)]">{a.title}</strong><div className="pf-small pf-muted flex gap-2.5"><span>{titleCase(a.category)}</span><span>{a.kind === "runtime" ? "Run is paused" : "Prepared work"}</span></div>{a.runId && <Link className="pf-small underline" href={`/ops/runs/${a.runId}`}>Open run</Link>}</td>
             <td>{bot ? <BotName typeKey={bot.typeKey} name={bot.name} /> : "—"}</td>
             {showClient && <td>{names.orgs?.get(a.orgId)}</td>}
             <td className="pf-small">{a.audience === "client" ? "Client" : "AgenticBots"}</td>
@@ -156,8 +178,8 @@ export function AuditTable({ rows, names }: { rows: AuditLog[]; names: Names }) 
       {rows.map((a) => (
         <tr key={a.id}>
           <td><When iso={a.createdAt} /></td>
-          <td>{a.actorName}</td>
-          <td><span className="pf-mono">{a.action}</span>{a.detail && <div className="pf-small pf-muted pf-trunc">{a.detail}</div>}</td>
+          <td><span className="inline-flex items-center gap-2 whitespace-nowrap"><Avatar name={a.actorName} size="sm" />{a.actorName}</span></td>
+          <td><span className="pf-chip-model">{a.action}</span>{a.detail && <div className="pf-small pf-muted pf-trunc">{a.detail}</div>}</td>
           <td className="pf-small">{a.orgId ? names.orgs?.get(a.orgId) : "—"}</td>
           <td className="pf-small">{a.targetType}{a.targetId ? <span className="pf-mono pf-muted"> {shortId(a.targetId)}</span> : null}</td>
           <td><Status value={a.result === "success" ? "succeeded" : "failed"} label={titleCase(a.result)} /></td>

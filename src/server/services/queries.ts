@@ -6,6 +6,32 @@ import { clientBillingStatus, deriveInvoiceStatus, outstandingCents, todayStr, t
 import { monthKey } from "./common";
 import { isActive } from "./runs";
 
+/** Run outcomes per day, oldest first, for the last `days` days. */
+export interface RunDay {
+  date: string;
+  completed: number;
+  failed: number;
+  other: number;
+}
+
+export function runsByDay(runs: Run[], days = 14, now = Date.now()): RunDay[] {
+  const DAY = 86_400_000;
+  const out: RunDay[] = Array.from({ length: days }, (_, i) => ({
+    date: new Date(now - (days - 1 - i) * DAY).toISOString().slice(0, 10),
+    completed: 0,
+    failed: 0,
+    other: 0,
+  }));
+  for (const r of runs) {
+    const i = days - 1 - Math.floor((now - Date.parse(r.createdAt)) / DAY);
+    if (i < 0 || i >= days) continue;
+    if (r.status === "completed") out[i].completed++;
+    else if (r.status === "failed" || r.status === "interrupted") out[i].failed++;
+    else out[i].other++;
+  }
+  return out;
+}
+
 export interface ClientRow {
   org: Organization;
   agreement?: ServiceAgreement;
@@ -20,15 +46,17 @@ export interface ClientRow {
   estimatedCostUsd: number;
   openIncidents: number;
   worstIncident?: Incident["severity"];
+  /** Runs per day, last 14 days (all outcomes). */
+  runsDaily: number[];
 }
 
 const SEV_RANK: Record<Incident["severity"], number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
 export async function clientRows(r: Repository, actor: Actor): Promise<ClientRow[]> {
   const month = monthKey();
-  const [orgs, agreements, invoices, runtimes, bots, approvals, requests, integrations, rollups, incidents] = await Promise.all([
+  const [orgs, agreements, invoices, runtimes, bots, approvals, requests, integrations, rollups, incidents, runs] = await Promise.all([
     r.list("organizations", { order: "asc" }), r.list("service_agreements"), r.list("invoices"), r.list("runtimes"), r.list("bots"),
-    r.list("approvals"), r.list("requests"), r.list("integrations"), r.list("usage_rollups"), r.list("incidents"),
+    r.list("approvals"), r.list("requests"), r.list("integrations"), r.list("usage_rollups"), r.list("incidents"), r.list("runs", { limit: 1000 }),
   ]);
   return orgs
     .filter((o) => can(actor, "ops.view", o.id))
@@ -52,6 +80,7 @@ export async function clientRows(r: Repository, actor: Actor): Promise<ClientRow
         estimatedCostUsd: Math.round((roll.reduce((s, u) => s + u.modelCostUsd, 0) + (rt?.estimatedMonthlyCostUsd ?? 0)) * 100) / 100,
         openIncidents: inc.length,
         worstIncident: worst,
+        runsDaily: runsByDay(runs.filter((x) => x.orgId === org.id)).map((d) => d.completed + d.failed + d.other),
       };
     });
 }
@@ -77,6 +106,10 @@ export interface OpsDashboard {
   eligibleForReactivation: Organization[];
   orgNames: Map<string, string>;
   botNames: Map<string, string>;
+  runsDaily: RunDay[];
+  fleet: { orgId: string; orgName: string; health: Runtime["health"]; ready: boolean; tunnel: Runtime["tunnel"]; diskUsedPct?: number; deploymentState: Runtime["deploymentState"] }[];
+  mrrCents: number;
+  pastDueCents: number;
 }
 
 /** "What needs my attention?" — the operator's default screen. */
@@ -106,7 +139,15 @@ export async function opsDashboard(r: Repository, actor: Actor): Promise<OpsDash
   for (const a of v(approvals).filter((a) => a.status === "pending" && a.audience === "operator")) add(a.orgId, "Approval waiting on AgenticBots");
 
   const vRuntimes = v(runtimes);
+  const openInvoices = v(invoices).map((i) => ({ ...i, status: deriveInvoiceStatus(i, today) }));
+  const agreementsAll = await r.list("service_agreements");
   return {
+    runsDaily: runsByDay(v(runs)),
+    fleet: vRuntimes
+      .filter((rt) => rt.deploymentState !== "not_provisioned")
+      .map((rt) => ({ orgId: rt.orgId, orgName: orgNames.get(rt.orgId) ?? "", health: rt.health, ready: rt.ready, tunnel: rt.tunnel, diskUsedPct: rt.diskUsedPct, deploymentState: rt.deploymentState })),
+    mrrCents: v(agreementsAll).filter((a) => a.status === "active" || a.status === "past_due").reduce((s, a) => s + a.monthlyValueCents, 0),
+    pastDueCents: openInvoices.filter((i) => i.status === "past_due").reduce((s, i) => s + Math.max(0, i.balanceDueCents), 0),
     activeClients: vOrgs.filter((o) => o.status === "active" || o.status === "past_due").length,
     clientsNeedingAttention: [...attention.entries()].map(([id, reasons]) => ({ org: vOrgs.find((o) => o.id === id)!, reasons })).filter((x) => x.org),
     incidents: openInc.sort((a, b) => SEV_RANK[b.severity] - SEV_RANK[a.severity]).slice(0, 8),

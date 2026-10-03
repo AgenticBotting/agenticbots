@@ -1,23 +1,57 @@
 import Link from "next/link";
+import { AlertTriangle, Bell, Bot as BotIcon, CircleDollarSign, ClipboardList, Inbox, Receipt, Users } from "lucide-react";
 import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { opsDashboard } from "@/server/services/queries";
-import { PageHead, Panel, Stat, Stats, Table, When, Empty, Banner } from "@/components/platform/ui";
+import { PageHead, Panel, When, Empty, Banner } from "@/components/platform/ui";
 import { Status } from "@/components/platform/status";
-import { money, usd, titleCase } from "@/lib/platform/format";
+import { Avatar, Kpi, KpiRow, Lights, SegBar, TimelineList, toneFor, type Tone } from "@/components/platform/viz";
+import { StackedColumns } from "@/components/platform/charts";
+import { money, titleCase } from "@/lib/platform/format";
 
 export const metadata = { title: "Dashboard" };
+
+const SEV_TONE: Record<string, Tone> = { critical: "bad", high: "bad", medium: "watch", low: "quiet" };
 
 export default async function OpsDashboard() {
   const actor = await requireOperatorPage();
   const d = await opsDashboard(await repo(), actor);
-  const attention = d.clientsNeedingAttention;
+  const runTotals = d.runsDaily.map((x) => x.completed + x.failed + x.other);
+  const runs14 = runTotals.reduce((a, b) => a + b, 0);
+  const failed14 = d.runsDaily.reduce((s, x) => s + x.failed, 0);
+  const health = {
+    healthy: d.fleet.filter((f) => f.health === "healthy").length,
+    degraded: d.fleet.filter((f) => f.health === "degraded").length,
+    offline: d.fleet.filter((f) => f.health === "offline").length,
+    stopped: d.fleet.filter((f) => f.health === "stopped" || f.health === "unknown").length,
+  };
+
+  // One queue: incidents first (they carry severity), then other reasons a client needs a look.
+  const queue: { key: string; tone: Tone; title: string; orgId: string; orgName: string; at?: string; href: string; tag: string }[] = [
+    ...d.incidents.map((i) => ({
+      key: i.id, tone: SEV_TONE[i.severity] ?? "quiet", title: i.title, orgId: i.orgId, orgName: d.orgNames.get(i.orgId) ?? "",
+      at: i.lastSeenAt, href: `/ops/monitoring#incident-${i.id}`, tag: titleCase(i.severity),
+    })),
+  ];
+  for (const { org, reasons } of d.clientsNeedingAttention) {
+    for (const r of reasons) {
+      if (queue.some((q) => q.orgId === org.id && q.title.toLowerCase().includes(r.toLowerCase().slice(0, 18)))) continue;
+      queue.push({ key: `${org.id}-${r}`, tone: /past due/i.test(r) ? "bad" : "watch", title: r, orgId: org.id, orgName: org.name, href: `/ops/clients/${org.id}`, tag: /past due/i.test(r) ? "Billing" : "Client" });
+    }
+  }
+
+  const activity = [
+    ...d.recentDeployments.map((x, i) => ({ key: `dep-${i}`, at: x.at, title: <>{titleCase(x.detail.split(" — ")[0])} <span className="pf-muted ml-1.5">{x.orgName}</span></>, sub: x.detail.split(" — ")[1], tone: toneFor(x.status) })),
+    ...d.recentActions.map((a, i) => ({ key: `act-${i}`, at: a.at, title: <>{titleCase(a.action.replace(/\./g, " "))}{a.orgName ? <span className="pf-muted ml-1.5">{a.orgName}</span> : null}</>, sub: `by ${a.actorName}`, tone: "info" as Tone })),
+  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
+
+  const live = [...d.activeRuns, ...d.failedRuns].slice(0, 7);
 
   return (
     <>
       <PageHead
-        title="What needs attention"
-        description={attention.length === 0 && d.incidents.length === 0 ? "Nothing is waiting on you. Bots are running." : `${attention.length} client${attention.length === 1 ? "" : "s"} need${attention.length === 1 ? "s" : ""} a look.`}
+        title="Control center"
+        description={queue.length === 0 ? "Nothing is waiting on you. Bots are running." : `${queue.length} item${queue.length === 1 ? "" : "s"} need${queue.length === 1 ? "s" : ""} a look across ${new Set(queue.map((q) => q.orgId)).size} client${new Set(queue.map((q) => q.orgId)).size === 1 ? "" : "s"}.`}
       />
 
       {d.eligibleForReactivation.map((o) => (
@@ -26,102 +60,106 @@ export default async function OpsDashboard() {
         </Banner>
       ))}
 
-      <Stats>
-        <Stat value={d.activeClients} label="Active clients" href="/ops/clients" />
-        <Stat value={d.incidents.length} label="Open incidents" href="/ops/monitoring" tone={d.incidents.some((i) => i.severity === "critical") ? "bad" : d.incidents.length ? "watch" : undefined} />
-        <Stat value={d.activeRuns.length} label="Bots working now" href="/ops/runs?status=active" />
-        <Stat value={d.failedRuns.length} label="Recent failed runs" href="/ops/runs?status=failed" tone={d.failedRuns.length ? "watch" : undefined} />
-        <Stat value={d.pendingApprovals} label="Pending approvals" href="/ops/approvals" />
-        <Stat value={d.newRequests} label="New requests" href="/ops/requests?status=submitted" tone={d.newRequests ? "watch" : undefined} />
-        <Stat value={d.disconnectedIntegrations.length} label="Integration problems" href="/ops/integrations?status=problems" tone={d.disconnectedIntegrations.length ? "watch" : undefined} />
-        <Stat value={money(d.outstandingCents)} label="Outstanding receivables" href="/ops/billing" />
-      </Stats>
+      <KpiRow cols={4}>
+        <Kpi icon={Users} value={d.activeClients} label="Active clients" href="/ops/clients" hint={`${d.suspended.length} suspended, ${d.pastDue.length} past due`} />
+        <Kpi icon={CircleDollarSign} value={money(d.mrrCents)} label="Monthly recurring revenue" href="/ops/billing" hint="Active agreements" />
+        <Kpi icon={BotIcon} value={d.activeRuns.length} label="Bots working now" href="/ops/runs?status=active" spark={runTotals} hint={`${runs14} runs in the last 14 days`} />
+        <Kpi icon={AlertTriangle} value={failed14} label="Failed runs, 14 days" href="/ops/runs?status=failed" tone={failed14 ? "watch" : undefined} hint={runs14 ? `${Math.round(((runs14 - failed14) / runs14) * 100)}% succeeded` : "No runs yet"} meter={runs14 ? { pct: ((runs14 - failed14) / runs14) * 100 } : undefined} />
+        <Kpi icon={Bell} value={d.incidents.length} label="Open incidents" href="/ops/monitoring" tone={d.incidents.some((i) => i.severity === "critical" || i.severity === "high") ? "bad" : d.incidents.length ? "watch" : undefined} hint={d.incidents.length ? `Worst: ${d.incidents[0].severity}` : "All clear"} />
+        <Kpi icon={ClipboardList} value={d.pendingApprovals} label="Pending approvals" href="/ops/approvals" tone={d.pendingApprovals ? "watch" : undefined} hint="Waiting on clients or you" />
+        <Kpi icon={Inbox} value={d.newRequests} label="New requests" href="/ops/requests" tone={d.newRequests ? "watch" : undefined} hint="Not yet routed" />
+        <Kpi icon={Receipt} value={money(d.outstandingCents)} label="Outstanding receivables" href="/ops/billing" tone={d.pastDueCents ? "bad" : undefined} hint={d.pastDueCents ? `${money(d.pastDueCents)} past due` : "Nothing past due"} meter={d.outstandingCents ? { pct: (d.pastDueCents / d.outstandingCents) * 100, tone: "bad" } : undefined} />
+      </KpiRow>
 
       <div className="pf-grid pf-grid-main">
-        <div className="pf-grid">
-          <Panel title="Clients needing attention" flush>
-            {attention.length === 0 ? (
-              <Empty title="All clients look healthy" />
-            ) : (
-              <Table head={["Client", "Why", "Status"]}>
-                {attention.map(({ org, reasons }) => (
-                  <tr key={org.id}>
-                    <td><Link className="row-link" href={`/ops/clients/${org.id}`}>{org.name}</Link></td>
-                    <td>{reasons.slice(0, 3).map((r, i) => <div key={i}>{r}</div>)}</td>
-                    <td><Status value={org.status} /></td>
-                  </tr>
-                ))}
-              </Table>
-            )}
-          </Panel>
+        <Panel title="Bot runs, last 14 days" sub="Completed, failed and still in progress" action={<Link href="/ops/runs" className="pf-small font-semibold text-[var(--accent-text)]">All runs</Link>}>
+          <StackedColumns
+            label="Bot runs per day"
+            dates={d.runsDaily.map((x) => x.date)}
+            series={[
+              { key: "completed", label: "Completed", tone: "good", values: d.runsDaily.map((x) => x.completed) },
+              { key: "failed", label: "Failed", tone: "bad", values: d.runsDaily.map((x) => x.failed) },
+              { key: "other", label: "In progress or waiting", tone: "live", values: d.runsDaily.map((x) => x.other) },
+            ]}
+          />
+        </Panel>
 
-          <Panel title="Runtime and provider incidents" action={<Link href="/ops/monitoring" className="pf-small underline">All incidents</Link>} flush>
-            <Table head={["Severity", "Incident", "Client", "Last seen", "Count"]} empty={<Empty title="No open incidents" />}>
-              {d.incidents.map((i) => (
-                <tr key={i.id}>
-                  <td><Status value={i.severity} /></td>
-                  <td>{i.title}</td>
-                  <td>{d.orgNames.get(i.orgId)}</td>
-                  <td><When iso={i.lastSeenAt} /></td>
-                  <td className="num">{i.occurrences}</td>
-                </tr>
+        <Panel title="Fleet health" sub={`${d.fleet.length} client runtime${d.fleet.length === 1 ? "" : "s"}`} action={<Link href="/ops/infrastructure" className="pf-small font-semibold text-[var(--accent-text)]">Infrastructure</Link>}>
+          <SegBar
+            label="Runtime health"
+            items={[
+              { label: "Healthy", value: health.healthy, tone: "good" },
+              { label: "Degraded", value: health.degraded, tone: "watch" },
+              { label: "Offline", value: health.offline, tone: "bad" },
+              { label: "Stopped", value: health.stopped, tone: "quiet" },
+            ]}
+          />
+          <ul className="pf-fleet">
+            {d.fleet.map((f) => (
+              <li key={f.orgId}>
+                <Avatar name={f.orgName} size="sm" />
+                <Link href={`/ops/clients/${f.orgId}?tab=infrastructure`} className="n">{f.orgName}</Link>
+                <Lights items={[
+                  { label: "Engine", tone: f.ready ? "good" : f.health === "stopped" ? "quiet" : "bad", title: f.ready ? "ready" : f.health },
+                  { label: "Tunnel", tone: toneFor(f.tunnel === "connected" ? "connected" : f.tunnel === "down" ? "down" : undefined), title: f.tunnel },
+                ]} />
+                <span className="disk" title="Data volume used">{f.diskUsedPct ?? "—"}{f.diskUsedPct !== undefined ? "%" : ""}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+
+        <Panel title="Needs attention" sub="Incidents and client problems, most severe first" flush>
+          {queue.length === 0 ? <Empty title="All clear">Nothing needs a decision right now.</Empty> : (
+            <ul className="pf-queue">
+              {queue.slice(0, 8).map((q) => (
+                <li key={q.key} className={`edge-${q.tone}`}>
+                  <Avatar name={q.orgName} size="sm" />
+                  <div className="body">
+                    <div className="t">{q.title}</div>
+                    <div className="m"><span className={`pf-badge ${q.tone === "bad" ? "bad" : q.tone === "watch" ? "watch" : ""}`}>{q.tag}</span><span>{q.orgName}</span>{q.at && <When iso={q.at} />}</div>
+                  </div>
+                  <Link href={q.href} className="btn btn-outline">Open</Link>
+                </li>
               ))}
-            </Table>
-          </Panel>
+            </ul>
+          )}
+        </Panel>
 
-          <Panel title="Bots working and recent failures" flush>
-            <Table head={["Bot", "Client", "Task", "Status", "Started"]} empty={<Empty title="No runs in progress or failing" />}>
-              {[...d.activeRuns, ...d.failedRuns].slice(0, 10).map((r) => (
-                <tr key={r.id}>
-                  <td>{d.botNames.get(r.botId)}</td>
-                  <td>{d.orgNames.get(r.orgId)}</td>
-                  <td><Link className="row-link pf-trunc inline-block" href={`/ops/runs/${r.id}`}>{r.task}</Link></td>
-                  <td><Status value={r.status} /></td>
-                  <td><When iso={r.startedAt ?? r.createdAt} /></td>
-                </tr>
-              ))}
-            </Table>
-          </Panel>
-        </div>
-
-        <div className="pf-grid">
-          <Panel title="Accounts">
-            <dl className="pf-kv">
-              <dt>Past due</dt><dd>{d.pastDue.length ? d.pastDue.map((o) => <div key={o.id}><Link className="underline" href={`/ops/clients/${o.id}?tab=billing`}>{o.name}</Link></div>) : "None"}</dd>
-              <dt>Suspended</dt><dd>{d.suspended.length ? d.suspended.map((o) => <div key={o.id}><Link className="underline" href={`/ops/clients/${o.id}`}>{o.name}</Link></div>) : "None"}</dd>
-              <dt>Failing automations</dt><dd><Link className="underline" href="/ops/automations?status=failed">{d.failingAutomations}</Link></dd>
-              <dt>Provider problems</dt><dd>{d.providerProblems.length || "None"}</dd>
-            </dl>
-          </Panel>
-          <Panel title="This month" sub="Estimates from operator-entered rates">
-            <dl className="pf-kv">
-              <dt>Bot Runs</dt><dd>{d.usageThisMonth.runs}</dd>
-              <dt>Model cost</dt><dd>{usd(d.usageThisMonth.modelCostUsd)}</dd>
-              <dt>Infrastructure</dt><dd>{usd(d.usageThisMonth.infraCostUsd, 0)}</dd>
-            </dl>
-          </Panel>
-          <Panel title="Recent payments" flush>
-            <Table head={["Client", "Amount", "Received"]} empty={<Empty title="No payments yet" />}>
+        <Panel title="Recent payments" flush action={<Link href="/ops/billing" className="pf-small font-semibold text-[var(--accent-text)]">Billing</Link>}>
+          {d.recentPayments.length === 0 ? <Empty title="No payments yet" /> : (
+            <ul className="pf-paylist">
               {d.recentPayments.map((p, i) => (
-                <tr key={i}><td>{p.orgName}<div className="pf-muted pf-small">{p.method.toUpperCase()}</div></td><td className="num">{money(p.amountCents)}</td><td>{p.date}</td></tr>
+                <li key={i}>
+                  <Avatar name={p.orgName} size="sm" />
+                  <div className="body"><div className="t">{p.orgName}</div><div className="m"><span>{p.method.toUpperCase()}</span><span>{p.date}</span></div></div>
+                  <div className="amt">{money(p.amountCents)}</div>
+                </li>
               ))}
-            </Table>
-          </Panel>
-          <Panel title="Recent deployments" flush>
-            <Table head={["Change", "When"]} empty={<Empty title="No deployments yet" />}>
-              {d.recentDeployments.map((x, i) => (
-                <tr key={i}><td>{x.orgName}<div className="pf-small pf-muted">{x.detail}</div></td><td><When iso={x.at} /></td></tr>
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title="Working now and recent failures" flush action={<Link href="/ops/runs" className="pf-small font-semibold text-[var(--accent-text)]">Runs</Link>}>
+          {live.length === 0 ? <Empty title="No runs in progress or failing" /> : (
+            <ul className="pf-queue">
+              {live.map((r) => (
+                <li key={r.id} className={`edge-${toneFor(r.status)}`}>
+                  <Avatar name={d.orgNames.get(r.orgId) ?? ""} size="sm" />
+                  <div className="body">
+                    <Link href={`/ops/runs/${r.id}`} className="t row-link">{r.task}</Link>
+                    <div className="m"><span>{d.botNames.get(r.botId)}</span><span>{d.orgNames.get(r.orgId)}</span><When iso={r.startedAt ?? r.createdAt} /></div>
+                  </div>
+                  <Status value={r.status} />
+                </li>
               ))}
-            </Table>
-          </Panel>
-          <Panel title="Recent operator actions" flush>
-            <Table head={["Who", "Action", "When"]} empty={<Empty title="No actions yet" />}>
-              {d.recentActions.map((a, i) => (
-                <tr key={i}><td>{a.actorName}</td><td>{titleCase(a.action.replace(/\./g, " "))}{a.orgName ? <div className="pf-small pf-muted">{a.orgName}</div> : null}</td><td><When iso={a.at} /></td></tr>
-              ))}
-            </Table>
-          </Panel>
-        </div>
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title="Activity" sub="Deployments and operator actions" flush>
+          <TimelineList items={activity} empty="No activity yet." />
+        </Panel>
       </div>
     </>
   );

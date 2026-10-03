@@ -353,3 +353,67 @@ export function ColumnChart({ labels, values, label, height = 180 }: { labels: s
     </div>
   );
 }
+
+/* ───────────────────────── Stacked daily columns ───────────────────────── */
+
+export interface StackSeries {
+  key: string;
+  label: string;
+  tone: "good" | "bad" | "live" | "watch" | "quiet";
+  values: number[];
+}
+
+/** Daily outcome columns (e.g. completed / failed runs). Hover or focus a
+ *  day to read every series; values also available in the legend totals. */
+export function StackedColumns({ dates, series, height = 190, label }: { dates: string[]; series: StackSeries[]; height?: number; label: string }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const totals = dates.map((_, i) => series.reduce((s, x) => s + (x.values[i] ?? 0), 0));
+  const max = niceMax(Math.max(1, ...totals));
+  const ticks = [0, max / 2, max];
+  const every = dates.length > 16 ? 3 : dates.length > 9 ? 2 : 1;
+  return (
+    <div className="pf-stack" aria-label={label} role="group">
+      <div className="pf-stack-legend" aria-hidden="true">
+        {series.map((s) => (
+          <span key={s.key}><i className={`sw ${s.tone}`} />{s.label} <b>{s.values.reduce((a, b) => a + b, 0).toLocaleString("en-US")}</b></span>
+        ))}
+      </div>
+      <div className="pf-stack-plot" style={{ height }}>
+        <div className="yaxis" aria-hidden="true">
+          {ticks.slice().reverse().map((t) => <span key={t}>{fmt(t)}</span>)}
+        </div>
+        <div className="grid" aria-hidden="true">{ticks.map((t) => <i key={t} style={{ bottom: `${(t / max) * 100}%` }} />)}</div>
+        <div className="cols" role="list">
+          {dates.map((d, i) => (
+            <div
+              key={d}
+              role="listitem"
+              tabIndex={0}
+              className={`col${hover === i ? " on" : ""}`}
+              aria-label={`${shortDate(d)}: ${series.map((s) => `${s.values[i] ?? 0} ${s.label.toLowerCase()}`).join(", ")}`}
+              onPointerEnter={() => setHover(i)}
+              onPointerLeave={() => setHover(null)}
+              onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)}
+            >
+              <div className="stack" style={{ height: `${(totals[i] / max) * 100}%` }}>
+                {series.map((s) => (s.values[i] ?? 0) > 0 && <span key={s.key} className={`seg ${s.tone}`} style={{ flexGrow: s.values[i] }} />)}
+              </div>
+              {hover === i && (
+                <div className={`pf-tooltip stack-tip${i > dates.length * 0.6 ? " flip" : ""}`} role="status">
+                  <div className="d">{shortDate(d)}</div>
+                  {series.map((s) => (
+                    <div key={s.key} className="row"><i className={`sw ${s.tone}`} /><b>{fmt(s.values[i] ?? 0)}</b><span>{s.label}</span></div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="pf-stack-x" aria-hidden="true">
+        {dates.map((d, i) => <span key={d}>{(dates.length - 1 - i) % every === 0 ? shortDate(d) : ""}</span>)}
+      </div>
+    </div>
+  );
+}
