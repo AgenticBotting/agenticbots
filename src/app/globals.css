@@ -831,3 +831,12 @@
   .swarm-bot, .swarm-dot, .swarm-line { animation: none; }
   .swarm-line:nth-child(2) { display: none; }
 }
+
+/* ── Offer hero charts: one quiet entrance, then still. ── */
+@keyframes ov-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ov-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes ov-in   { from { opacity: 0; } }
+.ov-draw { stroke-dasharray: 1; stroke-dashoffset: 0; animation: ov-draw 1.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.ov-fade { animation: ov-in 0.8s ease-out 0.6s both; }
+.ov-dot  { animation: ov-in 0.3s ease-out 1.3s both; }
+.ov-grow { transform-box: fill-box; transform-origin: bottom; animation: ov-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
