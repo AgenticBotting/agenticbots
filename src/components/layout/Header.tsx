@@ -28,9 +28,9 @@ type MenuId = "services" | "areas" | null;
    marketing vs. sales. Speed-to-Lead is pulled out as the starting point. */
 const START_SLUG = "inbound";
 const STAGES: { title: string; blurb: string; slugs: string[] }[] = [
-  { title: "Get more leads", blurb: "Show up and get the call", slugs: ["paid-media", "seo", "content", "lead-generation", "outbound"] },
+  { title: "Get found", blurb: "Show up first and get the call", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
   { title: "Close more jobs", blurb: "Turn leads into booked work", slugs: ["cro", "email", "enablement"] },
-  { title: "Run the business", blurb: "Keep customers and see the numbers", slugs: ["crm", "account-management", "analytics", "revops"] },
+  { title: "Win repeat work", blurb: "Bring customers back and see the numbers", slugs: ["reactivation", "crm", "analytics"] },
 ];
 
 export function Header() {

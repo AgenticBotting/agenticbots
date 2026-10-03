@@ -19,7 +19,7 @@
 > agentic-email-marketing · agentic-cro · agentic-analytics ·
 > agentic-lead-generation · agentic-outbound-sdr · agentic-speed-to-lead ·
 > agentic-crm-automation · agentic-proposal-automation ·
-> agentic-account-management · agentic-revops
+> agentic-review-generation · agentic-customer-reactivation (replaced account-management and revops, Oct 2026 — 308 redirects in src/lib/redirects.mjs)
 >
 > **Migration completed:** `/marketing/{category}` and `/sales/{category}` (13
 > pages) and the whole `/local/**` tree (3,904 pages) now 308 into

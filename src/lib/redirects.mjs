@@ -27,8 +27,8 @@ const CATEGORY_MAP = {
   "/sales/inbound": "agentic-speed-to-lead",
   "/sales/crm": "agentic-crm-automation",
   "/sales/enablement": "agentic-proposal-automation",
-  "/sales/account-management": "agentic-account-management",
-  "/sales/revops": "agentic-revops",
+  "/sales/account-management": "agentic-customer-reactivation",
+  "/sales/revops": "agentic-crm-automation",
 };
 
 /** Old /local slug → new flat service slug. These four carried the geo
@@ -38,6 +38,12 @@ const LOCAL_MAP = {
   seo: "agentic-seo",
   crm: "agentic-crm-automation",
   "speed-to-lead": "agentic-speed-to-lead",
+};
+
+/** Retired /services slugs → replacement service. */
+const RETIRED_SERVICES = {
+  "agentic-account-management": "agentic-customer-reactivation",
+  "agentic-revops": "agentic-crm-automation",
 };
 
 export const REDIRECTS = [
@@ -57,6 +63,13 @@ export const REDIRECTS = [
   ]),
 
   { source: "/local", destination: "/services", permanent: true },
+
+  /* Oct 2026: Retention and RevOps retired for local-services fit.
+     Each service and its geo tree go to the nearest replacement. */
+  ...Object.entries(RETIRED_SERVICES).flatMap(([oldSlug, slug]) => [
+    { source: `/services/${oldSlug}`, destination: `/services/${slug}`, permanent: true },
+    { source: `/services/${oldSlug}/:path*`, destination: `/services/${slug}/:path*`, permanent: true },
+  ]),
 ];
 
 /** Sources with no path parameter — these must never also be real routes. */
