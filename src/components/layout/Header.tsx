@@ -180,6 +180,7 @@ export function Header() {
                 silently wrapping "Service areas" onto two lines the way
                 it did earlier. */}
             <nav className="hidden lg:flex shrink-0 items-center gap-8 whitespace-nowrap">
+              <MenuTrigger label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -430,6 +431,63 @@ export function Header() {
             </div>
 
             <div className="pb-16 pt-4">
+              <MobileGroup
+                id="areas"
+                open={mobileGroup === "areas"}
+                onToggle={() => {
+                  setMobileRegion(null);
+                  setMobileGroup(mobileGroup === "areas" ? null : "areas");
+                }}
+                kicker="Where we deploy"
+                title="Service areas"
+              >
+                {regionMobile === null ? (
+                  <>
+                    <li className="pb-3"><MarketSearch onNavigate={closeMobile} /></li>
+                    <MobileRow href="/markets" onGo={closeMobile} boxed>All markets</MobileRow>
+                    {regions.map(({ region, states }) => (
+                      <MobileDrill key={region} onClick={() => setMobileRegion(region)} meta={`${states.length} states`} boxed>
+                        {region}
+                      </MobileDrill>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <li className="pb-1">
+                      <button
+                        type="button"
+                        onClick={() => setMobileRegion(null)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-[var(--border-strong)] text-[13px] font-semibold tracking-[-0.01em] hover:bg-ink-950 hover:text-white hover:border-ink-950 transition-colors"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        All regions
+                      </button>
+                    </li>
+                    {regionMobile.states.map((st) => (
+                      <MobileRow
+                        key={st.slug}
+                        href={`/markets/${st.slug}`}
+                        onGo={closeMobile}
+                        meta={`${allCitiesInState(st.slug).length} cities`}
+                        boxed
+                      >
+                        {st.name}
+                      </MobileRow>
+                    ))}
+                    <li className="pt-2">
+                      <Link
+                        href={`/markets/region/${regionSlug(regionMobile.region)}`}
+                        onClick={closeMobile}
+                        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all"
+                      >
+                        View all {regionMobile.region} markets
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </li>
+                  </>
+                )}
+              </MobileGroup>
+
               <ul className="py-5 space-y-2">
                 {NAV_LINKS.map((l) => (
                   <MobileRow key={l.href} href={l.href} onGo={closeMobile} boxed strong>

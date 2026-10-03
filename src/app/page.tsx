@@ -4,6 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container, Reveal, SectionHeader, Section, MediaSlot } from "@/components/ui";
+import { REGIONS, regionSlug } from "@/lib/geo/regions";
 import { BotFactory, FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 
 export const metadata: Metadata = {
@@ -362,14 +363,39 @@ function PricingAnchor() {
 function FullSystem() {
   return (
     <section className="border-t border-[var(--border)]">
-      <Container className="py-8 flex flex-wrap items-center justify-between gap-4">
-        <p className="body-sm max-w-[62ch]">
-          Speed-to-lead is where we start. Once it&apos;s running, clients add ads, reviews,
-          reactivation and reporting.
-        </p>
-        <Link href="/services" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all">
-          See the full system <ArrowRight className="w-4 h-4" />
-        </Link>
+      <Container className="py-10 space-y-8">
+        <div>
+          <p className="eyebrow mb-3">Service areas</p>
+          <p className="body-base max-w-[62ch]">
+            We set up speed-to-lead systems for contractors across the country. Find your market:
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {REGIONS.map((r) => (
+              <li key={r}>
+                <Link
+                  href={`/markets/region/${regionSlug(r)}`}
+                  className="inline-flex px-3.5 py-2 border border-[var(--border)] text-[13.5px] font-medium hover:border-ink-950 transition-colors"
+                >
+                  {r}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link href="/markets" className="inline-flex px-3.5 py-2 text-[13.5px] font-semibold text-[var(--accent-text)]">
+                All markets →
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div className="pt-8 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-4">
+          <p className="body-sm max-w-[62ch]">
+            Speed-to-lead is where we start. Once it&apos;s running, clients add ads, reviews,
+            reactivation and reporting.
+          </p>
+          <Link href="/services" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all">
+            See the full system <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </Container>
     </section>
   );
