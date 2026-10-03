@@ -72,16 +72,16 @@ export default async function ServiceHub({ params }: Params) {
           <Container className="py-14 sm:py-16">
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
               <div>
-                <p className="eyebrow mb-5">{svc.botName} <span className="eyebrow-dim">· {svc.name.toLowerCase()} for contractors</span></p>
+                <p className="eyebrow mb-5">{svc.botName} <span className="eyebrow-dim">for contractors</span></p>
                 <h1 className="display-hero max-w-[20ch] text-balance">{renderHeadline(svc.headline)}</h1>
-                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
+                <p className="display-lg mt-4 !font-medium text-[var(--text-secondary)]">{svc.hook}</p>
                 {/* The national lede. `geoIntro` is deliberately held back for
                     the state and city pages — reusing one paragraph across 924
                     of them is the doorway pattern the gate exists to stop. */}
                 <p className="body-lg mt-5 max-w-[52ch]">{svc.intro}</p>
                 {offer && (
-                  <p className="mt-5 inline-flex items-center gap-2 border border-[var(--border)] bg-[var(--bg-alt)] px-3 py-1.5 text-[13px] text-[var(--text-secondary)]">
-                    <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--accent-text)]">Best for</span> {offer.bestFor}
+                  <p className="mt-5 max-w-[52ch] border-l-2 border-[var(--color-accent-500)] bg-[var(--bg-alt)] px-3 py-2 text-[13.5px] text-[var(--text-secondary)]">
+                    <span className="font-semibold text-[var(--accent-text)] mr-1.5">Best for</span>{offer.bestFor}
                   </p>
                 )}
                 <div className="mt-8 cta-row">

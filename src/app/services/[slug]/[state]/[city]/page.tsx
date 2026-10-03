@@ -99,9 +99,9 @@ export default async function CityPage({ params }: Params) {
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">
-                  {svc.serviceName} <span className="eyebrow-dim">· {ct.name}, {ct.stateAbbr}</span>
+                  {svc.botName} <span className="eyebrow-dim">in {ct.name}, {ct.stateAbbr}</span>
                 </p>
-                <h1 className="display-hero max-w-[24ch] text-balance">
+                <h1 className="display-xl !text-[clamp(2.25rem,4.4vw,4rem)] max-w-[22ch] text-balance">
                   {svc.headlinePattern.replace("{city}", ct.name).replace("{st}", ct.stateAbbr)}
                 </h1>
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
@@ -356,9 +356,9 @@ function StructuralCityService({ svc, st, rec }: {
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">
-                  {svc.serviceName} <span className="eyebrow-dim">· {rec.city}, {rec.state_abbr} · {rec.metro} metro</span>
+                  {svc.botName} <span className="eyebrow-dim">in {rec.city}, {rec.state_abbr}</span>
                 </p>
-                <h1 className="display-hero max-w-[24ch] text-balance">
+                <h1 className="display-xl !text-[clamp(2.25rem,4.4vw,4rem)] max-w-[22ch] text-balance">
                   {svc.headlinePattern.replace("{city}", rec.city).replace("{st}", rec.state_abbr)}
                 </h1>
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>

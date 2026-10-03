@@ -67,12 +67,12 @@ export function LeakCalculator() {
       </div>
 
       <div className="p-6 sm:p-9 bg-ink-950 on-dark flex flex-col">
-        <p className="mono text-[10.5px] uppercase tracking-[0.12em] text-ink-300">Estimated revenue leaking</p>
-        <p className="mt-3 text-[clamp(2.6rem,5vw,3.6rem)] font-semibold tracking-[-0.045em] leading-none tabular-nums text-accent-400">
+        <p className="text-[13px] font-semibold text-ink-300">Estimated revenue leaking</p>
+        <p className="mt-4 num-display text-[clamp(3.75rem,8vw,6.75rem)] text-accent-400">
           {usd(monthly)}
-          <span className="text-[0.4em] text-ink-300 font-medium tracking-normal"> / month</span>
         </p>
-        <p className="mt-2 text-[15px] text-ink-200 tabular-nums">{usd(monthly * 12)} a year</p>
+        <p className="mt-2 text-[14px] text-ink-300">a month in jobs going to whoever answered first</p>
+        <p className="mt-4 text-[15px] text-white tabular-nums"><span className="font-semibold">{usd(monthly * 12)}</span> <span className="text-ink-300">a year</span></p>
 
         <dl className="mt-7 grid grid-cols-2 gap-px bg-ink-700 border border-ink-700">
           <div className="bg-ink-900 px-4 py-4">

@@ -88,7 +88,7 @@ export default async function StateHub({ params }: Params) {
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
             <div>
             <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· {st.name} · {all.length} cities</span></p>
-            <h1 className="display-hero max-w-[20ch] text-balance">
+            <h1 className="display-hero !text-[clamp(2.5rem,5vw,4.75rem)] max-w-[18ch] text-balance">
               {svc.serviceName} across {st.name}.
             </h1>
             {/* `geoIntro` — the lede authored specifically for state/city

@@ -126,7 +126,7 @@ export function StackStrip({ tools = STACK, label = "Deploys into the tools you 
   return (
     <div className="border-b border-[var(--border)] bg-white">
       <Container className="py-5 flex flex-wrap items-center gap-x-8 gap-y-3">
-        <p className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)] shrink-0">
+        <p className="text-[13px] font-semibold text-[var(--text-muted)] shrink-0">
           {label}
         </p>
         <ul className="flex flex-wrap items-center gap-x-7 gap-y-2">

@@ -1,53 +1,16 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-
 /**
- * Scroll-triggered fade-up. CSS transition + one IntersectionObserver —
- * replaced framer-motion (≈45KB gz) for a 150KB route budget (Phase 7).
- * Fires once; `prefers-reduced-motion` is honored by the global CSS rule
- * that zeroes transition durations.
+ * Formerly a scroll-triggered fade-up on every section. Retired in the
+ * Oct 2026 design pass: scattered entrance fades read as template, and the
+ * page now spends its motion on one orchestrated moment (the hero clock).
+ * Kept as a pass-through so the ~60 call sites keep compiling.
  */
 export function Reveal({
   children,
   className,
-  delay = 0,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -60px 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: shown ? `${delay}s` : undefined }}
-      className={cn(
-        "transition-[opacity,transform] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-        shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 }

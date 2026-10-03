@@ -92,7 +92,7 @@ export default async function CityMarketHub({ params }: Params) {
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">The {rec.city} market <span className="eyebrow-dim">· {rec.state_abbr} · {rec.metro} metro</span></p>
-                <h1 className="display-hero max-w-[22ch] text-balance">
+                <h1 className="display-xl !text-[clamp(2.25rem,4.4vw,4rem)] max-w-[22ch] text-balance">
                   Bots that get {rec.city}{enriched ? "" : `, ${rec.state_abbr}`} businesses customers.
                 </h1>
                 {ct ? (
