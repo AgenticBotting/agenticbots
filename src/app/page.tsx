@@ -3,10 +3,9 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
-import { Container, Reveal, Section } from "@/components/ui";
+import { Container, Reveal, SectionHeader, Section, MediaSlot } from "@/components/ui";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
-import { cn } from "@/lib/utils";
-import { FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, HeroClock, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
+import { BotFactory, FaqAccordion, BotOrbit, AgentTrace, AuditForm, LeakCalculator, VignetteAsk, VignetteBuild, VignetteBooked } from "@/components/marketing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -16,68 +15,101 @@ export const metadata: Metadata = {
 
 function Hero() {
   return (
-    <HeroClock>
-      <p className="eyebrow mb-5">For residential and commercial contractors</p>
-      <h1 className="display-mega !text-[clamp(3.1rem,6.4vw,6.25rem)] max-w-[10.5ch] text-balance">
-        Every lead answered in 60&nbsp;seconds.
-      </h1>
-      <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-        Our bots text back every call, form and quote request in under a minute, follow
-        up until the job is booked, and log it all to your CRM. Nights and weekends
-        included. Installed in 14 days.
-      </p>
-      <div className="mt-8 cta-row">
-        <BotOrbit>
-          <a href="#audit" className="btn btn-primary h-[52px] px-6 text-[15px]">
-            Get my free lead leak audit
-            <ArrowRight className="w-4 h-4" />
-          </a>
-        </BotOrbit>
-        <a
-          href="#demo"
-          className="self-start text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
-        >
-          Watch a full booking
-        </a>
-      </div>
-    </HeroClock>
+    <section className="relative border-b border-[var(--border)] overflow-hidden">
+      <Container className="py-14 sm:py-18">
+        <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-12 lg:gap-20 items-center">
+          <Reveal>
+            <p className="eyebrow mb-6">
+              For contractors <span className="eyebrow-dim">· residential and commercial</span>
+            </p>
+            <h1 className="display-hero max-w-[16ch] text-balance">
+              Every lead answered in 60 seconds.
+            </h1>
+            <p className="body-lg mt-5 max-w-[48ch] text-pretty">
+              Our bots text back every call, form and quote request in under a
+              minute, follow up until the job is booked, and log it all to your
+              CRM — nights and weekends included. Installed in 14 days.
+            </p>
+            <div className="mt-8 cta-row">
+              <BotOrbit>
+                <a href="#audit" className="btn btn-primary">
+                  Get my free lead leak audit
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </BotOrbit>
+              <a
+                href="#demo"
+                className="text-[15px] font-semibold tracking-[-0.01em] border-b-2 border-[var(--border-strong)] pb-0.5 hover:border-ink-950 transition-colors"
+              >
+                Watch a bot book a job
+              </a>
+            </div>
+            <dl className="mt-9 pt-8 border-t border-[var(--border)] grid grid-cols-3 gap-6 max-w-[520px]">
+              {[
+                { v: "41", u: "s", l: "To the first reply" },
+                { v: "24/7", u: "", l: "Nights and weekends" },
+                { v: "14", u: "d", l: "To your first bot live" },
+              ].map((s) => (
+                <div key={s.l}>
+                  <dt className="flex items-baseline">
+                    <span className="text-[clamp(1.9rem,3vw,2.5rem)] font-semibold tracking-[-0.045em] leading-[0.9] tabular-nums text-[var(--foreground)]">
+                      {s.v}
+                    </span>
+                    {s.u && (
+                      <span className="text-[clamp(1.1rem,1.6vw,1.4rem)] font-semibold tracking-[-0.03em] leading-none text-[var(--accent-text)]">
+                        {s.u}
+                      </span>
+                    )}
+                  </dt>
+                  <dd className="text-[13.5px] font-medium tracking-[-0.01em] mt-3 leading-snug text-[var(--text-body)]">
+                    {s.l}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <BotFactory />
+          </Reveal>
+        </div>
+      </Container>
+    </section>
   );
 }
 
 /* ─────────────────────────  THREE PLAIN STEPS  ──────────────────────── */
 
 const SIMPLE_STEPS = [
-  { day: "Day 0", t: "We secret-shop your leads", d: "An after-hours call, a form, a quote request, all timed. Your scorecard lands two days later.", Art: VignetteAsk },
-  { day: "Day 3", t: "We wire it into your business", d: "Your phone line, website forms, calendar and CRM. Nothing for you to replace.", Art: VignetteBuild },
-  { day: "Day 14", t: "Every lead gets answered", d: "Live and monitored from the first call, nights and weekends included.", Art: VignetteBooked },
+  { n: "01", t: "We secret-shop your leads", d: "We call after hours, fill out your form and time the reply. You get a scorecard showing exactly where jobs slip away.", Art: VignetteAsk },
+  { n: "02", t: "We install the system", d: "Wired into your phone line, website forms, calendar and CRM. Live in 14 days, monitored from day one.", Art: VignetteBuild },
+  { n: "03", t: "Every lead gets worked", d: "Answered in under a minute, followed up until it books, and reported to you every month.", Art: VignetteBooked },
 ];
 
 function HowSimple() {
   return (
-    <section id="how" className="section-pad border-b border-[var(--border)] scroll-mt-28">
-      <Container>
-        <div className="grid lg:grid-cols-[0.8fr_1.2fr] gap-6 lg:gap-16 items-end">
-          <h2 className="display-xl max-w-[14ch] text-balance">From first audit to answering in 14 days.</h2>
-          <p className="body-lg max-w-[48ch] lg:justify-self-end">
-            No kickoff calls, no six-week onboarding. We test what you have, show you the gap, then close it.
-          </p>
-        </div>
-
-        <ol className="mt-14 grid md:grid-cols-3 gap-10 md:gap-0 relative">
-          {/* the timeline rail */}
-          <span aria-hidden className="hidden md:block absolute left-0 right-0 top-[3.1rem] h-px bg-[var(--border-strong)]" />
-          {SIMPLE_STEPS.map(({ day, t, d, Art }, i) => (
-            <li key={day} className="relative md:pr-10">
-              <p className="num-display text-[clamp(2.5rem,4vw,3.5rem)] text-ink-950">{day}</p>
-              <span aria-hidden className={cn("hidden md:block absolute top-[2.75rem] left-0 h-3.5 w-3.5 border-[3px] border-white", i === 2 ? "bg-[var(--color-accent-500)]" : "bg-ink-950")} />
-              <div className="mt-8 border border-[var(--border)] bg-[var(--bg-alt)] px-4 pt-4 pb-2"><Art /></div>
-              <h3 className="display-lg mt-5">{t}</h3>
-              <p className="body-base mt-2 max-w-[36ch]">{d}</p>
-            </li>
-          ))}
-        </ol>
-      </Container>
-    </section>
+    <Section
+      id="how"
+      variant="light"
+      eyebrow="How it works"
+      heading="Three steps. No jargon."
+    >
+      <div className="grid md:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
+        {SIMPLE_STEPS.map(({ n, t, d, Art }) => (
+          <div key={n} className="card-cell flex flex-col">
+            {/* The image slot from the wireframe — drawn, not photographed. */}
+            <div className="border-b border-[var(--border)] bg-[var(--bg-alt)] px-4 pt-5 pb-3">
+              <Art />
+            </div>
+            <div className="p-7">
+              <p className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">Step {n}</p>
+              <h3 className="display-lg mt-2">{t}</h3>
+              <p className="body-base mt-2.5">{d}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Section>
   );
 }
 
@@ -95,7 +127,9 @@ function DemoSection() {
         <div className="grid lg:grid-cols-[0.42fr_0.58fr] gap-12 lg:gap-16 items-start">
           <div className="lg:sticky lg:top-32">
             <Reveal>
-              <p className="eyebrow mb-4">The full booking, step by step</p>
+              <p className="eyebrow mb-4">
+                See a bot run <span className="eyebrow-dim">· simulated, step for step</span>
+              </p>
               <h2 className="display-xl text-balance">Watch a missed call become a booked job.</h2>
               <p className="body-lg mt-5 max-w-[40ch]">
                 A real booking flow, step by step, at ~10× real time. Every action is logged where you can see it.
@@ -140,7 +174,7 @@ function Faq() {
         <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
           <div className="lg:sticky lg:top-32">
             <Reveal>
-              <h2 className="display-xl max-w-[12ch]">The things people ask first.</h2>
+              <SectionHeader eyebrow="Questions" title="The things people ask first." />
               <div className="mt-10 border border-[var(--border)] bg-[var(--bg-alt)] p-6 max-w-[380px]">
                 <p className="mono text-[10.5px] uppercase tracking-[0.11em] text-[var(--text-muted)]">
                   Not answered here?
@@ -170,8 +204,8 @@ function FinalCta() {
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
           <Reveal>
             <p className="eyebrow mb-4">Free lead leak audit</p>
-            <h2 className="display-xl text-balance max-w-[16ch]">
-              Find out how many jobs you lose before the phone rings.
+            <h2 className="display-xl text-balance">
+              Find out how many jobs you are losing before you hear the phone ring.
             </h2>
             <p className="body-lg mt-5 max-w-[46ch]">
               We test your business the way a new customer would: an after-hours call, a
@@ -211,7 +245,7 @@ function Calculator() {
       id="calculator"
       variant="light"
       eyebrow="Lead leak calculator"
-      heading="What slow replies cost you."
+      heading={<>What slow replies <span className="em-green">cost you.</span></>}
       sub="Most contractors call back when they get a minute. By then the customer has called someone else. Put in your numbers."
     >
       <LeakCalculator />
@@ -222,46 +256,29 @@ function Calculator() {
 /* ──────────────────────────  WHO THIS IS FOR  ───────────────────────── */
 
 const WHO = [
-  {
-    who: "Residential",
-    d: "Homeowners call three companies and hire whoever answers first. Your bot answers first.",
-    trades: ["Roofing", "HVAC", "Plumbing", "Electrical", "Remodeling", "Pest control"],
-  },
-  {
-    who: "Commercial",
-    d: "Bid requests and RFQs worked the same day, so no project goes cold waiting on an estimator.",
-    trades: ["General contractors", "Specialty trades", "Facilities", "Paving", "Glazing", "Fire protection"],
-  },
+  { id: "W-01", label: "Residential crew at a customer's home", spec: "1600×1200 · horizontal · real crew, real truck, natural light. No stock handshakes.", who: "Residential contractors", eg: "Roofing · HVAC · plumbing · electrical · remodeling", d: "Homeowners call three companies and hire whoever answers first. Your bot is first, every time." },
+  { id: "W-02", label: "Commercial estimator on a job site", spec: "1600×1200 · horizontal · hard hat, plans, a phone in hand.", who: "Commercial contractors", eg: "GCs · specialty trades · facilities services", d: "Bid requests, follow-ups and RFQs worked the same day, so no project goes cold waiting on an estimator." },
 ];
 
 function WhoFor() {
   return (
-    <section id="who" className="section-pad bg-[var(--bg-alt)] border-b border-[var(--border)] scroll-mt-28">
-      <Container>
-        <h2 className="display-xl max-w-[16ch] text-balance">Built for the people on the roof, not at the desk.</h2>
-        <p className="body-lg mt-5 max-w-[50ch]">
-          You can&apos;t answer the phone from a ladder or a job walk. That&apos;s exactly when leads come in.
-        </p>
-        <div className="mt-14 grid md:grid-cols-2 gap-x-14 gap-y-14">
-          {WHO.map((g) => (
-            <div key={g.who}>
-              <div className="pb-4 border-b-2 border-ink-950">
-                <p className="display-lg">{g.who}</p>
-              </div>
-              <ul>
-                {g.trades.map((t) => (
-                  <li key={t} className="group flex items-center justify-between border-b border-[var(--border-strong)] py-2.5">
-                    <span className="num-display text-[clamp(2rem,4.2vw,3.5rem)] text-ink-950 group-hover:text-[var(--accent-text)] transition-colors">{t}</span>
-                    <span aria-hidden className="h-2.5 w-2.5 bg-[var(--color-accent-500)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </li>
-                ))}
-              </ul>
-              <p className="body-base mt-5 max-w-[44ch]">{g.d}</p>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </section>
+    <Section
+      variant="alt"
+      eyebrow="Who this is for"
+      heading={<>Built for contractors <span className="em-green">who are on the job.</span></>}
+      sub="You can't answer the phone from a roof or a job walk. That's exactly when leads come in."
+    >
+      <div className="grid sm:grid-cols-2 gap-8 max-w-[920px]">
+        {WHO.map((t) => (
+          <div key={t.id}>
+            <MediaSlot id={t.id} ratio="4 / 3" label={t.label} spec={t.spec} />
+            <p className="display-lg mt-5">{t.who}</p>
+            <p className="mono text-[11px] uppercase tracking-[0.08em] text-[var(--accent-text)] mt-1.5">{t.eg}</p>
+            <p className="body-base mt-3 max-w-[44ch]">{t.d}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
   );
 }
 
@@ -269,31 +286,46 @@ function WhoFor() {
 
 function FoundingClients() {
   return (
-    <section id="founding" className="bg-ink-950 on-dark scroll-mt-28 overflow-hidden">
-      <Container className="section-pad">
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
+    <section id="founding" className="border-b border-ink-700 bg-ink-950 on-dark scroll-mt-28">
+      <Container className="section-pad-sm">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-10 lg:gap-16 items-center">
           <div>
-            <p className="eyebrow-dark eyebrow mb-4">Founding clients</p>
-            <h2 className="display-xl text-balance max-w-[14ch]">Three spots at a reduced setup fee.</h2>
-            <p className="body-lg mt-5 max-w-[44ch]">
-              Same system, same monthly price, same guarantee. In return, we publish your
-              before-and-after numbers as a case study.
+            <p className="eyebrow-dark mb-4">Founding clients</p>
+            <h2 className="display-xl text-balance">
+              Three spots. <span className="em-green-dark">Reduced setup.</span>
+            </h2>
+            <p className="body-lg mt-5 max-w-[46ch] text-ink-300">
+              We&apos;re taking on our first three contractors at a reduced setup fee. In return, we
+              publish your before-and-after numbers as a case study. Same system, same monthly
+              price, same guarantee.
             </p>
-            <a href="#audit" className="btn btn-primary mt-9 h-[52px] px-6 text-[15px]">
-              Claim a spot with the free audit <ArrowRight className="w-4 h-4" />
+            <a href="#audit" className="btn btn-on-dark mt-8">
+              Start with the free audit <ArrowRight className="w-4 h-4" />
             </a>
           </div>
-          <ol className="grid grid-cols-3 gap-3">
-            {[1, 2, 3].map((n) => (
-              <li key={n} className="relative aspect-[3/4] border border-ink-700 bg-ink-900 p-4 flex flex-col justify-between">
-                <span className="text-[12px] text-ink-400">Spot</span>
-                <span className="num-display text-[clamp(5rem,11vw,9rem)] text-white">{n}</span>
-                <span className="flex items-center gap-2 text-[13px] font-semibold text-accent-300">
-                  <span className="h-2 w-2 bg-accent-400 animate-pulse-dot" /> Open
-                </span>
-              </li>
-            ))}
-          </ol>
+
+          <div className="border border-ink-700 bg-ink-900">
+            <div className="flex items-center justify-between gap-4 border-b border-ink-700 px-5 h-11">
+              <span className="mono text-[10.5px] uppercase tracking-[0.11em] text-ink-300">Founding spots</span>
+              <span className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.1em] text-ink-400">
+                <span className="h-1.5 w-1.5 bg-[var(--color-accent-400)] animate-pulse-dot" />
+                3 of 3 open
+              </span>
+            </div>
+            <ul className="px-5 py-4 space-y-3">
+              {[
+                ["Reduced setup fee", "Founding rate"],
+                ["Monthly retainer", "Standard"],
+                ["Booked-appointment guarantee", "Included"],
+                ["Published case study", "Required"],
+              ].map(([k, v]) => (
+                <li key={k} className="flex items-baseline justify-between gap-4 border-b border-ink-800 pb-3 last:border-b-0 last:pb-0">
+                  <span className="text-[14px] text-ink-200">{k}</span>
+                  <span className="mono text-[10.5px] uppercase tracking-[0.08em] text-accent-400 shrink-0">{v}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </Container>
     </section>
@@ -304,24 +336,22 @@ function FoundingClients() {
 
 function PricingAnchor() {
   return (
-    <section className="border-b border-[var(--border)] overflow-hidden">
-      <Container className="section-pad">
-        <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-10 items-end">
+    <section className="section-pad-sm border-b border-[var(--border)] bg-[var(--bg-alt)]">
+      <Container>
+        <div className="grid md:grid-cols-[1fr_auto] gap-8 items-center">
           <div>
-            <p className="eyebrow mb-3">Systems start at</p>
-            <p className="num-display text-[clamp(5.5rem,17vw,15rem)] text-ink-950">
-              $2,500<span className="text-[0.28em] text-[var(--text-muted)] tracking-normal">/mo</span>
+            <p className="eyebrow mb-3">Pricing</p>
+            <p className="display-xl text-balance max-w-[24ch]">
+              Systems start at <span className="em-green">$2,500 a month.</span>
+            </p>
+            <p className="body-base mt-4 max-w-[58ch]">
+              One-time setup, then a monthly retainer for monitoring, tuning and reporting. If the
+              system doesn&apos;t hit the booked-appointment target we agree on, your first month is on us.
             </p>
           </div>
-          <div className="pb-4">
-            <p className="body-lg max-w-[40ch]">
-              One-time setup, then a monthly retainer for monitoring, tuning and reporting.
-              Miss the booked-appointment target we agree on, and your first month is on us.
-            </p>
-            <Link href="/pricing" className="btn btn-outline mt-7">
-              See pricing <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <Link href="/pricing" className="btn btn-outline">
+            See pricing <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </Container>
     </section>

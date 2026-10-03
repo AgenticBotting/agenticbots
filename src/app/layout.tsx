@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ExitIntent, RogueBot, ConsoleGreeting } from "@/components/marketing";
 import Script from "next/script";
@@ -8,16 +8,6 @@ import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap",
-});
-
-/* Display face: Archivo on its width axis, pulled narrow — the
-   register of lettering on a truck door or a job-site sign. Body and UI
-   stay in Geist. */
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-  axes: ["wdth"],
   display: "swap",
 });
 
@@ -81,7 +71,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}

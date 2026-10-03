@@ -47,7 +47,7 @@ function Kpi({ label, value, unit, delta, good = true, big }: {
     <div className="min-w-0">
       <p className="mono text-[9.5px] uppercase tracking-[0.1em] text-ink-400 truncate">{label}</p>
       <p className="mt-1.5 flex items-baseline gap-1">
-        <span className={cn("num-display text-white", big ? "text-[3.5rem]" : "text-[2.25rem]")}>{value}</span>
+        <span className={cn("font-semibold tracking-[-0.045em] leading-none tabular-nums text-white", big ? "text-[2.6rem]" : "text-[1.6rem]")}>{value}</span>
         {unit && <span className={cn("font-semibold tracking-[-0.02em] text-accent-400", big ? "text-[1.2rem]" : "text-[0.95rem]")}>{unit}</span>}
       </p>
       {delta && (
@@ -473,7 +473,7 @@ function Reviews() {
     <Frame title="Reviews Bot · Google reviews" status="100% replied">
       <div className="grid grid-cols-[auto_1fr] gap-6 items-center pb-5 border-b border-ink-800">
         <div>
-          <p className="flex items-baseline gap-1"><span className="num-display text-[3.75rem] text-white">4.8</span></p>
+          <p className="flex items-baseline gap-1"><span className="text-[2.8rem] font-semibold tracking-[-0.045em] leading-none tabular-nums text-white">4.8</span></p>
           <span className="mt-1.5 flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-3.5 h-3.5", i < 5 ? "fill-[var(--color-accent-400)] text-[var(--color-accent-400)]" : "")} />)}</span>
           <p className="mt-1.5 mono text-[10px] text-ink-400 tabular-nums">112 reviews</p>
         </div>
