@@ -121,13 +121,13 @@ export function Footer() {
         {/* Optin strip */}
         <div className="rounded-none border border-ink-700 bg-ink-800 px-6 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center gap-5 justify-between mb-10">
           <div>
-            <p className="display-md text-white">Get your bot plan — free.</p>
+            <p className="display-md text-white">Get your free lead leak audit.</p>
             <p className="text-[13.5px] text-ink-400 mt-1.5">
-              Tell us what is getting stuck. We map the bots that fix it.
+              We test how fast your business answers a new lead and send you the scorecard.
             </p>
           </div>
-          <Link href="/plan" className="btn btn-primary shrink-0">
-            Get your bot plan
+          <Link href="/#audit" className="btn btn-primary shrink-0">
+            Get your free audit
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

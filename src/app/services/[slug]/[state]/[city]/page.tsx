@@ -5,9 +5,10 @@ import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
-  BotPlanForm, PlanCta, FaqAccordion, CityVignette,
-  AgentConsole, StackStrip, StatSplit, ZigZag, JoinBand, TaskConveyor,
+  AuditForm, PlanCta, FaqAccordion, CityVignette, OfferVisual,
+  AgentConsole, StackStrip, StatSplit, ZigZag, TaskConveyor,
 } from "@/components/marketing";
+import { getOffer } from "@/lib/offers";
 import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, getService, serviceHref, type Service } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
@@ -117,10 +118,11 @@ export default async function CityPage({ params }: Params) {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
+                <p className="body-sm mt-5">Free lead leak audit. Scorecard back in two business days.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
+                feed={getOffer(svc.slug)?.feed}
                 cityName={ct.name}
                 places={ct.districts}
                 stat={{ value: svc.baseline[0].value, label: svc.baseline[0].metric }}
@@ -129,7 +131,7 @@ export default async function CityPage({ params }: Params) {
           </Container>
         </section>
 
-        <StackStrip />
+        <StackStrip tools={getOffer(svc.slug)?.tools} label={`${svc.botName} plugs into`} />
 
         {/* This bot's own work, named for this market. */}
         {category && (
@@ -141,6 +143,24 @@ export default async function CityPage({ params }: Params) {
           >
             <div className="-mx-5 sm:-mx-8">
               <TaskConveyor tasks={category.capabilities} />
+            </div>
+          </Section>
+        )}
+
+        {/* The offer's own product view, so each service × city page shows
+            the work this bot does rather than a shared console. */}
+        {getOffer(svc.slug) && (
+          <Section variant="light">
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
+              <div>
+                <p className="eyebrow mb-4">{getOffer(svc.slug)!.signature.eyebrow} · {ct.name}</p>
+                <h2 className="display-xl text-balance">
+                  {getOffer(svc.slug)!.signature.heading} <span className="em-green">{getOffer(svc.slug)!.signature.accent}</span>
+                </h2>
+                <p className="body-lg mt-5 max-w-[46ch]">{getOffer(svc.slug)!.signature.sub}</p>
+                <p className="body-sm mt-4">Best for: {getOffer(svc.slug)!.bestFor}.</p>
+              </div>
+              <OfferVisual slug={svc.slug} />
             </div>
           </Section>
         )}
@@ -269,16 +289,10 @@ export default async function CityPage({ params }: Params) {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.serviceName.replace(/^Agentic /, "")} tasks.</span></>}
-          sub={`One conversation, one free plan — mapped to the ${ct.name} market, not a template.`}
-          source={`local-${svc.slug}-${ct.slug}-joinband`}
-        />
-
-        <Section variant="light" eyebrow="Start here" heading={`Get the ${ct.name} bot plan.`}
-          sub={`Tell us what you sell and where it is getting stuck. ${rotatedCta(svc.slug, ct.slug)}`}>
+        <Section id="audit" variant="light" eyebrow="Free lead leak audit" heading={`See where ${ct.name} leads are slipping.`}
+          sub={`We test your lead flow like a new customer would and send you a scorecard. ${rotatedCta(svc.slug, ct.slug)}`}>
           <div>
-            <BotPlanForm source={`local-${svc.slug}-${ct.slug}-form`} defaultFocus={category?.name} />
+            <AuditForm source={`local-${svc.slug}-${ct.slug}-form`} focus={svc.botName} />
           </div>
         </Section>
       </main>
@@ -307,7 +321,7 @@ function StructuralCityService({ svc, st, rec }: {
   const faqs = [
     { q: `Do you serve ${rec.city} remotely?`, a: `Yes — ${svc.botName} runs inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro, on your local hours.` },
     { q: `How fast can ${svc.serviceName.toLowerCase()} go live in ${rec.city}?`, a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
-    { q: `What does it cost?`, a: `A one-time build fee, then a monthly fee to run and tune — no per-seat pricing, no percentage of ad spend, no lock-in. The free plan comes back with numbers for your situation.` },
+    { q: `What does it cost?`, a: `A one-time build fee, then a monthly fee to run and tune — no per-seat pricing, no percentage of ad spend, no lock-in. Systems start at $2,500 a month, and the free audit shows what your leak is worth before you spend anything.` },
   ];
 
   return (
@@ -361,10 +375,11 @@ function StructuralCityService({ svc, st, rec }: {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
+                <p className="body-sm mt-5">Free lead leak audit. Scorecard back in two business days.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
+                feed={getOffer(svc.slug)?.feed}
                 cityName={rec.city}
                 places={consolePlaces}
                 stat={{ value: svc.baseline[0].value, label: svc.baseline[0].metric }}
@@ -373,7 +388,7 @@ function StructuralCityService({ svc, st, rec }: {
           </Container>
         </section>
 
-        <StackStrip />
+        <StackStrip tools={getOffer(svc.slug)?.tools} label={`${svc.botName} plugs into`} />
 
         {/* This bot's own work, named for this market. */}
         {category && (
@@ -390,6 +405,24 @@ function StructuralCityService({ svc, st, rec }: {
         )}
 
         {/* ── Zig-zag deep dives: before/after pairs with mockups. ── */}
+        {/* The offer's own product view, so each service × city page shows
+            the work this bot does rather than a shared console. */}
+        {getOffer(svc.slug) && (
+          <Section variant="light">
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
+              <div>
+                <p className="eyebrow mb-4">{getOffer(svc.slug)!.signature.eyebrow} · {rec.city}</p>
+                <h2 className="display-xl text-balance">
+                  {getOffer(svc.slug)!.signature.heading} <span className="em-green">{getOffer(svc.slug)!.signature.accent}</span>
+                </h2>
+                <p className="body-lg mt-5 max-w-[46ch]">{getOffer(svc.slug)!.signature.sub}</p>
+                <p className="body-sm mt-4">Best for: {getOffer(svc.slug)!.bestFor}.</p>
+              </div>
+              <OfferVisual slug={svc.slug} />
+            </div>
+          </Section>
+        )}
+
         {category && (
           <ZigZag
             eyebrow="What changes"
@@ -476,16 +509,10 @@ function StructuralCityService({ svc, st, rec }: {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.serviceName.replace(/^Agentic /, "")} tasks.</span></>}
-          sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
-          source={`local-${svc.slug}-${rec.city_slug}-joinband`}
-        />
-
-        <Section variant="light" eyebrow="Start here" heading={`Get the ${rec.city} plan.`}
-          sub={`Tell us what you sell and where it is getting stuck. ${rcta(svc.slug, rec.city_slug)}`}>
+        <Section id="audit" variant="light" eyebrow="Free lead leak audit" heading={`See where ${rec.city} leads are slipping.`}
+          sub={`We test your lead flow like a new customer would and send you a scorecard. ${rcta(svc.slug, rec.city_slug)}`}>
           <div>
-            <BotPlanForm source={`local-${svc.slug}-${rec.city_slug}-form`} defaultFocus={category?.name} />
+            <AuditForm source={`local-${svc.slug}-${rec.city_slug}-form`} focus={svc.botName} />
           </div>
         </Section>
       </main>

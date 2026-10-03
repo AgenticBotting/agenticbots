@@ -62,7 +62,10 @@ export function AgentConsole({
   cityName,
   places,
   stat,
+  feed,
 }: {
+  /** Offer-specific rows; falls back to the legacy keyed feeds. */
+  feed?: (p: string[]) => { t: string; body: string }[];
   botName: string;
   /** Localizes the console header; omit on national pages. */
   cityName?: string;
@@ -74,7 +77,7 @@ export function AgentConsole({
   const key = botName === "Ads Bot" ? "ppc" : botName === "SEO Bot" ? "seo"
     : botName === "CRM Bot" ? "crm" : botName === "Speed-to-Lead Bot" ? "speed-to-lead" : "";
   const p = places.length ? places : ["your area"];
-  const rows = (FEED[key] ?? FALLBACK_FEED)(p);
+  const rows = (feed ?? FEED[key] ?? FALLBACK_FEED)(p);
 
   return (
     <div className="relative pb-16">
@@ -119,15 +122,15 @@ export function AgentConsole({
 const STACK = ["Google Ads", "Meta", "HubSpot", "Salesforce", "Twilio", "Slack", "Google Analytics", "Stripe"];
 
 /** The wireframes' logo bar, kept honest: the tools the bots deploy into. */
-export function StackStrip() {
+export function StackStrip({ tools = STACK, label = "Deploys into the tools you already use" }: { tools?: string[]; label?: string } = {}) {
   return (
     <div className="border-b border-[var(--border)] bg-white">
       <Container className="py-5 flex flex-wrap items-center gap-x-8 gap-y-3">
         <p className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)] shrink-0">
-          Deploys into the tools you already use
+          {label}
         </p>
         <ul className="flex flex-wrap items-center gap-x-7 gap-y-2">
-          {STACK.map((s) => (
+          {tools.map((s) => (
             <li key={s} className="text-[13px] font-semibold tracking-[-0.01em] text-[var(--text-secondary)] whitespace-nowrap">
               {s}
             </li>

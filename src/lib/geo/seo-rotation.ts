@@ -16,11 +16,11 @@ function pick<T>(items: T[], seed: string, offset = 0): T {
 }
 
 const CTA_BANK = [
-  "Get your bot plan for this market — free, one business day.",
-  "Request the free bot plan. No call required to get it.",
-  "Map your leaks in this market — the plan is free.",
-  "Start with the free plan; the audit numbers are yours to keep.",
-  "One business day to a written plan for this market.",
+  "The audit is free, and the scorecard is yours to keep.",
+  "No call required to get it.",
+  "Find the leaks in this market before you spend a dollar.",
+  "Your real response times, measured, not estimated.",
+  "Scorecard back in two business days.",
 ];
 
 /* The bank lives on the service record. There is deliberately no

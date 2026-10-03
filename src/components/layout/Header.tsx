@@ -27,16 +27,17 @@ type MenuId = "services" | "areas" | null;
 /* The 13 bots, grouped by the job a contractor needs done — not by
    marketing vs. sales. Speed-to-Lead is pulled out as the starting point. */
 const START_SLUG = "inbound";
-const STAGES: { title: string; blurb: string; slugs: string[] }[] = [
-  { title: "Get found", blurb: "Show up first and get the call", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
-  { title: "Close more jobs", blurb: "Turn leads into booked work", slugs: ["cro", "email", "enablement"] },
-  { title: "Win repeat work", blurb: "Bring customers back and see the numbers", slugs: ["reactivation", "crm", "analytics"] },
+const STAGES: { id: string; title: string; blurb: string; slugs: string[] }[] = [
+  { id: "found", title: "Get found", blurb: "Show up first on Google and in the map pack, so the phone rings.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
+  { id: "close", title: "Close more jobs", blurb: "Answer every lead in seconds and follow up until it books.", slugs: ["inbound", "cro", "email", "enablement"] },
+  { id: "repeat", title: "Win repeat work", blurb: "Bring past customers back and know what is working.", slugs: ["reactivation", "crm", "analytics"] },
 ];
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
+  const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const [mobileRegion, setMobileRegion] = useState<Region | null>(null);
@@ -80,6 +81,7 @@ export function Header() {
   function closeMenu() {
     setOpenMenu(null);
     setSelectedRegion(null);
+    setSelectedStage(null);
   }
 
   function toggleMenu(id: Exclude<MenuId, null>) {
@@ -89,7 +91,7 @@ export function Header() {
     setOpenMenu(id);
   }
 
-  const start = ALL_CATEGORIES.find((c) => c.slug === START_SLUG);
+  const stageSel = selectedStage;
   const stages = STAGES.map((st) => ({
     ...st,
     items: st.slugs.map((sl) => ALL_CATEGORIES.find((c) => c.slug === sl)).filter((c): c is NonNullable<typeof c> => !!c),
@@ -280,60 +282,69 @@ export function Header() {
           </div>
         </div>
 
-        {/* ── Mega: Services — one panel, start-here card + three jobs ── */}
+        {/* ── Mega: Services — step 1 pick an outcome, step 2 pick the bot ── */}
         {openMenu === "services" && (
           <MegaPanel ref={panelRef}>
-            <div className="grid grid-cols-[minmax(260px,0.9fr)_2.1fr] gap-8">
-              {start && (
-                <div className="bg-ink-950 on-dark p-6 flex flex-col">
-                  <p className="mono text-[10.5px] uppercase tracking-[0.12em] text-accent-400">Start here</p>
-                  <p className="display-lg mt-2 text-white">{start.botName}</p>
-                  <p className="mt-2 text-[14px] leading-relaxed text-ink-300">
-                    Every call, form and quote request answered in under 60 seconds and followed up until it books.
-                  </p>
-                  <div className="mt-auto pt-6 flex flex-col gap-2.5">
-                    <Link href="/#audit" onClick={() => { closeMenu(); track("cta_clicked", { source: "services-menu", label: "audit" }); }} className="btn btn-primary">
-                      Get your free audit <ArrowRight className="w-4 h-4" />
-                    </Link>
-                    <Link href={serviceHref(start)} onClick={closeMenu} className="text-[13px] font-semibold text-ink-200 hover:text-white transition-colors">
-                      How Speed-to-Lead works →
-                    </Link>
-                  </div>
-                </div>
-              )}
-              <div className="grid grid-cols-3 gap-6">
-                {stages.map((st) => (
-                  <div key={st.title}>
-                    <p className="eyebrow">{st.title}</p>
-                    <p className="mt-1 text-[12.5px] text-[var(--text-muted)]">{st.blurb}</p>
-                    <ul className="mt-4 space-y-1">
-                      {st.items.map((c) => (
-                        <li key={c.slug}>
-                          <Link
-                            href={serviceHref(c)}
-                            onClick={closeMenu}
-                            className="group block -mx-2 px-2 py-2 hover:bg-[var(--bg-alt)] transition-colors"
+            {(() => {
+              const st = stages.find((x) => x.id === stageSel);
+              if (!st) {
+                return (
+                  <>
+                    <MegaHeader eyebrow="Services · Step 1 of 2" title="What do you need more of?" />
+                    <ul className="grid grid-cols-3 gap-3">
+                      {stages.map((x, i) => (
+                        <li key={x.id} className="flex">
+                          <button
+                            onClick={() => setSelectedStage(x.id)}
+                            className="group w-full flex flex-col justify-between gap-8 p-6 min-h-[188px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                           >
-                            <span className="block min-w-0">
-                              <span className="block text-[14.5px] font-semibold tracking-[-0.01em] group-hover:text-[var(--accent-text)] transition-colors">{c.botName}</span>
-                              <span className="block text-[12.5px] leading-snug text-[var(--text-secondary)]">{c.name}</span>
+                            <span>
+                              <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{i + 1}</span>
+                              <span className="block display-lg mt-2">{x.title}</span>
+                              <span className="block mt-2 text-[14px] leading-relaxed text-[var(--text-secondary)]">{x.blurb}</span>
                             </span>
-                          </Link>
+                            <span className="flex items-center justify-between">
+                              <span className="text-[13px] font-medium text-[var(--text-muted)] truncate">
+                                {x.items.map((c) => c.botName.replace(/ Bot$/, "")).join(" · ")}
+                              </span>
+                              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                            </span>
+                          </button>
                         </li>
                       ))}
                     </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-8 pt-5 border-t border-[var(--border)] flex items-center justify-between gap-6">
-              <p className="text-[13.5px] text-[var(--text-secondary)]">
-                Start with Speed-to-Lead. Add the rest once it&apos;s paying for itself.
-              </p>
-              <Link href="/services" onClick={closeMenu} className="text-[13.5px] font-semibold text-[var(--accent-text)]">
-                All services →
-              </Link>
-            </div>
+                  </>
+                );
+              }
+              return (
+                <>
+                  <StepBack onBack={() => setSelectedStage(null)} backLabel="All outcomes"
+                    eyebrow={`${st.title.toUpperCase()} · Step 2 of 2`} title={st.blurb} />
+                  <ul className={cn("grid gap-3", st.items.length > 4 ? "grid-cols-3" : "grid-cols-2 xl:grid-cols-4")}>
+                    {st.items.map((c) => (
+                      <li key={c.slug} className="flex">
+                        <Link
+                          href={serviceHref(c)}
+                          onClick={closeMenu}
+                          className={cn(
+                            "group relative w-full flex flex-col gap-2 p-5 border hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                            c.slug === START_SLUG ? "bg-ink-950 border-ink-950 on-dark" : "bg-white border-[var(--border)] hover:border-ink-950"
+                          )}
+                        >
+                          {c.slug === START_SLUG && (
+                            <span className="mono text-[10px] uppercase tracking-[0.12em] text-accent-400">Start here</span>
+                          )}
+                          <span className={cn("display-md !text-[16px]", c.slug === START_SLUG ? "text-white" : "group-hover:text-[var(--accent-text)] transition-colors")}>{c.botName}</span>
+                          <span className={cn("text-[13px] leading-snug", c.slug === START_SLUG ? "text-ink-300" : "text-[var(--text-secondary)]")}>{c.outcome}</span>
+                          <ArrowRight className={cn("w-4 h-4 mt-auto pt-1 transition-transform duration-200 group-hover:translate-x-1", c.slug === START_SLUG ? "text-accent-400" : "text-[var(--accent-text)]")} />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              );
+            })()}
+            <MegaFooter onAct={closeMenu} label="Not sure where to start?" text="We usually recommend starting with Speed-to-Lead. The free audit shows where your leads are slipping before you pick anything." />
           </MegaPanel>
         )}
 
@@ -442,35 +453,22 @@ export function Header() {
             </div>
 
             <div className="pb-16 pt-4">
-              <MobileGroup
-                id="services"
-                open={mobileGroup === "services"}
-                onToggle={() => setMobileGroup(mobileGroup === "services" ? null : "services")}
-                kicker="What we build"
-                title="Services"
-              >
-                {start && (
-                  <li className="pb-2">
-                    <Link href={serviceHref(start)} onClick={closeMobile} className="block bg-ink-950 px-4 py-4">
-                      <span className="block mono text-[10px] uppercase tracking-[0.12em] text-accent-400">Start here</span>
-                      <span className="block display-md text-white mt-1">{start.botName}</span>
-                      <span className="block text-[13px] text-ink-300 mt-1">Every lead answered in under 60 seconds</span>
-                    </Link>
-                  </li>
-                )}
-                {stages.map((st) => (
-                  <li key={st.title} className="pt-3">
-                    <p className="eyebrow mb-2">{st.title}</p>
-                    <ul className="space-y-2">
-                      {st.items.map((c) => (
-                        <MobileRow key={c.slug} href={serviceHref(c)} onGo={closeMobile} boxed>
-                          {c.botName}
-                        </MobileRow>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </MobileGroup>
+              {stages.map((st) => (
+                <MobileGroup
+                  key={st.id}
+                  id={st.id}
+                  open={mobileGroup === st.id}
+                  onToggle={() => setMobileGroup(mobileGroup === st.id ? null : st.id)}
+                  kicker="Services"
+                  title={st.title}
+                >
+                  {st.items.map((c) => (
+                    <MobileRow key={c.slug} href={serviceHref(c)} onGo={closeMobile} meta={c.slug === START_SLUG ? "Start here" : undefined} boxed>
+                      {c.botName}
+                    </MobileRow>
+                  ))}
+                </MobileGroup>
+              ))}
 
               <MobileGroup
                 id="areas"

@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 const TRADES = ["Residential", "Commercial", "Both"] as const;
 const VOLUME = ["Under 25", "25–75", "75–200", "200+"] as const;
 
-export function AuditForm({ source = "home-audit", className }: { source?: string; className?: string }) {
+export function AuditForm({ source = "home-audit", focus, className }: { source?: string; focus?: string; className?: string }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", website: "" });
   const [trade, setTrade] = useState<string>("");
   const [volume, setVolume] = useState<string>("");
@@ -35,7 +35,7 @@ export function AuditForm({ source = "home-audit", className }: { source?: strin
           email: form.email,
           website: form.website,
           company: form.website,
-          focus: "Lead Leak Audit",
+          focus: focus ? `Lead Leak Audit · ${focus}` : "Lead Leak Audit",
           goal: [
             trade && `Work: ${trade}`,
             volume && `Leads/mo: ${volume}`,

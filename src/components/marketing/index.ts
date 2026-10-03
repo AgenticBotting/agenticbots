@@ -36,3 +36,4 @@ export { ConsoleGreeting } from "./ConsoleGreeting";
 export { BlogArchive } from "./BlogArchive";
 export { AuditForm } from "./AuditForm";
 export { LeakCalculator } from "./LeakCalculator";
+export { OfferVisual } from "./OfferVisual";

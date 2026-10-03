@@ -170,22 +170,22 @@ export function ExitIntent() {
           <Check className="w-5 h-5" strokeWidth={2.5} />
         </span>
         <h3 className="display-lg mt-4">Sent.</h3>
-        <p className="body-base mt-2">Your plan lands within one business day.</p>
+        <p className="body-base mt-2">Your scorecard lands within two business days.</p>
         <button onClick={() => setOpen(false)} className="btn btn-outline mt-6">Keep reading</button>
       </div>
     ) : step === "pitch" ? (
       <div>
-        <p className="eyebrow">Free bot plan</p>
+        <p className="eyebrow">Free lead leak audit</p>
         <h3 className="display-xl mt-3 text-balance">
           Want to know where you are <span className="em-green">losing customers?</span>
         </h3>
         <p className="body-base mt-3">
-          Tell us what you sell. We map every point where people drop out between a lead
-          arriving and a job closing, and name the bots that fix it. One business day, no call.
+          We test your business the way a new customer would, then send a scorecard showing
+          how fast you respond and where jobs slip away. Free, no call.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <button onClick={() => setStep("form")} className="btn btn-primary">
-            Yes — send the plan <ArrowRight className="w-4 h-4" />
+            Yes, audit my leads <ArrowRight className="w-4 h-4" />
           </button>
           <button onClick={() => dismiss("no_thanks")}
             className="text-[13.5px] text-[var(--text-muted)] hover:text-[var(--text-body)] underline underline-offset-4">
@@ -212,7 +212,7 @@ export function ExitIntent() {
 
   if (open === "sheet") {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-[90]" role="dialog" aria-modal="true" aria-label="Free bot plan offer">
+      <div className="fixed inset-x-0 bottom-0 z-[90]" role="dialog" aria-modal="true" aria-label="Free lead leak audit offer">
         <div ref={panelRef} className="max-h-[35vh] overflow-y-auto bg-white border-t-2 border-ink-950 shadow-mega px-5 py-5 animate-fade-up">
           <button onClick={() => dismiss("x")} aria-label="Close"
             className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 hover:bg-[var(--bg-alt)]">
@@ -227,7 +227,7 @@ export function ExitIntent() {
   return (
     <div
       className="fixed inset-0 z-[90] bg-ink-950/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in"
-      role="dialog" aria-modal="true" aria-label="Free bot plan offer"
+      role="dialog" aria-modal="true" aria-label="Free lead leak audit offer"
       onClick={(e) => e.target === e.currentTarget && dismiss("backdrop")}
     >
       <div ref={panelRef} className="w-full max-w-[880px] bg-white shadow-mega overflow-hidden grid md:grid-cols-[0.85fr_1.15fr]">

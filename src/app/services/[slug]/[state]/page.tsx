@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
-import { PlanCta, StatSplit, FaqAccordion, SecurityBlock } from "@/components/marketing";
+import { PlanCta, StatSplit, FaqAccordion, SecurityBlock, AuditForm, OfferVisual } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, getService } from "@/lib/catalog";
@@ -85,6 +85,8 @@ export default async function StateHub({ params }: Params) {
               <Link href={`/services/${svc.serviceSlug}`} className="hover:text-[var(--foreground)]">{svc.serviceName}</Link><span>/</span>
               <span className="text-[var(--text-body)]">{st.name}</span>
             </nav>
+            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
+            <div>
             <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· {st.name} · {all.length} cities</span></p>
             <h1 className="display-hero max-w-[20ch] text-balance">
               {svc.serviceName} across {st.name}.
@@ -101,6 +103,9 @@ export default async function StateHub({ params }: Params) {
                 <span className="sm:hidden">Full service page</span>
                 <span className="hidden sm:inline">See the full {svc.botName} page</span>
               </Link>
+            </div>
+            </div>
+            <OfferVisual slug={svc.slug} />
             </div>
           </Container>
         </section>
@@ -163,15 +168,13 @@ export default async function StateHub({ params }: Params) {
         </Section>
 
         <Section
+          id="audit"
           variant="alt"
-          size="sm"
-          eyebrow="Start here"
-          heading={`Get the ${st.name} bot plan.`}
-          sub="Tell us where in the state you are — the plan comes back mapped to your market either way."
+          eyebrow="Free lead leak audit"
+          heading={`See where your ${st.name} leads are slipping.`}
+          sub="We test your lead flow like a new customer would and send you a scorecard. Free, and yours to keep."
         >
-          <div className="cta-row">
-            <PlanCta source={`state-bottom-${svc.serviceSlug}-${st.slug}`} />
-          </div>
+          <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.botName} />
         </Section>
       </main>
       <Footer />

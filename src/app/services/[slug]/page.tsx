@@ -4,37 +4,26 @@ import { notFound } from "next/navigation";
 
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
+import { ArrowRight } from "lucide-react";
 import {
-  BotPlanForm, PlanCta, FaqAccordion, ProofBar, CompoundingCurve, BotFactory,
-  AuditLogPanel, SecurityBlock, VideoSection, CplDecayChart, PipelineMockup,
-  StackStrip, StatSplit, FeatureTriad, ZigZag, JoinBand, TaskConveyor,
+  AuditForm, PlanCta, FaqAccordion, BotFactory, SecurityBlock, CplDecayChart, PipelineMockup,
+  StackStrip, StatSplit, FeatureTriad, ZigZag, TaskConveyor, OfferVisual,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState } from "@/lib/geo/data";
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion } from "@/lib/geo/regions";
-import { ALL_SERVICES, getService } from "@/lib/catalog";
+import { ALL_SERVICES, ALL_CATEGORIES, getService, serviceHref } from "@/lib/catalog";
+import { getOffer } from "@/lib/offers";
 import { renderHeadline } from "@/lib/headline";
 
 type Params = { params: Promise<{ slug: string }> };
 
-/* Two graphics that are only honest on one service each: a cost-per-lead
-   decay curve means nothing on the RevOps page, and "texted them back in 4
-   seconds" is speed-to-lead's story, not Content Marketing's. Keyed rather
-   than shown everywhere. */
-const SERVICE_GRAPHIC: Record<string, { eyebrow: string; heading: React.ReactNode; sub: string; render: () => React.ReactNode }> = {
-  "agentic-ppc-management": {
-    eyebrow: "What daily management does to cost",
-    heading: <>The same budget, <span className="em-green">bought better.</span></>,
-    sub: "Nothing changes about the platforms. What changes is how often anybody looks — and wasted spend gets cut the day it appears rather than the month after.",
-    render: () => <CplDecayChart />,
-  },
-  "agentic-speed-to-lead": {
-    eyebrow: "One lead, handled",
-    heading: <>Answered before they <span className="em-green">call the next name.</span></>,
-    sub: "The whole sequence, start to finish, without anyone reaching for a phone.",
-    render: () => <PipelineMockup />,
-  },
+/* Offers with a proof chart of their own get it in the "how it runs"
+   section; everyone else gets their own factory scene. */
+const HOW_GRAPHIC: Record<string, () => React.ReactNode> = {
+  "agentic-ppc-management": () => <CplDecayChart />,
+  "agentic-speed-to-lead": () => <PipelineMockup />,
 };
 
 export function generateStaticParams() {
@@ -60,6 +49,10 @@ export default async function ServiceHub({ params }: Params) {
   if (!svc) notFound();
   const regions = groupByRegion(ALL_STATES);
   const href = `/services/${svc.serviceSlug}`;
+  const offer = getOffer(svc.slug);
+  const pairs = (offer?.pairs ?? [])
+    .map((sl) => ALL_CATEGORIES.find((c) => c.slug === sl))
+    .filter((c): c is NonNullable<typeof c> => !!c);
 
   return (
     <>
@@ -79,13 +72,18 @@ export default async function ServiceHub({ params }: Params) {
           <Container className="py-14 sm:py-16">
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
               <div>
-                <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· {svc.botName} · every US market</span></p>
+                <p className="eyebrow mb-5">{svc.botName} <span className="eyebrow-dim">· {svc.name.toLowerCase()} for contractors</span></p>
                 <h1 className="display-hero max-w-[20ch] text-balance">{renderHeadline(svc.headline)}</h1>
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
                 {/* The national lede. `geoIntro` is deliberately held back for
                     the state and city pages — reusing one paragraph across 924
                     of them is the doorway pattern the gate exists to stop. */}
                 <p className="body-lg mt-5 max-w-[52ch]">{svc.intro}</p>
+                {offer && (
+                  <p className="mt-5 inline-flex items-center gap-2 border border-[var(--border)] bg-[var(--bg-alt)] px-3 py-1.5 text-[13px] text-[var(--text-secondary)]">
+                    <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--accent-text)]">Best for</span> {offer.bestFor}
+                  </p>
+                )}
                 <div className="mt-8 cta-row">
                   <PlanCta source={`service-${svc.serviceSlug}`} />
                   <Link href="#included" className="btn btn-outline">
@@ -95,18 +93,15 @@ export default async function ServiceHub({ params }: Params) {
                     <span className="hidden sm:inline">See everything included</span>
                   </Link>
                 </div>
-                <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
+                <p className="body-sm mt-5">Free audit of your lead flow. Scorecard back in two business days.</p>
               </div>
-              {/* Every service draws its own factory: `stations` is per-record,
-                  so Ads Bot reads search terms while CRM Bot merges duplicates.
-                  AgentConsole stays on the city pages, where the variable is
-                  the place rather than the work. */}
-              <BotFactory stations={svc.stations} title={`${svc.botName}, going to work`} />
+              {/* The offer's own product view — no two service heroes share one. */}
+              <OfferVisual slug={svc.slug} />
             </div>
           </Container>
         </section>
 
-        <StackStrip />
+        <StackStrip tools={offer?.tools} label={`${svc.botName} plugs into`} />
 
         <Section
           variant="alt"
@@ -122,30 +117,28 @@ export default async function ServiceHub({ params }: Params) {
           </div>
         </Section>
 
-        <ProofBar />
-
-        {/* The narrative beat between "here are the numbers" and "here is what
-            changes": why continuous beats monthly at all. Curve is drawn from
-            the service's own implementationWeeks, so each one differs. */}
-        <Section
-          variant="light"
-          eyebrow="The compounding part"
-          heading={<>An agency bills monthly. <span className="em-green">An agent never stops.</span></>}
-          sub={`The gap is not effort, it is cadence. ${svc.botName} goes live in about ${svc.implementationWeeks} weeks and then keeps running — so the work compounds instead of resetting every invoice.`}
-        >
-          <CompoundingCurve botName={svc.botName} liveWeek={svc.implementationWeeks} />
+        {/* How it runs: the offer's own story on the left, its factory (or
+            proof chart) on the right. */}
+        <Section variant="light">
+          <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
+            <div>
+              <p className="eyebrow mb-4">{offer?.signature.eyebrow ?? "How it runs"}</p>
+              <h2 className="display-xl text-balance">
+                {offer?.signature.heading ?? svc.serviceName} <span className="em-green">{offer?.signature.accent}</span>
+              </h2>
+              <p className="body-lg mt-5 max-w-[46ch]">{offer?.signature.sub ?? svc.outcome}</p>
+              <ol className="mt-8 border-t border-[var(--border)]">
+                {svc.stations.map((st, i) => (
+                  <li key={st.label} className="grid grid-cols-[32px_1fr] gap-3 py-3 border-b border-[var(--border)]">
+                    <span className="mono text-[11px] tabular-nums text-[var(--accent-text)] pt-0.5">0{i + 1}</span>
+                    <span><span className="block text-[14.5px] font-medium">{st.label}</span><span className="block text-[12.5px] text-[var(--text-secondary)]">{st.meta}</span></span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            {HOW_GRAPHIC[svc.serviceSlug]?.() ?? <BotFactory stations={svc.stations} title={`${svc.botName}, going to work`} />}
+          </div>
         </Section>
-
-        {SERVICE_GRAPHIC[svc.serviceSlug] && (
-          <Section
-            variant="alt"
-            eyebrow={SERVICE_GRAPHIC[svc.serviceSlug].eyebrow}
-            heading={SERVICE_GRAPHIC[svc.serviceSlug].heading}
-            sub={SERVICE_GRAPHIC[svc.serviceSlug].sub}
-          >
-            {SERVICE_GRAPHIC[svc.serviceSlug].render()}
-          </Section>
-        )}
 
         <ZigZag
           eyebrow="What changes"
@@ -173,14 +166,6 @@ export default async function ServiceHub({ params }: Params) {
           note="No per-seat pricing. No percentage of ad spend. No lock-in."
         />
 
-        <VideoSection
-          heading={<>Ninety seconds of {svc.botName}, <span className="em-green">actually running.</span></>}
-          sub="No slides and no diagram — the real thing, doing the work, on a real account."
-          slotId={`V-${svc.index}`}
-          slotLabel={`${svc.botName} explainer`}
-          slotSpec={`1920×1080 · 60–90s · screen recording of ${svc.serviceName.toLowerCase()} running, voiceover in plain English, captions burned in`}
-        />
-
         <div id="included" className="scroll-mt-[92px] lg:scroll-mt-[136px]">
           <FeatureTriad
             eyebrow={`${svc.capabilities.length} capabilities`}
@@ -196,6 +181,22 @@ export default async function ServiceHub({ params }: Params) {
             }))}
           />
         </div>
+
+        {pairs.length > 0 && (
+          <Section variant="alt" size="sm" eyebrow="Pairs well with" heading={`What to add once ${svc.botName} is running.`}>
+            <ul className="grid sm:grid-cols-3 gap-3">
+              {pairs.map((c) => (
+                <li key={c.slug} className="flex">
+                  <Link href={serviceHref(c)} className="group w-full flex flex-col gap-2 p-5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all">
+                    <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{c.botName}</span>
+                    <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{c.outcome}</span>
+                    <ArrowRight className="w-4 h-4 mt-auto pt-1 text-[var(--accent-text)] group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
         {/* ── Markets: region columns, focus metros first. ── */}
         <Section
@@ -245,37 +246,27 @@ export default async function ServiceHub({ params }: Params) {
             governance rather than assert the results. */}
         <SecurityBlock />
 
-        <Section
-          variant="alt"
-          eyebrow="The receipt"
-          heading={<>Not a promise of a log — <span className="em-green">the log.</span></>}
-          sub={`A real slice of what ${svc.botName} writes as it works, including the action it refused because it sat outside the authority you granted.`}
-        >
-          <AuditLogPanel />
-        </Section>
-
         {/* The full FAQ set — the local template used to show only three
             because the category page carried the rest. It no longer does. */}
         <Section variant="alt" eyebrow="Questions" heading={`${svc.serviceName}, specifically.`}>
           <div className="max-w-[760px]"><FaqAccordion items={svc.faqs} /></div>
         </Section>
 
-        <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">{svc.serviceName.replace(/^Agentic /, "")} tasks.</span></>}
-          sub={`One conversation, one free plan — and ${svc.serviceName.toLowerCase()} stops being the thing nobody has time for.`}
-          source={`service-${svc.serviceSlug}-joinband`}
-        />
-
-        <Section
-          variant="light"
-          eyebrow="Start here"
-          heading={`Get the ${svc.serviceName.toLowerCase()} plan for your market.`}
-          sub="Tell us what you sell and where you are. The plan comes back mapped to your market — free, one business day."
-        >
-          <div>
-            <BotPlanForm source={`service-${svc.serviceSlug}-form`} defaultFocus={svc.name} />
-          </div>
-        </Section>
+        <section id="audit" className="section-pad scroll-mt-28 border-t border-[var(--border)]">
+          <Container>
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
+              <div>
+                <p className="eyebrow mb-4">Free lead leak audit</p>
+                <h2 className="display-xl text-balance">See what {svc.botName} would fix in your business.</h2>
+                <p className="body-lg mt-5 max-w-[46ch]">
+                  We test your lead flow the way a new customer would and send back a short scorecard:
+                  response times, missed follow-ups, and where {svc.name.toLowerCase()} fits in. Free, and yours to keep.
+                </p>
+              </div>
+              <AuditForm source={`service-${svc.serviceSlug}-form`} focus={svc.botName} />
+            </div>
+          </Container>
+        </section>
       </main>
       <Footer />
     </>

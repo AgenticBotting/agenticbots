@@ -1,18 +1,17 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { openBotPlan } from "@/lib/lead-flow";
+import { useRouter } from "next/navigation";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /**
- * The primary CTA. Opens the multi-step flow rather than navigating —
- * a modal converts better than a page load. `/plan` still exists as a
- * real page for ad traffic and anyone who lands there directly.
+ * The primary CTA: the free lead leak audit. Scrolls to the page's own
+ * audit form when there is one, otherwise goes to the homepage form.
  */
 export function PlanCta({
   source,
-  label = "Get your bot plan",
+  label = "Get your free audit",
   variant = "primary",
   className,
 }: {
@@ -21,6 +20,7 @@ export function PlanCta({
   variant?: "primary" | "secondary" | "outline" | "onDark";
   className?: string;
 }) {
+  const router = useRouter();
   const cls = {
     primary: "btn-primary",
     secondary: "btn-secondary",
@@ -29,7 +29,12 @@ export function PlanCta({
   }[variant];
 
   return (
-    <button type="button" onClick={() => { track("cta_clicked", { source, label }); openBotPlan(source); }} className={cn("btn", cls, className)}>
+    <button type="button" onClick={() => {
+      track("cta_clicked", { source, label });
+      const el = document.getElementById("audit");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      else router.push("/#audit");
+    }} className={cn("btn", cls, className)}>
       {label}
       <ArrowRight className="w-4 h-4" />
     </button>
