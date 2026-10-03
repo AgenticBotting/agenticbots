@@ -40,3 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+# platform
+/.platform-data/
+/test-results/
+/playwright-report/
+/infra/terraform/**/.terraform/
+/infra/terraform/**/*.tfstate*
+/dist/
+!.env.example

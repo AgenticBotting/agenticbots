@@ -1,0 +1,10 @@
+# Example: a client system exposed to ONE Bot through an MCP server.
+# Mark every server you do not fully control `trust: untrusted`: every
+# write-capable tool call then parks the run in waiting_for_approval and
+# surfaces in the AgenticBots approvals queue.
+mcp_servers:
+  hubspot:
+    url: "https://mcp.example-hubspot-bridge.com/mcp"
+    trust: untrusted
+    headers:
+      Authorization: "Bearer ${HUBSPOT_MCP_TOKEN}"   # from the profile .env, never inline

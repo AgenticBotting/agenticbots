@@ -9,19 +9,35 @@
     "lint": "eslint",
     "prebuild": "node scripts/pseo-gate.mjs",
     "postbuild": "node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs",
-    "gates": "npm run prebuild && node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs"
+    "gates": "npm run prebuild && node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs",
+    "ops": "tsx --conditions=react-server --tsconfig tsconfig.json ops/cli.ts",
+    "demo": "DEMO_MODE=true next dev -p 3003",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:security": "vitest run tests/security",
+    "test:white-label": "vitest run tests/security/white-label.test.ts && node scripts/white-label-scan.mjs",
+    "test:e2e": "playwright test",
+    "test:hermes-contract": "vitest run --config vitest.contract.config.mts"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
+    "@aws-sdk/client-cloudwatch": "^3.1146.0",
+    "@aws-sdk/client-ec2": "^3.1146.0",
+    "@aws-sdk/client-secrets-manager": "^3.1146.0",
+    "@aws-sdk/client-ssm": "^3.1146.0",
     "@convex-dev/auth": "^0.0.95",
+    "@vercel/functions": "^3.9.11",
     "convex": "^1.46.0",
     "lucide-react": "^1.40.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -29,6 +45,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
   }
 }

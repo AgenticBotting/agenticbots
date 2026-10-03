@@ -1,0 +1,60 @@
+#!/bin/bash
+# First boot of a client runtime. Idempotent: safe to re-run.
+set -euo pipefail
+exec > >(tee -a /var/log/agenticbots-bootstrap.log) 2>&1
+
+TENANT_ID="${tenant_id}"
+ENVIRONMENT="${environment}"
+REGION="${region}"
+SECRET_PREFIX="${secret_prefix}"
+DATA_DIR=/opt/agenticbots/data
+BUNDLE_DIR=/opt/agenticbots/runtime
+
+dnf install -y docker jq amazon-cloudwatch-agent xfsprogs python3-pyyaml rsync openssl
+mkdir -p /usr/local/lib/docker/cli-plugins
+if [ ! -x /usr/local/lib/docker/cli-plugins/docker-compose ]; then
+  curl -fsSL "https://github.com/docker/compose/releases/download/v2.39.4/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose
+  chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+fi
+systemctl enable --now docker
+
+# ── Persistent data volume (the only place runtime state lives) ──
+DEV=""
+for i in $(seq 1 60); do
+  for cand in /dev/sdf /dev/xvdf /dev/nvme1n1; do [ -b "$cand" ] && DEV=$cand && break; done
+  [ -n "$DEV" ] && break; sleep 5
+done
+[ -n "$DEV" ] || { echo "data volume not attached"; exit 1; }
+if ! blkid "$DEV" >/dev/null 2>&1; then mkfs.xfs -L agb-data "$DEV"; fi
+mkdir -p "$DATA_DIR"
+grep -q "LABEL=agb-data" /etc/fstab || echo "LABEL=agb-data $DATA_DIR xfs defaults,nofail 0 2" >> /etc/fstab
+mount -a
+
+# ── Runtime bundle: compose file, lifecycle script, AgenticBots skills ──
+mkdir -p "$BUNDLE_DIR"
+aws s3 cp "s3://${artifact_bucket}/runtime/${bundle_version}/bundle.tar.gz" /tmp/bundle.tar.gz --region "$REGION"
+tar -xzf /tmp/bundle.tar.gz -C "$BUNDLE_DIR"
+mkdir -p /opt/agenticbots/bin
+install -m 0755 "$BUNDLE_DIR/lifecycle.sh" /opt/agenticbots/bin/lifecycle.sh
+
+cat > /opt/agenticbots/runtime.env <<ENV
+TENANT_ID=$TENANT_ID
+AGB_ENV=$ENVIRONMENT
+AWS_REGION=$REGION
+SECRET_PREFIX=$SECRET_PREFIX
+ENGINE_IMAGE=${engine_image}
+AGB_DATA_DIR=$DATA_DIR
+BOT_PROFILES="${profiles}"
+ENV
+chmod 600 /opt/agenticbots/runtime.env
+
+# ── Disk metric for the platform's disk alarm ──
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'CW'
+{ "metrics": { "namespace": "AgenticBots/Runtime", "append_dimensions": { "InstanceId": "$${aws:InstanceId}" },
+  "metrics_collected": { "disk": { "measurement": ["used_percent"], "resources": ["/opt/agenticbots/data"], "metrics_collection_interval": 300 } } } }
+CW
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json || true
+
+# ── Bring the runtime up and create the purchased Bot profiles ──
+/opt/agenticbots/bin/lifecycle.sh bootstrap none
+echo "bootstrap complete"

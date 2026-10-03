@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
+import { PLATFORM_TABLES, physical } from "./platformTables";
 
 /**
  * Course accounts and entitlements.
@@ -14,8 +15,30 @@ import { authTables } from "@convex-dev/auth/server";
  * has to be recordable without deleting the account, and a second
  * product later should not mean a schema change.
  */
+/**
+ * AgenticBots platform tables (operator console + client portal).
+ * Generic envelope: the domain record lives in `doc`; `pid` (UUID) and
+ * `orgId` are lifted out so every tenant read goes through an index.
+ * Validation of `doc` happens in the platform service layer (TypeScript
+ * domain types), which is the only writer. See convex/platform.ts.
+ */
+const platformTables = Object.fromEntries(
+  PLATFORM_TABLES.map((t) => [
+    physical(t),
+    defineTable({
+      pid: v.string(),
+      orgId: v.optional(v.string()),
+      doc: v.any(),
+      version: v.number(),
+    })
+      .index("by_pid", ["pid"])
+      .index("by_org", ["orgId"]),
+  ]),
+);
+
 export default defineSchema({
   ...authTables,
+  ...platformTables,
 
   users: defineTable({
     email: v.string(),

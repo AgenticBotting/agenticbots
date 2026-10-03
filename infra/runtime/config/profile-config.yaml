@@ -1,0 +1,23 @@
+# Engine configuration applied to every AgenticBots Bot profile.
+# lifecycle.sh merges this into <data>/engine/profiles/<profile>/config.yaml.
+
+agent:
+  # Least capability: no shell and no code execution unless an operator
+  # deliberately enables them for a specific Bot (and then only with a
+  # cloud sandbox terminal backend — see SECURITY in HERMES_INTEGRATION.md).
+  disabled_toolsets:
+    - terminal
+    - code_execution
+
+approvals:
+  mode: manual
+  # API-driven runs have no one at a keyboard: anything dangerous is
+  # denied instantly instead of waiting.
+  unattended_mode: deny
+  cron_mode: deny
+  timeout: 300
+
+gateway:
+  multiplex_profiles: true
+  api_server:
+    max_concurrent_runs: 4

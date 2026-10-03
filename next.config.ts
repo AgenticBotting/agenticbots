@@ -17,6 +17,29 @@ const nextConfig: NextConfig = {
   async redirects() {
     return REDIRECTS;
   },
+  // Authenticated product hosts. ops.agenticbots.dev serves the operator
+  // console and app.agenticbots.dev the client portal, from this same
+  // deployment. Set OPS_HOST / APP_HOST once the domains are attached in
+  // Vercel; until then /ops and /portal work on any host.
+  async rewrites() {
+    const opsHost = process.env.OPS_HOST;
+    const appHost = process.env.APP_HOST;
+    const beforeFiles = [
+      ...(opsHost
+        ? [
+            { source: "/", has: [{ type: "host" as const, value: opsHost }], destination: "/ops" },
+            { source: "/:path((?!ops|api|login|_next|portal).*)", has: [{ type: "host" as const, value: opsHost }], destination: "/ops/:path" },
+          ]
+        : []),
+      ...(appHost
+        ? [
+            { source: "/", has: [{ type: "host" as const, value: appHost }], destination: "/portal" },
+            { source: "/:path(activity|approvals|requests|integrations|reports)/:rest*", has: [{ type: "host" as const, value: appHost }], destination: "/portal/:path/:rest*" },
+          ]
+        : []),
+    ];
+    return { beforeFiles, afterFiles: [], fallback: [] };
+  },
 };
 
 export default nextConfig;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ExitIntent, RogueBot, ConsoleGreeting } from "@/components/marketing";
+import { MarketingOnly } from "@/components/marketing/MarketingOnly";
 import Script from "next/script";
 import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
 
@@ -75,10 +76,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}
-        <BotPlanFlow />
-        <ExitIntent />
-        <RogueBot />
-        <ConsoleGreeting />
+        <MarketingOnly>
+          <BotPlanFlow />
+          <ExitIntent />
+          <RogueBot />
+          <ConsoleGreeting />
+        </MarketingOnly>
         {process.env.NEXT_PUBLIC_UMAMI_URL && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
             defer

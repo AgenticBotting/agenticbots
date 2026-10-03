@@ -1,6 +1,6 @@
-# CI (Phase 10). Every gate here also runs locally:
-#   npm run lint · npx tsc --noEmit · node scripts/pseo-gate.mjs ·
-#   npm run build · node scripts/seo-checks.mjs
+# CI. Every gate here also runs locally:
+#   npm run lint · npm run typecheck · npm test · npm run build · npm run test:white-label
+#   npm run test:e2e · terraform validate · docker compose config
 name: ci
 on:
   push: { branches: [main] }
@@ -17,17 +17,52 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run typecheck
+      - name: Unit, integration, security and white-label tests (demo mode, no external services)
+        run: npm test
       - name: Dataset validation
         run: node scripts/validate-cities.mjs
       - name: pSEO uniqueness gate
         run: node scripts/pseo-gate.mjs
       - name: Build (runs prebuild gate again)
         run: npm run build
+      - name: White-label scan of browser bundles
+        run: node scripts/white-label-scan.mjs
       - name: SEO gates — title/meta uniqueness, one H1, canonical
         run: node scripts/seo-checks.mjs
       - name: Link & data integrity — sitemap, hrefs, enriched⟕dataset
         run: node scripts/link-integrity.mjs
-      # Lighthouse budgets (LCP<2.0s mobile, JS<150KB, ≥95 all categories)
-      # run against a deployed preview URL — wire once Vercel is connected:
-      # - uses: treosh/lighthouse-ci-action with budgets.json
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env: { CI: "true" }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: playwright-report }
+
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: terraform fmt
+        run: terraform -chdir=infra/terraform fmt -check -recursive
+      - name: terraform validate
+        run: |
+          cd infra/terraform/envs/prod
+          terraform init -backend=false -input=false
+          terraform validate
+      - name: Runtime compose config
+        run: |
+          mkdir -p /opt/agenticbots/secrets 2>/dev/null || sudo mkdir -p /opt/agenticbots/secrets
+          sudo touch /opt/agenticbots/secrets/engine.env /opt/agenticbots/secrets/tunnel.env
+          ENGINE_IMAGE="nousresearch/hermes-agent:v2026.9.24@sha256:$(printf '0%.0s' {1..64})" docker compose -f infra/runtime/docker-compose.yml config --quiet
+      - name: Lifecycle script syntax
+        run: bash -n infra/runtime/lifecycle.sh
