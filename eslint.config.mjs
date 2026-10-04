@@ -23,12 +23,28 @@ const RUNTIME_INTERNALS = [
   },
 ];
 
+/**
+ * Prospecting provider boundary (docs/PROSPECTING_PROVIDER_ADAPTERS.md):
+ * vendor adapters and credential access stay inside
+ * src/server/prospecting/providers. Everything else uses the registry and
+ * the EnrichmentRouter, which speak only vendor-neutral types.
+ */
+const PROVIDER_INTERNALS = {
+  group: ["@/server/prospecting/providers/vendors", "@/server/prospecting/providers/secrets", "**/prospecting/providers/vendors", "**/prospecting/providers/secrets"],
+  message: "Vendor adapters and credentials are private to src/server/prospecting/providers. Use the registry / EnrichmentRouter.",
+};
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["src/server/runtime/**", "src/server/demo/**", "src/server/aws/control.ts"],
+    ignores: ["src/server/runtime/**", "src/server/demo/**", "src/server/aws/control.ts", "src/server/prospecting/providers/**"],
+    rules: { "no-restricted-imports": ["error", { patterns: [...RUNTIME_INTERNALS, PROVIDER_INTERNALS] }] },
+  },
+  {
+    // Provider adapters may use their own internals, but never the runtime's.
+    files: ["src/server/prospecting/providers/**/*.{ts,tsx}"],
     rules: { "no-restricted-imports": ["error", { patterns: RUNTIME_INTERNALS }] },
   },
   {
@@ -45,6 +61,7 @@ const eslintConfig = defineConfig([
         {
           patterns: [
             ...RUNTIME_INTERNALS,
+            PROVIDER_INTERNALS,
             { group: ["@/server/runtime", "@/server/runtime/*"], message: "UI components never talk to the runtime. Ask the AgenticBots server for a view." },
           ],
         },
