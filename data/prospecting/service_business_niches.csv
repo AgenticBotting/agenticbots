@@ -1,0 +1,342 @@
+Category,Niche,Sells To
+Roofing & Exterior,Residential Roofing,Residential
+Roofing & Exterior,Commercial Roofing,Commercial
+Roofing & Exterior,Flat/TPO/Modified Bitumen Roofing,Commercial
+Roofing & Exterior,Metal Roofing,Mixed
+Roofing & Exterior,Tile Roofing,Residential
+Roofing & Exterior,Roof Repair & Leak Detection,Mixed
+Roofing & Exterior,Roof Coating & Restoration,Commercial
+Roofing & Exterior,Gutter Installation & Repair,Mixed
+Roofing & Exterior,Gutter Cleaning,Mixed
+Roofing & Exterior,Siding Contractors,Residential
+Roofing & Exterior,Soffit & Fascia,Residential
+Roofing & Exterior,Stucco Contractors,Mixed
+Roofing & Exterior,Exterior Painting,Mixed
+Roofing & Exterior,Pressure Washing,Mixed
+Roofing & Exterior,Soft Washing,Mixed
+Roofing & Exterior,Roof Cleaning,Residential
+Roofing & Exterior,Window Cleaning,Mixed
+Roofing & Exterior,Skylight Installation,Mixed
+Roofing & Exterior,Chimney Sweep & Repair,Residential
+Roofing & Exterior,Storm Damage Restoration,Mixed
+Roofing & Exterior,Hurricane Shutter Installation,Mixed
+Roofing & Exterior,Impact Window & Door Installation,Mixed
+Roofing & Exterior,Awning & Canopy Installation,Commercial
+Landscaping & Outdoor,Lawn Care & Mowing,Mixed
+Landscaping & Outdoor,Commercial Landscape Maintenance,Commercial
+Landscaping & Outdoor,Landscape Design & Installation,Mixed
+Landscaping & Outdoor,Irrigation & Sprinkler Install/Repair,Mixed
+Landscaping & Outdoor,Tree Trimming & Removal,Mixed
+Landscaping & Outdoor,Stump Grinding,Residential
+Landscaping & Outdoor,Palm Tree Service,Mixed
+Landscaping & Outdoor,Sod Installation,Mixed
+Landscaping & Outdoor,Mulch & Topsoil Delivery,Mixed
+Landscaping & Outdoor,Hardscaping & Pavers,Mixed
+Landscaping & Outdoor,Retaining Walls,Mixed
+Landscaping & Outdoor,Artificial Turf Installation,Mixed
+Landscaping & Outdoor,Fertilization & Weed Control,Mixed
+Landscaping & Outdoor,Lawn Aeration & Overseeding,Residential
+Landscaping & Outdoor,Landscape Lighting,Mixed
+Landscaping & Outdoor,Fence Installation,Mixed
+Landscaping & Outdoor,Gate & Access Control Installation,Commercial
+Landscaping & Outdoor,Deck Builders,Residential
+Landscaping & Outdoor,Patio & Pergola Builders,Residential
+Landscaping & Outdoor,Outdoor Kitchen Builders,Residential
+Landscaping & Outdoor,Pool Construction,Residential
+Landscaping & Outdoor,Pool Service & Maintenance,Mixed
+Landscaping & Outdoor,Pool Resurfacing & Repair,Mixed
+Landscaping & Outdoor,Pool Cleaning,Mixed
+Landscaping & Outdoor,Fountain & Water Feature Service,Commercial
+Landscaping & Outdoor,Pond Management & Lake Maintenance,Commercial
+Landscaping & Outdoor,Snow Removal & Ice Management,Commercial
+Landscaping & Outdoor,Land Clearing & Excavation,Mixed
+Landscaping & Outdoor,Drainage Solutions,Mixed
+Landscaping & Outdoor,Seawall & Dock Construction,Mixed
+Landscaping & Outdoor,Playground Installation,Commercial
+Landscaping & Outdoor,Sports Turf Maintenance,Commercial
+Pest & Wildlife,General Pest Control,Mixed
+Pest & Wildlife,Termite Control & Fumigation,Mixed
+Pest & Wildlife,Mosquito Control,Mixed
+Pest & Wildlife,Rodent Control,Mixed
+Pest & Wildlife,Bed Bug Treatment,Mixed
+Pest & Wildlife,Wildlife Removal,Mixed
+Pest & Wildlife,Bird Control & Deterrents,Commercial
+Pest & Wildlife,Commercial Pest Control (Food/Healthcare),Commercial
+Pest & Wildlife,Lawn Pest Control,Residential
+Plumbing & Water,Residential Plumbing,Residential
+Plumbing & Water,Commercial Plumbing,Commercial
+Plumbing & Water,Drain Cleaning & Rooter,Mixed
+Plumbing & Water,Water Heater Install/Repair,Mixed
+Plumbing & Water,Tankless Water Heaters,Residential
+Plumbing & Water,Repiping,Residential
+Plumbing & Water,Sewer Line Repair & Trenchless,Mixed
+Plumbing & Water,Camera Inspection & Hydro Jetting,Mixed
+Plumbing & Water,Backflow Testing & Certification,Commercial
+Plumbing & Water,Grease Trap Cleaning,Commercial
+Plumbing & Water,Septic Tank Services,Mixed
+Plumbing & Water,Water Treatment & Softeners,Mixed
+Plumbing & Water,Well Drilling & Pump Service,Mixed
+Plumbing & Water,Leak Detection,Mixed
+Plumbing & Water,Slab Leak Repair,Residential
+Plumbing & Water,Gas Line Installation,Mixed
+Plumbing & Water,Fire Sprinkler Installation & Inspection,Commercial
+Plumbing & Water,Fire Alarm Installation & Monitoring,Commercial
+Plumbing & Water,Fire Extinguisher Service,Commercial
+Plumbing & Water,Hydrant Flushing & Testing,Commercial
+HVAC & Mechanical,Residential HVAC,Residential
+HVAC & Mechanical,Commercial HVAC,Commercial
+HVAC & Mechanical,Industrial Refrigeration,Industrial
+HVAC & Mechanical,Commercial Refrigeration,Commercial
+HVAC & Mechanical,Duct Cleaning,Mixed
+HVAC & Mechanical,Ductwork Fabrication & Install,Mixed
+HVAC & Mechanical,Air Quality & Purification,Mixed
+HVAC & Mechanical,Boiler Service,Commercial
+HVAC & Mechanical,Chiller Maintenance,Commercial
+HVAC & Mechanical,Mini-Split Installation,Mixed
+HVAC & Mechanical,Heat Pump Installation,Residential
+HVAC & Mechanical,Commercial Kitchen Hood Cleaning,Commercial
+HVAC & Mechanical,Commercial Kitchen Equipment Repair,Commercial
+HVAC & Mechanical,Ice Machine Service,Commercial
+HVAC & Mechanical,Building Automation & Controls,Commercial
+HVAC & Mechanical,Insulation Contractors,Mixed
+HVAC & Mechanical,Spray Foam Insulation,Mixed
+HVAC & Mechanical,Generator Sales Install & Service,Mixed
+Electrical & Low Voltage,Residential Electricians,Residential
+Electrical & Low Voltage,Commercial Electricians,Commercial
+Electrical & Low Voltage,Industrial Electrical Contractors,Industrial
+Electrical & Low Voltage,Solar Installation Residential,Residential
+Electrical & Low Voltage,Solar Installation Commercial,Commercial
+Electrical & Low Voltage,EV Charger Installation,Mixed
+Electrical & Low Voltage,Lighting Retrofit & LED,Commercial
+Electrical & Low Voltage,Security System Installation,Mixed
+Electrical & Low Voltage,CCTV & Surveillance,Commercial
+Electrical & Low Voltage,Access Control Systems,Commercial
+Electrical & Low Voltage,Structured Cabling & Data,Commercial
+Electrical & Low Voltage,AV & Smart Home Integration,Mixed
+Electrical & Low Voltage,Home Automation,Residential
+Electrical & Low Voltage,Lightning Protection,Commercial
+Electrical & Low Voltage,Emergency Lighting & Exit Signs,Commercial
+Electrical & Low Voltage,Utility & Power Line Contractors,Utility
+Electrical & Low Voltage,Telecom & Cell Tower Services,Commercial
+Interior Trades & Finishes,Flooring Installation,Mixed
+Interior Trades & Finishes,Hardwood Floor Refinishing,Residential
+Interior Trades & Finishes,Tile & Stone Installation,Mixed
+Interior Trades & Finishes,Carpet Installation,Mixed
+Interior Trades & Finishes,Epoxy & Garage Floor Coatings,Mixed
+Interior Trades & Finishes,Polished Concrete,Commercial
+Interior Trades & Finishes,Interior Painting,Mixed
+Interior Trades & Finishes,Commercial Painting,Commercial
+Interior Trades & Finishes,Drywall & Plastering,Mixed
+Interior Trades & Finishes,Acoustical Ceilings,Commercial
+Interior Trades & Finishes,Cabinet Makers & Installers,Mixed
+Interior Trades & Finishes,Countertops (Granite/Quartz),Mixed
+Interior Trades & Finishes,Millwork & Trim Carpentry,Mixed
+Interior Trades & Finishes,Interior Doors & Hardware,Mixed
+Interior Trades & Finishes,Window Treatments & Blinds,Mixed
+Interior Trades & Finishes,Wallpaper Installation,Mixed
+Interior Trades & Finishes,Closet & Storage Systems,Residential
+Interior Trades & Finishes,Interior Design & Staging,Mixed
+Interior Trades & Finishes,Commercial Interior Build-Out,Commercial
+Interior Trades & Finishes,Demolition Contractors,Mixed
+Interior Trades & Finishes,Glass & Mirror Installation,Mixed
+Interior Trades & Finishes,Shower Door & Glass Enclosures,Residential
+Interior Trades & Finishes,Furniture Installation (Commercial FF&E),Commercial
+Remodeling & Construction,Kitchen & Bath Remodeling,Residential
+Remodeling & Construction,Whole-Home Remodeling,Residential
+Remodeling & Construction,Home Additions,Residential
+Remodeling & Construction,Custom Home Builders,Residential
+Remodeling & Construction,Production Home Builders,Residential
+Remodeling & Construction,General Contractors Commercial,Commercial
+Remodeling & Construction,Tenant Improvement Contractors,Commercial
+Remodeling & Construction,Healthcare Construction Contractors,Commercial
+Remodeling & Construction,Design-Build Firms,Mixed
+Remodeling & Construction,Concrete Contractors,Mixed
+Remodeling & Construction,Masonry & Brick,Mixed
+Remodeling & Construction,Foundation Repair,Mixed
+Remodeling & Construction,Framing Contractors,Mixed
+Remodeling & Construction,Waterproofing,Mixed
+Remodeling & Construction,Structural Steel & Welding,Commercial
+Remodeling & Construction,Sitework & Paving Contractors,Commercial
+Remodeling & Construction,Asphalt Paving,Commercial
+Remodeling & Construction,Parking Lot Striping & Sealcoating,Commercial
+Remodeling & Construction,Parking Lot Maintenance & Repair,Commercial
+Remodeling & Construction,Road Marking & Traffic Control,Government
+Remodeling & Construction,Scaffolding Rental & Erection,Commercial
+Remodeling & Construction,Temporary Fencing & Site Services,Commercial
+Remodeling & Construction,Dumpster & Roll-Off Rental,Mixed
+Remodeling & Construction,Portable Toilet Rental,Mixed
+Remodeling & Construction,Equipment Rental,Mixed
+Remodeling & Construction,Crane & Rigging Services,Industrial
+Remodeling & Construction,Elevator Installation & Service,Commercial
+Remodeling & Construction,Handyman Services,Residential
+Remodeling & Construction,Home Inspection,Residential
+Remodeling & Construction,Permit Expediting,Mixed
+Remodeling & Construction,Architects & Engineers,Mixed
+Remodeling & Construction,Land Surveyors,Mixed
+Remodeling & Construction,Civil Engineering Firms,Mixed
+Remodeling & Construction,Environmental Consultants,Commercial
+Remodeling & Construction,Asbestos & Lead Abatement,Commercial
+Remodeling & Construction,Mold Remediation & Testing,Mixed
+Remodeling & Construction,Infection Control & Containment Services,Commercial
+Cleaning & Restoration,Residential House Cleaning,Residential
+Cleaning & Restoration,Commercial Janitorial,Commercial
+Cleaning & Restoration,Post-Construction Cleaning,Commercial
+Cleaning & Restoration,Carpet & Upholstery Cleaning,Mixed
+Cleaning & Restoration,Tile & Grout Cleaning,Mixed
+Cleaning & Restoration,Floor Waxing & Stripping,Commercial
+Cleaning & Restoration,Move-In/Move-Out Cleaning,Residential
+Cleaning & Restoration,Airbnb & Vacation Rental Cleaning,Residential
+Cleaning & Restoration,Medical & Healthcare Facility Cleaning,Commercial
+Cleaning & Restoration,Disinfection & Sanitizing Services,Commercial
+Cleaning & Restoration,Biohazard & Trauma Cleanup,Mixed
+Cleaning & Restoration,Water Damage Restoration,Mixed
+Cleaning & Restoration,Fire & Smoke Restoration,Mixed
+Cleaning & Restoration,Junk Removal & Hauling,Mixed
+Cleaning & Restoration,Estate Cleanout,Residential
+Cleaning & Restoration,Trash Valet & Dumpster Pad Cleaning,Commercial
+Cleaning & Restoration,Waste Management & Recycling,Commercial
+Cleaning & Restoration,Industrial Cleaning,Industrial
+Cleaning & Restoration,Boat & Yacht Detailing,Mixed
+Cleaning & Restoration,Car Wash & Mobile Detailing,Mixed
+Cleaning & Restoration,Fleet Washing,Commercial
+Cleaning & Restoration,Uniform & Linen Services,Commercial
+Cleaning & Restoration,Restroom Supply & Sanitation,Commercial
+Cleaning & Restoration,Laundry & Dry Cleaning,Residential
+Auto & Fleet,Auto Repair,Residential
+Auto & Fleet,Collision & Body Shops,Mixed
+Auto & Fleet,Windshield & Auto Glass,Mixed
+Auto & Fleet,Tire Shops,Mixed
+Auto & Fleet,Oil Change & Quick Lube,Residential
+Auto & Fleet,Window Tinting & Paint Protection,Residential
+Auto & Fleet,Mobile Mechanics,Mixed
+Auto & Fleet,Diesel & Truck Repair,Commercial
+Auto & Fleet,Fleet Maintenance,Commercial
+Auto & Fleet,Towing & Roadside,Mixed
+Auto & Fleet,Truck Upfitting & Vehicle Wraps,Commercial
+Auto & Fleet,Motorcycle & Powersports Repair,Residential
+Auto & Fleet,RV Repair & Service,Residential
+Auto & Fleet,Boat Repair & Marine Service,Mixed
+Auto & Fleet,Marine Electronics & Canvas,Mixed
+Auto & Fleet,Used Car Dealers,Residential
+Auto & Fleet,Trailer Sales & Repair,Mixed
+Moving & Logistics,Residential Movers,Residential
+Moving & Logistics,Commercial Movers & Office Relocation,Commercial
+Moving & Logistics,Self-Storage Facilities,Mixed
+Moving & Logistics,Courier & Last-Mile Delivery,Commercial
+Moving & Logistics,Freight Brokers & Trucking,Commercial
+Moving & Logistics,Warehousing & 3PL,Commercial
+Moving & Logistics,Packing & Crating,Mixed
+Moving & Logistics,Piano & Specialty Movers,Residential
+Security & Safety,Security Guard Companies,Commercial
+Security & Safety,Alarm Monitoring,Mixed
+Security & Safety,Locksmiths,Mixed
+Security & Safety,Commercial Locksmith & Safe Services,Commercial
+Security & Safety,Private Investigators,Mixed
+Security & Safety,Safety Consulting & OSHA Training,Commercial
+Security & Safety,Drone Inspection & Aerial Services,Commercial
+Security & Safety,Parking Management & Valet,Commercial
+Home Services (Other),Garage Door Installation & Repair,Residential
+Home Services (Other),Appliance Repair,Residential
+Home Services (Other),Window & Door Replacement,Residential
+Home Services (Other),Smart Home & Wi-Fi Installers,Residential
+Home Services (Other),Home Organizers,Residential
+Home Services (Other),Furniture Assembly,Residential
+Home Services (Other),TV Mounting,Residential
+Home Services (Other),Antenna & Satellite Installation,Residential
+Home Services (Other),Mattress & Upholstery Services,Residential
+Home Services (Other),Pet Waste Removal,Residential
+Home Services (Other),Dog Grooming & Boarding,Residential
+Home Services (Other),Pet Sitting & Walking,Residential
+Home Services (Other),Veterinary Clinics,Residential
+Home Services (Other),Home Care & Senior Care,Residential
+Home Services (Other),Senior Home Modification & Aging-in-Place,Residential
+Home Services (Other),Real Estate Photography,Mixed
+Home Services (Other),Property Management Companies,Mixed
+Home Services (Other),Vacation Rental Management,Residential
+Home Services (Other),Home Warranty Providers,Residential
+Home Services (Other),Utility Bill & Energy Auditors,Mixed
+Home Services (Other),Water Conservation Services,Mixed
+Property & Facility Services,Facility Management Companies,Commercial
+Property & Facility Services,HOA & Community Management Companies,Mixed
+Property & Facility Services,Janitorial Supply Distributors,Commercial
+Property & Facility Services,Building Maintenance Contractors,Commercial
+Property & Facility Services,Painting & Maintenance Crews for Multifamily,Commercial
+Property & Facility Services,Apartment Turnover Services,Commercial
+Property & Facility Services,Parking Garage Maintenance,Commercial
+Property & Facility Services,Roof & Building Envelope Consultants,Commercial
+Property & Facility Services,Reserve Study & Condo Inspection Firms,Mixed
+Property & Facility Services,Concrete Restoration & Balcony Repair,Mixed
+Property & Facility Services,Building Signage & Wayfinding,Commercial
+Property & Facility Services,Sign Companies,Commercial
+Property & Facility Services,Printing & Large-Format,Commercial
+Food & Hospitality Services,Restaurants,Residential
+Food & Hospitality Services,Catering,Mixed
+Food & Hospitality Services,Food Trucks,Residential
+Food & Hospitality Services,Bakeries,Residential
+Food & Hospitality Services,Coffee Shops,Residential
+Food & Hospitality Services,Bars & Breweries,Residential
+Food & Hospitality Services,Commercial Kitchen Design & Install,Commercial
+Food & Hospitality Services,Event Rentals (Tents/Tables),Mixed
+Food & Hospitality Services,Event Planners,Mixed
+Food & Hospitality Services,Wedding Venues,Residential
+Food & Hospitality Services,DJs & Entertainment,Mixed
+Food & Hospitality Services,Photographers & Videographers,Mixed
+Food & Hospitality Services,Florists,Mixed
+Food & Hospitality Services,Hotels & Boutique Lodging,Mixed
+Health Wellness & Beauty,Dental Practices,Residential
+Health Wellness & Beauty,Orthodontists,Residential
+Health Wellness & Beauty,Chiropractors,Residential
+Health Wellness & Beauty,Physical Therapy Clinics,Residential
+Health Wellness & Beauty,Med Spas & Aesthetics,Residential
+Health Wellness & Beauty,Dermatology & Plastic Surgery,Residential
+Health Wellness & Beauty,Optometrists & Vision Centers,Residential
+Health Wellness & Beauty,Urgent Care & Primary Care,Residential
+Health Wellness & Beauty,Mental Health & Therapy Practices,Residential
+Health Wellness & Beauty,Home Health Agencies,Residential
+Health Wellness & Beauty,Hair Salons & Barbershops,Residential
+Health Wellness & Beauty,Nail Salons & Spas,Residential
+Health Wellness & Beauty,Massage & Wellness Studios,Residential
+Health Wellness & Beauty,Gyms & Fitness Studios,Residential
+Health Wellness & Beauty,Personal Trainers,Residential
+Health Wellness & Beauty,Yoga & Pilates Studios,Residential
+Health Wellness & Beauty,Martial Arts & Dance Studios,Residential
+Professional Services (Local),Law Firms (PI/Estate/Immigration/Family),Residential
+Professional Services (Local),Accounting & Tax Firms,Mixed
+Professional Services (Local),Insurance Agencies,Mixed
+Professional Services (Local),Mortgage Brokers & Lenders,Residential
+Professional Services (Local),Real Estate Agents & Brokerages,Residential
+Professional Services (Local),Commercial Real Estate Brokers,Commercial
+Professional Services (Local),Financial Advisors,Residential
+Professional Services (Local),Title & Escrow Companies,Residential
+Professional Services (Local),Staffing & Recruiting Agencies,Commercial
+Professional Services (Local),IT Managed Service Providers,Commercial
+Professional Services (Local),Bookkeeping & Payroll Services,Commercial
+Professional Services (Local),Notary & Process Servers,Mixed
+Professional Services (Local),Yacht Brokers & Marine Dealers,Residential
+Education & Childcare,Daycare & Preschools,Residential
+Education & Childcare,Tutoring & Test Prep,Residential
+Education & Childcare,Driving Schools,Residential
+Education & Childcare,Trade Schools & Training Centers,Mixed
+Education & Childcare,Music & Art Lessons,Residential
+Education & Childcare,Summer Camps,Residential
+Industrial & Specialty,Machine Shops & Fabrication,Industrial
+Industrial & Specialty,Welding Services,Industrial
+Industrial & Specialty,Industrial Equipment Repair,Industrial
+Industrial & Specialty,Pressure Washing Industrial,Industrial
+Industrial & Specialty,Sandblasting & Industrial Coatings,Industrial
+Industrial & Specialty,Powder Coating,Industrial
+Industrial & Specialty,Pallet & Packaging Suppliers,Industrial
+Industrial & Specialty,Material Handling & Forklift Dealers,Industrial
+Industrial & Specialty,Compressed Air & Pneumatics,Industrial
+Industrial & Specialty,Industrial Supply Distributors,Industrial
+Industrial & Specialty,Pump & Motor Repair,Industrial
+Industrial & Specialty,Backup Power & Switchgear,Industrial
+Industrial & Specialty,Lab Testing & Calibration,Industrial
+Industrial & Specialty,Environmental Remediation,Industrial
+Agriculture & Marine,Farm & Ranch Services,Agricultural
+Agriculture & Marine,Nurseries & Garden Centers,Mixed
+Agriculture & Marine,Equipment Dealers (Ag/Turf),Mixed
+Agriculture & Marine,Marinas & Boatyards,Mixed
+Agriculture & Marine,Charter Boats & Fishing Guides,Residential
+Agriculture & Marine,Dock & Boat Lift Installers,Mixed
+Agriculture & Marine,Dredging & Marine Construction,Government

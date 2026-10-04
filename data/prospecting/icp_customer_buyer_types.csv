@@ -1,0 +1,138 @@
+Segment,Customer Type,Typical Decision-Maker Titles
+Residential Communities,HOA Boards,Board President; Treasurer; Board Member
+Residential Communities,HOA/Community Management Companies,Community Manager; Regional Manager; VP Operations
+Residential Communities,Condo Associations,Board President; Property Manager
+Residential Communities,Co-op Boards,Board President; Managing Agent
+Residential Communities,Master-Planned Communities,General Manager; CDD Manager
+Residential Communities,Community Development Districts (CDDs),District Manager; Field Manager
+Residential Communities,Gated Communities & Country Clubs,General Manager; Facilities Director
+Residential Communities,55+ & Active Adult Communities,Community Manager; Maintenance Director
+Residential Communities,Mobile Home & Manufactured Home Parks,Park Manager; Owner
+Residential Communities,Townhome & Villa Associations,Board President; Property Manager
+Residential Communities,Timeshare Resorts,Resort Manager; Director of Maintenance
+Property Owners & Managers,Property Management Companies (Residential),Property Manager; Director of Operations; Owner
+Property Owners & Managers,Property Management Companies (Commercial),Property Manager; Portfolio Manager; VP Property Management
+Property Owners & Managers,Multifamily Apartment Owners & Operators,Regional Manager; Community Manager; Maintenance Supervisor
+Property Owners & Managers,Student Housing Operators,Property Manager; Regional Director
+Property Owners & Managers,Single-Family Rental Operators,Asset Manager; Operations Director; Regional Manager
+Property Owners & Managers,Build-to-Rent Communities,Community Manager; Regional Operations Manager
+Property Owners & Managers,Real Estate Investors & Landlords,Owner; Investor
+Property Owners & Managers,Real Estate Investment Trusts (REITs),Asset Manager; Regional Property Director
+Property Owners & Managers,Commercial Real Estate Owners,Owner; Asset Manager; Property Manager
+Property Owners & Managers,Real Estate Developers,Development Director; Project Manager; Owner
+Property Owners & Managers,Real Estate Brokers (Leasing/Sales),Broker; Managing Director
+Property Owners & Managers,Vacation Rental Owners & Managers,Owner; Operations Manager
+Property Owners & Managers,Senior Living Operators,Executive Director; Facilities Director
+Property Owners & Managers,Hotel Owners & Management Companies,General Manager; Director of Engineering
+Property Owners & Managers,Self-Storage Operators,Facility Manager; District Manager; Owner
+Property Owners & Managers,Office Park & Business Park Owners,Property Manager; Owner
+Property Owners & Managers,Mixed-Use Developments,Property Manager; Asset Manager
+Construction & Development,General Contractors (Commercial),Project Manager; Estimator; Owner; VP Preconstruction
+Construction & Development,General Contractors (Residential),Owner; Project Manager; Operations Manager
+Construction & Development,Construction Managers (CM at Risk),Project Executive; Senior Project Manager
+Construction & Development,Design-Build Firms,Principal; Project Director
+Construction & Development,Subcontractors (all trades),Owner; Operations Manager; Estimator
+Construction & Development,Home Builders (Production),Division President; Purchasing Manager; Construction Director
+Construction & Development,Custom Home Builders,Owner; Project Manager
+Construction & Development,Remodelers,Owner; Sales Manager
+Construction & Development,Architects,Principal; Project Architect
+Construction & Development,Engineers (Civil/MEP/Structural),Principal; Project Engineer
+Construction & Development,Interior Designers,Owner; Principal Designer
+Construction & Development,Owner's Representatives,Principal; Project Director
+Construction & Development,Land Developers,Principal; Development Manager
+Construction & Development,Specialty Contractors (Roofing/Paving/Concrete),Owner; Estimator
+Commercial & Retail,Retail Chains (Regional/National),Facilities Manager; Regional Operations Manager; Real Estate Manager
+Commercial & Retail,Shopping Centers & Malls,Center Manager; Property Manager; Operations Manager
+Commercial & Retail,Big Box & Strip Center Owners,Property Manager; Owner
+Commercial & Retail,Grocery & Supermarkets,Store Manager; Facilities Director
+Commercial & Retail,Convenience Stores & Gas Stations,Owner; Operations Manager; Facilities Manager
+Commercial & Retail,Restaurants & Franchise Groups,Owner; Operations Director; Facilities Manager
+Commercial & Retail,Franchisors & Franchisees,Franchise Owner; Operations Manager; Marketing Director
+Commercial & Retail,Banks & Credit Unions,Facilities Manager; Branch Operations Manager
+Commercial & Retail,Auto Dealerships,General Manager; Fixed Ops Director; Facilities Manager
+Commercial & Retail,Office Buildings & Tenants,Office Manager; Facilities Manager; Property Manager
+Commercial & Retail,Coworking & Flex Space Operators,Community Manager; Operations Director
+Commercial & Retail,Fitness Center Chains,Regional Manager; Facilities Director
+Commercial & Retail,Entertainment Venues & Theaters,General Manager; Operations Director
+Commercial & Retail,Golf Courses & Country Clubs,General Manager; Superintendent; Facilities Director
+Commercial & Retail,Marinas & Yacht Clubs,General Manager; Dockmaster
+Commercial & Retail,Amusement Parks & Attractions,Director of Operations; Maintenance Director
+Commercial & Retail,Convention Centers & Event Venues,Director of Facilities; General Manager
+Commercial & Retail,Stadiums & Arenas,Director of Facilities; Operations Director
+Commercial & Retail,Airports & Terminals (private/commercial),Facilities Director; Operations Manager
+Commercial & Retail,Parking Operators & Garages,Operations Manager; Regional Manager
+Commercial & Retail,Car Washes,Owner; Operations Manager
+Commercial & Retail,Cannabis Dispensaries & Cultivators,Owner; Operations Director
+Industrial & Logistics,Manufacturing Plants,Plant Manager; Maintenance Manager; Facilities Engineer
+Industrial & Logistics,Warehouses & Distribution Centers,Facility Manager; Operations Manager; Maintenance Supervisor
+Industrial & Logistics,Industrial Park Owners,Property Manager; Asset Manager
+Industrial & Logistics,Food Processing & Packaging Plants,Plant Manager; Quality/Safety Director; Maintenance Manager
+Industrial & Logistics,Cold Storage Facilities,Facility Manager; Maintenance Director
+Industrial & Logistics,Trucking & Fleet Operators,Fleet Manager; Operations Director; Owner
+Industrial & Logistics,Ports & Marine Terminals,Operations Director; Facilities Manager
+Industrial & Logistics,Shipping Yards & Cross-Docks,Terminal Manager; Facilities Manager
+Industrial & Logistics,Data Centers,Facilities Director; Critical Environment Manager
+Industrial & Logistics,Labs & Cleanrooms,Facilities Director; EHS Manager
+Industrial & Logistics,Aerospace & Defense Contractors,Facilities Manager; EHS Director
+Industrial & Logistics,Oil Gas & Energy Facilities,Plant Manager; Maintenance Manager
+Industrial & Logistics,Utilities (Electric/Water/Gas),Facilities Manager; Procurement Director
+Industrial & Logistics,Recycling & Waste Facilities,Plant Manager; Operations Manager
+Industrial & Logistics,Agricultural Operations,Owner; Operations Manager
+Healthcare,Hospitals & Health Systems,Facilities Director; Director of Construction; Infection Prevention Director; Director of Engineering
+Healthcare,Outpatient & Surgery Centers,Administrator; Facilities Manager
+Healthcare,Medical Office Buildings,Property Manager; Facilities Manager
+Healthcare,Urgent Care & Clinic Chains,Operations Director; Real Estate Manager
+Healthcare,Dental Group Practices (DSOs),Operations Director; Facilities Manager
+Healthcare,Dialysis & Imaging Centers,Facilities Manager; Regional Director
+Healthcare,Skilled Nursing & Assisted Living,Administrator; Maintenance Director; Executive Director
+Healthcare,Behavioral Health Facilities,Administrator; Facilities Director
+Healthcare,Veterinary Hospital Groups,Practice Manager; Facilities Manager
+Healthcare,Pharmacies & Compounding Labs,Pharmacy Manager; Facilities Manager
+Healthcare,Rehab & Physical Therapy Centers,Owner; Operations Manager
+Education,K-12 Public School Districts,Facilities Director; Maintenance Director; Purchasing Director; Superintendent
+Education,Private & Charter Schools,Head of School; Business Manager; Facilities Director
+Education,Colleges & Universities,Facilities Director; Capital Projects Manager; Procurement Director
+Education,Trade & Technical Schools,Campus Director; Operations Manager
+Education,Daycare & Early Learning Chains,Owner; Regional Director
+Education,Churches & Religious Organizations,Pastor; Facilities Manager; Business Administrator
+Education,Nonprofits & Community Centers,Executive Director; Operations Director
+Education,Libraries & Museums,Director; Facilities Manager
+Government & Public Sector,City & Municipal Governments,Public Works Director; Facilities Manager; Purchasing Manager; City Manager
+Government & Public Sector,County Governments,Public Works Director; Facilities Director; Procurement Officer
+Government & Public Sector,State Agencies,Facilities Manager; Procurement Officer
+Government & Public Sector,Federal Agencies (GSA/Military),Contracting Officer; Facilities Manager
+Government & Public Sector,Housing Authorities,Executive Director; Maintenance Director; Procurement Manager
+Government & Public Sector,Parks & Recreation Departments,Parks Director; Superintendent
+Government & Public Sector,Water & Utility Districts,District Manager; Operations Manager
+Government & Public Sector,Transit Agencies,Facilities Director; Maintenance Director
+Government & Public Sector,Airports & Seaports (public),Facilities Manager; Procurement Director
+Government & Public Sector,Fire & Police Departments,Chief; Facilities Manager
+Government & Public Sector,Emergency Management Agencies,Director; Logistics Manager
+Government & Public Sector,Code Enforcement & Building Departments,Director; Chief Building Official
+Government & Public Sector,Community Redevelopment Agencies,Executive Director; Project Manager
+Government & Public Sector,Special Taxing Districts,District Manager
+Specialty Buyers,Insurance Companies & Adjusters,Claims Manager; Vendor Manager; Adjuster
+Specialty Buyers,Insurance Agents & Brokers,Agency Owner; Producer
+Specialty Buyers,Public Adjusters,Owner; Lead Adjuster
+Specialty Buyers,Restoration Contractors (as referral sources),Owner; Project Manager
+Specialty Buyers,Real Estate Agents (as referral sources),Agent; Team Lead
+Specialty Buyers,Home Inspectors (as referral sources),Owner
+Specialty Buyers,Title Companies & Closing Attorneys,Owner; Operations Manager
+Specialty Buyers,Lenders & Mortgage Brokers (as referral sources),Loan Officer; Branch Manager
+Specialty Buyers,Law Firms (Construction/Real Estate/Condo Law),Partner; Managing Attorney
+Specialty Buyers,Engineering & Inspection Firms (referral),Principal
+Specialty Buyers,Consultants (Reserve Study/Energy),Principal
+Specialty Buyers,Franchise Systems (Home Service Brands),Franchisee Owner; Field Marketing Director
+Specialty Buyers,Distributors & Suppliers (Building Materials),Branch Manager; Outside Sales Rep
+Specialty Buyers,Equipment Dealers & Rental Houses,Branch Manager; Sales Director
+Specialty Buyers,Chambers of Commerce & Trade Associations,Executive Director; Membership Director
+Specialty Buyers,Disaster Relief & Emergency Response Contractors,Owner; Operations Director
+Residential Consumers,Homeowners (Single-Family),Homeowner
+Residential Consumers,Seniors & Aging-in-Place Homeowners,Homeowner; Adult Child
+Residential Consumers,Luxury & Waterfront Homeowners,Homeowner; Estate Manager
+Residential Consumers,Second-Home & Seasonal Owners,Homeowner; Property Manager
+Residential Consumers,New Home Buyers,Homeowner
+Residential Consumers,Renters & Landlords (Small),Landlord; Tenant
+Residential Consumers,Boat & Yacht Owners,Owner; Captain; Marina Manager
+Residential Consumers,Pet Owners,Owner
+Residential Consumers,Estate Managers & Household Staff Employers,Estate Manager; Principal
