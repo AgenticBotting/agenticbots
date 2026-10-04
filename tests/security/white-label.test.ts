@@ -26,6 +26,7 @@ const CLIENT_SOURCES = [
   "src/app/api/reports",
   "src/app/login",
   "src/server/views/client.ts",
+  "src/server/prospecting/views.ts",
   "src/config/bot-catalog.ts",
   "src/config/integrations.ts",
   "src/lib/platform/metrics.ts",
@@ -51,7 +52,11 @@ describe("white-label", () => {
   it("client payloads never name the runtime", async () => {
     const w = await world();
     for (const org of [w.acme, w.bayside, w.coastal]) {
-      const blob = JSON.stringify([await portalData(org), await portalReport(org, 90)]).toLowerCase();
+      // Random ids (UUIDs, correlation ids) can contain "8642" by chance — strip them first.
+      const blob = JSON.stringify([await portalData(org), await portalReport(org, 90)])
+        .toLowerCase()
+        .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g, "<id>")
+        .replace(/cor_[a-z0-9_-]{12}/g, "<id>");
       for (const t of TERMS) expect(blob, `payload for ${org.name} contains ${t}`).not.toContain(t.toLowerCase());
     }
   });

@@ -23,7 +23,7 @@ export interface SkillDef {
 }
 
 export const SKILLS: readonly SkillDef[] = [
-  { key: "prospecting", name: "Prospect research", version: "1.0.0", description: "Find, enrich and qualify commercial prospects against an ideal-customer profile.", botTypes: ["prospecting", "outbound"], writes: false },
+  { key: "prospecting", name: "Prospect research", version: "1.1.0", description: "Find, enrich and qualify commercial prospects against an ideal-customer profile.", botTypes: ["prospecting", "outbound"], writes: false },
   { key: "seo-analysis", name: "Local SEO analysis", version: "1.0.0", description: "Crawl, rank-track and find local-search content opportunities.", botTypes: ["seo", "analytics", "content"], writes: false },
   { key: "follow-up", name: "Follow-up drafting", version: "1.0.0", description: "Draft follow-up and outreach messages for human approval before sending.", botTypes: ["outbound", "reactivation", "proposal"], writes: true },
   { key: "google-ads-analysis", name: "Google Ads analysis", version: "1.0.0", description: "Review search terms, spend and conversions; propose negatives and budget moves.", botTypes: ["ads", "analytics"], writes: false },

@@ -1,7 +1,7 @@
 ---
 name: prospecting
 description: Find, enrich and qualify commercial prospects against the client's ideal-customer profile.
-version: 1.0.0
+version: 1.1.0
 author: AgenticBots
 license: Proprietary — AgenticBots operational IP
 metadata:
@@ -15,6 +15,25 @@ Find, enrich and qualify commercial prospects against the client's ideal-custome
 
 ## Procedure
 
+When the AgenticBots prospecting tools are available, use them — they are
+the source of truth and they enforce budgets and suppression for you:
+
+1. `searchMarkets` — see this client's markets. Never create targets that
+   are not in a market the client approved.
+2. `getMarketCoverage` — see what is already found before discovering more.
+3. `discoverCompanies` for one market (keep `maxCompanies` small). It
+   researches, finds decision makers, resolves and verifies emails, scores
+   and qualifies the new companies. If it comes back paused, stop and
+   report that a budget needs an operator's approval — do not retry.
+4. Review qualified prospects with `scoreProspect`. Use `rejectProspect`
+   with a reason for clear misfits. `qualifyProspect` applies the rules;
+   you cannot override them.
+5. `sendToOutbound` only for prospects the client wants contacted. If it
+   reports violations (suppression, email status, caps), accept them —
+   never try another route to the same person.
+
+Without the tools:
+
 1. Restate the target: geography, property/company type, size threshold, buyer titles.
 2. Search public sources (company sites, directories, permit and property records).
 3. For each company record: name, website, location, why it fits, the likely
@@ -23,6 +42,9 @@ Find, enrich and qualify commercial prospects against the client's ideal-custome
 4. Qualify against the profile; mark each as qualified / maybe / not a fit.
 5. Deliver the list as a table. Adding contacts to the CRM is a CRM write —
    prepare it for approval instead of writing.
+
+A "why now" reason must come from something actually observed (a permit,
+a posting, a sale). If nothing was observed, say so.
 
 Report: prospects_researched, qualified_opportunities.
 
