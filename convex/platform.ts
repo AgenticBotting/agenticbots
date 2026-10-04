@@ -67,6 +67,34 @@ export const list = query({
   },
 });
 
+/**
+ * Paged read. Convex caps a single query at ~16k documents / 8 MB, which
+ * the Prospect Graph tables can exceed, so large tables are read page by
+ * page. `list` above stays for small tables and backward compatibility.
+ */
+export const page = query({
+  args: {
+    secret: v.string(),
+    table: v.string(),
+    orgId: v.optional(v.string()),
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, { secret, table, orgId, cursor, numItems }) => {
+    checkSecret(secret);
+    const t = tableOf(table);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const base = ctx.db.query(t as any);
+    const q =
+      orgId !== undefined
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? base.withIndex("by_org", (ix: any) => ix.eq("orgId", orgId))
+        : base;
+    const res = await q.paginate({ cursor, numItems: Math.min(Math.max(numItems, 1), 1000) });
+    return { docs: (res.page as Row[]).map((r) => r.doc), cursor: res.continueCursor, isDone: res.isDone };
+  },
+});
+
 export const commit = mutation({
   args: {
     secret: v.string(),

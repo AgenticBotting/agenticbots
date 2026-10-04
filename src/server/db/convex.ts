@@ -11,6 +11,9 @@ import { platformMode } from "@/server/env";
  * Calls go server-to-server with PLATFORM_SERVER_SECRET; nothing here is
  * reachable from a browser.
  */
+/** Documents per Convex page (well under the per-call byte limit). */
+const PAGE_SIZE = 400;
+
 export class ConvexRepository implements Repository {
   private client: ConvexHttpClient;
   private secret: string;
@@ -32,11 +35,21 @@ export class ConvexRepository implements Repository {
   }
 
   async list<K extends TableName>(table: K, q: ListQuery<Tables[K]> = {}): Promise<Tables[K][]> {
-    let rows = (await this.client.query(anyApi.platform.list, {
-      secret: this.secret,
-      table,
-      orgId: q.orgId,
-    })) as Tables[K][];
+    // Paged so no single Convex call approaches its document/byte limits.
+    let rows: Tables[K][] = [];
+    let cursor: string | null = null;
+    for (let i = 0; i < 10_000; i++) {
+      const res = (await this.client.query(anyApi.platform.page, {
+        secret: this.secret,
+        table,
+        orgId: q.orgId,
+        cursor,
+        numItems: PAGE_SIZE,
+      })) as { docs: Tables[K][]; cursor: string; isDone: boolean };
+      rows = rows.concat(res.docs);
+      if (res.isDone) break;
+      cursor = res.cursor;
+    }
     rows = rows.filter((r) => matches(r, q.where));
     rows = sortRows(rows as (Tables[K] & { createdAt: string })[], q.order);
     return q.limit ? rows.slice(0, q.limit) : rows;

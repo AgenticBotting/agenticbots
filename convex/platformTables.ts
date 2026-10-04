@@ -15,10 +15,16 @@ export const PLATFORM_TABLES = [
   "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
   "processed_webhooks",
+  // Prospect Graph
+  "pg_import_runs", "pg_niches", "pg_buyer_types", "pg_relationships", "pg_companies", "pg_company_sources",
+  "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
+  "pg_icps", "pg_markets", "pg_prospects", "pg_jobs", "pg_handoffs", "pg_outcomes",
+  "pg_cost_events", "pg_budgets", "pg_suppressions",
 ] as const;
 
 export const APPEND_ONLY = new Set<string>([
   "payments", "billing_events", "audit_logs", "invoices", "service_agreements", "deployment_events",
+  "pg_import_runs", "pg_cost_events", "pg_outcomes",
 ]);
 
 export type PlatformTable = (typeof PLATFORM_TABLES)[number];

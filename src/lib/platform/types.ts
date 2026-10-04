@@ -10,6 +10,7 @@
  * projections in src/server/views.
  */
 import type { BotTypeKey, Capability, IntegrationKey } from "@/config/bot-catalog";
+import type { ProspectingTables } from "@/lib/prospecting/types";
 
 export type ID = string;
 export type ISODate = string;
@@ -596,7 +597,7 @@ export interface ProcessedWebhook extends Base {
 
 /* ─────────────────────────── Table registry ───────────────────────── */
 
-export interface Tables {
+export interface Tables extends ProspectingTables {
   users: User;
   memberships: Membership;
   sessions: Session;
@@ -634,9 +635,15 @@ export const TABLE_NAMES: readonly TableName[] = [
   "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
   "processed_webhooks",
+  // Prospect Graph (see src/lib/prospecting/types.ts)
+  "pg_import_runs", "pg_niches", "pg_buyer_types", "pg_relationships", "pg_companies", "pg_company_sources",
+  "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
+  "pg_icps", "pg_markets", "pg_prospects", "pg_jobs", "pg_handoffs", "pg_outcomes",
+  "pg_cost_events", "pg_budgets", "pg_suppressions",
 ];
 
 /** Tables whose rows are never hard-deleted (financial + audit history). */
 export const APPEND_ONLY_TABLES: readonly TableName[] = [
   "payments", "billing_events", "audit_logs", "invoices", "service_agreements", "deployment_events",
+  "pg_import_runs", "pg_cost_events", "pg_outcomes",
 ];

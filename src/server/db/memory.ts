@@ -33,6 +33,8 @@ export class MemoryRepository implements Repository {
   private store: Store = emptyStore();
 
   constructor(private readonly persistPath?: string) {
+    // Never lose the last debounced write when a CLI process finishes.
+    if (persistPath) process.once("beforeExit", () => this.flush());
     if (persistPath && existsSync(persistPath)) {
       try {
         const raw = JSON.parse(readFileSync(persistPath, "utf8")) as Record<string, Row[]>;
@@ -52,7 +54,7 @@ export class MemoryRepository implements Repository {
 
   reset(): void {
     this.store = emptyStore();
-    this.persist();
+    this.flush();
   }
 
   async get<K extends TableName>(table: K, id: string): Promise<Tables[K] | null> {
@@ -102,7 +104,27 @@ export class MemoryRepository implements Repository {
     this.persist();
   }
 
+  private timer?: ReturnType<typeof setTimeout>;
+
+  /**
+   * Debounced: a burst of commits (an ontology import, a discovery job)
+   * writes the file once instead of once per commit.
+   */
   private persist(): void {
+    if (!this.persistPath || this.timer) return;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.flush();
+    }, 300);
+    (this.timer as { unref?: () => void }).unref?.();
+  }
+
+  /** Write the demo state file now. */
+  flush(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
     if (!this.persistPath) return;
     try {
       mkdirSync(dirname(this.persistPath), { recursive: true });

@@ -38,33 +38,43 @@ export type Permission =
   | "ops.users.manage"
   | "ops.provisioning"
   | "ops.destroy"
+  // prospecting (Prospect Graph)
+  | "ops.prospecting.view"
+  | "ops.prospecting.manage"
+  | "ops.prospecting.ontology"
+  | "ops.prospecting.spend"
+  | "ops.prospecting.global_suppression"
   // client portal
   | "portal.view"
   | "portal.requests.create"
   | "portal.requests.comment"
   | "portal.approvals.resolve"
   | "portal.reports.view"
-  | "portal.integrations.view";
+  | "portal.integrations.view"
+  | "portal.prospects.view";
 
 const OPERATOR: ReadonlySet<Permission> = new Set<Permission>([
   "ops.view", "ops.bots.manage", "ops.runs.control", "ops.requests.manage", "ops.approvals.resolve",
   "ops.automations.manage", "ops.integrations.manage", "ops.runtime.control", "ops.clients.suspend",
   "ops.clients.manage", "ops.billing.read", "ops.billing.write", "ops.skills.manage", "ops.models.manage",
   "ops.notes.write", "ops.audit.read", "ops.provisioning",
+  "ops.prospecting.view", "ops.prospecting.manage", "ops.prospecting.ontology", "ops.prospecting.spend",
 ]);
 
 const SUPERADMIN_ONLY: ReadonlySet<Permission> = new Set<Permission>([
   "ops.settings.manage", "ops.users.manage", "ops.destroy",
+  // Global (all-client) suppression changes affect every customer.
+  "ops.prospecting.global_suppression",
 ]);
 
 const CLIENT: Record<ClientRole, ReadonlySet<Permission>> = {
   client_admin: new Set<Permission>([
     "portal.view", "portal.requests.create", "portal.requests.comment", "portal.approvals.resolve",
-    "portal.reports.view", "portal.integrations.view",
+    "portal.reports.view", "portal.integrations.view", "portal.prospects.view",
   ]),
   client_member: new Set<Permission>([
     "portal.view", "portal.requests.create", "portal.requests.comment", "portal.reports.view",
-    "portal.integrations.view",
+    "portal.integrations.view", "portal.prospects.view",
   ]),
 };
 
