@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity, Bell, Bot, CalendarClock, ClipboardList, CreditCard, Gauge, Inbox, LayoutDashboard,
-  Plug, ScrollText, Server, Settings, Sparkles, Users,
+  Plug, ScrollText, Server, Settings, Sparkles, Target, Users,
 } from "lucide-react";
 
 const GROUPS: { label: string; items: { href: string; label: string; icon: React.ElementType; countKey?: string }[] }[] = [
@@ -19,6 +19,7 @@ const GROUPS: { label: string; items: { href: string; label: string; icon: React
       { href: "/ops/approvals", label: "Approvals", icon: ClipboardList, countKey: "approvals" },
       { href: "/ops/automations", label: "Automations", icon: CalendarClock },
       { href: "/ops/integrations", label: "Integrations", icon: Plug },
+      { href: "/ops/prospecting", label: "Prospecting", icon: Target },
     ],
   },
   {

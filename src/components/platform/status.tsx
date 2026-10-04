@@ -14,6 +14,9 @@ const TONES: Record<string, Tone> = {
   failed: "bad", past_due: "bad", offline: "bad", suspended: "bad", error: "bad", interrupted: "bad", denied: "bad", down: "bad",
   open: "bad", critical: "bad", high: "bad", canceled: "bad", terminated: "bad", missing: "bad", declined: "quiet",
   disabled: "quiet", draft: "quiet", unknown: "quiet", stopped: "quiet", not_configured: "quiet", disconnected: "bad", none: "quiet",
+  // prospecting
+  qualified: "good", auto_approved: "good", accepted: "good", ready: "good", review: "watch", needs_review: "watch",
+  researching: "live", sent_to_outbound: "live", rejected: "quiet", exhausted: "quiet", rejected_policy: "bad", not_implemented: "quiet",
   cancelled: "quiet", expired: "quiet", void: "quiet", written_off: "quiet", ignored: "quiet", low: "quiet", not_provisioned: "quiet", completed_agreement: "good",
 };
 

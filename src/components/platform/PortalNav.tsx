@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CheckSquare, Home, Inbox, Plug, Rows3 } from "lucide-react";
+import { BarChart3, CheckSquare, Home, Inbox, Plug, Rows3, Target } from "lucide-react";
 
 const ITEMS = [
   { href: "/portal", label: "Overview", icon: Home },
   { href: "/portal/activity", label: "Activity", icon: Rows3 },
   { href: "/portal/approvals", label: "Approvals", icon: CheckSquare, key: "approvals" },
   { href: "/portal/requests", label: "Requests", icon: Inbox },
+  { href: "/portal/prospects", label: "Prospects", icon: Target },
   { href: "/portal/integrations", label: "Integrations", icon: Plug },
   { href: "/portal/reports", label: "Reports", icon: BarChart3 },
 ];
