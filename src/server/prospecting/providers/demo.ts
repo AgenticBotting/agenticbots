@@ -1,5 +1,5 @@
 import "server-only";
-import type { EmailStatus, OutboundPayload, SignalType } from "@/lib/prospecting/types";
+import type { EmailStatus, OutboundPayload, SignalType, UsagePolicy } from "@/lib/prospecting/types";
 import { isDemo } from "@/server/env";
 import type {
   CompanyRef, ContactEnrichmentProvider, DiscoveredCompany, DiscoveryPage, DiscoveryQuery, EmailFindResult,
@@ -17,6 +17,16 @@ import type {
  * contacts can never be handed to a live outbound system.
  */
 export const DEMO_PROVIDER_KEY = "demo";
+export const DEMO_POLICY: UsagePolicy = {
+  scope: "public_shared",
+  cacheAllowed: true,
+  cacheTtlDays: 30,
+  crossTenantReuseAllowed: true,
+  rawDisplayAllowed: true,
+  attributionRequired: false,
+  derivedInsightAllowed: true,
+  policyRef: "demo-fictional",
+};
 
 function hash(s: string): number {
   let h = 0x811c9dc5;
@@ -86,6 +96,7 @@ export class DemoDataProvider implements ProspectDataProvider {
   readonly paid = false;
   readonly demo = true;
   readonly priority = 100;
+  readonly policy = DEMO_POLICY;
   /** Demo signal dates are relative to this clock (day-rounded) — reproducible for a given day. */
   constructor(private readonly clock: () => Date = () => new Date()) {}
   status() {
@@ -180,6 +191,7 @@ export class DemoContactProvider implements ContactEnrichmentProvider {
   readonly paid = false;
   readonly demo = true;
   readonly priority = 100;
+  readonly policy = DEMO_POLICY;
   status() {
     return enabled();
   }
@@ -217,6 +229,7 @@ export class DemoVerificationProvider implements EmailVerificationProvider {
   readonly paid = false;
   readonly demo = true;
   readonly priority = 100;
+  readonly policy = DEMO_POLICY;
   status() {
     return enabled();
   }
@@ -235,6 +248,7 @@ export class DemoOutboundProvider implements OutboundProvider {
   readonly paid = false;
   readonly demo = true;
   readonly priority = 100;
+  readonly policy = DEMO_POLICY;
   readonly received: { payload: OutboundPayload; key: string }[] = [];
   status() {
     return enabled();

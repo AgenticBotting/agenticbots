@@ -1,13 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { prospectWorld, acmeMarket, demoSet, FakePaid, NOW } from "./helpers";
 import { EnrichmentRouter } from "@/server/prospecting/router";
-import { BudgetBlocked, setBudget } from "@/server/prospecting/costs";
+import { BudgetBlocked, reservePaidOperation, setBudget } from "@/server/prospecting/costs";
 import { enqueueJob, runJob, approveJobSpend } from "@/server/prospecting/jobs";
 import { defaultProviders, providerCatalog } from "@/server/prospecting/providers/registry";
 import { DemoDataProvider } from "@/server/prospecting/providers/demo";
 import { getDomainMailIntelligence, inferPattern, applyPattern, isValidEmailSyntax, demoResolver } from "@/server/prospecting/email";
 import type { Company, ProspectingJob } from "@/lib/prospecting/types";
 import type { ProviderSet } from "@/server/prospecting/providers/types";
+import { ingestCompany } from "@/server/prospecting/companies";
+import { PUBLIC_FACT_POLICY } from "@/server/prospecting/data-policy";
 
 const DAY = 86_400_000;
 
@@ -58,6 +60,10 @@ describe("EnrichmentRouter — cost, cache, fallback", () => {
     const events = await pw.ops.store.list("pg_cost_events");
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({ provider: "vendor-a", costUsd: 0.1, pricingSource: "configured", success: true, orgId: pw.acme.id });
+    expect(events[0].operationId).toBeTruthy();
+    const ops = await pw.ops.store.list("pg_paid_operations");
+    expect(ops).toHaveLength(1);
+    expect(ops[0]).toMatchObject({ provider: "vendor-a", capability: "people_search", status: "settled", reservedCostUsd: 0.1, actualCostUsd: 0.1 });
     const second = await new EnrichmentRouter(opts).findDecisionMakers(c, wanted, gate);
     expect(second.source).toBe("cache");
     expect(p.calls).toBe(1);
@@ -65,6 +71,16 @@ describe("EnrichmentRouter — cost, cache, fallback", () => {
     const later = await new EnrichmentRouter({ ...opts, now: new Date(NOW.getTime() + 61 * DAY) }).findDecisionMakers(c, wanted, gate);
     expect(later.source).toBe("provider");
     expect(p.calls).toBe(2);
+  });
+
+  it("reserves estimated paid spend before the provider call and releases budget on failure", async () => {
+    const pw = await prospectWorld();
+    await setBudget(pw.ops, { scope: "client", orgId: pw.acme.id, monthlyLimitUsd: 0.15 });
+    const first = await reservePaidOperation(pw.ops.store, NOW, { orgId: pw.acme.id, marketId: "m1", jobId: "j1" }, { provider: "vendor-a", capability: "people_search", operation: "enrichment", estimateUsd: 0.1, targetKey: "one", demo: false });
+    expect(first.duplicate).toBe(false);
+    await expect(reservePaidOperation(pw.ops.store, NOW, { orgId: pw.acme.id, marketId: "m1", jobId: "j2" }, { provider: "vendor-a", capability: "people_search", operation: "enrichment", estimateUsd: 0.1, targetKey: "two", demo: false })).rejects.toMatchObject({ scope: "client" });
+    const budget = (await pw.ops.store.list("pg_budgets")).find((b) => b.orgId === pw.acme.id)!;
+    expect(budget.reservedUsd).toBe(0.1);
   });
 
   it("value-gates paid calls for low-fit prospects", async () => {
@@ -196,6 +212,15 @@ describe("jobs", () => {
     // One company can have several source records (identity merges); every company has at least one.
     expect(new Set(sources.map((s) => s.companyId))).toEqual(new Set(companies.map((c) => c.id)));
     expect(sources.every((s) => s.provenance.provider === "demo" && s.provenance.demo)).toBe(true);
+    const claims = await pw.ops.store.list("pg_fact_claims");
+    expect(claims.length).toBeGreaterThan(0);
+    expect(claims.every((c) => c.policy.scope === "public_shared" && c.provenance.demo)).toBe(true);
+    const builds = await pw.ops.store.list("pg_market_builds", { orgId: pw.acme.id });
+    expect(builds).toHaveLength(1);
+    expect(builds[0]).toMatchObject({ marketId: m.id, status: "ready", providerSpendUsd: 0 });
+    const outcomes = await pw.ops.store.list("pg_outcomes", { orgId: pw.acme.id });
+    expect(outcomes.some((o) => o.stage === "discovered")).toBe(true);
+    expect(outcomes.every((o) => o.source === "deterministic_worker")).toBe(true);
     const prospects = await pw.ops.store.list("pg_prospects");
     expect(prospects.every((p) => p.score && p.score.version)).toBe(true);
     // The same query yields the same companies.
@@ -207,6 +232,35 @@ describe("jobs", () => {
     await runJob(pw.r, j2.id, { now: NOW, providers: demoSet() });
     const all = await pw.ops.store.list("pg_companies");
     expect(new Set(all.map((c) => c.domain)).size).toBe(all.length);
+  });
+
+  it("keeps near-duplicate company matches for operator merge review instead of auto-merging", async () => {
+    const pw = await prospectWorld();
+    const tx = pw.ops.store.tx();
+    const pending = new Map<string, Company>();
+    const fetchedAt = NOW.toISOString();
+    await ingestCompany(pw.ops.store, tx, {
+      externalId: "src:1",
+      name: "Harbor Roofing LLC",
+      domain: "harbor-roofing.example",
+      location: { city: "Columbus", state: "OH", zip: "43004" },
+      facts: {},
+      confidence: 0.9,
+    }, { provider: "native", observedAt: fetchedAt, fetchedAt, confidence: 0.9, demo: false }, undefined, pending, PUBLIC_FACT_POLICY);
+    await tx.commit();
+    const tx2 = pw.ops.store.tx();
+    await ingestCompany(pw.ops.store, tx2, {
+      externalId: "src:2",
+      name: "Harbor Roofng",
+      location: { city: "Columbus", state: "OH", zip: "43004" },
+      facts: {},
+      confidence: 0.7,
+    }, { provider: "native", observedAt: fetchedAt, fetchedAt, confidence: 0.7, demo: false }, undefined, new Map(), PUBLIC_FACT_POLICY);
+    await tx2.commit();
+    expect(await pw.ops.store.list("pg_companies")).toHaveLength(2);
+    const reviews = await pw.ops.store.list("pg_company_merge_reviews");
+    expect(reviews).toHaveLength(1);
+    expect(reviews[0]).toMatchObject({ status: "needs_review", reason: expect.stringMatching(/automatic merge threshold/) });
   });
 
   it("pauses at a budget limit, needs a person to approve, then continues", async () => {

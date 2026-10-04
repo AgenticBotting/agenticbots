@@ -1,5 +1,5 @@
 import "server-only";
-import type { CompanyLocation, EmailStatus, Geography, OutboundPayload, SignalType } from "@/lib/prospecting/types";
+import type { CompanyLocation, EmailStatus, Geography, OutboundPayload, SignalType, UsagePolicy } from "@/lib/prospecting/types";
 
 /**
  * Vendor-neutral provider contracts.
@@ -46,6 +46,8 @@ export interface ProviderInfo {
   readonly credentialSetting?: string;
   /** Link to the vendor's API docs, for the operator and for implementers. */
   readonly docsUrl?: string;
+  /** Required before a paid provider can store reusable facts. Unknown policy fails closed. */
+  readonly policy?: UsagePolicy;
   status(): ProviderStatus;
 }
 

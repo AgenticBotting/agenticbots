@@ -229,6 +229,38 @@ export interface Provenance {
   demo: boolean;
 }
 
+export type DataScope = "public_shared" | "licensed_shared" | "tenant_private" | "restricted";
+
+export interface UsagePolicy {
+  scope: DataScope;
+  cacheAllowed: boolean;
+  cacheTtlDays?: number;
+  crossTenantReuseAllowed: boolean;
+  rawDisplayAllowed: boolean;
+  retentionLimitDays?: number;
+  attributionRequired: boolean;
+  derivedInsightAllowed: boolean;
+  /** Human-readable source contract or internal rule reference. */
+  policyRef: string;
+}
+
+export interface FactClaim extends Base {
+  /** Entity type, e.g. company, person, contact_point, signal. */
+  entityType: string;
+  entityId: ID;
+  /** Field or fact key, e.g. domain, employee_range, permit_signal. */
+  field: string;
+  value: string | number | boolean | null;
+  orgId?: ID;
+  provenance: Provenance;
+  policy: UsagePolicy;
+  confidence: number;
+  observedAt: ISODate;
+  fetchedAt: ISODate;
+  expiresAt?: ISODate;
+  metadata?: Record<string, string | number | boolean | null>;
+}
+
 /* ───────────────────────────── Companies (shared) ───────────────────────────── */
 
 export interface CompanyLocation {
@@ -272,10 +304,24 @@ export interface Company extends Base {
 export interface CompanySourceRecord extends Base {
   companyId: ID;
   provenance: Provenance;
+  policy?: UsagePolicy;
   /** Facts exactly as the source reported them. */
   facts: Record<string, string | number | boolean | null>;
   matchMethod: "domain" | "phone" | "name_address" | "new";
   matchConfidence: number;
+}
+
+export interface CompanyMergeReview extends Base {
+  candidateCompanyId?: ID;
+  sourceRecordId?: ID;
+  canonicalCompanyId?: ID;
+  proposedName: string;
+  evidence: { kind: "domain" | "phone" | "address" | "external_id" | "name" | "geo" | "legal_registration"; value: string; confidence: number }[];
+  confidence: number;
+  status: "needs_review" | "approved" | "rejected" | "merged" | "unmerged";
+  reason: string;
+  reviewedBy?: ID;
+  reviewedAt?: ISODate;
 }
 
 /* ───────────────────────────── People (shared) ───────────────────────────── */
@@ -424,12 +470,40 @@ export interface ProspectingJob extends Base {
   spendUsd: number;
 }
 
+export interface MarketBuild extends Base {
+  orgId: ID;
+  icpId?: ID;
+  marketId?: ID;
+  nicheId: ID;
+  geography: Geography;
+  buyerTypeIds: ID[];
+  discoveryStrategy: string[];
+  maxDataAcquisitionBudgetUsd: number;
+  companyDiscoveryCount: number;
+  companyResearchCount: number;
+  qualifiedCompanyCount: number;
+  decisionMakersRequested: number;
+  decisionMakersFound: number;
+  contactsVerified: number;
+  providerSpendUsd: number;
+  coverageMethodology: string;
+  status: "draft" | "planned" | "approval_required" | "discovering" | "qualifying" | "enriching" | "ready" | "refreshing" | "paused" | "failed" | "cancelled";
+  createdBy: string;
+  approvedBy?: ID;
+  approvedAt?: ISODate;
+  startedAt?: ISODate;
+  finishedAt?: ISODate;
+  failureReason?: string;
+}
+
 export interface CostEvent extends Base {
   /** Absent = platform-level cost not attributable to a client. */
   orgId?: ID;
   marketId?: ID;
+  marketBuildId?: ID;
   jobId?: ID;
   prospectId?: ID;
+  operationId?: ID;
   provider: string;
   operation: "discovery" | "enrichment" | "verification" | "research" | "signals" | "llm" | "outbound";
   units: number;
@@ -438,6 +512,32 @@ export interface CostEvent extends Base {
   /** "configured" = from configured pricing; "provider_reported" = invoice/API reported. */
   pricingSource: "configured" | "provider_reported" | "free";
   success: boolean;
+  demo: boolean;
+}
+
+export interface PaidOperation extends Base {
+  operationId: ID;
+  orgId: ID;
+  marketBuildId?: ID;
+  marketId?: ID;
+  jobId?: ID;
+  companyId?: ID;
+  personId?: ID;
+  prospectId?: ID;
+  provider: string;
+  capability: string;
+  operation: CostEvent["operation"];
+  estimatedCostUsd: number;
+  reservedCostUsd: number;
+  actualCostUsd?: number;
+  status: "reserved" | "running" | "settled" | "released" | "failed" | "unknown";
+  attemptCount: number;
+  providerRequestId?: string;
+  startedAt: ISODate;
+  completedAt?: ISODate;
+  lastError?: string;
+  reservationMonth: string;
+  reservationScopes: ("platform" | "client" | "market" | "provider")[];
   demo: boolean;
 }
 
@@ -453,6 +553,8 @@ export interface ProspectingBudget extends Base {
   maxProviderRetries: number;
   /** "stop" fails closed; "approval" pauses the job for an operator. */
   onLimit: "stop" | "approval";
+  reservedMonth?: string;
+  reservedUsd?: number;
 }
 
 /* ───────────────────────────── Compliance ───────────────────────────── */
@@ -501,14 +603,15 @@ export interface OutboundPayload {
 }
 
 export type OutcomeStage =
-  | "contacted" | "replied" | "positive_reply" | "meeting" | "quote" | "opportunity" | "won" | "lost";
+  | "discovered" | "researched" | "qualified" | "enriched" | "verified" | "queued_for_outbound"
+  | "contacted" | "replied" | "positive_reply" | "meeting" | "quote" | "opportunity" | "won" | "lost" | "suppressed";
 
 export interface OutcomeEvent extends Base {
   orgId: ID;
   prospectId: ID;
   stage: OutcomeStage;
   valueCents?: number;
-  source: "outbound_bot" | "crm_bot" | "operator" | "provider_webhook";
+  source: "deterministic_worker" | "outbound_bot" | "crm_bot" | "operator" | "provider_webhook";
   note?: string;
   occurredAt: ISODate;
 }
@@ -520,6 +623,8 @@ export interface ProspectingTables {
   pg_relationships: NicheBuyerRelationship;
   pg_companies: Company;
   pg_company_sources: CompanySourceRecord;
+  pg_fact_claims: FactClaim;
+  pg_company_merge_reviews: CompanyMergeReview;
   pg_people: Person;
   pg_company_people: CompanyPerson;
   pg_contact_points: ContactPoint;
@@ -529,6 +634,8 @@ export interface ProspectingTables {
   pg_markets: Market;
   pg_prospects: Prospect;
   pg_jobs: ProspectingJob;
+  pg_market_builds: MarketBuild;
+  pg_paid_operations: PaidOperation;
   pg_cost_events: CostEvent;
   pg_budgets: ProspectingBudget;
   pg_suppressions: Suppression;
@@ -539,16 +646,16 @@ export interface ProspectingTables {
 /** Shared market intelligence: must never carry orgId or private fields. */
 export const SHARED_PROSPECT_TABLES = [
   "pg_import_runs", "pg_niches", "pg_buyer_types", "pg_relationships", "pg_companies", "pg_company_sources",
-  "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
+  "pg_fact_claims", "pg_company_merge_reviews", "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
 ] as const;
 
 /** Private client intelligence: every row carries orgId. */
 export const PRIVATE_PROSPECT_TABLES = [
-  "pg_icps", "pg_markets", "pg_prospects", "pg_jobs", "pg_handoffs", "pg_outcomes",
+  "pg_icps", "pg_markets", "pg_prospects", "pg_jobs", "pg_market_builds", "pg_handoffs", "pg_outcomes",
 ] as const;
 
 /** Rows may be private (orgId) or platform-level (no orgId, operator-only). */
-export const MIXED_PROSPECT_TABLES = ["pg_cost_events", "pg_budgets", "pg_suppressions"] as const;
+export const MIXED_PROSPECT_TABLES = ["pg_paid_operations", "pg_cost_events", "pg_budgets", "pg_suppressions"] as const;
 
 export const PROSPECT_TABLE_NAMES = [
   ...SHARED_PROSPECT_TABLES, ...PRIVATE_PROSPECT_TABLES, ...MIXED_PROSPECT_TABLES,

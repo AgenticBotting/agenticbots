@@ -1,10 +1,14 @@
 import "server-only";
 import type { BuyerType, Company, CompanyPerson, Person, Provenance } from "@/lib/prospecting/types";
 import type { GraphTx, ProspectGraphStore } from "./store";
+import { audit } from "@/server/services/common";
+import { correlationId } from "@/server/ids";
 import type { DiscoveredCompany, FoundPerson } from "./providers/types";
 import { coreName, normalizeDomain, normalizePhone, resolveIdentity } from "./identity";
 import { normalizeName, stableId } from "./ontology/normalize";
 import { normalizeTitle, roleFamilyOf, seniorityOf } from "./ontology/titles";
+import { PUBLIC_FACT_POLICY, recordFactClaims } from "./data-policy";
+import { assertAllowed, principalRef, type Ctx } from "./access";
 
 /**
  * Company identity graph writes.
@@ -20,13 +24,16 @@ export interface IngestResult {
   matchMethod: "domain" | "phone" | "name_address" | "new";
 }
 
-export async function candidatesFor(store: ProspectGraphStore, d: Pick<DiscoveredCompany, "name" | "domain" | "phone">): Promise<Company[]> {
+export async function candidatesFor(store: ProspectGraphStore, d: Pick<DiscoveredCompany, "name" | "domain" | "phone" | "location">): Promise<Company[]> {
   const out = new Map<string, Company>();
   const byDomain = d.domain ? await store.findCompanyByDomain(d.domain) : null;
   if (byDomain) out.set(byDomain.id, byDomain);
   const byPhone = d.phone ? await store.findCompanyByPhone(d.phone) : null;
   if (byPhone) out.set(byPhone.id, byPhone);
   for (const c of await store.findCompaniesByName(normalizeName(d.name))) out.set(c.id, c);
+  for (const c of await store.list("pg_companies")) {
+    if (c.locations.some((l) => l.state === d.location.state && (l.zip === d.location.zip || (!!l.city && l.city === d.location.city)))) out.set(c.id, c);
+  }
   return [...out.values()];
 }
 
@@ -41,6 +48,7 @@ export async function ingestCompany(
   provenance: Provenance,
   buyerType: BuyerType | undefined,
   pending: Map<string, Company>,
+  policy = PUBLIC_FACT_POLICY,
 ): Promise<IngestResult> {
   const now = provenance.fetchedAt;
   const candidates = [...(await candidatesFor(store, d)), ...pending.values()];
@@ -101,14 +109,42 @@ export async function ingestCompany(
 
   const srcId = stableId(`src_${provenance.provider}_${d.externalId}`);
   if (!(await store.get("pg_company_sources", srcId))) {
-    tx.insert("pg_company_sources", {
+    const source = tx.insert("pg_company_sources", {
       id: srcId,
       companyId: company.id,
       provenance: { ...provenance, externalId: d.externalId, sourceUrl: d.sourceUrl },
+      policy,
       facts: { name: d.name, domain: d.domain ?? null, phone: d.phone ?? null, city: d.location.city ?? null, state: d.location.state ?? null, zip: d.location.zip ?? null, category: d.category ?? null, ...d.facts },
       matchMethod: match.method,
       matchConfidence: match.company ? match.confidence : 1,
     });
+    recordFactClaims(tx, {
+      entityType: "company",
+      entityId: company.id,
+      facts: source.facts,
+      provenance: source.provenance,
+      policy,
+    });
+    if (!match.company && candidates.length > 0) {
+      const nearest = candidates.sort((a, b) => normalizeName(a.canonicalName).localeCompare(normalizeName(b.canonicalName)))[0];
+      const reviewConfidence = Math.max(match.confidence, 0.5);
+      tx.insert("pg_company_merge_reviews", {
+        id: stableId(`merge_${source.id}_${nearest?.id ?? "none"}`),
+        candidateCompanyId: nearest?.id,
+        sourceRecordId: source.id,
+        canonicalCompanyId: company.id,
+        proposedName: d.name,
+        confidence: reviewConfidence,
+        status: "needs_review",
+        reason: "Near company identity match below the automatic merge threshold.",
+        evidence: [
+          { kind: "name", value: d.name, confidence: reviewConfidence },
+          ...(d.domain ? [{ kind: "domain" as const, value: d.domain, confidence: 0.95 }] : []),
+          ...(d.phone ? [{ kind: "phone" as const, value: d.phone, confidence: 0.85 }] : []),
+          ...(d.location.city || d.location.zip ? [{ kind: "address" as const, value: `${d.location.city ?? ""} ${d.location.state ?? ""} ${d.location.zip ?? ""}`.trim(), confidence: 0.6 }] : []),
+        ],
+      });
+    }
   }
   return { company, created, matchMethod: match.method };
 }
@@ -127,6 +163,32 @@ export function classifyBuyerType(company: Pick<Company, "canonicalName" | "indu
     if (conf > (best?.confidence ?? 0)) best = { buyerTypeId: b.id, confidence: conf };
   }
   return best;
+}
+
+export async function approveCompanyMerge(ctx: Ctx, reviewId: string): Promise<void> {
+  assertAllowed(ctx.p, "review_ontology");
+  const review = await ctx.store.get("pg_company_merge_reviews", reviewId);
+  if (!review || !review.candidateCompanyId || !review.canonicalCompanyId || !review.sourceRecordId) return;
+  const source = await ctx.store.get("pg_company_sources", review.sourceRecordId);
+  if (!source) return;
+  const tx = ctx.store.tx();
+  tx.patch("pg_company_sources", source, { companyId: review.candidateCompanyId });
+  tx.patch("pg_company_merge_reviews", review, { status: "merged", reviewedBy: principalRef(ctx.p).id, reviewedAt: ctx.now.toISOString() });
+  audit(tx.audit, principalRef(ctx.p), { action: "prospecting.company.merge", targetType: "company_merge_review", targetId: review.id, correlationId: correlationId(), detail: `${review.canonicalCompanyId} → ${review.candidateCompanyId}` });
+  await tx.commit();
+}
+
+export async function unmergeCompanySource(ctx: Ctx, reviewId: string): Promise<void> {
+  assertAllowed(ctx.p, "review_ontology");
+  const review = await ctx.store.get("pg_company_merge_reviews", reviewId);
+  if (!review || !review.canonicalCompanyId || !review.sourceRecordId) return;
+  const source = await ctx.store.get("pg_company_sources", review.sourceRecordId);
+  if (!source) return;
+  const tx = ctx.store.tx();
+  tx.patch("pg_company_sources", source, { companyId: review.canonicalCompanyId });
+  tx.patch("pg_company_merge_reviews", review, { status: "unmerged", reviewedBy: principalRef(ctx.p).id, reviewedAt: ctx.now.toISOString() });
+  audit(tx.audit, principalRef(ctx.p), { action: "prospecting.company.unmerge", targetType: "company_merge_review", targetId: review.id, correlationId: correlationId(), detail: `${review.candidateCompanyId ?? "unknown"} → ${review.canonicalCompanyId}` });
+  await tx.commit();
 }
 
 /** Upsert people found at a company, de-duplicated by company + normalized name. */

@@ -1,5 +1,5 @@
 import "server-only";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import type { Company, Prospect } from "@/lib/prospecting/types";
 import type { Repository } from "@/server/db/repository";
@@ -269,9 +269,10 @@ export async function runProspectingTool(ctx: Ctx, name: string, args: unknown, 
  * token, be a Prospecting Bot, not be disabled, and the org must be able
  * to run work. Otherwise: refused.
  */
-export async function botPrincipal(r: Repository, botId: string, orgId: string): Promise<Principal> {
+export async function botPrincipal(r: Repository, botId: string, orgId: string, runtimeId?: string): Promise<Principal> {
   const bot = await r.get("bots", botId);
   if (!bot || bot.orgId !== orgId) throw forbidden("bot");
+  if (runtimeId && bot.runtimeId !== runtimeId) throw forbidden("Bot runtime mismatch.");
   if (bot.typeKey !== "prospecting") throw forbidden("Only a Prospecting Bot can use prospecting tools.");
   if (bot.status === "disabled" || bot.status === "provisioning") throw forbidden("This Bot is not active.");
   const org = await r.get("organizations", orgId);
@@ -279,32 +280,63 @@ export async function botPrincipal(r: Repository, botId: string, orgId: string):
   return { kind: "bot", botId: bot.id, orgId, name: bot.name };
 }
 
-function toolSecret(): string {
-  const s = process.env.PROSPECTING_TOOL_SECRET;
+function toolSecret(kid?: string): string {
+  const current = process.env.PROSPECTING_TOOL_SECRET_CURRENT ?? process.env.PROSPECTING_TOOL_SECRET;
+  const previous = process.env.PROSPECTING_TOOL_SECRET_PREVIOUS;
+  const currentKid = process.env.PROSPECTING_TOOL_KEY_ID ?? "current";
+  if (kid && kid !== currentKid && previous) return previous;
+  const s = current;
   if (!s || s.length < 32) throw unavailable("Prospecting tools are not configured.");
   return s;
 }
 
 const sign = (payload: string, secret: string) => createHmac("sha256", secret).update(payload).digest("base64url");
 
-/** Short-lived token the platform gives a Bot's runtime. Contains no secret. */
-export function issueToolToken(botId: string, orgId: string, ttlSeconds = 3600, now = Date.now()): string {
-  const payload = Buffer.from(JSON.stringify({ b: botId, o: orgId, e: Math.floor(now / 1000) + Math.min(ttlSeconds, 86_400) })).toString("base64url");
-  return `${payload}.${sign(payload, toolSecret())}`;
+export interface ToolTokenClaims {
+  botId: string;
+  orgId: string;
+  runtimeId: string;
+  scopes: string[];
+  issuedAt: number;
+  expiresAt: number;
+  tokenId: string;
+  keyId: string;
 }
 
-export function verifyToolToken(token: string, now = Date.now()): { botId: string; orgId: string } {
+/** Short-lived token the platform gives a Bot's runtime. Contains no secret. */
+export function issueToolToken(input: { botId: string; orgId: string; runtimeId: string; scopes?: string[]; ttlSeconds?: number; tokenId?: string }, now = Date.now()): string {
+  const ttl = Math.max(60, Math.min(input.ttlSeconds ?? 3600, 3600));
+  const iat = Math.floor(now / 1000);
+  const kid = process.env.PROSPECTING_TOOL_KEY_ID ?? "current";
+  const payload = Buffer.from(JSON.stringify({
+    v: 2,
+    kid,
+    b: input.botId,
+    o: input.orgId,
+    r: input.runtimeId,
+    scp: [...new Set(input.scopes ?? ["prospecting:tools"])].sort(),
+    iat,
+    e: iat + ttl,
+    jti: input.tokenId ?? randomUUID(),
+  })).toString("base64url");
+  return `${payload}.${sign(payload, toolSecret(kid))}`;
+}
+
+export function verifyToolToken(token: string, now = Date.now()): ToolTokenClaims {
   const [payload, sig] = token.split(".");
   if (!payload || !sig) throw new AppError("unauthenticated", "Invalid tool token.", 401);
-  const want = Buffer.from(sign(payload, toolSecret()));
-  const got = Buffer.from(sig);
-  if (want.length !== got.length || !timingSafeEqual(want, got)) throw new AppError("unauthenticated", "Invalid tool token.", 401);
-  let data: { b?: string; o?: string; e?: number };
+  let data: { v?: number; kid?: string; b?: string; o?: string; r?: string; scp?: string[]; iat?: number; e?: number; jti?: string };
   try {
     data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
   } catch {
     throw new AppError("unauthenticated", "Invalid tool token.", 401);
   }
-  if (!data.b || !data.o || !data.e || data.e * 1000 < now) throw new AppError("unauthenticated", "Tool token expired.", 401);
-  return { botId: data.b, orgId: data.o };
+  const want = Buffer.from(sign(payload, toolSecret(data.kid)));
+  const got = Buffer.from(sig);
+  if (want.length !== got.length || !timingSafeEqual(want, got)) throw new AppError("unauthenticated", "Invalid tool token.", 401);
+  if (data.v !== 2 || !data.b || !data.o || !data.r || !Array.isArray(data.scp) || !data.iat || !data.e || !data.jti) throw new AppError("unauthenticated", "Invalid tool token.", 401);
+  if (data.e * 1000 < now) throw new AppError("unauthenticated", "Tool token expired.", 401);
+  if (data.iat * 1000 > now + 60_000) throw new AppError("unauthenticated", "Tool token issued in the future.", 401);
+  if (!data.scp.includes("prospecting:tools")) throw new AppError("forbidden", "Tool token scope is not allowed.", 403);
+  return { botId: data.b, orgId: data.o, runtimeId: data.r, scopes: data.scp, issuedAt: data.iat, expiresAt: data.e, tokenId: data.jti, keyId: data.kid ?? "current" };
 }

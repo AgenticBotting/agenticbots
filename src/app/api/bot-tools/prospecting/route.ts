@@ -29,9 +29,9 @@ export const GET = (req: Request) =>
 
 export const POST = (req: Request) =>
   handle(async () => {
-    const { botId, orgId } = verifyToolToken(bearer(req));
+    const { botId, orgId, runtimeId } = verifyToolToken(bearer(req));
     const r = await repo();
-    const principal = await botPrincipal(r, botId, orgId);
+    const principal = await botPrincipal(r, botId, orgId, runtimeId);
     const b = await body<{ tool?: string; args?: unknown }>(req);
     const result = await runProspectingTool(ctxOf(r, principal), String(b.tool ?? ""), b.args);
     return json({ result });

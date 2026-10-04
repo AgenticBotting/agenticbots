@@ -102,7 +102,7 @@ Proprietary prospecting infrastructure: **service niche → buyer relationships 
 | `identity.ts`, `companies.ts` | Company identity resolution (domain 0.95 → phone 0.85 → name+locality 0.8; merge ≥ 0.75) and source records; people ingestion |
 | `router.ts` | **EnrichmentRouter** — cache → free internal (email patterns, MX) → value gate → providers by priority; budget check before each paid call; retries; fallback; cost event per call |
 | `providers/*` | Neutral contracts, `DemoProvider`, vendor stubs, registry + pricing, server-only secrets |
-| `costs.ts`, `freshness.ts` | Budgets, run limits, cost ledger, TTLs |
+| `costs.ts`, `freshness.ts` | Budgets, run limits, paid-operation reservations, cost ledger, TTLs |
 | `email.ts` | Syntax, pattern inference/application, MX via injectable resolver (no SMTP probing), status vocabulary |
 | `signals.ts` | Observed "why now" signals only, with expiry |
 | `scoring.ts` | Deterministic Fit/Timing/Priority (`asOf` param) + qualification rules |
@@ -127,9 +127,9 @@ Storage is a generic document envelope: Convex table `pf_<name>` with `pid`, `or
 **Platform tables** (`TABLE_NAMES`, mirrored in `convex/platformTables.ts` — keep identical): `users`, `memberships`, `sessions`, `organizations`, `bots`, `skill_assignments`, `runtimes`, `deployment_events`, `runs`, `run_events`, `conversations`, `activity_events`, `approvals`, `requests`, `automation_jobs`, `integrations`, `usage_rollups`, `provider_configurations`, `service_agreements`, `invoices`, `payments`, `billing_events`, `incidents`, `operator_notes`, `audit_logs`, `processed_webhooks`.
 
 **Prospect Graph tables:**
-* Shared (never an `orgId`): `pg_import_runs`, `pg_niches`, `pg_buyer_types`, `pg_relationships`, `pg_companies`, `pg_company_sources`, `pg_people`, `pg_company_people`, `pg_contact_points`, `pg_domain_intel`, `pg_signals`.
-* Private (always `orgId`): `pg_icps`, `pg_markets`, `pg_prospects`, `pg_jobs`, `pg_handoffs`, `pg_outcomes`.
-* Mixed (`orgId` optional; operator-only when absent): `pg_cost_events`, `pg_budgets`, `pg_suppressions`.
+* Shared (never an `orgId`): `pg_import_runs`, `pg_niches`, `pg_buyer_types`, `pg_relationships`, `pg_companies`, `pg_company_sources`, `pg_fact_claims`, `pg_company_merge_reviews`, `pg_people`, `pg_company_people`, `pg_contact_points`, `pg_domain_intel`, `pg_signals`.
+* Private (always `orgId`): `pg_icps`, `pg_markets`, `pg_prospects`, `pg_jobs`, `pg_market_builds`, `pg_handoffs`, `pg_outcomes`.
+* Mixed (`orgId` optional; operator-only when absent): `pg_paid_operations`, `pg_cost_events`, `pg_budgets`, `pg_suppressions`.
 
 Field-level detail: `docs/PROSPECTING_DATA_MODEL.md` and the type files.
 
@@ -218,7 +218,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 * Conversations: operator test entry point only; no client chat UI.
 * Vercel → AWS OIDC, Convex/Vercel production configuration, runtime health/version tracking: need real accounts.
 * Background sync: daily cron only on Vercel Hobby (`vercel.json`); every-minute needs Pro.
-* Prospecting: jobs run inline after enqueue (no background worker); CRM handoff queues only; outcomes recorded but no recalibration; discovery recipes beyond demo not executable; Bot tool endpoint works but token issuance to the runtime is not wired; ICP edit UI missing.
+* Prospecting: jobs run inline after enqueue (no background worker); CRM handoff queues only; outcomes recorded but no recalibration; discovery recipes beyond demo not executable; Bot tool endpoint works with runtime/org/Bot-scoped tokens but token issuance to the runtime is not wired; MarketBuild has records but no dedicated UI; ICP edit UI missing.
 
 ## 12. Stubs / placeholders
 
@@ -246,7 +246,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 ## 14. Architectural invariants
 
 * All storage goes through `Repository` (`ProspectGraphStore` for prospecting). Never call Convex directly from app code.
-* Every write is a `Tx` commit with version checks; append-only tables are never deleted.
+* Every write is a `Tx` commit with version checks; append-only tables are never deleted. Paid operations are mutable ledgers: reserve → running → settled/released/failed.
 * Every server action and route re-checks permissions; hidden UI is never the control.
 * AgenticBots ids are primary keys; runtime-side ids are opaque server-only mapping fields.
 * `TABLE_NAMES` (TS) and `PLATFORM_TABLES` (Convex) stay identical; `APPEND_ONLY` sets match (tested).
@@ -297,7 +297,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 1. **Verify locally and push**: run `npm run build`, `npm test`, `npm run test:e2e` on the owner's machine; fix anything; ask the owner before pushing `platform-v1`.
 2. **First AWS staging test** per `docs/runbooks/FIRST_STAGING_TEST.md` (owner supplies accounts; no apply without `ALLOW_CLOUD_CHANGES=1` and owner approval). Include `npx convex deploy` and `prospecting:seed:staging`.
 3. **Background job worker for prospecting**: run `pg_jobs` outside the request (Vercel cron route calling `runQueuedJobs`, guarded by `CRON_SECRET`); make server actions enqueue only.
-4. **Wire Prospecting Bot tool access**: issue short-lived tool tokens server-side to the Prospecting Bot's runtime profile (via the runtime facade, never exposing other secrets) and expose the 16 tools to the skill.
+4. **Wire Prospecting Bot tool access**: issue the existing runtime/org/Bot-scoped short-lived tool tokens server-side to the Prospecting Bot's runtime profile (via the runtime facade, never exposing other secrets) and expose the 16 tools to the skill.
 5. **First real data adapter, with approval**: implement one contact/verification vendor (from current docs, recorded-response contract test, configured price, client budget, small run), then one discovery source.
 
 ## 20. Read these first

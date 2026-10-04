@@ -1,7 +1,7 @@
 import "server-only";
 import type { BuyerType, Company, CompanyPerson, ContactPoint, Person, ProspectingJob, Provenance, Signal } from "@/lib/prospecting/types";
 import type { ProspectGraphStore } from "./store";
-import { BudgetBlocked, budgetsFor, checkSpend, recordCost, type SpendContext } from "./costs";
+import { BudgetBlocked, budgetsFor, checkSpend, markPaidOperationRunning, recordCost, reservePaidOperation, settlePaidOperation, type SpendContext } from "./costs";
 import { configuredPricing, providers as defaultProviderSet, type Pricing } from "./providers/registry";
 import { ProviderError, type AnyProvider, type DiscoveryPage, type DiscoveryQuery, type ProspectDataProvider, type ProviderCapability, type ProviderSet } from "./providers/types";
 import { ingestPeople } from "./companies";
@@ -80,6 +80,7 @@ export class EnrichmentRouter {
     list: P[],
     op: "discovery" | "enrichment" | "verification" | "research",
     run: (p: P) => Promise<T & { units: number }>,
+    targetKey: string,
     gate?: Gate,
   ): Promise<{ provider: P; value: T & { units: number } } | null> {
     const candidates = [...list].filter((p) => p.capabilities.includes(cap)).sort((a, b) => a.priority - b.priority);
@@ -100,19 +101,27 @@ export class EnrichmentRouter {
         continue;
       }
       // Throws BudgetBlocked — the caller stops; a budget is never "fallen through".
-      await checkSpend(this.o.store, this.o.now, this.o.spend, p.key, price, this.o.job);
+      const reserved = p.paid ? await reservePaidOperation(this.o.store, this.o.now, this.o.spend, { provider: p.key, capability: cap, operation: op, estimateUsd: price, job: this.o.job, targetKey, demo: p.demo }) : undefined;
+      if (reserved?.duplicate) {
+        this.log({ step: "skipped", provider: p.key, detail: `${cap}: duplicate paid operation already recorded; not buying again` });
+        continue;
+      }
+      if (!p.paid) await checkSpend(this.o.store, this.o.now, this.o.spend, p.key, price, this.o.job);
       for (let tryNo = 0; ; tryNo++) {
         try {
+          if (reserved) await markPaidOperationRunning(this.o.store, reserved.operation);
           const value = await run(p);
           const units = p.paid ? Math.max(1, value.units) : value.units;
-          await this.cost(p, op, units, price, true);
+          await this.cost(p, op, units, price, true, reserved?.operation.operationId);
+          if (reserved) await settlePaidOperation(this.o.store, reserved.operation, units * price, true);
           this.log({ step: "called", provider: p.key, detail: `${cap}: ok${price ? ` ($${(units * price).toFixed(4)})` : " ($0)"}` });
           return { provider: p, value };
         } catch (e) {
           if (e instanceof BudgetBlocked) throw e;
           const pe = e instanceof ProviderError ? e : new ProviderError(p.key, "bad_response", "Unexpected provider error.");
           if (pe.retryable && tryNo < retries) continue;
-          await this.cost(p, op, 0, price, false);
+          await this.cost(p, op, 0, price, false, reserved?.operation.operationId);
+          if (reserved) await settlePaidOperation(this.o.store, reserved.operation, 0, false, pe.message);
           this.log({ step: "failed", provider: p.key, detail: `${cap}: ${pe.kind.replace("_", " ")}` });
           if (!pe.fallthrough) return null;
           break;
@@ -122,10 +131,10 @@ export class EnrichmentRouter {
     return null;
   }
 
-  private async cost(p: AnyProvider, op: "discovery" | "enrichment" | "verification" | "research", units: number, unitCostUsd: number, success: boolean) {
+  private async cost(p: AnyProvider, op: "discovery" | "enrichment" | "verification" | "research", units: number, unitCostUsd: number, success: boolean, operationId?: string) {
     const tx = this.o.store.tx();
     const ev = recordCost(tx, {
-      orgId: this.o.spend.orgId, marketId: this.o.spend.marketId, jobId: this.o.spend.jobId, prospectId: this.o.spend.prospectId,
+      orgId: this.o.spend.orgId, marketBuildId: this.o.spend.marketBuildId, marketId: this.o.spend.marketId, jobId: this.o.spend.jobId, prospectId: this.o.spend.prospectId, operationId,
       provider: p.key, operation: op, units, unitCostUsd, pricingSource: p.paid ? "configured" : "free", success, demo: p.demo,
     });
     await tx.commit();
@@ -143,7 +152,8 @@ export class EnrichmentRouter {
    */
   async discoverCompanies(q: Omit<DiscoveryQuery, "cursor">, state: { cursorFor(provider: string): string | undefined; exhausted(provider: string): boolean }): Promise<{ provider: ProspectDataProvider; page: DiscoveryPage } | null> {
     const list = this.set.discovery.filter((p) => !state.exhausted(p.key));
-    const hit = await this.attempt("company_discovery", list, "discovery", (p) => p.discoverCompanies({ ...q, cursor: state.cursorFor(p.key) }));
+    const target = `${this.o.spend.marketId ?? "market"}:${q.buyerType.id}:${q.geography.kind}:${q.geography.name}:${q.geography.state}:${q.limit}`;
+    const hit = await this.attempt("company_discovery", list, "discovery", (p) => p.discoverCompanies({ ...q, cursor: state.cursorFor(p.key) }), target);
     return hit ? { provider: hit.provider, page: hit.value } : null;
   }
 
@@ -160,8 +170,12 @@ export class EnrichmentRouter {
       this.log({ step: "cache", detail: "research: fresh" });
       return { signals: await activeSignals(store, company.id, this.o.now), source: "cache" };
     }
-    const hit = await this.attempt("company_research", this.set.discovery.filter((p) => !!p.researchCompany), "research", (p) =>
-      p.researchCompany!({ name: company.canonicalName, domain: company.domain, city: company.locations[0]?.city, state: company.locations[0]?.state, buyerTags: buyer?.tags }),
+    const hit = await this.attempt(
+      "company_research",
+      this.set.discovery.filter((p) => !!p.researchCompany),
+      "research",
+      (p) => p.researchCompany!({ name: company.canonicalName, domain: company.domain, city: company.locations[0]?.city, state: company.locations[0]?.state, buyerTags: buyer?.tags }),
+      `company:${company.id}`,
     );
     if (!hit) return { signals: await activeSignals(store, company.id, this.o.now), source: "none" };
     const tx = store.tx();
@@ -195,7 +209,7 @@ export class EnrichmentRouter {
       return { people: cached, source: "cache" };
     }
     const hit = await this.attempt("people_search", this.set.contacts, "enrichment", (p) =>
-      p.findPeople({ name: company.canonicalName, domain: company.domain, city: company.locations[0]?.city, state: company.locations[0]?.state }, wanted.titles, limit), gate);
+      p.findPeople({ name: company.canonicalName, domain: company.domain, city: company.locations[0]?.city, state: company.locations[0]?.state }, wanted.titles, limit), `company:${company.id}:roles:${wanted.families.join(",")}:${limit}`, gate);
     if (!hit) return { people: [], source: "none" };
     const tx = store.tx();
     const rows = await ingestPeople(store, tx, company.id, hit.value.people, this.provenance(hit.provider, 0.75));
@@ -234,7 +248,7 @@ export class EnrichmentRouter {
         return { contact: await save(guess, "LIKELY_VALID", intel.patternConfidence ?? 0.7, "pattern", { provider: "native", observedAt: now, fetchedAt: now, confidence: intel.patternConfidence ?? 0.7, demo: person.demo }), source: "internal" };
       }
     }
-    const hit = await this.attempt("email_finding", this.set.contacts, "enrichment", (p) => p.findEmail(person, company.domain!), gate);
+    const hit = await this.attempt("email_finding", this.set.contacts, "enrichment", (p) => p.findEmail(person, company.domain!), `email:${company.id}:${person.id}`, gate);
     if (!hit || !hit.value.email || !isValidEmailSyntax(hit.value.email)) return { source: "none", reason: "No provider returned a usable address." };
     return { contact: await save(hit.value.email, hit.value.status, hit.value.confidence, "provider", this.provenance(hit.provider, hit.value.confidence)), source: "provider" };
   }
@@ -262,7 +276,7 @@ export class EnrichmentRouter {
       this.log({ step: "internal", detail: "verify: role address" });
       return { contact: await patchWith({ status: "RISKY" }), source: "internal" };
     }
-    const hit = await this.attempt("email_verification", this.set.verification, "verification", (p) => p.verify(cp.value), gate);
+    const hit = await this.attempt("email_verification", this.set.verification, "verification", (p) => p.verify(cp.value), `verify:${cp.id}:${cp.value}`, gate);
     if (!hit) return { contact: cp, source: "none" };
     const contact = await patchWith({ status: hit.value.status, verifiedAt: this.o.now.toISOString(), confidence: hit.value.status === "VERIFIED" ? 0.95 : cp.confidence });
     if (hit.value.catchAll) {

@@ -221,6 +221,7 @@ describe("Prospecting Bot tools", () => {
     const { pw, m } = await discovered();
     const principal = await botPrincipal(pw.r, pw.acmeBot.id, pw.acme.id);
     await expect(botPrincipal(pw.r, pw.acmeBot.id, pw.bayside.id)).rejects.toThrow();
+    await expect(botPrincipal(pw.r, pw.acmeBot.id, pw.acme.id, "wrong-runtime")).rejects.toThrow(/access|runtime/i);
     const seo = (await pw.r.list("bots")).find((b) => b.orgId === pw.acme.id && b.typeKey !== "prospecting")!;
     await expect(botPrincipal(pw.r, seo.id, pw.acme.id)).rejects.toThrow();
     const disabled = await addBot(pw, { status: "disabled" });
@@ -255,15 +256,17 @@ describe("Prospecting Bot tools", () => {
   it("tool tokens are signed, bound and expire", () => {
     process.env.PROSPECTING_TOOL_SECRET = "x".repeat(40);
     try {
-      const t = issueToolToken("bot1", "org1", 60, 1_000_000);
-      expect(verifyToolToken(t, 1_000_000)).toEqual({ botId: "bot1", orgId: "org1" });
+      const t = issueToolToken({ botId: "bot1", orgId: "org1", runtimeId: "rt1", ttlSeconds: 60, tokenId: "tok1" }, 1_000_000);
+      expect(verifyToolToken(t, 1_000_000)).toMatchObject({ botId: "bot1", orgId: "org1", runtimeId: "rt1", scopes: ["prospecting:tools"], tokenId: "tok1" });
       expect(() => verifyToolToken(t, 1_000_000 + 61_000)).toThrow(/expired/);
       const [payload, sig] = t.split(".");
-      const forged = Buffer.from(JSON.stringify({ b: "bot1", o: "org2", e: 9e9 })).toString("base64url");
+      const forged = Buffer.from(JSON.stringify({ v: 2, kid: "current", b: "bot1", o: "org2", r: "rt1", scp: ["prospecting:tools"], iat: 1, e: 9e9, jti: "tok1" })).toString("base64url");
       expect(() => verifyToolToken(`${forged}.${sig}`, 1_000_000)).toThrow(/Invalid/);
       expect(() => verifyToolToken(`${payload}.AAAA`, 1_000_000)).toThrow(/Invalid/);
+      const scopedOut = issueToolToken({ botId: "bot1", orgId: "org1", runtimeId: "rt1", scopes: ["other"], ttlSeconds: 60 }, 1_000_000);
+      expect(() => verifyToolToken(scopedOut, 1_000_000)).toThrow(/scope/);
       delete process.env.PROSPECTING_TOOL_SECRET;
-      expect(() => issueToolToken("b", "o")).toThrow(/not configured/);
+      expect(() => issueToolToken({ botId: "b", orgId: "o", runtimeId: "r" })).toThrow(/not configured/);
     } finally {
       delete process.env.PROSPECTING_TOOL_SECRET;
     }

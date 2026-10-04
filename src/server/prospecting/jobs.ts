@@ -1,5 +1,5 @@
 import "server-only";
-import type { BuyerType, Company, JobKind, Market, MarketSourceState, Prospect, ProspectingJob } from "@/lib/prospecting/types";
+import type { BuyerType, Company, JobKind, Market, MarketBuild, MarketSourceState, Prospect, ProspectingJob } from "@/lib/prospecting/types";
 import type { Repository } from "@/server/db/repository";
 import { assertExecutable, audit } from "@/server/services/common";
 import { correlationId } from "@/server/ids";
@@ -9,6 +9,7 @@ import { allowed, assertAllowed, getPrivate, principalRef, type Ctx } from "./ac
 import { BudgetBlocked, runLimitsFor } from "./costs";
 import { EnrichmentRouter, type Gate } from "./router";
 import { ingestCompany } from "./companies";
+import { policyForProvider } from "./data-policy";
 import { autoQualify, loadScoreInput, prospectId, rescore } from "./prospects";
 import { scoreProspect } from "./scoring";
 import { sendToOutbound } from "./outbound";
@@ -37,6 +38,37 @@ export interface RunOptions {
 /** Only prospects whose pre-contact fit clears this get paid enrichment. */
 export const ENRICH_PRELIM_MIN = 35;
 
+const ACTIVE_BUILD: MarketBuild["status"][] = ["draft", "planned", "approval_required", "discovering", "qualifying", "enriching", "refreshing", "paused"];
+
+async function ensureMarketBuild(ctx: Ctx, orgId: string, market: Market, kind: JobKind, maxBudgetUsd: number): Promise<MarketBuild> {
+  const existing = (await ctx.store.list("pg_market_builds", { orgId })).find((b) => b.marketId === market.id && ACTIVE_BUILD.includes(b.status));
+  if (existing) return existing;
+  const tx = ctx.store.tx();
+  const build = tx.insert("pg_market_builds", {
+    orgId,
+    marketId: market.id,
+    icpId: market.icpId,
+    nicheId: market.nicheId,
+    geography: market.geography,
+    buyerTypeIds: market.buyerTypeIds,
+    discoveryStrategy: market.discovery.map((s) => s.provider),
+    maxDataAcquisitionBudgetUsd: maxBudgetUsd,
+    companyDiscoveryCount: 0,
+    companyResearchCount: 0,
+    qualifiedCompanyCount: 0,
+    decisionMakersRequested: 0,
+    decisionMakersFound: 0,
+    contactsVerified: 0,
+    providerSpendUsd: 0,
+    coverageMethodology: market.universeEstimate?.methodology ?? "Observed provider/source coverage only; no invented TAM.",
+    status: kind === "REFRESH_MARKET" ? "refreshing" : "planned",
+    createdBy: principalRef(ctx.p).name,
+  });
+  audit(tx.audit, principalRef(ctx.p), { action: "prospecting.market_build.create", orgId, targetType: "market_build", targetId: build.id, correlationId: correlationId(), detail: market.name });
+  await tx.commit();
+  return build;
+}
+
 export async function enqueueJob(
   ctx: Ctx,
   orgId: string,
@@ -47,10 +79,11 @@ export async function enqueueJob(
   const org = await ctx.r.get("organizations", orgId);
   if (!org) throw notFound("Client");
   assertExecutable(org);
+  let market: Market | undefined;
   if (args.marketId) {
-    const m = await getPrivate(ctx.store, "pg_markets", args.marketId, ctx.p, "write_private");
-    if (m.orgId !== orgId) throw notFound();
-    if (m.status !== "active") throw invalid("This market is not active.");
+    market = await getPrivate(ctx.store, "pg_markets", args.marketId, ctx.p, "write_private");
+    if (market.orgId !== orgId) throw notFound();
+    if (market.status !== "active") throw invalid("This market is not active.");
   }
   if (args.prospectId) {
     const p = await getPrivate(ctx.store, "pg_prospects", args.prospectId, ctx.p, "write_private");
@@ -62,11 +95,14 @@ export async function enqueueJob(
   if (active) throw conflict("That job is already queued or running.");
   // A Bot can lower limits, never raise them above the budget.
   const limits = await runLimitsFor(ctx.store, orgId, args.marketId, args.limits);
+  const build = market && (kind === "DISCOVER_MARKET" || kind === "REFRESH_MARKET")
+    ? await ensureMarketBuild(ctx, orgId, market, kind, limits.maxSpendUsd)
+    : undefined;
   const who = principalRef(ctx.p);
   const tx = ctx.store.tx();
   const job = tx.insert("pg_jobs", {
     orgId, kind, marketId: args.marketId, prospectId: args.prospectId, status: "queued", progress: { done: 0, total: 0 },
-    params: args.params ?? {}, requestedBy: who.name, limits, paidCalls: 0, spendUsd: 0,
+    params: { ...(args.params ?? {}), ...(build ? { marketBuildId: build.id } : {}) }, requestedBy: who.name, limits, paidCalls: 0, spendUsd: 0,
   });
   audit(tx.audit, who, { action: "prospecting.job.enqueue", orgId, targetType: "prospecting_job", targetId: job.id, correlationId: correlationId(), detail: kind });
   await tx.commit();
@@ -137,7 +173,9 @@ export async function runJob(r: Repository, jobId: string, opts: RunOptions = {}
   }
   job = await save(store, jobId, { status: "running", startedAt: job.startedAt ?? now.toISOString(), error: undefined });
   const counters = { limits: job.limits, paidCalls: job.paidCalls, spendUsd: job.spendUsd };
-  const router = new EnrichmentRouter({ store, now, spend: { orgId: job.orgId, marketId: job.marketId, jobId: job.id, prospectId: job.prospectId }, job: counters, providers: opts.providers, pricing: opts.pricing, resolver: opts.resolver });
+  const marketBuildId = typeof job.params.marketBuildId === "string" ? job.params.marketBuildId : undefined;
+  if (marketBuildId) await patchMarketBuild(store, marketBuildId, { status: job.kind === "REFRESH_MARKET" ? "refreshing" : "discovering", startedAt: job.startedAt ?? now.toISOString() });
+  const router = new EnrichmentRouter({ store, now, spend: { orgId: job.orgId, marketBuildId, marketId: job.marketId, jobId: job.id, prospectId: job.prospectId }, job: counters, providers: opts.providers, pricing: opts.pricing, resolver: opts.resolver });
   const persistCounters = () => ({ paidCalls: counters.paidCalls, spendUsd: counters.spendUsd });
 
   try {
@@ -166,10 +204,12 @@ export async function runJob(r: Repository, jobId: string, opts: RunOptions = {}
         break;
     }
     if (await cancelled(store, jobId)) return save(store, jobId, persistCounters());
+    if (marketBuildId) await patchMarketBuildFromResult(store, marketBuildId, result, counters.spendUsd, "ready");
     return save(store, jobId, { ...persistCounters(), status: "completed", result, finishedAt: new Date().toISOString() });
   } catch (e) {
     if (e instanceof BudgetBlocked) {
       const paused = e.onLimit === "approval";
+      if (marketBuildId) await patchMarketBuild(store, marketBuildId, { status: paused ? "approval_required" : "failed", providerSpendUsd: counters.spendUsd, failureReason: paused ? e.message : e.message });
       return save(store, jobId, {
         ...persistCounters(),
         status: paused ? "paused" : "failed",
@@ -179,8 +219,27 @@ export async function runJob(r: Repository, jobId: string, opts: RunOptions = {}
       });
     }
     const msg = e instanceof Error ? e.message.slice(0, 300) : "Job failed.";
+    if (marketBuildId) await patchMarketBuild(store, marketBuildId, { status: "failed", providerSpendUsd: counters.spendUsd, failureReason: msg });
     return save(store, jobId, { ...persistCounters(), status: "failed", error: msg, finishedAt: new Date().toISOString() });
   }
+}
+
+async function patchMarketBuild(store: ProspectGraphStore, id: string, changes: Partial<MarketBuild>): Promise<void> {
+  const cur = await store.get("pg_market_builds", id);
+  if (!cur) return;
+  const tx = store.tx();
+  tx.patch("pg_market_builds", cur, changes);
+  await tx.commit();
+}
+
+async function patchMarketBuildFromResult(store: ProspectGraphStore, id: string, result: ProspectingJob["result"], spendUsd: number, status: MarketBuild["status"]): Promise<void> {
+  await patchMarketBuild(store, id, {
+    status,
+    companyDiscoveryCount: Number(result?.found ?? 0),
+    qualifiedCompanyCount: Number(result?.qualified ?? 0),
+    providerSpendUsd: spendUsd,
+    finishedAt: new Date().toISOString(),
+  });
 }
 
 /** The pipeline for one prospect: research → decision makers → email → verify → score → qualify. */
@@ -236,7 +295,17 @@ async function enrichProspect(store: ProspectGraphStore, router: EnrichmentRoute
     await tx.commit();
   }
   cur = await rescore(store, cur, now);
-  return autoQualify(store, cur);
+  const beforeStatus = cur.status;
+  const next = await autoQualify(store, cur);
+  if (!only || only === "ENRICH_CONTACT" || only === "VERIFY_CONTACT" || only === "FIND_DECISION_MAKERS") await appendOutcome(store, next, "enriched", now, `job:${only ?? "pipeline"}`);
+  if (beforeStatus !== "qualified" && next.status === "qualified") await appendOutcome(store, next, "qualified", now, "rules");
+  return next;
+}
+
+async function appendOutcome(store: ProspectGraphStore, p: Prospect, stage: "discovered" | "researched" | "qualified" | "enriched" | "verified", now: Date, sourceName: string): Promise<void> {
+  const tx = store.tx();
+  tx.insert("pg_outcomes", { orgId: p.orgId, prospectId: p.id, stage, source: "deterministic_worker", note: sourceName, occurredAt: now.toISOString() });
+  await tx.commit();
 }
 
 async function discoverMarket(store: ProspectGraphStore, job: ProspectingJob, router: EnrichmentRouter, now: Date): Promise<ProspectingJob["result"]> {
@@ -266,14 +335,16 @@ async function discoverMarket(store: ProspectGraphStore, job: ProspectingJob, ro
     let newHere = 0;
     for (const d of hit.page.companies) {
       const fetchedAt = now.toISOString();
-      const ing = await ingestCompany(store, tx, d, { provider: hit.provider.key, observedAt: fetchedAt, fetchedAt, confidence: d.confidence, demo: hit.provider.demo }, buyer, pending);
+      const ing = await ingestCompany(store, tx, d, { provider: hit.provider.key, observedAt: fetchedAt, fetchedAt, confidence: d.confidence, demo: hit.provider.demo }, buyer, pending, policyForProvider(hit.provider));
       if (ing.created) newHere++;
       const pid = prospectId(market.orgId, market.id, ing.company.id);
       if (!(await store.get("pg_prospects", pid)) && !touched.some((t) => t.id === pid)) {
-        touched.push(tx.insert("pg_prospects", {
+        const prospect = tx.insert("pg_prospects", {
           id: pid, orgId: market.orgId, marketId: market.id, companyId: ing.company.id, buyerTypeId: buyer.id, decisionMakerIds: [],
           status: "researching", whyNow: [], createdBy: `job:${job.kind}`, acquisitionCostUsd: 0,
-        }));
+        });
+        touched.push(prospect);
+        tx.insert("pg_outcomes", { orgId: prospect.orgId, prospectId: prospect.id, stage: "discovered", source: "deterministic_worker", note: `job:${job.kind}`, occurredAt: now.toISOString() });
         created++;
       }
       found++;
