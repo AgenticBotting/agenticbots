@@ -86,7 +86,7 @@ export interface MarketInput {
 export async function defaultBuyerTypes(ctx: Ctx, nicheId: string, icp?: ClientIcp): Promise<string[]> {
   const rels = (await ctx.store.list("pg_relationships", { where: { nicheId } }))
     .filter((x) => (x.status === "approved" || x.status === "auto_approved") && x.relationshipType !== "referral")
-    .sort((a, b) => a.priority - b.priority || b.confidence - a.confidence);
+    .sort((a, b) => a.priority - b.priority || b.confidence - a.confidence || a.buyerTypeId.localeCompare(b.buyerTypeId));
   let ids = rels.map((x) => x.buyerTypeId);
   if (icp) {
     ids = ids.filter((id) => !icp.excludedBuyerTypeIds.includes(id));

@@ -39,13 +39,18 @@ export class MemoryRepository implements Repository {
       try {
         const raw = JSON.parse(readFileSync(persistPath, "utf8")) as Record<string, Row[]>;
         for (const t of TABLE_NAMES) {
-          for (const row of raw[t] ?? []) this.store[t].set(row.id, row);
+          for (const row of raw[t] ?? []) this.tbl(t).set(row.id, row);
         }
       } catch {
         // A corrupt demo file is simply discarded; the seed runs again.
         this.store = emptyStore();
       }
     }
+  }
+
+  /** A table added after this store was created (dev hot-reload, older demo file) starts empty. */
+  private tbl(t: TableName): Map<string, Row> {
+    return (this.store[t] ??= new Map());
   }
 
   isEmpty(): boolean {
@@ -58,12 +63,12 @@ export class MemoryRepository implements Repository {
   }
 
   async get<K extends TableName>(table: K, id: string): Promise<Tables[K] | null> {
-    const row = this.store[table].get(id);
+    const row = this.tbl(table).get(id);
     return row ? (structuredClone(row) as unknown as Tables[K]) : null;
   }
 
   async list<K extends TableName>(table: K, q: ListQuery<Tables[K]> = {}): Promise<Tables[K][]> {
-    let rows = [...this.store[table].values()] as unknown as Tables[K][];
+    let rows = [...this.tbl(table).values()] as unknown as Tables[K][];
     if (q.orgId !== undefined) rows = rows.filter((r) => (r as { orgId?: string }).orgId === q.orgId);
     rows = rows.filter((r) => matches(r, q.where));
     rows = sortRows(rows as (Tables[K] & { createdAt: string })[], q.order);
@@ -78,7 +83,7 @@ export class MemoryRepository implements Repository {
     const current = (t: TableName, id: string): Row | undefined => {
       const k = key(t, id);
       if (staged.has(k)) return staged.get(k) ?? undefined;
-      return this.store[t].get(id);
+      return this.tbl(t).get(id);
     };
     for (const op of ops) {
       assertOpAllowed(op);
@@ -98,8 +103,8 @@ export class MemoryRepository implements Repository {
     }
     for (const [k, row] of staged) {
       const [t, id] = k.split("\u0000") as [TableName, string];
-      if (row === null) this.store[t].delete(id);
-      else this.store[t].set(id, row);
+      if (row === null) this.tbl(t).delete(id);
+      else this.tbl(t).set(id, row);
     }
     this.persist();
   }
@@ -128,7 +133,7 @@ export class MemoryRepository implements Repository {
     if (!this.persistPath) return;
     try {
       mkdirSync(dirname(this.persistPath), { recursive: true });
-      const out = Object.fromEntries(TABLE_NAMES.map((t) => [t, [...this.store[t].values()]]));
+      const out = Object.fromEntries(TABLE_NAMES.map((t) => [t, [...this.tbl(t).values()]]));
       writeFileSync(this.persistPath, JSON.stringify(out));
     } catch {
       // Read-only filesystems (serverless) keep state in memory only.

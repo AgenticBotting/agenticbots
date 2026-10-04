@@ -193,7 +193,8 @@ describe("jobs", () => {
     const companies = await pw.ops.store.list("pg_companies");
     expect(companies.every((c) => c.demo && c.canonicalName.startsWith("[Demo]") && c.domain?.endsWith(".example"))).toBe(true);
     const sources = await pw.ops.store.list("pg_company_sources");
-    expect(sources.length).toBe(companies.length);
+    // One company can have several source records (identity merges); every company has at least one.
+    expect(new Set(sources.map((s) => s.companyId))).toEqual(new Set(companies.map((c) => c.id)));
     expect(sources.every((s) => s.provenance.provider === "demo" && s.provenance.demo)).toBe(true);
     const prospects = await pw.ops.store.list("pg_prospects");
     expect(prospects.every((p) => p.score && p.score.version)).toBe(true);
