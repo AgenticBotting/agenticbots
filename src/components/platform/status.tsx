@@ -11,6 +11,8 @@ const TONES: Record<string, Tone> = {
   pending: "watch", waiting_for_approval: "watch", due: "watch", partially_paid: "watch", degraded: "watch", needs_attention: "watch",
   reviewing: "watch", waiting_on_client: "watch", submitted: "watch", onboarding: "watch", investigating: "watch", upcoming: "watch",
   sent: "watch", failing: "bad", paused: "quiet", medium: "watch", rotating: "watch",
+  intake_complete: "watch", analyzing: "live", review_required: "watch", client_action_required: "watch", ready_for_operator_approval: "watch",
+  ready_for_review: "watch", ready_to_provision: "good", not_ready: "quiet", budget_requires_configuration: "watch", operator_approval_required: "watch",
   failed: "bad", past_due: "bad", offline: "bad", suspended: "bad", error: "bad", interrupted: "bad", denied: "bad", down: "bad",
   open: "bad", critical: "bad", high: "bad", canceled: "bad", terminated: "bad", missing: "bad", declined: "quiet",
   disabled: "quiet", draft: "quiet", unknown: "quiet", stopped: "quiet", not_configured: "quiet", disconnected: "bad", none: "quiet",

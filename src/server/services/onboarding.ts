@@ -22,7 +22,7 @@ import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
 import { can } from "@/server/auth/policy";
 import { correlationId, nowIso } from "@/server/ids";
-import { conflict, notFound } from "@/server/errors";
+import { conflict, invalid, notFound } from "@/server/errors";
 import { audit, getOrgFor } from "@/server/services/common";
 import { ctxOf, asUser } from "@/server/prospecting/access";
 import { createIcp, createMarket, defaultBuyerTypes, validateGeography } from "@/server/prospecting/markets";
@@ -43,6 +43,87 @@ const EMPTY_INTAKE: OnboardingIntake = {
   exclusions: [],
   goals: [],
 };
+
+const STATE_NAMES: Record<string, string> = {
+  alabama: "AL", alaska: "AK", arizona: "AZ", arkansas: "AR", california: "CA", colorado: "CO", connecticut: "CT", delaware: "DE",
+  florida: "FL", georgia: "GA", hawaii: "HI", idaho: "ID", illinois: "IL", indiana: "IN", iowa: "IA", kansas: "KS", kentucky: "KY",
+  louisiana: "LA", maine: "ME", maryland: "MD", massachusetts: "MA", michigan: "MI", minnesota: "MN", mississippi: "MS", missouri: "MO",
+  montana: "MT", nebraska: "NE", nevada: "NV", "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY",
+  "north carolina": "NC", "north dakota": "ND", ohio: "OH", oklahoma: "OK", oregon: "OR", pennsylvania: "PA", "rhode island": "RI",
+  "south carolina": "SC", "south dakota": "SD", tennessee: "TN", texas: "TX", utah: "UT", vermont: "VT", virginia: "VA", washington: "WA",
+  "west virginia": "WV", wisconsin: "WI", wyoming: "WY", dc: "DC",
+};
+
+const STATE_ABBRS = new Set([...Object.values(STATE_NAMES), "DC"]);
+
+const TERRITORY_ALIASES: { pattern: RegExp; geography: Geography }[] = [
+  { pattern: /\bcolumbus(?:,\s*|\s+)(?:oh|ohio)\b|\bcolumbus\b.*\b(?:oh|ohio)\b/i, geography: { kind: "metro", name: "Columbus", state: "OH", radiusMiles: 45 } },
+  { pattern: /\btampa(?:,\s*|\s+)(?:fl|florida)\b|\btampa\b.*\b(?:fl|florida)\b/i, geography: { kind: "metro", name: "Tampa", state: "FL", radiusMiles: 50 } },
+  { pattern: /\bsouth florida\b/i, geography: { kind: "metro", name: "South Florida", state: "FL" } },
+  { pattern: /\bakron(?:,\s*|\s+)(?:oh|ohio)\b|\bakron\b.*\b(?:oh|ohio)\b/i, geography: { kind: "city", name: "Akron", state: "OH", radiusMiles: 20 } },
+];
+
+function addOnce<T>(set: Set<T>, value: T | undefined): void {
+  if (value !== undefined) set.add(value);
+}
+
+function detectServiceType(text: string): OnboardingIntake["serviceType"] | undefined {
+  if (/\bresidential[-\s]*only\b|\bhomeowners?\b|\bsingle[-\s]*family\b/i.test(text) && !/\bcommercial\b|\bindustrial\b|\bfacilit(y|ies)\b/i.test(text)) return "residential";
+  if (/\bcommercial\b|\bindustrial\b|\bfacilit(y|ies)\b|\bproperty managers?\b|\bmultifamily\b|\bschools?\b|\bmunicipal\b|\bgovernment\b/i.test(text)) return "commercial";
+  if (/\bresidential\b/i.test(text) && /\bcommercial\b/i.test(text)) return "mixed";
+  return undefined;
+}
+
+function detectGeographies(summary: string): Geography[] {
+  const found: Geography[] = [];
+  for (const alias of TERRITORY_ALIASES) if (alias.pattern.test(summary)) found.push(alias.geography);
+  const statePattern = Object.keys(STATE_NAMES).sort((a, b) => b.length - a.length).join("|");
+  const explicit = new RegExp(`\\b(?:in|near|around|serving|across)\\s+([A-Z][A-Za-z .'-]{1,40}?)(?:,\\s*|\\s+)(${statePattern}|[A-Z]{2})\\b`, "gi");
+  let match: RegExpExecArray | null;
+  while ((match = explicit.exec(summary)) !== null) {
+    const rawName = match[1].replace(/\b(and|for|with|serving)$/i, "").trim();
+    const rawState = match[2].trim();
+    const state = rawState.length === 2 ? rawState.toUpperCase() : STATE_NAMES[normalizeName(rawState)];
+    if (!rawName || !state || !STATE_ABBRS.has(state)) continue;
+    if (found.some((g) => normalizeName(g.name) === normalizeName(rawName) && g.state === state)) continue;
+    found.push({ kind: "metro", name: rawName, state });
+  }
+  return found.slice(0, 4);
+}
+
+export function intakeFromBusinessSummary(summary: string, overrides: Partial<OnboardingIntake> = {}): Partial<OnboardingIntake> {
+  const text = summary.trim();
+  if (!text) throw invalid("Enter a business summary.");
+  const hay = normalizeName(text);
+  const services = new Set<string>();
+  if (/roof|reroof|tpo|coating|leak repair/.test(hay)) addOnce(services, hay.includes("commercial") ? "commercial roofing" : "roofing");
+  if (/\bhvac\b|mechanical|chiller|rtu|air conditioning|refrigeration/.test(hay)) addOnce(services, hay.includes("commercial") ? "commercial HVAC" : "HVAC");
+  if (/asphalt|paving|sealcoat|striping|parking/.test(hay)) addOnce(services, "asphalt paving");
+  if (/review/.test(hay)) addOnce(services, "reviews");
+  const preferences = new Set<string>();
+  if (/property managers?/.test(hay)) preferences.add("property managers");
+  if (/schools?/.test(hay)) preferences.add("schools");
+  if (/industrial/.test(hay)) preferences.add("industrial buildings");
+  if (/multifamily|apartments?/.test(hay)) preferences.add("multifamily owners");
+  if (/facilit(y|ies)/.test(hay)) preferences.add("facilities teams");
+  if (/government|municipal|public sector/.test(hay)) preferences.add("government buyers");
+  if (/homeowners?/.test(hay)) preferences.add("homeowners");
+  const exclusions = new Set<string>();
+  if (/\bno residential\b|\bnot residential\b|\bexclude residential\b/.test(hay)) exclusions.add("residential");
+  if (/\bresidential[-\s]*only\b/.test(hay)) exclusions.add("commercial buyers");
+  const goals = new Set<string>();
+  if (/prospect|lead|outbound|market|tam|icp/.test(hay)) goals.add("build initial ICP and market plan");
+  return mergeIntake({
+    ...EMPTY_INTAKE,
+    description: text,
+    services: [...services],
+    serviceType: detectServiceType(text),
+    geographies: detectGeographies(text),
+    targetCustomerPreferences: [...preferences],
+    exclusions: [...exclusions],
+    goals: [...goals],
+  }, overrides);
+}
 
 function allowedForOnboarding(actor: Actor, orgId: string, write = false): boolean {
   return can(actor, write ? "ops.clients.manage" : "ops.view", orgId) || can(actor, write ? "portal.requests.create" : "portal.view", orgId);

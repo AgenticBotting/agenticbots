@@ -6,6 +6,7 @@ import type { Organization } from "@/lib/platform/types";
 import {
   compileOnboardingPlan,
   getClientOnboarding,
+  intakeFromBusinessSummary,
   recordOnboardingDecision,
   startClientOnboarding,
   updateOnboardingIntake,
@@ -39,6 +40,18 @@ async function addOrg(slug: string, name: string, industry: string, sellsTo?: Se
 }
 
 describe("client onboarding compiler", () => {
+  it("parses a simple sales-call sentence into explicit intake without inventing TAM or budget", () => {
+    const intake = intakeFromBusinessSummary("Commercial roofer in Columbus, Ohio selling maintenance and reroofs to property managers, schools, industrial buildings, and multifamily owners.");
+    expect(intake).toMatchObject({
+      serviceType: "commercial",
+      services: ["commercial roofing"],
+      geographies: [columbus],
+      targetCustomerPreferences: expect.arrayContaining(["property managers", "schools", "industrial buildings", "multifamily owners"]),
+    });
+    expect(intake.minimumOpportunityUsd).toBeUndefined();
+    expect(intake.implementationBudgetUsd).toBeUndefined();
+  });
+
   it("compiles a commercial roofing intake into ICP, MarketBuild, Bot stack and review-ready plan without external calls", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     const w = await addOrg("buckeye-roofing", "Buckeye Commercial Roofing", "Commercial roofing");
