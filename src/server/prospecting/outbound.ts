@@ -108,6 +108,7 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
     const handoff = tx.insert("pg_handoffs", {
       orgId: p.orgId, prospectId: p.id, contactPointId: contact?.id ?? "", provider: provider?.key ?? "none", status: "rejected_policy",
       payload, policyViolations: violations, requestedBy: who.name, demo: demoContact,
+      createdAt: ctx.now.toISOString(),
     });
     audit(tx.audit, who, { action: "prospecting.outbound.blocked", orgId: p.orgId, targetType: "prospect", targetId: p.id, result: "denied", correlationId: cid, detail: violations.join(" ") });
     await tx.commit();
@@ -129,6 +130,7 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
   const handoff = tx.insert("pg_handoffs", {
     orgId: p.orgId, prospectId: p.id, contactPointId: contact.id, provider: provider.key, status, payload, externalRef,
     policyViolations: reasons, requestedBy: who.name, demo: demoContact,
+    createdAt: ctx.now.toISOString(),
   });
   if (status === "accepted") tx.patch("pg_prospects", p, { status: "sent_to_outbound", nextAction: "In outbound sequence" });
   audit(tx.audit, who, { action: "prospecting.outbound.handoff", orgId: p.orgId, targetType: "prospect", targetId: p.id, result: status === "accepted" ? "success" : "failure", correlationId: cid, detail: status });
@@ -166,6 +168,7 @@ export async function sendToCRM(ctx: Ctx, prospectId: string): Promise<OutboundR
       reasons: p.whyNow.slice(0, 5), sequenceKey: "crm", marketName: market?.name ?? "",
     },
     policyViolations: violations, requestedBy: who.name, demo: !!company?.demo,
+    createdAt: ctx.now.toISOString(),
   });
   audit(tx.audit, who, { action: "prospecting.crm.queue", orgId: p.orgId, targetType: "prospect", targetId: p.id, result: violations.length ? "denied" : "success", correlationId: correlationId() });
   await tx.commit();
