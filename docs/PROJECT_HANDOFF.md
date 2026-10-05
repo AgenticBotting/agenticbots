@@ -8,11 +8,11 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 | | |
 |---|---|
-| Working branch | `platform-v1` (not merged; contains all of `homepage-simplify` and is 21 commits ahead of `main`, 0 behind) |
-| Latest commit | `e90d63e` — "Demo store: tolerate tables added after the store was created; deterministic market buyer order" (this handoff commit sits on top) |
+| Working branch | `platform-v1` (not merged; contains all of `homepage-simplify`; do not merge main from an agent task) |
+| Latest commit | See `git log -1 --oneline`; this branch now includes Production Data & Spend Hardening and the Client Onboarding Orchestrator work. |
 | `main` | `ea9847c` — the public marketing site (`origin/main`) |
 | Other branches | `homepage-simplify` (website simplification, merged into `platform-v1`), `backup/pre-author-rewrite` (safety copy, do not delete), `gh/main` (old throwaway history, ignore) |
-| Remote | GitHub `AgenticBotting/agenticbots` (private) via SSH alias `git@github-agenticbots:…`. **`platform-v1` has never been pushed.** Pushing is the owner's decision. |
+| Remote | GitHub `AgenticBotting/agenticbots` (private) via SSH alias `git@github-agenticbots:…`. Push only when Nick explicitly asks. |
 | Owner | Nick Thomson — not a software engineer. Wants plain-English explanations, no jargon questions, and to be told before anything irreversible, expensive or security-sensitive. |
 | Product | AgenticBots.dev: an implementation firm that **operates "Bots"** for contractors and local service businesses. Client-facing terms are **BOT, BOTS, BOT RUN, BOT ACTIVITY** — never "agents". |
 
@@ -124,7 +124,7 @@ Seed result: 341 niches (102 A / 133 B / 106 C), 137 buyer types, ~11,357 rule-p
 
 Storage is a generic document envelope: Convex table `pf_<name>` with `pid`, `orgId?`, `doc`, `version`, indexes `by_pid`, `by_org`. Rows share `Base` (`id`, `createdAt`, `updatedAt`, `version`). All writes go through `Tx` with optimistic `version` checks. Append-only tables (never deleted): `payments`, `billing_events`, `audit_logs`, `invoices`, `service_agreements`, `deployment_events`, `pg_import_runs`, `pg_cost_events`, `pg_outcomes`.
 
-**Platform tables** (`TABLE_NAMES`, mirrored in `convex/platformTables.ts` — keep identical): `users`, `memberships`, `sessions`, `organizations`, `bots`, `skill_assignments`, `runtimes`, `deployment_events`, `runs`, `run_events`, `conversations`, `activity_events`, `approvals`, `requests`, `automation_jobs`, `integrations`, `usage_rollups`, `provider_configurations`, `service_agreements`, `invoices`, `payments`, `billing_events`, `incidents`, `operator_notes`, `audit_logs`, `processed_webhooks`.
+**Platform tables** (`TABLE_NAMES`, mirrored in `convex/platformTables.ts` — keep identical): `users`, `memberships`, `sessions`, `organizations`, `client_onboardings`, `bots`, `skill_assignments`, `runtimes`, `deployment_events`, `runs`, `run_events`, `conversations`, `activity_events`, `approvals`, `requests`, `automation_jobs`, `integrations`, `usage_rollups`, `provider_configurations`, `service_agreements`, `invoices`, `payments`, `billing_events`, `incidents`, `operator_notes`, `audit_logs`, `processed_webhooks`.
 
 **Prospect Graph tables:**
 * Shared (never an `orgId`): `pg_import_runs`, `pg_niches`, `pg_buyer_types`, `pg_relationships`, `pg_companies`, `pg_company_sources`, `pg_fact_claims`, `pg_company_merge_reviews`, `pg_people`, `pg_company_people`, `pg_contact_points`, `pg_domain_intel`, `pg_signals`.
@@ -210,9 +210,11 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 * Manual billing with suspension/reactivation workflow (auto off by default).
 * Terraform staging/prod, SSM lifecycle document, OIDC control role, backups, provisioning CLI.
 * Prospect Graph V1 (see `docs/PROSPECTING_BUILD_STATUS.md` for the item-by-item list).
+* Client Onboarding Orchestrator V1 (`src/server/services/onboarding.ts`, `docs/ONBOARDING_ARCHITECTURE.md`): creates a draft client deployment plan from intake; classifies the business with the existing 341-niche ontology; creates actual private ICP, Market and MarketBuild draft records; recommends Bot stack, skills, integrations, approval policies and budget status; preserves manual operator decisions; stays deterministic and side-effect free.
 
 ## 11. Partial features
 
+* Onboarding has backend/domain coverage and tests, but no polished operator/client UI yet. It does not provision runtimes, connect OAuth, send email, call paid providers or approve spend. Future work should add review screens and the final human-approved provisioner.
 * Run progress events: engine delivers events once / expires after 5 minutes; status/results reconciled by polling.
 * Human approvals on a live engine: unproven (rarely triggered until write integrations exist).
 * Conversations: operator test entry point only; no client chat UI.

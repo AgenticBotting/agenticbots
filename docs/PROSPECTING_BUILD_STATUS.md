@@ -30,6 +30,7 @@ with a stated gap · **PLACEHOLDER** contract/stub only · **NOT IMPLEMENTED**.
 | CRM handoff | PARTIAL | Queues a `crm_queue` handoff; CRM Bot pickup not wired |
 | Feedback / outcomes | PARTIAL | Append-only lifecycle + outbound outcome history; no automatic recalibration |
 | MarketBuild object | PARTIAL | First-class build records attached to discovery/refresh jobs; no dedicated UI yet |
+| Onboarding-generated ICP/MarketBuild drafts | PARTIAL | `compileOnboardingPlan()` can create private ICPs, Markets and draft MarketBuilds from client intake; no dedicated review UI yet |
 | Jobs (queued/running/completed/failed/cancelled/paused, progress) | PARTIAL | Run inline after enqueue; no scheduled background worker yet |
 | Prospecting Bot tools (16) | COMPLETE | Authorization, zod args, normalized output |
 | Bot tool HTTP endpoint + signed tokens | PARTIAL | Runtime/org/Bot/scoped short-lived tokens; issuing tokens to the runtime is not wired |
@@ -44,5 +45,7 @@ with a stated gap · **PLACEHOLDER** contract/stub only · **NOT IMPLEMENTED**.
 
 ## Tests
 
-`tests/prospecting/` — ontology (11), router/jobs/email (13), security/policy
-(22). Full suite: 151 tests, all passing, plus `tsc` and ESLint clean.
+`tests/prospecting/` — ontology, router/jobs/email and security/policy.
+`tests/unit/onboarding.test.ts` covers deterministic onboarding compilation,
+reruns without duplicates, manual overrides, demo scenarios, tenant isolation,
+authorization, budget fail-closed behavior and no fabricated market totals.

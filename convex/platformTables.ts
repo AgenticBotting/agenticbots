@@ -12,7 +12,7 @@ export const PLATFORM_TABLES = [
   "users", "memberships", "sessions", "organizations", "bots", "skill_assignments",
   "runtimes", "deployment_events", "runs", "run_events", "conversations",
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",
-  "usage_rollups", "provider_configurations", "service_agreements", "invoices",
+  "client_onboardings", "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
   "processed_webhooks",
   // Prospect Graph

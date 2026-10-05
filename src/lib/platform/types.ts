@@ -10,7 +10,7 @@
  * projections in src/server/views.
  */
 import type { BotTypeKey, Capability, IntegrationKey } from "@/config/bot-catalog";
-import type { ProspectingTables } from "@/lib/prospecting/types";
+import type { Geography, ProspectingTables, RoleFamily, SellsTo } from "@/lib/prospecting/types";
 
 export type ID = string;
 export type ISODate = string;
@@ -395,6 +395,145 @@ export interface Integration extends Tenanted {
   webhookSecretRef?: string;
 }
 
+/* ───────────────────────────── Onboarding ─────────────────────────── */
+
+export type OnboardingStage =
+  | "draft"
+  | "intake_complete"
+  | "analyzing"
+  | "review_required"
+  | "client_action_required"
+  | "ready_for_operator_approval"
+  | "approved"
+  | "ready_to_provision"
+  | "provisioning"
+  | "active"
+  | "paused"
+  | "failed"
+  | "cancelled";
+
+export type OnboardingReadiness = "not_ready" | "ready_for_review" | "ready_to_provision" | "active" | "blocked";
+
+export interface OnboardingIntake {
+  businessName?: string;
+  website?: string;
+  description?: string;
+  services: string[];
+  serviceType?: "residential" | "commercial" | "industrial" | "government" | "mixed";
+  geographies: Geography[];
+  averageJobValueUsd?: number;
+  minimumOpportunityUsd?: number;
+  targetCustomerPreferences: string[];
+  existingCustomerTypes: string[];
+  exclusions: string[];
+  goals: string[];
+  implementationBudgetUsd?: number;
+}
+
+export interface OnboardingClassification {
+  primaryNicheId?: ID;
+  primaryNicheName?: string;
+  secondaryNicheIds: ID[];
+  category?: string;
+  sellsTo?: SellsTo;
+  confidence: number;
+  reviewRequired: boolean;
+  reasoning: string[];
+  verticalPackKey?: string;
+  verticalPackLabel?: string;
+  prospectabilityScore?: number;
+  clientFitScore?: number;
+}
+
+export interface OnboardingBotRecommendation {
+  botType: BotTypeKey;
+  status: "recommended" | "optional" | "not_recommended";
+  reasoning: string[];
+}
+
+export interface OnboardingIntegrationRequirement {
+  provider: IntegrationKey;
+  displayName: string;
+  requirement: "required" | "recommended" | "optional";
+  botTypes: BotTypeKey[];
+  clientAction: boolean;
+  reasoning: string[];
+}
+
+export interface OnboardingSkillPlan {
+  botType: BotTypeKey;
+  skillKey: string;
+  skillVersion: string;
+  status: "planned" | "incompatible";
+  reasoning: string;
+}
+
+export interface OnboardingApprovalPolicy {
+  action: ApprovalCategory | "analytics_read" | "seo_research" | "recommendation_generation" | "budget_increase" | "delete_data";
+  defaultPolicy: "automatic" | "approval_required" | "prohibited";
+  audience: "client" | "operator";
+  reasoning: string;
+}
+
+export interface OnboardingBudgetPlan {
+  status: "not_needed" | "budget_requires_configuration" | "operator_approval_required" | "approved";
+  proposedMaxUsd?: number;
+  reasoning: string[];
+  approvedBy?: ID;
+  approvedAt?: ISODate;
+}
+
+export interface OnboardingChecklistItem {
+  key: string;
+  label: string;
+  status: "open" | "done" | "blocked" | "not_needed";
+  owner: "client" | "operator" | "system";
+  blocking: boolean;
+  reason?: string;
+}
+
+export interface OnboardingDeploymentPlan {
+  runtime: { kind: "client_runtime"; region: string; status: "draft" | "ready" | "blocked" };
+  bots: { botType: BotTypeKey; runtimeProfile: string; status: "planned" | "optional" | "blocked"; skillKeys: string[]; integrationKeys: IntegrationKey[] }[];
+  integrations: OnboardingIntegrationRequirement[];
+  marketBuildIds: ID[];
+  providerConfiguration: { required: boolean; status: "configured" | "missing" };
+  notes: string[];
+}
+
+export interface OnboardingDecision {
+  key: string;
+  value: string | number | boolean | string[] | null;
+  decidedBy: ID;
+  decidedAt: ISODate;
+  note?: string;
+}
+
+export interface ClientOnboarding extends Tenanted {
+  stage: OnboardingStage;
+  readiness: OnboardingReadiness;
+  intake: OnboardingIntake;
+  classification?: OnboardingClassification;
+  recommendedBotStack: OnboardingBotRecommendation[];
+  recommendedIcpIds: ID[];
+  recommendedBuyerTypeIds: ID[];
+  recommendedDecisionMakerRoleFamilies: RoleFamily[];
+  recommendedMarkets: ID[];
+  marketBuildIds: ID[];
+  integrationRequirements: OnboardingIntegrationRequirement[];
+  skillPlan: OnboardingSkillPlan[];
+  approvalPolicies: OnboardingApprovalPolicy[];
+  budgetPlan: OnboardingBudgetPlan;
+  deploymentPlan?: OnboardingDeploymentPlan;
+  outstandingClientActions: OnboardingChecklistItem[];
+  outstandingOperatorActions: OnboardingChecklistItem[];
+  readinessBlockers: string[];
+  decisions: OnboardingDecision[];
+  compilerVersion: string;
+  lastCompiledAt?: ISODate;
+  completedAt?: ISODate;
+}
+
 /* ───────────────────────────── Usage ──────────────────────────────── */
 
 export interface UsageRollup extends Tenanted {
@@ -614,6 +753,7 @@ export interface Tables extends ProspectingTables {
   requests: WorkRequest;
   automation_jobs: AutomationJob;
   integrations: Integration;
+  client_onboardings: ClientOnboarding;
   usage_rollups: UsageRollup;
   provider_configurations: ProviderConfiguration;
   service_agreements: ServiceAgreement;
@@ -632,7 +772,7 @@ export const TABLE_NAMES: readonly TableName[] = [
   "users", "memberships", "sessions", "organizations", "bots", "skill_assignments",
   "runtimes", "deployment_events", "runs", "run_events", "conversations",
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",
-  "usage_rollups", "provider_configurations", "service_agreements", "invoices",
+  "client_onboardings", "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
   "processed_webhooks",
   // Prospect Graph (see src/lib/prospecting/types.ts)
