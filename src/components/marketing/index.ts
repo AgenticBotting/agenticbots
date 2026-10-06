@@ -37,4 +37,5 @@ export { BlogArchive } from "./BlogArchive";
 export { AuditForm } from "./AuditForm";
 export { LeakCalculator } from "./LeakCalculator";
 export { OfferVisual } from "./OfferVisual";
+export { OperatingTransition } from "./OperatingTransition";
 export { Window, LeadInbox, ActivityLog, StepScorecard, StepConnected, StepBooked, ServiceArea } from "./ProductUI";

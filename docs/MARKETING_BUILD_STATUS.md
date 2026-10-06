@@ -8,6 +8,12 @@ Homepage and national service-page language now targets established residential 
 
 Every national service page now uses a service-specific enterprise positioning record and adds a deployment profile covering best fit, operating model and authority. The services index adds a shared operating-standard record for existing systems, defined authority and reviewable operation. Illustrative portfolio metrics were replaced with mandate, authority and activity states. Security copy now reflects implemented tenant isolation, approval, audit and scope controls without making unsupported DPA, storage or certification claims.
 
+## Service-page visual refinement — 2026-10-06
+
+The services portfolio and all 13 national service pages now open with a dark, numbered editorial hero and a framed product-style operating view. Detail pages add a four-part page index plus a dedicated operating-transition section that maps fragmented current-state work to the managed BOT workflow. Section contrast now creates clear chapters across mandate, execution, scope, national delivery, governance and assessment content.
+
+The visual work remains UI- and CSS-driven: no stock photography, generated people or additional image requests. Large service numbers are decorative and hidden from assistive technology; anchored sections preserve sticky-header offsets; mobile layouts collapse profiles and transition rows into a readable sequence. Existing local SEO links and routes remain unchanged. Client-facing service copy now uses BOT terminology throughout.
+
 ## Public experience
 
 - Homepage rebuilt around a coordinated BOT workforce, code-rendered system visuals, a guided workflow, operating controls, delivery, pricing and a free audit.
@@ -47,6 +53,7 @@ The hero and residential/commercial sections use lightweight, code-rendered inte
 - Final production verification passed with `npm run build -- --webpack`, including prebuild and postbuild gates. 13,753 static outputs generated; internal-link and SEO checks passed across 13,707 prerendered pages plus 100 dynamic routes. Topic gate passed for 13 services, 521 indexable topic/scope pages and 26 redirects. The default compiler was blocked from binding its local CSS helper port; Webpack was used for the final build. Existing middleware deprecation, Edge dependency warnings and topic-coverage notes remain.
 - Revision validation passed `npm run typecheck`, `npm run lint` with zero errors, all 170 tests and the full Webpack production build. In-app browser automation could not reload localhost because the browser security layer rejected the navigation; no policy bypass was attempted.
 - Enterprise positioning validation passed `npm run typecheck`, `npm run lint` with zero errors, all 172 tests and the full Webpack production build. All 13,753 static outputs generated; link integrity, metadata uniqueness and topic gates passed.
+- Service-page visual refinement passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 172 tests, in-app full-page visual review, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
 
 ## Follow-on evidence work
 

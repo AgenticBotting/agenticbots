@@ -157,7 +157,7 @@ const MARKETING: Category[] = [
     faqs: [
       { q: "How long until I see movement?", a: "Technical fixes can show up in weeks. New content and authority typically take three to six months. Anyone promising page one in thirty days is selling something else." },
       { q: "Do you write the content or just brief it?", a: "Both. You choose. Some teams want briefs their own writers execute; most want the full draft delivered ready to review." },
-      { q: "Will the pages read like AI wrote them?", a: "They are drafted by agents and reviewed before publishing. Thin, generic pages hurt rankings, so the quality gate is the whole point." },
+      { q: "Will the pages read like AI wrote them?", a: "They are drafted by BOTS and reviewed before publishing. Thin, generic pages hurt rankings, so the quality gate is the whole point." },
     ],
   },
   {
@@ -473,7 +473,7 @@ const SALES: Category[] = [
     ],
     highlights: [
       { title: "Missed-call text-back", body: "A missed call gets an immediate text that starts qualifying — before your competitor's voicemail even picks up." },
-      { title: "Real conversation, not a decision tree", body: "The agent answers questions, asks the qualifying ones back, and knows when to hand off to a human instead of guessing." },
+      { title: "Real conversation, not a decision tree", body: "The BOT answers questions, asks the qualifying ones back, and knows when to hand off to a human instead of guessing." },
       { title: "Booked, not just captured", body: "Qualified leads land on your real calendar with service-area and buffer rules applied, not a generic scheduling link." },
       { title: "Scored on the way in", body: "Every lead ranked by fit and urgency so your team works the ones worth working first." },
     ],
@@ -699,7 +699,7 @@ export const CATALOG: Pillar[] = [
     menuBlurb: "Ads, search, content, social and email — run every day.",
     headline: "Bots that make people find you.",
     intro:
-      "Everything that fills the top of your funnel — ads, search, content, social, email and the pages they land on — run continuously by agents instead of sporadically by whoever has time.",
+      "Everything that fills the top of your funnel — ads, search, content, social, email and the pages they land on — operated continuously by specialized BOTS.",
     categories: MARKETING,
   },
   {
@@ -767,7 +767,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic PPC",
     hook: "Reviewed daily, not quarterly.",
     geoIntro:
-      "An ad account managed by an agent reads every search term, every day, and moves budget while the human agencies are preparing next month's slide deck. Same platforms, radically shorter feedback loop.",
+      "An ad account managed by a BOT reads every search term, every day, and moves budget while the human agencies are preparing next month's slide deck. Same platforms, radically shorter feedback loop.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Search-term review cadence", value: "daily" },
@@ -793,7 +793,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic SEO",
     hook: "Maintenance, not a one-time audit.",
     geoIntro:
-      "Rankings decay because nobody re-crawls, re-writes and re-links after the audit PDF lands. An agent runs the crawl on a schedule, fixes what broke, and closes coverage gaps while they are still cheap.",
+      "Rankings decay because nobody re-crawls, re-writes and re-links after the audit PDF lands. A BOT runs the crawl on a schedule, fixes what broke, and closes coverage gaps while they are still cheap.",
     implementationWeeks: 3,
     baseline: [
       { metric: "Technical crawl cadence", value: "weekly" },
@@ -819,7 +819,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Content Marketing",
     hook: "One idea, eight assets, every week.",
     geoIntro:
-      "Publishing dies the week the person who volunteered gets busy. An agent works a running calendar, cuts every source piece into the formats each channel wants, and holds the cadence whether or not anyone remembers it is Tuesday.",
+      "Publishing dies the week the person who volunteered gets busy. A BOT works a running calendar, cuts every source piece into the formats each channel wants, and holds the cadence whether or not anyone remembers it is Tuesday.",
     implementationWeeks: 3,
     baseline: [
       { metric: "Publishing cadence", value: "weekly" },
@@ -846,7 +846,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Email Marketing",
     hook: "The follow-up that never forgets.",
     geoIntro:
-      "Most revenue lost in email is not lost to bad copy, it is lost to sequences nobody ever built. An agent writes them, sends them, watches list health, and stops the moment a lead converts so nobody gets sold something they already bought.",
+      "Most revenue lost in email is not lost to bad copy, it is lost to sequences nobody ever built. A BOT writes them, sends them, watches list health, and stops the moment a lead converts so nobody gets sold something they already bought.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Quotes left unfollowed", value: "0" },
@@ -873,7 +873,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic CRO",
     hook: "The cheapest lead you already paid for.",
     geoIntro:
-      "You are already buying the traffic. An agent watches where those visitors hesitate, builds the test, runs it to significance, and ships the winner instead of leaving three years of opinions unresolved in a spreadsheet.",
+      "You are already buying the traffic. A BOT watches where those visitors hesitate, builds the test, runs it to significance, and ships the winner instead of leaving three years of opinions unresolved in a spreadsheet.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Session and heatmap capture", value: "always on" },
@@ -900,7 +900,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Marketing Analytics",
     hook: "One dashboard, not fifteen tabs.",
     geoIntro:
-      "Most owners have more reporting than they have answers. An agent wires the tracking once, reconciles the numbers that disagree, and writes the weekly summary in plain language so the next decision is obvious.",
+      "Most owners have more reporting than they have answers. A BOT wires the tracking once, reconciles the numbers that disagree, and writes the weekly summary in plain language so the next decision is obvious.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Dashboards to check", value: "1" },
@@ -927,7 +927,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Lead Generation",
     hook: "Stop selling to whoever answers.",
     geoIntro:
-      "A list nobody scrubbed is a list nobody should call. An agent builds the profile from your closed-won, finds the accounts that match it, verifies every contact, and watches for the triggers that make a cold account warm.",
+      "A list nobody scrubbed is a list nobody should call. A BOT builds the profile from your closed-won, finds the accounts that match it, verifies every contact, and watches for the triggers that make a cold account warm.",
     implementationWeeks: 3,
     baseline: [
       { metric: "Contact verification", value: "before outreach" },
@@ -954,7 +954,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Outbound SDR",
     hook: "The cadence nobody forgets to run.",
     geoIntro:
-      "Outbound does not fail on the first touch, it fails on the fifth that nobody sent. An agent runs the full multi-channel cadence, keeps the sending infrastructure healthy, and sorts the replies so a human only reads the ones worth answering.",
+      "Outbound does not fail on the first touch, it fails on the fifth that nobody sent. A BOT runs the full multi-channel cadence, keeps the sending infrastructure healthy, and sorts the replies so a human only reads the ones worth answering.",
     implementationWeeks: 3,
     baseline: [
       { metric: "Sequence steps actually sent", value: "every" },
@@ -981,7 +981,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Speed-to-Lead",
     hook: "Under a minute, any hour.",
     geoIntro:
-      "The first responder wins the job, and the decay is measured in minutes. An agent answers every call, form and chat within seconds, qualifies in real conversation, and books straight onto the calendar.",
+      "The first responder wins the job, and the decay is measured in minutes. A BOT answers every call, form and chat within seconds, qualifies in real conversation, and books straight onto the calendar.",
     implementationWeeks: 2,
     baseline: [
       { metric: "First response", value: "<60s" },
@@ -1007,7 +1007,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic CRM Automation",
     hook: "Records that update themselves.",
     geoIntro:
-      "A CRM nobody updates is a reporting liability you pay monthly for. An agent logs every call, email and meeting against the right record, advances stages on evidence, and merges the duplicates nobody has time for.",
+      "A CRM nobody updates is a reporting liability you pay monthly for. A BOT logs every call, email and meeting against the right record, advances stages on evidence, and merges the duplicates nobody has time for.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Activity logging", value: "automatic" },
@@ -1033,7 +1033,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Proposal Automation",
     hook: "The proposal that goes out today.",
     geoIntro:
-      "Most quotes lose to the calendar, not to the competitor. An agent assembles the proposal from live pricing the same day it is asked for, chases the signature, and keeps the answers your team needs current instead of two years stale.",
+      "Most quotes lose to the calendar, not to the competitor. A BOT assembles the proposal from live pricing the same day it is asked for, chases the signature, and keeps the answers your team needs current instead of two years stale.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Proposal turnaround", value: "same day" },
@@ -1060,7 +1060,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Review Generation",
     hook: "Every finished job, asked.",
     geoIntro:
-      "Local customers pick between three contractors by star rating and review count before they ever call. An agent asks every finished job for a Google review the same day, answers every review that lands, and routes unhappy customers to the owner before they post.",
+      "Local customers pick between three contractors by star rating and review count before they ever call. A BOT asks every finished job for a Google review the same day, answers every review that lands, and routes unhappy customers to the owner before they post.",
     implementationWeeks: 1,
     baseline: [
       { metric: "Review request timing", value: "same day" },
@@ -1086,7 +1086,7 @@ const SERVICE_META: Record<string, ServiceMeta> = {
     serviceName: "Agentic Customer Reactivation",
     hook: "Repeat work, no new leads.",
     geoIntro:
-      "The cheapest job a contractor books is from someone who already hired them. An agent works the customer list on a seasonal calendar, follows up on estimates that went quiet, and books the replies straight onto the schedule.",
+      "The cheapest job a contractor books is from someone who already hired them. A BOT works the customer list on a seasonal calendar, follows up on estimates that went quiet, and books the replies straight onto the schedule.",
     implementationWeeks: 2,
     baseline: [
       { metric: "Seasonal reminders", value: "automatic" },

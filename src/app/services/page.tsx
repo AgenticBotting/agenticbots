@@ -24,11 +24,12 @@ export default function ServicesIndex() {
         { name: "Services", path: "/services" },
       ])} />
       <Header />
-      <main>
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-14 sm:py-16">
-            <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
-              <div>
+      <main className="service-hub">
+        <section className="service-hero services-index-hero on-dark">
+          <Container className="service-hero-container">
+            <span className="service-hero-number" aria-hidden="true">13</span>
+            <div className="service-hero-grid">
+              <div className="service-hero-copy">
                 <p className="eyebrow mb-5">
                   Managed service portfolio <span className="eyebrow-dim">· {ALL_SERVICES.length} specialized BOTS · national delivery</span>
                 </p>
@@ -42,16 +43,22 @@ export default function ServicesIndex() {
                 </p>
                 <div className="mt-8"><PlanCta source="services-index" /></div>
               </div>
-              <BotFactory />
+              <div className="service-hero-visual">
+                <div className="service-hero-visual-head">
+                  <span>Managed BOT portfolio</span>
+                  <span>Illustrative activity</span>
+                </div>
+                <BotFactory />
+              </div>
             </div>
-            <dl className="mt-12 grid md:grid-cols-3 border border-[var(--border-strong)] bg-[var(--bg-alt)]">
+            <dl className="services-index-standards">
               {[
                 ["01 · Existing systems", "Deploy into the platforms and records your organization already controls."],
                 ["02 · Defined authority", "Document access, approval gates and exception handling before launch."],
                 ["03 · Reviewable operation", "Track activity, decisions and outcomes through a consistent management record."],
               ].map(([term, detail], index) => (
-                <div key={term} className={cn("p-5 sm:p-6", index > 0 && "border-t md:border-t-0 md:border-l border-[var(--border)]")}>
-                  <dt className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--accent-text)]">{term}</dt>
+                <div key={term} className={cn(index > 0 && "is-divided")}>
+                  <dt>{term}</dt>
                   <dd className="body-sm mt-3">{detail}</dd>
                 </div>
               ))}

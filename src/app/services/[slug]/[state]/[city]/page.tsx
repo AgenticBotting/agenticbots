@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
        pushed the longest combinations past the 70-char cap. */
     title: { absolute: `${svc.serviceName} Company in ${rec.city}, ${rec.state_abbr}` },
     description: ct
-      ? `${svc.serviceName} for ${ct.name} businesses — agent systems that run continuously across a ${fmt.format(ct.businessCount)}-business metro. First system live in ~${svc.implementationWeeks} weeks.`
+      ? `${svc.serviceName} for ${ct.name} businesses — BOT systems that run continuously across a ${fmt.format(ct.businessCount)}-business metro. First system live in ~${svc.implementationWeeks} weeks.`
       : `${svc.serviceName} for ${rec.city}, ${rec.state_abbr} businesses — ${svc.botName} runs continuously across the ${rec.metro} metro, live in ~${svc.implementationWeeks} weeks.`,
     alternates: { canonical: `/services/${slug}/${state}/${city}` },
     /* Structural markets stay out of the index until enriched —

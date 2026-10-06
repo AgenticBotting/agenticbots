@@ -1078,3 +1078,199 @@
   .workflow-customer { margin-bottom: 18px; }
   .workflow-footer-note { margin-top: 18px; }
 }
+
+/* ── National service pages ──────────────────────────────────────
+   Editorial hierarchy for a complex managed service: one dark opening,
+   one quiet page index and one explicit operating transition. */
+.service-hub { overflow: clip; }
+.service-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-ink-950);
+  border-bottom: 1px solid var(--color-ink-700);
+}
+.service-hero-container {
+  position: relative;
+  padding-block: clamp(54px, 6.5vw, 88px);
+}
+.service-hero-number {
+  position: absolute;
+  top: -58px;
+  right: -18px;
+  z-index: 0;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: clamp(160px, 22vw, 310px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.1em;
+  opacity: .035;
+  pointer-events: none;
+  user-select: none;
+}
+.service-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.03fr) minmax(420px, .97fr);
+  gap: clamp(42px, 6vw, 82px);
+  align-items: center;
+}
+.service-hero-copy { min-width: 0; }
+.service-hero-copy .eyebrow-dim { color: var(--color-ink-400); }
+.service-hero-copy > .display-lg { color: var(--color-accent-300) !important; }
+.service-profile {
+  margin-top: 30px;
+  border: 1px solid var(--color-ink-700);
+  background: var(--color-ink-900);
+}
+.service-profile-label {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--color-ink-700);
+  color: var(--color-ink-400);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.service-profile dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.service-profile dl > div { padding: 16px; border-right: 1px solid var(--color-ink-700); }
+.service-profile dl > div:last-child { border-right: 0; }
+.service-profile dt {
+  color: var(--color-accent-400);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.service-profile dd { margin-top: 8px; color: var(--color-ink-200); font-size: 12.5px; line-height: 1.45; }
+.service-hero .btn-outline { border-color: var(--color-ink-600); color: var(--color-ink-100); }
+.service-hero .btn-outline:hover { border-color: var(--color-ink-100); background: var(--color-ink-800); color: #FFFFFF; }
+.service-hero-visual {
+  position: relative;
+  min-width: 0;
+  padding: 0 0 16px 16px;
+  border-left: 1px solid var(--color-ink-700);
+  border-bottom: 1px solid var(--color-ink-700);
+}
+.service-hero-visual-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px 13px 0;
+  color: var(--color-ink-400);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.service-hero-visual-head span:first-child { color: var(--color-accent-400); }
+.service-hero-visual > figure { box-shadow: 18px 18px 0 var(--color-ink-800); }
+.services-index-standards {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: clamp(42px, 5vw, 66px);
+  border-top: 1px solid var(--color-ink-700);
+  border-bottom: 1px solid var(--color-ink-700);
+}
+.services-index-standards > div { padding: 23px 24px; }
+.services-index-standards > div.is-divided { border-left: 1px solid var(--color-ink-700); }
+.services-index-standards dt {
+  color: var(--color-accent-400);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.services-index-standards dd { color: var(--color-ink-300); }
+
+.service-spine { background: var(--background); border-bottom: 1px solid var(--border); }
+.service-spine .container-site { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.service-spine a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
+  transition: background-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
+}
+.service-spine a:first-child { border-left: 1px solid var(--border); }
+.service-spine a:hover { background: var(--bg-alt); color: var(--accent-text); }
+.service-spine a span { color: var(--accent-text); font-family: var(--font-mono); font-size: 10px; }
+.service-spine a strong { overflow: hidden; font-size: 12px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+
+.service-transition {
+  padding-block: clamp(72px, 8vw, 112px);
+  background: var(--color-ink-950);
+  border-bottom: 1px solid var(--color-ink-700);
+}
+.service-transition-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, .68fr) minmax(0, 1.32fr);
+  gap: clamp(50px, 8vw, 110px);
+  align-items: start;
+}
+.service-transition-heading { position: sticky; top: 152px; }
+.service-transition-heading .eyebrow { margin-bottom: 18px; }
+.service-transition-heading .body-lg { max-width: 40ch; margin-top: 22px; }
+.service-transition-rows { border-top: 1px solid var(--color-ink-600); }
+.service-transition-rows > li {
+  display: grid;
+  grid-template-columns: minmax(120px, .74fr) minmax(0, 1fr) 22px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding-block: 27px;
+  border-bottom: 1px solid var(--color-ink-700);
+}
+.service-transition-title { display: flex; align-items: baseline; gap: 10px; padding-top: 2px; }
+.service-transition-title span,
+.service-transition-state > span {
+  color: var(--color-ink-400);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.service-transition-title span { color: var(--color-accent-400); }
+.service-transition-title strong { color: var(--color-ink-100); font-size: 13px; font-weight: 550; line-height: 1.35; }
+.service-transition-state p { margin-top: 9px; color: var(--color-ink-300); font-size: 12.5px; line-height: 1.55; }
+.service-transition-state.is-managed > span { color: var(--color-accent-400); }
+.service-transition-state.is-managed p { color: var(--color-ink-100); }
+.service-transition-arrow { width: 16px; height: 16px; margin-top: 25px; color: var(--color-accent-400); }
+
+@media (max-width: 1023px) {
+  .service-hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .service-hero-copy { max-width: 760px; }
+  .service-hero-visual { max-width: 760px; }
+  .service-transition-layout { grid-template-columns: minmax(0, 1fr); gap: 42px; }
+  .service-transition-heading { position: static; max-width: 680px; }
+}
+@media (max-width: 639px) {
+  .service-hero-container { padding-block: 44px 50px; }
+  .service-hero-number { top: -10px; right: 4px; font-size: 130px; }
+  .service-hero-grid { gap: 38px; }
+  .service-profile dl { grid-template-columns: minmax(0, 1fr); }
+  .service-profile dl > div { border-right: 0; border-bottom: 1px solid var(--color-ink-700); }
+  .service-profile dl > div:last-child { border-bottom: 0; }
+  .service-hero-visual { padding: 0 0 10px 10px; }
+  .service-hero-visual-head { align-items: start; padding-bottom: 10px; font-size: 8.5px; }
+  .service-hero-visual > figure { box-shadow: 10px 10px 0 var(--color-ink-800); }
+  .services-index-standards { grid-template-columns: minmax(0, 1fr); }
+  .services-index-standards > div { padding: 19px 0; }
+  .services-index-standards > div.is-divided { border-left: 0; border-top: 1px solid var(--color-ink-700); }
+  .service-spine .container-site { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .service-spine a { padding: 14px 10px; border-bottom: 1px solid var(--border); }
+  .service-spine a:nth-child(odd) { border-left: 1px solid var(--border); }
+  .service-spine a strong { font-size: 10.5px; }
+  .service-transition { padding-block: 68px; }
+  .service-transition-rows > li { grid-template-columns: 28px minmax(0, 1fr); gap: 12px 14px; padding-block: 25px; }
+  .service-transition-title { grid-column: 1 / -1; }
+  .service-transition-state { grid-column: 2; }
+  .service-transition-state.is-current { grid-row: 2; }
+  .service-transition-arrow { grid-column: 1; grid-row: 3; margin: 2px 0 0; transform: rotate(90deg); }
+  .service-transition-state.is-managed { grid-column: 2; grid-row: 3; }
+}

@@ -7,7 +7,7 @@ import { Container, Section } from "@/components/ui";
 import { ArrowRight } from "lucide-react";
 import {
   AuditForm, PlanCta, FaqAccordion, SecurityBlock, ActivityLog,
-  StackStrip, StatSplit, FeatureTriad, ZigZag, TaskConveyor, OfferVisual,
+  StackStrip, StatSplit, FeatureTriad, TaskConveyor, OfferVisual, OperatingTransition,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState } from "@/lib/geo/data";
@@ -62,12 +62,13 @@ export default async function ServiceHub({ params }: Params) {
         faqLd(svc.faqs),
       ]} />
       <Header />
-      <main>
+      <main className="service-hub">
         {/* ── Hero: promise left, the bot's console right. ── */}
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-14 sm:py-16">
-            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
-              <div>
+        <section className="service-hero on-dark">
+          <Container className="service-hero-container">
+            <span className="service-hero-number" aria-hidden="true">{svc.index}</span>
+            <div className="service-hero-grid">
+              <div className="service-hero-copy">
                 <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· managed BOT deployment</span></p>
                 <h1 className="display-hero max-w-[20ch] text-balance">{renderHeadline(positioning.headline)}</h1>
                 <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{positioning.subhead}</p>
@@ -76,12 +77,12 @@ export default async function ServiceHub({ params }: Params) {
                     of them is the doorway pattern the gate exists to stop. */}
                 <p className="body-lg mt-5 max-w-[54ch]">{positioning.lead}</p>
                 {offer && (
-                  <div className="mt-7 border border-[var(--border-strong)] bg-[var(--bg-alt)]">
-                    <p className="px-4 py-2.5 border-b border-[var(--border)] mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">Deployment profile</p>
-                    <dl className="grid sm:grid-cols-3">
-                      <div className="p-4 sm:border-r border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Best fit</dt><dd className="mt-2 text-[12.5px] leading-snug">{offer.bestFor}</dd></div>
-                      <div className="p-4 sm:border-r border-t sm:border-t-0 border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Operating model</dt><dd className="mt-2 text-[12.5px] leading-snug">Managed deployment in your existing systems</dd></div>
-                      <div className="p-4 border-t sm:border-t-0 border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Authority</dt><dd className="mt-2 text-[12.5px] leading-snug">Scoped access and defined approval gates</dd></div>
+                  <div className="service-profile">
+                    <p className="service-profile-label">Deployment profile</p>
+                    <dl>
+                      <div><dt>Best fit</dt><dd>{offer.bestFor}</dd></div>
+                      <div><dt>Operating model</dt><dd>Managed deployment in your existing systems</dd></div>
+                      <div><dt>Authority</dt><dd>Scoped access and defined approval gates</dd></div>
                     </dl>
                   </div>
                 )}
@@ -97,14 +98,37 @@ export default async function ServiceHub({ params }: Params) {
                 <p className="body-sm mt-5">No-cost workflow assessment. Initial findings within two business days.</p>
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
-              <OfferVisual slug={svc.slug} />
+              <div className="service-hero-visual">
+                <div className="service-hero-visual-head">
+                  <span>BOT {svc.index}</span>
+                  <span>Illustrative operating view</span>
+                </div>
+                <OfferVisual slug={svc.slug} />
+              </div>
             </div>
           </Container>
         </section>
 
         <StackStrip tools={offer?.tools} label={`${svc.botName} plugs into`} />
 
+        <nav className="service-spine" aria-label="On this service page">
+          <Container>
+            {[
+              ["01", "Mandate", "#mandate"],
+              ["02", "Execution", "#execution"],
+              ["03", "Scope and controls", "#included"],
+              ["04", "National delivery", "#coverage"],
+            ].map(([index, label, target]) => (
+              <a key={target} href={target}>
+                <span>{index}</span>
+                <strong>{label}</strong>
+              </a>
+            ))}
+          </Container>
+        </nav>
+
         <Section
+          id="mandate"
           variant="alt"
           size="sm"
           eyebrow={`${svc.botName} · operating mandate`}
@@ -120,7 +144,7 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* How it runs: the offer's own story on the left, its factory (or
             proof chart) on the right. */}
-        <Section variant="light">
+        <Section id="execution" variant="light">
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
             <div>
               <p className="eyebrow mb-4">Execution model</p>
@@ -146,12 +170,9 @@ export default async function ServiceHub({ params }: Params) {
           </div>
         </Section>
 
-        <ZigZag
-          eyebrow="Operating transition"
-          heading={<>From fragmented execution to <span className="em-green">a controlled workflow.</span></>}
+        <OperatingTransition
           botName={svc.botName}
           rows={svc.contrast.map((c, i) => ({
-            label: `${svc.botName} · ${svc.highlights[i]?.title ?? svc.serviceName}`,
             title: svc.highlights[i]?.title ?? svc.serviceName,
             today: c.today,
             after: c.after,
@@ -189,7 +210,7 @@ export default async function ServiceHub({ params }: Params) {
         </div>
 
         {pairs.length > 0 && (
-          <Section variant="alt" size="sm" eyebrow="Adjacent capabilities" heading={`Extend the operating model after ${svc.botName} is stable.`}>
+          <Section variant="light" size="sm" eyebrow="Adjacent capabilities" heading={`Extend the operating model after ${svc.botName} is stable.`}>
             <ul className="grid sm:grid-cols-3 gap-3">
               {pairs.map((c) => (
                 <li key={c.slug} className="flex">
@@ -206,7 +227,8 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* ── Markets: region columns, focus metros first. ── */}
         <Section
-          variant="light"
+          id="coverage"
+          variant="alt"
           eyebrow="National delivery"
           heading={`${svc.serviceName}, informed by local market context.`}
           sub="Focus metros include a detailed local market view. Every deployment uses the same governed operating model inside the systems your organization already controls."

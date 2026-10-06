@@ -10,6 +10,8 @@ The premium managed-workforce marketing pass is implemented locally on `platform
 
 The homepage and national service pages now use enterprise operating language for established contractors, typically above $2M in annual revenue. Each national service page has service-specific positioning plus a deployment profile for fit, operating model and authority. The service index adds a shared operating-standard record. Global marketing CTAs now request a workflow assessment, and unsupported security/procurement claims were removed from the service-page governance section.
 
+The services portfolio and all 13 national service pages now use a stronger editorial visual hierarchy: a dark numbered hero, UI-only operating views, restrained structural framing, and a clear section index. Service detail pages add a dedicated dark operating-transition block that compares the current and managed states without stock imagery or invented proof. Section surfaces now alternate intentionally so the long pages scan as distinct chapters. Client-facing service copy uses BOT terminology throughout. The implementation adds no image requests and keeps the existing local SEO route and link structure intact.
+
 ## 1. Where things are
 
 | | |
