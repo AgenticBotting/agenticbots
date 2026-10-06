@@ -107,8 +107,8 @@ Geist 600 display / Geist body / Geist Mono micro-labels · zero radius, diagona
 
 ## Managed workforce marketing pass — 2026-10-06
 
-The homepage, pricing, About and How it works retain Geist and the olive/near-black identity. Section structure uses open columns, editorial photography, restrained bordered records and clear deliverables rather than repeated promotional cards. Growth receives a quiet accent line; no unsupported popularity badge.
+The homepage, pricing, About and How it works retain Geist and the olive/near-black identity. Section structure uses open columns, code-rendered workflow interfaces, restrained bordered records and clear deliverables rather than repeated promotional cards. Growth receives a quiet accent line; no unsupported popularity badge.
 
 New scoped classes in `globals.css`: `workforce-*`, `hero-*`, `story-*`, `workflow-*`, `system-*`, `governance-*`, `audience-*`, `delivery-*`, `pricing-*`, `founding-note`, `coverage-*`. Overlay and shadow tokens derive from existing ink colors.
 
-The workflow stage is sticky on desktop, with compact spacing below 800 px viewport height. On mobile it becomes a static manual walkthrough. Entrance motion uses opacity/transform only; reduced motion disables it and automatic chapter progression. Photography stays still. All examples are visibly illustrative; no decorative infinite BOT motion on the rebuilt core pages.
+The workflow stage is sticky on desktop, with compact spacing below 800 px viewport height. All scenes share one stable grid track so chapter changes cannot resize the stage. A narrow center observer advances one chapter at a time. On mobile it becomes a static manual walkthrough. Scene and interface motion uses opacity/transform only; reduced motion disables it and automatic chapter progression. All examples are visibly illustrative.

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, CheckCheck, Fingerprint, Layers3, Settings2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, Fingerprint, Layers3, Settings2, ShieldCheck } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container } from "@/components/ui/Container";
@@ -9,6 +8,7 @@ import { AuditForm } from "@/components/marketing/AuditForm";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { BotWorkflowStory } from "@/components/marketing/BotWorkflowStory";
 import { PricingCards } from "@/components/marketing/PricingCards";
+import { CoverageSystemVisual, HeroSystemVisual } from "@/components/marketing/WorkforceSystemVisuals";
 import { AUDIT_OFFER, formatPlanPrice, MARKETING_PLANS } from "@/config/marketing-offer";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
 
@@ -26,7 +26,7 @@ const HOME_FAQ = [
   { q: "Do I have to replace my current tools?", a: "We start with the tools you already use. The audit identifies which connections are needed, and the proposal confirms what can be integrated before the build begins." },
   { q: "How quickly can we start?", a: `The initial ${AUDIT_OFFER.name} comes back within ${AUDIT_OFFER.turnaround}. Build and launch timing depends on the workflow, account access and integration requirements; we confirm it in your proposal.` },
   { q: "Can BOTS send or change things without me?", a: "Sending messages, publishing, changing ads and writing to connected systems require human approval. BOTS can prepare work and surface recommendations; your team makes the approval decisions." },
-  { q: "Are the examples on this page real client results?", a: "No. The workflow is an illustrative demonstration with a fictional account, and the photography is generated editorial imagery. We are developing our first client case studies and do not present demonstrations as measured results." },
+  { q: "Are the examples on this page real client results?", a: "No. The workflow and interface visuals are illustrative demonstrations with a fictional account. We are developing our first client case studies and do not present demonstrations as measured results." },
 ];
 
 function Hero() {
@@ -42,11 +42,7 @@ function Hero() {
             <p className="body-sm mt-5">Start with one workflow. Expand into a connected system.</p>
             <div className="hero-service-signals"><span><Layers3 size={15} /> Built around your tools</span><span><ShieldCheck size={15} /> Human approvals</span><span><Settings2 size={15} /> Managed continuously</span></div>
           </div>
-          <figure className="hero-editorial">
-            <div className="hero-image"><Image src="/media/residential-workforce.webp" alt="Illustrative residential roofing crew inspecting a house roof" fill preload sizes="(max-width: 1023px) 100vw, 50vw" className="object-cover" /></div>
-            <div className="hero-image-caption"><span>On the job. Still connected.</span><span>Generated editorial image</span></div>
-            <div className="hero-handoff" aria-label="Illustrative BOT handoff"><div className="hero-handoff-icon"><CheckCheck size={22} /></div><div><p>One enquiry. A connected workflow.</p><span>Prepare → approve → follow through</span></div><span className="hero-handoff-label">Example</span></div>
-          </figure>
+          <HeroSystemVisual />
         </div>
       </Container>
       <div className="hero-bottom-strip"><Container><p>One BOT → Growth System → Enterprise</p><Link href="/pricing">Setup from {formatPlanPrice(entry.setup)} · {formatPlanPrice(entry.monthly)}/month <ArrowRight size={15} /></Link></Container></div>
@@ -73,7 +69,7 @@ function Governance() {
 }
 
 function WhoFor() {
-  return <section className="section-pad border-b border-[var(--border)]"><Container><div className="audience-layout"><figure className="audience-editorial"><div className="audience-image"><Image src="/media/commercial-workforce.webp" alt="Illustrative commercial contractor reviewing site plans" fill sizes="(max-width: 1023px) 100vw, 50vw" className="object-cover" /></div><figcaption className="body-xs mt-3">Generated editorial image · illustrative scene</figcaption></figure><div><p className="eyebrow mb-5">Residential &amp; commercial</p><h2 className="display-xl max-w-[18ch]">Keep your pipeline moving while you run the business.</h2><p className="body-lg mt-6 max-w-[43ch]">For contractors with real work to deliver—and business processes that need more attention than the day allows.</p><div className="audience-trades"><div><h3 className="display-md">Residential service businesses</h3><p className="body-sm mt-2">Roofing · HVAC · plumbing · electrical · remodeling</p></div><div><h3 className="display-md">Commercial contractors</h3><p className="body-sm mt-2">General contractors · specialty trades · facilities services</p></div></div><a href="#audit" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Find the workflow worth starting with <ArrowRight size={16} /></a></div></div></Container></section>;
+  return <section className="section-pad border-b border-[var(--border)]"><Container><div className="audience-layout"><CoverageSystemVisual /><div><p className="eyebrow mb-5">Residential &amp; commercial</p><h2 className="display-xl max-w-[18ch]">Keep your pipeline moving while you run the business.</h2><p className="body-lg mt-6 max-w-[43ch]">For contractors with real work to deliver—and business processes that need more attention than the day allows.</p><div className="audience-trades"><div><h3 className="display-md">Residential service businesses</h3><p className="body-sm mt-2">Roofing · HVAC · plumbing · electrical · remodeling</p></div><div><h3 className="display-md">Commercial contractors</h3><p className="body-sm mt-2">General contractors · specialty trades · facilities services</p></div></div><a href="#audit" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Find the workflow worth starting with <ArrowRight size={16} /></a></div></div></Container></section>;
 }
 
 function Delivery() {

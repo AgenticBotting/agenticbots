@@ -6,7 +6,7 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ## Latest marketing update — 2026-10-06
 
-The premium managed-workforce marketing pass is implemented locally on `platform-v1`. Homepage, pricing, About and How it works are rebuilt; direct service mega navigation, illustrative editorial imagery, scroll/manual BOT workflow, and shared tier pricing are in place. One BOT is $7,500 + $2,500/month; Growth starts at $15,000 + $3,500/month for 3–5 BOTS, with expansion to ten scoped separately; Enterprise is custom. The free BOT opportunity audit promises initial recommendations in two business days. No engine benchmarks are presented as our results. No deployment or push occurred. Details and validation: `docs/MARKETING_BUILD_STATUS.md`; imagery: `docs/ASSET-BRIEF.md`.
+The premium managed-workforce marketing pass is implemented locally on `platform-v1`. Homepage, pricing, About and How it works are rebuilt; direct service mega navigation, lightweight code-rendered system visuals, a stable scroll/manual BOT workflow, and shared tier pricing are in place. The scrollytelling stage keeps one constant layout frame and advances through a narrow viewport-center trigger. One BOT is $7,500 + $2,500/month; Growth starts at $15,000 + $3,500/month for 3–5 BOTS, with expansion to ten scoped separately; Enterprise is custom. The free BOT opportunity audit promises initial recommendations in two business days. No engine benchmarks are presented as our results. No deployment or push occurred. Details and validation: `docs/MARKETING_BUILD_STATUS.md`; visual direction: `docs/ASSET-BRIEF.md`.
 
 ## 1. Where things are
 

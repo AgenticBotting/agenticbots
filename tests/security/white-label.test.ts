@@ -19,6 +19,7 @@ const CLIENT_SOURCES = [
   "src/app/about/page.tsx",
   "src/app/how-it-works/page.tsx",
   "src/components/marketing/BotWorkflowStory.tsx",
+  "src/components/marketing/WorkforceSystemVisuals.tsx",
   "src/components/marketing/PricingCards.tsx",
   "src/components/marketing/AuditForm.tsx",
   "src/config/marketing-offer.ts",
