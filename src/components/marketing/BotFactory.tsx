@@ -32,9 +32,9 @@ export function BotFactory({
       crumb={place}
       rows={rows}
       summary={[
-        { label: "Leads answered", value: "100%" },
-        { label: "Median reply", value: "38s" },
-        { label: "Actions today", value: "212" },
+        { label: "Mandate", value: "Defined" },
+        { label: "Authority", value: "Scoped" },
+        { label: "Activity", value: "Recorded" },
       ]}
     />
   );

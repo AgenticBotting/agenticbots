@@ -126,7 +126,7 @@ export function Footer() {
             </p>
           </div>
           <Link href="/#audit" className="btn btn-primary shrink-0">
-            Get your free audit
+            Request a workflow assessment
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

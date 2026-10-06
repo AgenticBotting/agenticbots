@@ -2,6 +2,12 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Enterprise positioning refinement — 2026-10-06
+
+Homepage and national service-page language now targets established residential and commercial contractors, typically above $2M in annual revenue. The core vocabulary is operating mandate, managed deployment, authority, governance, reviewable activity and coordinated revenue lifecycle. Consumer-style phrases such as “autopilot,” “not one idle” and “different week” were removed from the primary experience.
+
+Every national service page now uses a service-specific enterprise positioning record and adds a deployment profile covering best fit, operating model and authority. The services index adds a shared operating-standard record for existing systems, defined authority and reviewable operation. Illustrative portfolio metrics were replaced with mandate, authority and activity states. Security copy now reflects implemented tenant isolation, approval, audit and scope controls without making unsupported DPA, storage or certification claims.
+
 ## Public experience
 
 - Homepage rebuilt around a coordinated BOT workforce, code-rendered system visuals, a guided workflow, operating controls, delivery, pricing and a free audit.
@@ -35,11 +41,12 @@ The hero and residential/commercial sections use lightweight, code-rendered inte
 ## Validation
 
 - `npm run typecheck` passed. `npm run lint` passed with zero errors. `npm test` passed.
-- Latest complete test run: 23 files, 170 tests passed, including workflow decision/reset, code-rendered visual and public price/scope rendering coverage.
+- Latest complete test run: 24 files, 172 tests passed, including workflow decision/reset, code-rendered visual, enterprise service-positioning coverage and public price/scope rendering coverage.
 - Lint: zero errors; five existing warnings (four generated Convex directives and one BlogArchive image warning).
 - Browser QA from the original pass: homepage at 320, 390, 1024 and 1280 px; pricing at 390 px; no horizontal overflow at tested sizes. Mobile region → state navigation works; Florida hub retains 66 city destinations. Manual approval, skipped approval, reset, form required-field validation and browser error checks exercised without submitting a real lead. The stable scrollytelling and code-rendered visual revision is rechecked below.
 - Final production verification passed with `npm run build -- --webpack`, including prebuild and postbuild gates. 13,753 static outputs generated; internal-link and SEO checks passed across 13,707 prerendered pages plus 100 dynamic routes. Topic gate passed for 13 services, 521 indexable topic/scope pages and 26 redirects. The default compiler was blocked from binding its local CSS helper port; Webpack was used for the final build. Existing middleware deprecation, Edge dependency warnings and topic-coverage notes remain.
 - Revision validation passed `npm run typecheck`, `npm run lint` with zero errors, all 170 tests and the full Webpack production build. In-app browser automation could not reload localhost because the browser security layer rejected the navigation; no policy bypass was attempted.
+- Enterprise positioning validation passed `npm run typecheck`, `npm run lint` with zero errors, all 172 tests and the full Webpack production build. All 13,753 static outputs generated; link integrity, metadata uniqueness and topic gates passed.
 
 ## Follow-on evidence work
 

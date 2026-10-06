@@ -16,6 +16,7 @@ import { groupByRegion } from "@/lib/geo/regions";
 import { ALL_SERVICES, ALL_CATEGORIES, getService, serviceHref } from "@/lib/catalog";
 import { getOffer } from "@/lib/offers";
 import { renderHeadline } from "@/lib/headline";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -27,11 +28,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const svc = getService(slug);
   if (!svc) return {};
+  const positioning = getServicePositioning(svc.slug);
   return {
     /* absolute: the " | AgenticBots" suffix costs 14 of the 70 chars
        seo-checks allows, and the longest city label needs them. */
     title: { absolute: `${svc.serviceName} — ${svc.botName} | AgenticBots` },
-    description: svc.blurb,
+    description: positioning.summary,
     alternates: { canonical: `/services/${svc.serviceSlug}` },
   };
 }
@@ -43,6 +45,7 @@ export default async function ServiceHub({ params }: Params) {
   const regions = groupByRegion(ALL_STATES);
   const href = `/services/${svc.serviceSlug}`;
   const offer = getOffer(svc.slug);
+  const positioning = getServicePositioning(svc.slug);
   const pairs = (offer?.pairs ?? [])
     .map((sl) => ALL_CATEGORIES.find((c) => c.slug === sl))
     .filter((c): c is NonNullable<typeof c> => !!c);
@@ -65,17 +68,22 @@ export default async function ServiceHub({ params }: Params) {
           <Container className="py-14 sm:py-16">
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
               <div>
-                <p className="eyebrow mb-5">{svc.botName} <span className="eyebrow-dim">· {svc.name.toLowerCase()} for contractors</span></p>
-                <h1 className="display-hero max-w-[20ch] text-balance">{renderHeadline(svc.headline)}</h1>
-                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
+                <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· managed BOT deployment</span></p>
+                <h1 className="display-hero max-w-[20ch] text-balance">{renderHeadline(positioning.headline)}</h1>
+                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{positioning.subhead}</p>
                 {/* The national lede. `geoIntro` is deliberately held back for
                     the state and city pages — reusing one paragraph across 924
                     of them is the doorway pattern the gate exists to stop. */}
-                <p className="body-lg mt-5 max-w-[52ch]">{svc.intro}</p>
+                <p className="body-lg mt-5 max-w-[54ch]">{positioning.lead}</p>
                 {offer && (
-                  <p className="mt-5 inline-flex items-center gap-2 border border-[var(--border)] bg-[var(--bg-alt)] px-3 py-1.5 text-[13px] text-[var(--text-secondary)]">
-                    <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--accent-text)]">Best for</span> {offer.bestFor}
-                  </p>
+                  <div className="mt-7 border border-[var(--border-strong)] bg-[var(--bg-alt)]">
+                    <p className="px-4 py-2.5 border-b border-[var(--border)] mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">Deployment profile</p>
+                    <dl className="grid sm:grid-cols-3">
+                      <div className="p-4 sm:border-r border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Best fit</dt><dd className="mt-2 text-[12.5px] leading-snug">{offer.bestFor}</dd></div>
+                      <div className="p-4 sm:border-r border-t sm:border-t-0 border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Operating model</dt><dd className="mt-2 text-[12.5px] leading-snug">Managed deployment in your existing systems</dd></div>
+                      <div className="p-4 border-t sm:border-t-0 border-[var(--border)]"><dt className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Authority</dt><dd className="mt-2 text-[12.5px] leading-snug">Scoped access and defined approval gates</dd></div>
+                    </dl>
+                  </div>
                 )}
                 <div className="mt-8 cta-row">
                   <PlanCta source={`service-${svc.serviceSlug}`} />
@@ -86,7 +94,7 @@ export default async function ServiceHub({ params }: Params) {
                     <span className="hidden sm:inline">See everything included</span>
                   </Link>
                 </div>
-                <p className="body-sm mt-5">Free audit of your lead flow. Initial recommendations in two business days.</p>
+                <p className="body-sm mt-5">No-cost workflow assessment. Initial findings within two business days.</p>
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
               <OfferVisual slug={svc.slug} />
@@ -99,8 +107,8 @@ export default async function ServiceHub({ params }: Params) {
         <Section
           variant="alt"
           size="sm"
-          eyebrow={`${svc.botName} · what it runs`}
-          heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+          eyebrow={`${svc.botName} · operating mandate`}
+          heading={<>A defined scope, <span className="em-green">executed continuously.</span></>}
         >
           {/* The belts bleed past the container gutters on purpose, but the
               chips run far wider than the viewport — without clipping here the
@@ -115,11 +123,11 @@ export default async function ServiceHub({ params }: Params) {
         <Section variant="light">
           <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
             <div>
-              <p className="eyebrow mb-4">{offer?.signature.eyebrow ?? "How it runs"}</p>
+              <p className="eyebrow mb-4">Execution model</p>
               <h2 className="display-xl text-balance">
-                {offer?.signature.heading ?? svc.serviceName} <span className="em-green">{offer?.signature.accent}</span>
+                From signal to recorded action, <span className="em-green">within one operating loop.</span>
               </h2>
-              <p className="body-lg mt-5 max-w-[46ch]">{offer?.signature.sub ?? svc.outcome}</p>
+              <p className="body-lg mt-5 max-w-[48ch]">{positioning.execution}</p>
               <ol className="mt-8 border-t border-[var(--border)]">
                 {svc.stations.map((st, i) => (
                   <li key={st.label} className="grid grid-cols-[32px_1fr] gap-3 py-3 border-b border-[var(--border)]">
@@ -139,8 +147,8 @@ export default async function ServiceHub({ params }: Params) {
         </Section>
 
         <ZigZag
-          eyebrow="What changes"
-          heading={<>Same business. <span className="em-green">Different week.</span></>}
+          eyebrow="Operating transition"
+          heading={<>From fragmented execution to <span className="em-green">a controlled workflow.</span></>}
           botName={svc.botName}
           rows={svc.contrast.map((c, i) => ({
             label: `${svc.botName} · ${svc.highlights[i]?.title ?? svc.serviceName}`,
@@ -153,22 +161,22 @@ export default async function ServiceHub({ params }: Params) {
         {/* Metrics come from the record rather than baseline, so the numbers
             the category page used to show survive its retirement. */}
         <StatSplit
-          eyebrow="The complete system"
-          heading={<>{svc.serviceName}, run for you — <span className="em-green">end to end.</span></>}
-          body={`${svc.outcome} ${svc.botName} runs the whole loop — built, monitored and tuned continuously, inside the accounts you already own. You stay the owner of every account and every result.`}
+          eyebrow="Managed capability"
+          heading={<>{svc.serviceName}, delivered as <span className="em-green">an operating system.</span></>}
+          body={`We define the mandate, configure ${svc.botName}, establish the required controls and operate the workflow inside the systems your organization already owns.`}
           stats={[
             { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
             ...svc.metrics.slice(0, 3),
           ]}
           source={`service-${svc.serviceSlug}-statsplit`}
-          note="No per-seat pricing. No percentage of ad spend. No lock-in."
+          note="Engagement scope, approval rules, operating cadence and commercial terms are documented before launch."
         />
 
         <div id="included" className="scroll-mt-[92px] lg:scroll-mt-[136px]">
           <FeatureTriad
-            eyebrow={`${svc.capabilities.length} capabilities`}
-            heading={<>Everything under the hood, <span className="em-green">handled.</span></>}
-            sub="The work an agency does monthly and a bot does continuously. Not billed per line item."
+            eyebrow={`${svc.capabilities.length} defined capabilities`}
+            heading={<>Scope, controls and <span className="em-green">operating detail.</span></>}
+            sub="Each capability is assigned to a workflow, authority model and review process before it enters production."
             items={svc.highlights.slice(0, 3).map((h, i) => ({
               index: `0${i + 1}`,
               title: h.title,
@@ -181,7 +189,7 @@ export default async function ServiceHub({ params }: Params) {
         </div>
 
         {pairs.length > 0 && (
-          <Section variant="alt" size="sm" eyebrow="Pairs well with" heading={`What to add once ${svc.botName} is running.`}>
+          <Section variant="alt" size="sm" eyebrow="Adjacent capabilities" heading={`Extend the operating model after ${svc.botName} is stable.`}>
             <ul className="grid sm:grid-cols-3 gap-3">
               {pairs.map((c) => (
                 <li key={c.slug} className="flex">
@@ -199,9 +207,9 @@ export default async function ServiceHub({ params }: Params) {
         {/* ── Markets: region columns, focus metros first. ── */}
         <Section
           variant="light"
-          eyebrow="Markets"
-          heading={`${svc.serviceName}, anywhere in the country.`}
-          sub="Our focus metros carry a full local market read; every other US market deploys the same way — remotely, into the tools you already use."
+          eyebrow="National delivery"
+          heading={`${svc.serviceName}, informed by local market context.`}
+          sub="Focus metros include a detailed local market view. Every deployment uses the same governed operating model inside the systems your organization already controls."
         >
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-8">
             {regions.map(({ region, states }) => (
@@ -246,7 +254,7 @@ export default async function ServiceHub({ params }: Params) {
 
         {/* The full FAQ set — the local template used to show only three
             because the category page carried the rest. It no longer does. */}
-        <Section variant="alt" eyebrow="Questions" heading={`${svc.serviceName}, specifically.`}>
+        <Section variant="alt" eyebrow="Procurement and operations" heading={`${svc.serviceName}, in practical terms.`}>
           <div className="max-w-[760px]"><FaqAccordion items={svc.faqs} /></div>
         </Section>
 
@@ -254,10 +262,10 @@ export default async function ServiceHub({ params }: Params) {
           <Container>
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <div>
-                <p className="eyebrow mb-4">Free BOT opportunity audit</p>
-                <h2 className="display-xl text-balance">See what {svc.botName} would fix in your business.</h2>
+                <p className="eyebrow mb-4">Workflow assessment</p>
+                <h2 className="display-xl text-balance">Define the business case for {svc.botName}.</h2>
                 <p className="body-lg mt-5 max-w-[46ch]">
-                  We review your public customer journey and identify where {svc.name.toLowerCase()} fits into a useful BOT workflow. Initial recommendations within two business days, free and yours to keep.
+                  We review the relevant customer journey, operating constraints and systems to determine whether {svc.name.toLowerCase()} supports a credible managed workflow. Initial findings arrive within two business days.
                 </p>
               </div>
               <AuditForm source={`service-${svc.serviceSlug}-form`} focus={svc.botName} />

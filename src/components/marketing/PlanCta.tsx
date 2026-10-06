@@ -6,12 +6,12 @@ import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /**
- * The primary CTA: the free BOT opportunity audit. Scrolls to the page's own
- * audit form when there is one, otherwise goes to the homepage form.
+ * The primary CTA: the BOT workflow assessment. Scrolls to the page's own
+ * assessment form when there is one, otherwise goes to the homepage form.
  */
 export function PlanCta({
   source,
-  label = "Get your free audit",
+  label = "Request a workflow assessment",
   variant = "primary",
   className,
 }: {

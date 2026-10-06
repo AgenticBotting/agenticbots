@@ -312,7 +312,7 @@ export function Header() {
             <MegaFooter
               onAct={closeMenu}
               label="Don't see your market?"
-              text="We work with contractors anywhere in the US. Start with the free audit and we’ll map a useful starting workflow for your business."
+              text="We deliver managed BOT systems for established contractors across the US. Start with a workflow assessment to define the operating case."
             />
           </MegaPanel>
         )}
@@ -438,7 +438,7 @@ export function Header() {
               onClick={closeMobile}
               className="btn btn-primary w-full"
             >
-              Get your free audit
+              Request an assessment
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -523,7 +523,7 @@ function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string;
       <div className="max-w-[52ch]">
         <p className="mb-1.5 eyebrow">{label ?? "Not sure which one you need?"}</p>
         <p className="text-[13.5px] leading-relaxed text-[var(--text-secondary)]">
-          {text ?? "Tell us what is getting stuck. The free BOT opportunity audit comes back within two business days."}
+          {text ?? "Share the operating process that needs attention. Initial workflow findings arrive within two business days."}
         </p>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
@@ -531,7 +531,7 @@ function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string;
           How it works
         </Link>
         <Link href="/#audit" onClick={onAct} className="btn btn-primary">
-          Get your free audit
+          Request an assessment
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

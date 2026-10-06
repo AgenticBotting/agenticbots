@@ -24,6 +24,7 @@ const CLIENT_SOURCES = [
   "src/components/marketing/AuditForm.tsx",
   "src/config/marketing-offer.ts",
   "src/lib/marketing/workflow-example.ts",
+  "src/lib/service-positioning.ts",
   "src/app/portal",
   "src/components/platform/portal.tsx",
   "src/components/platform/RequestBox.tsx",

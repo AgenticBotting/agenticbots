@@ -3,8 +3,8 @@ import { BOT_VIEWBOX, BOT_BODY_PATH, BOT_EYE_PATHS } from "@/components/ui/BotFa
 import { ALL_SERVICES, serviceHref } from "@/lib/catalog";
 
 /**
- * The fleet, all at once — a status-board view of all thirteen bots
- * running simultaneously, rather than a diagram of how one of them works.
+ * The portfolio, all at once — a status-board view of all thirteen BOT
+ * capabilities, rather than a claim that a real client system is running.
  * `SignalFlow` explains the loop; this is what it looks like turned on.
  *
  * Every animation is CSS-only and desynced by a per-index negative delay
@@ -18,7 +18,7 @@ export function FleetSwarm() {
   return (
     <ul
       className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-px bg-[var(--border)] border border-[var(--border)]"
-      aria-label="All thirteen agentic bots, running"
+      aria-label="All thirteen managed BOT capabilities"
     >
       {ALL_SERVICES.map((s, i) => (
         <li key={s.serviceSlug} className="flex">
@@ -43,7 +43,7 @@ export function FleetSwarm() {
                   aria-hidden="true"
                 />
                 <span className="mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
-                  Running
+                  Managed
                 </span>
               </span>
             </div>

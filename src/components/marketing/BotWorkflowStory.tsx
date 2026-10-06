@@ -25,26 +25,26 @@ import {
 const CHAPTERS = [
   {
     name: "Receive",
-    title: "A new enquiry. A clear next step.",
-    copy: "A missed call or form starts a workflow. The BOT brings the details together so your team can act without hunting through inboxes.",
+    title: "Capture every qualified signal.",
+    copy: "A call or form enters one governed workflow. The BOT consolidates the relevant details and establishes ownership without relying on manual inbox review.",
     icon: PhoneMissed,
   },
   {
     name: "Prepare",
-    title: "The context travels with the work.",
-    copy: "Service area, the customer's request and your process shape the proposed response. The next BOT picks up the context instead of starting over.",
+    title: "Assemble the operating context.",
+    copy: "Service area, customer requirements and internal policy shape the proposed response. Context moves with the workflow across every BOT handoff.",
     icon: MessageSquare,
   },
   {
     name: "Approve",
-    title: "The important decisions stay yours.",
-    copy: "The proposed reply and appointment wait for approval. Your team reviews what will happen before anything is sent or written to a connected system.",
+    title: "Keep authority with your team.",
+    copy: "The proposed communication and appointment pause at a defined authorization gate before any external message or system update occurs.",
     icon: ShieldCheck,
   },
   {
     name: "Record",
-    title: "You can see what happened.",
-    copy: "The workflow records the decision and next steps in BOT ACTIVITY. You get a clear account of the work, including what is still waiting on a person.",
+    title: "Maintain a reviewable record.",
+    copy: "BOT ACTIVITY records the decision, next step and current owner so management can review completed work, exceptions and pending approvals.",
     icon: ClipboardCheck,
   },
 ] as const;
@@ -129,11 +129,11 @@ export function BotWorkflowStory() {
       <Container>
         <div className="story-heading">
           <div>
-            <p className="eyebrow mb-4">One workflow. Connected BOTS.</p>
-            <h2 className="display-xl max-w-[20ch]">Watch the work<br />move forward.</h2>
+            <p className="eyebrow mb-4">A governed operating workflow</p>
+            <h2 className="display-xl max-w-[20ch]">See the operating<br />model in motion.</h2>
           </div>
           <p className="body-lg max-w-[43ch]">
-            From the first enquiry to an approved next step. Each BOT has a role. Your business has the control.
+            One enquiry moves through defined roles, authorization gates and activity records. Each BOT has a mandate; your organization retains control.
           </p>
         </div>
 

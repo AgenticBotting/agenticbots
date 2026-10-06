@@ -13,7 +13,7 @@ describe("public pricing offer", () => {
     expect(html).toContain("initial system of 3–5 specialized BOTS");
     expect(html).toContain("ten BOTS are not included at the starting retainer");
     expect(html).toContain("third-party usage charges are separate");
-    expect(html).toContain("Custom BOTS. Custom capacity.");
+    expect(html).toContain("Custom architecture, BOT count and operating capacity.");
   });
 
   it("routes all plan enquiries to the audit on the page displaying the offer", () => {

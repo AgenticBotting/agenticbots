@@ -6,11 +6,13 @@ import { Container, Section, BotIndex } from "@/components/ui";
 import { PlanCta, BotFactory, SignalFlow, FleetSwarm } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
+import { getServicePositioning } from "@/lib/service-positioning";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Every agentic service we run",
+  title: "Managed BOT services for established contractors",
   description:
-    "Thirteen agentic services across demand creation and revenue capture — each one a bot that runs continuously inside the tools you already pay for.",
+    "Thirteen managed BOT capabilities across demand generation, revenue operations and customer lifecycle workflows.",
   alternates: { canonical: "/services" },
 };
 
@@ -28,20 +30,32 @@ export default function ServicesIndex() {
             <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
               <div>
                 <p className="eyebrow mb-5">
-                  Services <span className="eyebrow-dim">· {ALL_SERVICES.length} bots · every US market</span>
+                  Managed service portfolio <span className="eyebrow-dim">· {ALL_SERVICES.length} specialized BOTS · national delivery</span>
                 </p>
                 <h1 className="display-hero max-w-[20ch] text-balance">
-                  One bot per job. <span className="em-green">All of them running.</span>
+                  A managed BOT for every critical <span className="em-green">revenue workflow.</span>
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">
-                  Most businesses need two or three of these, not thirteen. Every one deploys
-                  remotely into the accounts you already own, and you stay the owner of every
-                  result.
+                  Deploy one priority workflow or coordinate a multi-BOT operating system.
+                  Every mandate is scoped around your existing systems, authority model and
+                  management requirements.
                 </p>
                 <div className="mt-8"><PlanCta source="services-index" /></div>
               </div>
               <BotFactory />
             </div>
+            <dl className="mt-12 grid md:grid-cols-3 border border-[var(--border-strong)] bg-[var(--bg-alt)]">
+              {[
+                ["01 · Existing systems", "Deploy into the platforms and records your organization already controls."],
+                ["02 · Defined authority", "Document access, approval gates and exception handling before launch."],
+                ["03 · Reviewable operation", "Track activity, decisions and outcomes through a consistent management record."],
+              ].map(([term, detail], index) => (
+                <div key={term} className={cn("p-5 sm:p-6", index > 0 && "border-t md:border-t-0 md:border-l border-[var(--border)]")}>
+                  <dt className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--accent-text)]">{term}</dt>
+                  <dd className="body-sm mt-3">{detail}</dd>
+                </div>
+              ))}
+            </dl>
           </Container>
         </section>
 
@@ -50,9 +64,9 @@ export default function ServicesIndex() {
             diagram after it explains HOW the loop works. */}
         <Section
           variant="light"
-          eyebrow="The fleet · right now"
-          heading={<>Thirteen bots. <span className="em-green">Not one of them idle.</span></>}
-          sub="This is illustrative, not a live feed of a real account — but every one of these runs exactly this continuously once it is deployed on yours."
+          eyebrow="Capability portfolio"
+          heading={<>Thirteen specialized BOTS. <span className="em-green">One operating standard.</span></>}
+          sub="Each BOT has a defined mandate and can operate independently or as part of a coordinated system. The interface below is illustrative."
         >
           <FleetSwarm />
         </Section>
@@ -62,9 +76,9 @@ export default function ServicesIndex() {
             the right number of times to say it. */}
         <Section
           variant="alt"
-          eyebrow="How the fleet fits together"
-          heading={<>Every way in, every way <span className="em-green">out.</span></>}
-          sub="However a customer arrives, the same loop runs: watch, act, record, report. The bots differ in what they watch."
+          eyebrow="Coordinated operating model"
+          heading={<>One control structure across <span className="em-green">the revenue lifecycle.</span></>}
+          sub="Signals enter through different channels, but every workflow follows the same discipline: observe, prepare, authorize, execute and record."
         >
           <SignalFlow />
         </Section>
@@ -81,6 +95,7 @@ export default function ServicesIndex() {
             <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {pillar.categories.map((c) => {
                 const svc = ALL_SERVICES.find((s) => s.slug === c.slug)!;
+                const positioning = getServicePositioning(svc.slug);
                 return (
                   <li key={svc.serviceSlug} className="flex">
                     <Link
@@ -96,7 +111,7 @@ export default function ServicesIndex() {
                           {svc.serviceName}
                         </span>
                         <span className="mt-2 block text-[13.5px] leading-snug text-[var(--text-secondary)]">
-                          {svc.blurb}
+                          {positioning.summary}
                         </span>
                       </span>
                       <ArrowRight className="w-4 h-4 shrink-0 mt-1 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />

@@ -5,28 +5,28 @@ import { Section } from "@/components/ui";
  */
 const ITEMS = [
   {
-    t: "Your data stays in your accounts",
-    b: "Bots operate inside your CRM, ad platforms and inbox under scoped credentials you grant and can revoke at any time. We do not warehouse your customer data on our side.",
+    t: "Tenant isolation",
+    b: "Private client records are scoped to one organization, and each client runtime is isolated from every other deployment.",
   },
   {
-    t: "Human-in-the-loop by default",
-    b: "Every bot launches in monitored mode. Escalation rules are explicit: anything ambiguous, sensitive or high-value routes to a person instead of being guessed at.",
+    t: "Human authorization",
+    b: "External communications, publishing, advertising changes and writes to connected systems follow explicit approval policies.",
   },
   {
-    t: "Every action is logged",
-    b: "Full audit trail — what the bot did, when, on which record, and why. If you cannot see the log, you should not trust the agent. You can see the log.",
+    t: "Reviewable activity",
+    b: "BOT RUNS, decisions, approvals and operator changes produce an activity and audit record for authorized review.",
   },
   {
-    t: "Rollback, always",
-    b: "Actions are reversible or staged wherever the underlying platform allows it, and every bot can be paused instantly without breaking the systems it connects.",
+    t: "Operational controls",
+    b: "Deployments use monitored launch procedures, defined exception paths and controls to pause work when review is required.",
   },
   {
     t: "Least-privilege access",
-    b: "Each bot gets the narrowest scopes that let it do its job — read-only wherever writing is not required. Credentials are stored encrypted and rotated.",
+    b: "Each BOT receives only the access required for its mandate. Write access and connected-system authority are scoped before launch.",
   },
   {
-    t: "DPA available",
-    b: "Data processing agreement and security documentation available on request for procurement and legal review. SOC 2 alignment on the roadmap and stated honestly as such.",
+    t: "Documented operating scope",
+    b: "The proposal defines integrations, authority, approval requirements, service boundaries and support responsibilities before implementation.",
   },
 ];
 
@@ -36,8 +36,8 @@ export function SecurityBlock() {
       id="security"
       variant="dark"
       eyebrow="Security & governance"
-      heading="Autonomy you can audit."
-      sub="Enterprise buyers should not have to take an agent vendor's word for anything. This is how the fleet is governed."
+      heading="Controls designed into every deployment."
+      sub="Access, authority, approvals and reviewability are established as operating requirements before a BOT enters production."
     >
       <dl className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink-700 border border-ink-700">
         {ITEMS.map((it) => (

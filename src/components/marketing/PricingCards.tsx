@@ -23,7 +23,7 @@ export function PricingCards({ auditHref = "#audit" }: { auditHref?: string }) {
               {plan.features.map((feature) => <li key={feature} className="flex gap-2.5 text-[13.5px] leading-relaxed"><Check className="w-4 h-4 mt-0.5 shrink-0 text-[var(--accent-text)]" /><span>{feature}</span></li>)}
             </ul>
             <Link href={auditHref} className={cn("btn mt-auto w-full", plan.featured ? "btn-primary" : "btn-outline")}>
-              {plan.key === "enterprise" ? "Discuss your system" : "Find your starting point"}<ArrowRight className="w-4 h-4" />
+              {plan.key === "enterprise" ? "Discuss enterprise architecture" : "Define your starting scope"}<ArrowRight className="w-4 h-4" />
             </Link>
           </article>
         ))}

@@ -1,27 +1,27 @@
 /** Public commercial terms. Shared by the homepage and pricing page. */
 export const AUDIT_OFFER = {
-  name: "BOT opportunity audit",
+  name: "BOT workflow assessment",
   turnaround: "two business days",
-  cta: "Get your free audit",
+  cta: "Request a workflow assessment",
 } as const;
 
 export const MARKETING_PLANS = [
   {
-    key: "one", name: "One BOT", label: "A focused start", setup: 7500, monthly: 2500,
+    key: "one", name: "One BOT", label: "Single operating mandate", setup: 7500, monthly: 2500,
     from: false, featured: false, botRange: "One defined workflow",
-    description: "Put one important business process in capable hands. Built around your tools, your rules and your team.",
+    description: "Deploy one managed BOT against a defined business process, with documented integrations, authority and acceptance criteria.",
     features: ["One specialized BOT", "Workflow discovery and configuration", "Agreed integrations and acceptance testing", "Monitored launch and ongoing maintenance", "Monthly activity and results review"],
   },
   {
-    key: "growth", name: "Growth System", label: "A connected workforce", setup: 15000, monthly: 3500,
-    from: true, featured: true, botRange: "Start with 3–5 BOTS. Expand to 10.",
-    description: "Connect the work across marketing, sales and operations. A phased rollout, with each workflow scoped before it goes live.",
+    key: "growth", name: "Growth System", label: "Coordinated operating system", setup: 15000, monthly: 3500,
+    from: true, featured: true, botRange: "Initial 3–5 BOT deployment. Expansion to 10 by scope.",
+    description: "Coordinate multiple workflows across demand generation, revenue operations and customer lifecycle management through a phased deployment.",
     features: ["An initial system of 3–5 specialized BOTS", "Expansion to 10 BOTS by agreed scope", "Connected workflows across your tools", "Shared reporting and approval controls", "Ongoing monitoring, maintenance and tuning"],
   },
   {
     key: "enterprise", name: "Enterprise", label: "Built around your organization", setup: null, monthly: null,
-    from: false, featured: false, botRange: "Custom BOTS. Custom capacity.",
-    description: "For multiple locations, complex operations or a workflow that needs its own architecture. We design the system together.",
+    from: false, featured: false, botRange: "Custom architecture, BOT count and operating capacity.",
+    description: "For multiple locations, complex operating models or requirements that need dedicated architecture and governance.",
     features: ["A custom number of BOTS and workflows", "Multiple teams, brands or locations", "Custom integrations and operating capacity", "Defined access and approval policies", "Support and reporting agreed for your team"],
   },
 ] as const;
@@ -38,5 +38,5 @@ export const PRICING_FAQ = [
   { q: "What does the retainer cover?", a: "Operating and maintaining the agreed system: monitoring, tuning, issue handling and reporting. Included usage, integrations and support are written into your proposal so you can see exactly what is covered." },
   { q: "Are ad spend and usage charges included?", a: "Ad spend is separate and paid through your own accounts. Third-party usage charges and any included allowance are specified in the proposal. Additional paid usage requires approval." },
   { q: "What stays under my control?", a: "Your customer relationships and business accounts remain yours. Access, approval rules, data handling and the handover process are defined before launch. Sending, publishing, changing ads and writing to connected systems require human approval." },
-  { q: "Do I need to choose a package now?", a: `No. The free ${AUDIT_OFFER.name} identifies a useful starting workflow. You receive the initial recommendations within ${AUDIT_OFFER.turnaround}, with no call required. Implementation timing is confirmed after we understand your scope.` },
+  { q: "Do I need to choose a package now?", a: `No. The no-cost ${AUDIT_OFFER.name} identifies a credible starting workflow. You receive initial findings within ${AUDIT_OFFER.turnaround}, with no call required. Implementation timing is confirmed after we understand your scope.` },
 ];
