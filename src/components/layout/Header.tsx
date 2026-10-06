@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight, MapPin,
+  Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
@@ -307,40 +307,44 @@ export function Header() {
           </MegaPanel>
         )}
 
-        {/* ── Mega: Service areas — region cards, then that region's states ── */}
+        {/* ── Mega: Service areas — outcome-style region lanes, then states ── */}
         {openMenu === "areas" && (
           <MegaPanel id="areas-menu" ref={panelRef}>
-            <div className="mb-7 grid grid-cols-[minmax(0,1fr)_minmax(380px,520px)] items-end gap-8 border-b border-[var(--border)] pb-5">
+            <div className="mb-7 grid grid-cols-[minmax(340px,.88fr)_minmax(380px,1.12fr)] items-end gap-12">
               <div>
-                <p className="eyebrow mb-1.5">Service areas</p>
-                <h3 className="display-md">
-                  {regionSel ? `Browse ${regionSel.region} markets.` : "Find your market."}
+                <p className="eyebrow mb-2">National service delivery</p>
+                <h3 className="display-lg !text-[30px] max-w-[27ch]">
+                  Choose the market. We map the local operating context.
                 </h3>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 justify-self-end w-full max-w-[540px]">
                 <MarketSearch onNavigate={closeMenu} />
               </div>
             </div>
             {regionSel === null ? (
               <>
-                <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                  {regions.map(({ region, states }) => {
+                <ul className="grid grid-cols-5 divide-x divide-[var(--border)] border-y border-[var(--border-strong)]">
+                  {regions.map(({ region, states }, index) => {
                     const metros = states.reduce((n, st) => n + allCitiesInState(st.slug).length, 0);
                     return (
                       <li key={region} className="flex">
                         <button
                           type="button"
                           onClick={() => setSelectedRegion(region)}
-                          className="group relative w-full min-h-[150px] border border-[var(--border)] bg-white p-5 text-left hover:border-[var(--color-accent-600)] hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          className="group relative w-full min-h-[188px] overflow-hidden bg-white px-5 py-5 text-left transition-colors duration-300 hover:bg-[var(--bg-alt)] focus-visible:z-10"
                         >
+                          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-[var(--color-accent-500)] transition-transform duration-300 group-hover:scale-x-100" />
                           <span className="flex h-full flex-col">
-                            <span className="block display-lg !text-[21px] transition-colors group-hover:text-[var(--accent-text)]">{region}</span>
-                            <span className="mt-2 mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                            <span className="mono text-[10px] tracking-[0.12em] text-[var(--text-muted)]">0{index + 1}</span>
+                            <span className="mt-6 block display-lg !text-[22px] transition-colors group-hover:text-[var(--accent-text)]">{region}</span>
+                            <span className="mt-2 text-[12px] text-[var(--text-secondary)]">
                               {states.length} states · {metros} cities
                             </span>
-                            <span className="mt-auto flex items-center justify-between pt-7 text-[12.5px] font-semibold text-[var(--accent-text)]">
-                              Explore
-                              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                            <span className="mt-auto flex items-center justify-between gap-3 pt-6">
+                              <span className="text-[12.5px] font-semibold text-[var(--foreground)]">Explore</span>
+                              <span className="grid h-9 w-9 place-items-center bg-ink-950 text-white transition-colors duration-200 group-hover:bg-[var(--color-accent-500)] group-hover:text-[var(--accent-ink)]">
+                                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                              </span>
                             </span>
                           </span>
                         </button>
@@ -356,7 +360,7 @@ export function Header() {
                 {/* States only. The city lists that used to live here put
                     115 links in one panel; they now live on the state and
                     region pages, which is also where a crawler wants them. */}
-                <ul className="grid grid-cols-3 xl:grid-cols-4 gap-3">
+                <ul className="grid grid-cols-4 gap-px border border-[var(--border-strong)] bg-[var(--border)]">
                   {regionSel.states.map((st) => {
                     const cities = allCitiesInState(st.slug);
                     return (
@@ -364,17 +368,13 @@ export function Header() {
                         <Link
                           href={`/markets/${st.slug}`}
                           onClick={closeMenu}
-                          className="group w-full flex items-center justify-between gap-3 px-4 py-3.5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          className="group w-full min-h-[76px] flex items-center justify-between gap-4 bg-white px-5 py-4 transition-colors duration-200 hover:bg-[var(--bg-alt)]"
                         >
-                          <span className="flex items-center gap-2 min-w-0">
-                            <MapPin className="w-3.5 h-3.5 shrink-0 text-[var(--accent-text)]" />
-                            <span className="display-md !text-[14px] truncate group-hover:text-[var(--accent-text)] transition-colors">
-                              {st.name}
-                            </span>
+                          <span className="min-w-0">
+                            <span className="block display-md !text-[14px] truncate transition-colors group-hover:text-[var(--accent-text)]">{st.name}</span>
+                            <span className="mt-1 block text-[11.5px] text-[var(--text-muted)]">{cities.length} cities</span>
                           </span>
-                          <span className="mono text-[10px] uppercase tracking-[0.08em] shrink-0 text-[var(--text-muted)]">
-                            {cities.length} cities
-                          </span>
+                          <ArrowRight className="h-4 w-4 shrink-0 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
                         </Link>
                       </li>
                     );
@@ -607,16 +607,14 @@ function ServiceMenuFooter({ onAct }: { onAct: () => void }) {
 function CoverageMenuFooter({ onAct }: { onAct: () => void }) {
   return (
     <div className="mt-7 flex items-center justify-between gap-8 border-t border-[var(--border)] pt-5">
-      <div className="max-w-[58ch]">
-        <p className="eyebrow mb-1.5">National delivery · local context</p>
-        <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
-          The {AUDIT_OFFER.priceLabel} audit is mapped to your service area and operating model.
-        </p>
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <Link href="/markets" onClick={onAct} className="btn btn-outline">
-          All markets
+      <div className="max-w-[68ch] text-[13px] leading-relaxed text-[var(--text-secondary)]">
+        <span className="font-semibold text-[var(--foreground)]">Need the market case mapped?</span>{" "}
+        The {AUDIT_OFFER.priceLabel} workflow audit connects your service area to the first viable BOT mandate.{" "}
+        <Link href="/markets" onClick={onAct} className="font-semibold text-[var(--foreground)] underline decoration-[var(--border-strong)] underline-offset-4 hover:text-[var(--accent-text)]">
+          View all markets
         </Link>
+      </div>
+      <div className="flex shrink-0 items-center">
         <Link href="/#audit" onClick={onAct} className="btn btn-primary">
           Find my first BOT
           <ArrowRight className="h-3.5 w-3.5" />
