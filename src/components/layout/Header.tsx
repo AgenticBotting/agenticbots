@@ -3,7 +3,11 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight, MapPin } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight, MapPin,
+  RefreshCw, Search, Target, Workflow,
+} from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
 
@@ -25,10 +29,10 @@ type MenuId = "services" | "areas" | null;
 /* The 13 bots, grouped by the job a contractor needs done — not by
    marketing vs. sales. Speed-to-Lead is pulled out as the starting point. */
 const START_SLUG = "inbound";
-const STAGES: { id: string; title: string; blurb: string; slugs: string[] }[] = [
-  { id: "found", title: "Get found", blurb: "Build visibility across search, content and paid media.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
-  { id: "close", title: "Close more jobs", blurb: "Prepare responses and follow-up across your sales process.", slugs: ["inbound", "cro", "email", "enablement"] },
-  { id: "repeat", title: "Win repeat work", blurb: "Bring past customers back and know what is working.", slugs: ["reactivation", "crm", "analytics"] },
+const STAGES: { id: string; title: string; kicker: string; blurb: string; icon: LucideIcon; slugs: string[] }[] = [
+  { id: "found", title: "Get found", kicker: "Demand capture", blurb: "Build visibility across search, content and paid media.", icon: Search, slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
+  { id: "close", title: "Close more jobs", kicker: "Revenue conversion", blurb: "Prepare responses and follow-up across your sales process.", icon: Target, slugs: ["inbound", "cro", "email", "enablement"] },
+  { id: "repeat", title: "Win repeat work", kicker: "Customer value", blurb: "Bring past customers back and know what is working.", icon: RefreshCw, slugs: ["reactivation", "crm", "analytics"] },
 ];
 
 export function Header() {
@@ -222,27 +226,47 @@ export function Header() {
                   <>
                     <MegaHeader eyebrow="Services · Step 1 of 2" title="Choose the business outcome you want to improve." />
                     <ul className="grid grid-cols-3 gap-3">
-                      {stages.map((item, index) => (
-                        <li key={item.id} className="flex">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedStage(item.id)}
-                            className="group w-full flex flex-col justify-between gap-8 p-6 min-h-[188px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                          >
-                            <span>
-                              <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{index + 1}</span>
-                              <span className="block display-lg mt-2">{item.title}</span>
-                              <span className="block mt-2 text-[14px] leading-relaxed text-[var(--text-secondary)]">{item.blurb}</span>
-                            </span>
-                            <span className="flex items-center justify-between gap-4">
-                              <span className="text-[13px] font-medium text-[var(--text-muted)] truncate">
-                                {item.items.map((category) => category.botName.replace(/ Bot$/, "")).join(" · ")}
+                      {stages.map((item, index) => {
+                        const StageIcon = item.icon;
+                        return (
+                          <li key={item.id} className="flex">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedStage(item.id)}
+                              className="group relative w-full min-h-[214px] overflow-hidden border border-[var(--border)] bg-white p-6 text-left hover:border-[var(--color-accent-600)] hover:bg-[var(--bg-alt)] hover:-translate-y-1 hover:shadow-lift transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                            >
+                              <StageIcon
+                                aria-hidden="true"
+                                strokeWidth={1}
+                                className="absolute -right-7 -bottom-9 h-36 w-36 text-[var(--color-accent-700)] opacity-[0.045] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-x-2 group-hover:-translate-y-2 group-hover:opacity-[0.09]"
+                              />
+                              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-0 bg-[var(--color-accent-500)] transition-transform duration-300 group-hover:scale-x-100" />
+                              <span className="relative z-10 flex h-full flex-col">
+                                <span className="flex items-start justify-between gap-4">
+                                  <span>
+                                    <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{index + 1}</span>
+                                    <span className="mt-1.5 block mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{item.kicker}</span>
+                                  </span>
+                                  <span className="grid h-10 w-10 place-items-center border border-[var(--border-tint)] bg-[var(--bg-tint)] text-[var(--accent-text)] transition-colors duration-300 group-hover:bg-[var(--color-accent-500)] group-hover:text-[var(--accent-ink)]">
+                                    <StageIcon aria-hidden="true" className="h-4.5 w-4.5" strokeWidth={1.75} />
+                                  </span>
+                                </span>
+                                <span className="mt-7 block display-lg !text-[25px] transition-colors group-hover:text-[var(--accent-text)]">{item.title}</span>
+                                <span className="mt-2 block max-w-[31ch] text-[14px] leading-relaxed text-[var(--text-secondary)]">{item.blurb}</span>
+                                <span className="mt-auto flex items-center justify-between gap-4 pt-7">
+                                  <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                                    {item.items.length} specialized BOTS
+                                  </span>
+                                  <span className="inline-flex items-center gap-2 text-[12.5px] font-semibold text-[var(--accent-text)]">
+                                    View services
+                                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                                  </span>
+                                </span>
                               </span>
-                              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
-                            </span>
-                          </button>
-                        </li>
-                      ))}
+                            </button>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </>
                 );
@@ -282,11 +306,7 @@ export function Header() {
                 </>
               );
             })()}
-            <MegaFooter
-              onAct={closeMenu}
-              label="Not sure where to start?"
-              text={`The ${AUDIT_OFFER.priceLabel} BOT workflow audit identifies the highest-value starting point before you choose a service.`}
-            />
+            <ServiceMenuFooter onAct={closeMenu} />
           </MegaPanel>
         )}
 
@@ -588,6 +608,35 @@ function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string;
         <Link href="/#audit" onClick={onAct} className="btn btn-primary">
           {AUDIT_OFFER.cta}
           <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ServiceMenuFooter({ onAct }: { onAct: () => void }) {
+  return (
+    <div className="relative mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-8 overflow-hidden border border-[var(--border-tint)] bg-[var(--bg-tint)] px-6 py-5">
+      <Workflow
+        aria-hidden="true"
+        strokeWidth={1}
+        className="absolute -bottom-16 right-[27%] h-48 w-48 text-[var(--color-accent-700)] opacity-[0.045]"
+      />
+      <div className="relative z-10 max-w-[60ch]">
+        <p className="eyebrow mb-1.5">Not sure where to start?</p>
+        <p className="display-md">Find the first workflow worth fixing.</p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+          The {AUDIT_OFFER.priceLabel} audit identifies the strongest starting point before you choose a service.
+        </p>
+      </div>
+      <div className="relative z-10 flex items-center gap-3">
+        <Link href="/how-it-works" onClick={onAct} className="btn btn-outline bg-white">
+          How it works
+        </Link>
+        <Link href="/#audit" onClick={onAct} className="btn btn-primary min-w-[230px] justify-between">
+          <span>Find my first BOT</span>
+          <span className="mono text-[9px] uppercase tracking-[0.08em]">{AUDIT_OFFER.priceLabel} audit</span>
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     </div>
