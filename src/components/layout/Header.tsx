@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight, MapPin,
-  Building2, Compass, MapPinned, Navigation, RefreshCw, Route, Search, Sun,
-  Target, Workflow,
+  RefreshCw, Search, Target, Workflow,
 } from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
@@ -35,14 +34,6 @@ const STAGES: { id: string; title: string; kicker: string; blurb: string; icon: 
   { id: "close", title: "Close more jobs", kicker: "Revenue conversion", blurb: "Prepare responses and follow-up across your sales process.", icon: Target, slugs: ["inbound", "cro", "email", "enablement"] },
   { id: "repeat", title: "Win repeat work", kicker: "Customer value", blurb: "Bring past customers back and know what is working.", icon: RefreshCw, slugs: ["reactivation", "crm", "analytics"] },
 ];
-
-const REGION_ICONS: Record<Region, LucideIcon> = {
-  West: Compass,
-  Southwest: Sun,
-  Midwest: Route,
-  Southeast: Navigation,
-  Northeast: Building2,
-};
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -322,62 +313,36 @@ export function Header() {
         {/* ── Mega: Service areas — region cards, then that region's states ── */}
         {openMenu === "areas" && (
           <MegaPanel id="areas-menu" ref={panelRef}>
-            <div className="relative mb-7 grid grid-cols-[minmax(220px,.72fr)_minmax(380px,1fr)] items-center gap-8 overflow-hidden border border-[var(--border-tint)] bg-[var(--bg-tint)] p-4 pl-5">
-              <MapPinned
-                aria-hidden="true"
-                strokeWidth={1}
-                className="absolute -bottom-12 left-[31%] h-40 w-40 text-[var(--color-accent-700)] opacity-[0.045]"
-              />
-              <div className="relative z-10">
-                <p className="eyebrow">Search national coverage</p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
-                  Go directly to a city or state market page.
-                </p>
+            <div className="mb-7 grid grid-cols-[minmax(0,1fr)_minmax(380px,520px)] items-end gap-8 border-b border-[var(--border)] pb-5">
+              <div>
+                <p className="eyebrow mb-1.5">Service areas</p>
+                <h3 className="display-md">
+                  {regionSel ? `Browse ${regionSel.region} markets.` : "Find your market."}
+                </h3>
               </div>
-              <div className="relative z-10 min-w-0">
+              <div className="min-w-0">
                 <MarketSearch onNavigate={closeMenu} />
               </div>
             </div>
             {regionSel === null ? (
               <>
-                <MegaHeader eyebrow="Service areas · Step 1 of 2" title="Choose a region to explore local coverage." />
                 <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                  {regions.map(({ region, states }, index) => {
+                  {regions.map(({ region, states }) => {
                     const metros = states.reduce((n, st) => n + allCitiesInState(st.slug).length, 0);
-                    const RegionIcon = REGION_ICONS[region];
                     return (
                       <li key={region} className="flex">
                         <button
                           type="button"
                           onClick={() => setSelectedRegion(region)}
-                          className="group relative w-full min-h-[210px] overflow-hidden border border-[var(--border)] bg-white p-5 text-left hover:border-[var(--color-accent-600)] hover:bg-[var(--bg-alt)] hover:-translate-y-1 hover:shadow-lift transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          className="group relative w-full min-h-[150px] border border-[var(--border)] bg-white p-5 text-left hover:border-[var(--color-accent-600)] hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                         >
-                          <RegionIcon
-                            aria-hidden="true"
-                            strokeWidth={1}
-                            className="absolute -bottom-8 -right-8 h-28 w-28 text-[var(--color-accent-700)] opacity-[0.045] transition-all duration-500 group-hover:-translate-x-1.5 group-hover:-translate-y-1.5 group-hover:opacity-[0.09]"
-                          />
-                          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-0 bg-[var(--color-accent-500)] transition-transform duration-300 group-hover:scale-x-100" />
-                          <span className="relative z-10 flex h-full flex-col">
-                            <span className="flex items-start justify-between gap-3">
-                              <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">R0{index + 1}</span>
-                              <span className="grid h-9 w-9 place-items-center border border-[var(--border-tint)] bg-[var(--bg-tint)] text-[var(--accent-text)] transition-colors duration-300 group-hover:bg-[var(--color-accent-500)] group-hover:text-[var(--accent-ink)]">
-                                <RegionIcon aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-                              </span>
+                          <span className="flex h-full flex-col">
+                            <span className="block display-lg !text-[21px] transition-colors group-hover:text-[var(--accent-text)]">{region}</span>
+                            <span className="mt-2 mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                              {states.length} states · {metros} cities
                             </span>
-                            <span className="mt-7 block display-lg !text-[22px] transition-colors group-hover:text-[var(--accent-text)]">{region}</span>
-                            <span className="mt-5 grid grid-cols-2 border-y border-[var(--border)] py-3">
-                              <span>
-                                <strong className="block text-[16px] font-semibold text-[var(--foreground)]">{states.length}</strong>
-                                <span className="mono text-[9px] uppercase tracking-[0.1em] text-[var(--text-muted)]">States</span>
-                              </span>
-                              <span className="border-l border-[var(--border)] pl-3">
-                                <strong className="block text-[16px] font-semibold text-[var(--foreground)]">{metros}</strong>
-                                <span className="mono text-[9px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Cities</span>
-                              </span>
-                            </span>
-                            <span className="mt-auto flex items-center justify-between pt-4 text-[12.5px] font-semibold text-[var(--accent-text)]">
-                              View region
+                            <span className="mt-auto flex items-center justify-between pt-7 text-[12.5px] font-semibold text-[var(--accent-text)]">
+                              Explore
                               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                             </span>
                           </span>
@@ -665,26 +630,19 @@ function ServiceMenuFooter({ onAct }: { onAct: () => void }) {
 
 function CoverageMenuFooter({ onAct }: { onAct: () => void }) {
   return (
-    <div className="relative mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-8 overflow-hidden border border-[var(--border-tint)] bg-[var(--bg-tint)] px-6 py-5">
-      <MapPinned
-        aria-hidden="true"
-        strokeWidth={1}
-        className="absolute -bottom-16 right-[28%] h-48 w-48 text-[var(--color-accent-700)] opacity-[0.045]"
-      />
-      <div className="relative z-10 max-w-[62ch]">
+    <div className="mt-7 flex items-center justify-between gap-8 border-t border-[var(--border)] pt-5">
+      <div className="max-w-[58ch]">
         <p className="eyebrow mb-1.5">National delivery · local context</p>
-        <p className="display-md">Your market shapes the operating plan.</p>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
-          We map the audit to your service area, existing systems and customer journey.
+        <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
+          The {AUDIT_OFFER.priceLabel} audit is mapped to your service area and operating model.
         </p>
       </div>
-      <div className="relative z-10 flex items-center gap-3">
-        <Link href="/markets" onClick={onAct} className="btn btn-outline bg-white">
+      <div className="flex shrink-0 items-center gap-3">
+        <Link href="/markets" onClick={onAct} className="btn btn-outline">
           All markets
         </Link>
-        <Link href="/#audit" onClick={onAct} className="btn btn-primary min-w-[230px] justify-between">
-          <span>Find my first BOT</span>
-          <span className="mono text-[9px] uppercase tracking-[0.08em]">{AUDIT_OFFER.priceLabel} audit</span>
+        <Link href="/#audit" onClick={onAct} className="btn btn-primary">
+          Find my first BOT
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
