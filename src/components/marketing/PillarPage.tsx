@@ -5,8 +5,9 @@ import { PlanCta } from "./PlanCta";
 import { Container, Reveal, SectionHeader, BotIndex, BrandMark } from "@/components/ui";
 import { BotPlanForm } from "./BotPlanForm";
 import { StatBand } from "./StatBand";
-import { serviceHref, type Pillar } from "@/lib/catalog";
+import { getServiceByCategorySlug, serviceHref, type Pillar } from "@/lib/catalog";
 import { renderHeadline } from "@/lib/headline";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 export function PillarPage({ pillar }: { pillar: Pillar }) {
   const other = pillar.slug === "marketing" ? "sales" : "marketing";
@@ -33,7 +34,7 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
                   href={`/${other}`}
                   className="text-[15px] font-medium border-b border-[var(--border-strong)] pb-0.5 hover:border-[var(--accent-text)] hover:text-[var(--accent-text)] transition-colors"
                 >
-                  See {other} bots instead
+                  Review the {other} portfolio
                 </Link>
               </div>
             </Reveal>
@@ -46,40 +47,43 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
           <Container className="relative">
             <Reveal>
               <SectionHeader
-                eyebrow={`${pillar.categories.length} bots`}
-                title={`Every ${pillar.name.toLowerCase()} job, handled continuously.`}
-                copy="Start with the one that fixes your worst bottleneck. Add the rest as each proves out."
+                eyebrow={`${pillar.categories.length} managed service mandates`}
+                title={`Defined operating mandates across ${pillar.name.toLowerCase()}.`}
+                copy="Select the business process that requires accountable ownership. The deployed BOT types, integrations and authority model are scoped around that mandate."
               />
             </Reveal>
 
             <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
-              {pillar.categories.map((c, i) => (
-                <Reveal key={c.slug} delay={Math.min(i, 6) * 0.05}>
+              {pillar.categories.map((c, i) => {
+                const service = getServiceByCategorySlug(c.slug);
+                const positioning = getServicePositioning(c.slug);
+                return <Reveal key={c.slug} delay={Math.min(i, 6) * 0.05}>
                   <Link
                     href={serviceHref(c)}
                     className="group bg-white h-full p-7 flex flex-col hover:bg-[var(--bg-alt)] transition-colors"
                   >
                     <BotIndex index={c.index} size="sm" tone="outline" />
-                    <h3 className="display-lg mt-5">{c.botName}</h3>
-                    <p className="body-sm mt-2.5 flex-1">{c.blurb}</p>
+                    <h3 className="display-lg mt-5">{service?.serviceName ?? c.name}</h3>
+                    <p className="mono mt-2 text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">{positioning.deliveryModel}</p>
+                    <p className="body-sm mt-3 flex-1">{positioning.summary}</p>
                     <span className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--accent-text)]">
-                      {c.name}
+                      Review the mandate
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </Link>
-                </Reveal>
-              ))}
+                </Reveal>;
+              })}
             </div>
           </Container>
         </section>
 
         <StatBand
-          eyebrow="Why continuously"
-          title="The work is not hard. Doing it every single day is."
+          eyebrow="Enterprise operating standard"
+          title="Defined authority. Reviewable execution. Managed continuity."
           metrics={[
-            { value: "Daily", label: "Every bot reviews, acts and logs — not monthly" },
-            { value: "2 wks", label: "Typical time to first bot live" },
-            { value: "Yours", label: "Every account, sequence and automation we build" },
+            { value: "Scoped", label: "Every mandate, integration and access boundary" },
+            { value: "Approved", label: "Every external action governed by policy" },
+            { value: "Recorded", label: "Every BOT RUN, exception and outcome" },
           ]}
         />
 
@@ -89,9 +93,9 @@ export function PillarPage({ pillar }: { pillar: Pillar }) {
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <Reveal>
                 <SectionHeader
-                  eyebrow="Start here"
-                  title={`Not sure which ${pillar.name.toLowerCase()} bot you need?`}
-                  copy="Tell us what you sell and where it is getting stuck. We send back the map — which bots, in what order, and what each is worth."
+                  eyebrow="Architecture entry point"
+                  title={`Define the first ${pillar.name.toLowerCase()} mandate.`}
+                  copy="The paid workflow audit identifies the process, BOT configuration, systems, controls and commercial scope required for a credible first deployment."
                 />
               </Reveal>
               <Reveal delay={0.08}>

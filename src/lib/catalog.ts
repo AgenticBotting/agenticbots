@@ -691,26 +691,113 @@ const SALES: Category[] = [
 
 /* ─────────────────────────────  ASSEMBLY  ────────────────────────────── */
 
+type EnterpriseCategoryCopy = Pick<Category, "blurb" | "outcome" | "headline" | "intro">;
+
+const ENTERPRISE_CATEGORY_COPY: Record<string, EnterpriseCategoryCopy> = {
+  "paid-media": {
+    blurb: "Continuous account monitoring, decision support and approval-gated media operations.",
+    outcome: "Advertising spend is governed through a defined operating cadence and authority model.",
+    headline: "Paid media governed at operating cadence.",
+    intro: "The Ads BOT monitors approved Google Ads activity, prepares account decisions and maintains a reviewable record. Budget and campaign changes remain inside the authority model defined for the engagement.",
+  },
+  seo: {
+    blurb: "Technical search health, local visibility and content coverage managed as one program.",
+    outcome: "Search operations move through a documented roadmap, review cadence and publishing policy.",
+    headline: "Search visibility managed as infrastructure.",
+    intro: "The SEO BOT coordinates technical monitoring, local-search analysis and optimization drafts across supported Google properties, with publishing controlled by the agreed approval policy.",
+  },
+  content: {
+    blurb: "Source-based content planning, production, review and approved distribution.",
+    outcome: "Organizational expertise becomes a governed publishing system with accountable ownership.",
+    headline: "Content operations with an accountable cadence.",
+    intro: "The Content BOT converts approved source material into structured drafts and channel adaptations, then routes each asset through the review and publishing controls defined for the mandate.",
+  },
+  email: {
+    blurb: "Governed lifecycle communication delivered through Outbound and Reactivation BOTS.",
+    outcome: "Audience, consent, message, approval and response handling remain part of one workflow.",
+    headline: "Lifecycle communication built into the operating model.",
+    intro: "Email Marketing is a managed service mandate delivered through the platform's Outbound and Reactivation BOTS. The workflow defines audiences, suppression, approvals, delivery and CRM handoff before operation begins.",
+  },
+  cro: {
+    blurb: "Analytics-led diagnosis, experiment planning and decision records for conversion improvement.",
+    outcome: "Conversion decisions follow an evidence-based program with implementation scoped separately.",
+    headline: "Conversion improvement as a continuous discipline.",
+    intro: "Conversion Rate Optimization is an Analytics BOT-led service mandate. The system identifies friction and prepares experiments; website implementation and changes are included only when explicitly scoped and approved.",
+  },
+  analytics: {
+    blurb: "A consistent management view across approved demand, pipeline and operating data.",
+    outcome: "Leadership receives reviewable reporting with definitions, assumptions and exceptions visible.",
+    headline: "One operating view of demand, pipeline and outcomes.",
+    intro: "The Analytics BOT monitors approved sources, reconciles operating activity and prepares management reporting without concealing data gaps, definitions or assumptions.",
+  },
+  "lead-generation": {
+    blurb: "Prospect Graph research, deterministic qualification and governed CRM handoff.",
+    outcome: "Commercial market coverage is built against an approved ICP, geography and buyer model.",
+    headline: "Prospecting infrastructure for defined commercial markets.",
+    intro: "The Prospecting BOT uses the Prospect Graph to define markets, research accounts and buyers, qualify against versioned rules and route approved records through budget and policy controls.",
+  },
+  outbound: {
+    blurb: "Approved email outreach with suppression, reply routing and CRM controls.",
+    outcome: "Outbound execution follows a defined audience, message, cadence and escalation policy.",
+    headline: "Structured outbound from first touch to qualified handoff.",
+    intro: "The Outbound BOT prepares and coordinates email outreach through supported systems. Sending, suppression, volume limits, reply handling and CRM writes remain governed by the approved operating policy.",
+  },
+  inbound: {
+    blurb: "Inbound ownership, qualification and routing across supported CRM, email and calendar systems.",
+    outcome: "Every included inbound source enters a defined response, escalation and record-update workflow.",
+    headline: "A controlled response to every included inbound opportunity.",
+    intro: "Inbound Lead Handling is a managed workflow delivered through CRM and Outbound BOTS. Sources, response commitments, qualification rules and escalation paths are confirmed in the deployment scope.",
+  },
+  crm: {
+    blurb: "Data-quality monitoring, exception management and approval-gated CRM operations.",
+    outcome: "Pipeline records and next steps follow consistent rules with visible exceptions.",
+    headline: "A revenue system management can rely on.",
+    intro: "The CRM BOT detects stale stages, duplicates and missing next steps, prepares updates and records approved changes across the supported systems included in the mandate.",
+  },
+  enablement: {
+    blurb: "Proposal preparation, review, approved delivery and CRM status handoff.",
+    outcome: "Commercial documents move from controlled inputs through a defined approval workflow.",
+    headline: "Proposal execution without operational delay.",
+    intro: "The Proposal BOT assembles documents from client-controlled notes, price books and rules, routes them for internal review and coordinates approved delivery and CRM updates.",
+  },
+  reviews: {
+    blurb: "Eligibility, request drafting, response preparation and sensitive-feedback escalation.",
+    outcome: "Reputation workflows operate consistently through supported customer and profile systems.",
+    headline: "Reputation management as a controlled customer workflow.",
+    intro: "The Reviews BOT coordinates eligible post-service requests and response preparation, while sensitive feedback and every external action follow the escalation and approval policy.",
+  },
+  reactivation: {
+    blurb: "Customer-history analysis and approved re-engagement under consent and suppression controls.",
+    outcome: "Dormant customer and opportunity records enter a governed lifecycle workflow.",
+    headline: "Existing customer demand, systematically re-engaged.",
+    intro: "The Reactivation BOT identifies eligible records, prepares segments and drafts relevant follow-up while consent, suppression, approval and response routing remain explicit.",
+  },
+};
+
+function applyEnterpriseCopy(categories: Category[]): Category[] {
+  return categories.map((category) => ({ ...category, ...ENTERPRISE_CATEGORY_COPY[category.slug] }));
+}
+
 export const CATALOG: Pillar[] = [
   {
     slug: "marketing",
     name: "Marketing",
-    tagline: "Demand creation",
-    menuBlurb: "Ads, search, content, social and email — run every day.",
-    headline: "Bots that make people find you.",
+    tagline: "Demand operations",
+    menuBlurb: "Governed media, search, content, lifecycle and measurement operations.",
+    headline: "Demand generation operated as a connected system.",
     intro:
-      "Everything that fills the top of your funnel — ads, search, content, social, email and the pages they land on — operated continuously by specialized BOTS.",
-    categories: MARKETING,
+      "Coordinate paid media, search, content, lifecycle communication, conversion analysis and management reporting through defined mandates, shared controls and reviewable BOT ACTIVITY.",
+    categories: applyEnterpriseCopy(MARKETING),
   },
   {
     slug: "sales",
     name: "Sales",
-    tagline: "Revenue capture",
-    menuBlurb: "Answering, following up, quoting and closing — every time.",
-    headline: "Bots that turn interest into booked revenue.",
+    tagline: "Revenue operations",
+    menuBlurb: "Governed prospecting, response, CRM, proposal and customer lifecycle operations.",
+    headline: "Revenue execution with defined ownership and control.",
     intro:
-      "Everything after the click — answering, qualifying, following up, quoting, closing and keeping the customer — handled the same way every time, at any hour.",
-    categories: SALES,
+      "Coordinate prospecting, outbound, inbound response, CRM administration, proposals, reputation and reactivation through explicit workflows, approval gates and management records.",
+    categories: applyEnterpriseCopy(SALES),
   },
 ];
 
@@ -1143,6 +1230,24 @@ export const ALL_SERVICES: Service[] = (() => {
     return {
       ...c,
       ...parsed,
+      faqs: [
+        {
+          q: `What is included in ${parsed.serviceName}?`,
+          a: "The proposal defines the operating mandate, supported integrations, approval rules, acceptance criteria, included usage and review cadence before implementation begins.",
+        },
+        {
+          q: "Can the BOTS make external changes on their own?",
+          a: "No. Sending, publishing, advertising changes and writes to connected systems require the human approval policy configured for the deployment.",
+        },
+        {
+          q: "Do we have to replace our existing systems?",
+          a: "The service is designed around supported systems your organization already controls. Required connections and any implementation limits are documented in the proposal.",
+        },
+        {
+          q: "How is the service managed after launch?",
+          a: "Monitoring, exception handling, maintenance and review expectations are included in the operating scope. Expansion is proposed and approved before new workflows are added.",
+        },
+      ],
       headlinePattern: `${parsed.serviceName} Company in {city}, {st}`,
     };
   });

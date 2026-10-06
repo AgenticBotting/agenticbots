@@ -6,14 +6,14 @@ import { BotPlanForm } from "@/components/marketing";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with AgenticBots. One business day response, every time.",
+  description: "Discuss a governed BOT operating mandate with AgenticBots.",
   alternates: { canonical: "/contact" },
 };
 
 const FACTS = [
-  { icon: Mail, t: "hello@agenticbots.dev", b: "The fastest way to reach a person." },
-  { icon: Clock, t: "One business day", b: "Every enquiry gets a real reply, not an autoresponder." },
-  { icon: FileText, t: "No call required", b: "You can get the full bot plan without ever booking a meeting." },
+  { icon: Mail, t: "Direct contact", b: "Write to hello@agenticbots.dev or use the operating brief." },
+  { icon: Clock, t: "Decision context", b: "Share the priority, timing and constraint behind the request." },
+  { icon: FileText, t: "A scoped next step", b: "The paid audit produces written findings before implementation is proposed." },
 ];
 
 export default function ContactPage() {
@@ -26,10 +26,9 @@ export default function ContactPage() {
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <Reveal>
                 <p className="eyebrow mb-5">Contact</p>
-                <h1 className="display-hero text-balance">Talk to <span className="em-green">a person.</span></h1>
+                <h1 className="display-hero text-balance">Define the <span className="em-green">operating case.</span></h1>
                 <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                  The form on the right is the fastest route — it gives us enough to come
-                  back with something useful rather than a scheduling link.
+                  Give us the business priority, current systems and decision horizon. We use that context to evaluate a specific BOT mandate and document the next step.
                 </p>
 
                 <ul className="mt-10 space-y-6">

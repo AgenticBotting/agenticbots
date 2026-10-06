@@ -7,12 +7,13 @@ import { PlanCta, BotFactory, SignalFlow, FleetSwarm, ServiceAtmosphere } from "
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { getServicePositioning } from "@/lib/service-positioning";
+import { BOT_CATALOG } from "@/config/bot-catalog";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Managed BOT services for established contractors",
   description:
-    "Thirteen managed BOT capabilities across demand generation, revenue operations and customer lifecycle workflows.",
+    "Thirteen managed service mandates delivered through ten deployable BOT types across demand generation, revenue operations and customer lifecycle workflows.",
   alternates: { canonical: "/services" },
 };
 
@@ -32,21 +33,20 @@ export default function ServicesIndex() {
             <div className="service-hero-grid">
               <div className="service-hero-copy">
                 <p className="eyebrow mb-5">
-                  Managed service portfolio <span className="eyebrow-dim">· {ALL_SERVICES.length} specialized BOTS · national delivery</span>
+                  Managed service portfolio <span className="eyebrow-dim">· {ALL_SERVICES.length} mandates · {BOT_CATALOG.length} BOT types · national delivery</span>
                 </p>
                 <h1 className="display-hero max-w-[20ch] text-balance">
-                  A managed BOT for every critical <span className="em-green">revenue workflow.</span>
+                  A governed operating mandate for every critical <span className="em-green">revenue workflow.</span>
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">
-                  Deploy one priority workflow or coordinate a multi-BOT operating system.
-                  Every mandate is scoped around your existing systems, authority model and
-                  management requirements.
+                  Start with one priority workflow or coordinate multiple BOT types as one managed operating system.
+                  Every mandate is scoped around your existing systems, authority model and management requirements.
                 </p>
                 <div className="mt-8"><PlanCta source="services-index" /></div>
               </div>
               <div className="service-hero-visual">
                 <div className="service-hero-visual-head">
-                  <span>Managed BOT portfolio</span>
+                  <span>Managed service portfolio</span>
                   <span>Illustrative activity</span>
                 </div>
                 <BotFactory />
@@ -72,9 +72,9 @@ export default function ServicesIndex() {
             diagram after it explains HOW the loop works. */}
         <Section
           variant="light"
-          eyebrow="Capability portfolio"
-          heading={<>Thirteen specialized BOTS. <span className="em-green">One operating standard.</span></>}
-          sub="Each BOT has a defined mandate and can operate independently or as part of a coordinated system. The interface below is illustrative."
+          eyebrow="Service mandate portfolio"
+          heading={<>Thirteen managed mandates. <span className="em-green">Ten deployable BOT types.</span></>}
+          sub="Each mandate is assembled from the BOT types, skills, integrations and authority rules required for the workflow. The interface below is illustrative."
         >
           <FleetSwarm />
         </Section>
@@ -96,7 +96,7 @@ export default function ServicesIndex() {
             key={pillar.slug}
             id={pillar.slug}
             variant={pillar.slug === "marketing" ? "alt" : "light"}
-            eyebrow={`${pillar.tagline} · ${pillar.categories.length} bots`}
+            eyebrow={`${pillar.tagline} · ${pillar.categories.length} service mandates`}
             heading={pillar.headline}
             sub={pillar.intro}
           >
@@ -113,10 +113,10 @@ export default function ServicesIndex() {
                       <BotIndex index={svc.index} size="sm" tone="outline" />
                       <span className="min-w-0 flex-1">
                         <span className="block display-md group-hover:text-[var(--accent-text)] transition-colors">
-                          {svc.botName}
+                          {svc.serviceName}
                         </span>
                         <span className="mt-0.5 block mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
-                          {svc.serviceName}
+                          {positioning.deliveryModel}
                         </span>
                         <span className="mt-2 block text-[13.5px] leading-snug text-[var(--text-secondary)]">
                           {positioning.summary}

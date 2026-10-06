@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "AgenticBots — Agentic bots get you customers";
+export const alt = "AgenticBots — governed BOT operating systems";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -32,15 +32,15 @@ export default function OgImage() {
         {BOT}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 72, fontWeight: 600, color: "#FFFFFF", letterSpacing: "-0.03em", lineHeight: 1.05 }}>
-            Agentic bots get you customers.
+            Governed BOT operations for established service businesses.
           </div>
           <div style={{ fontSize: 28, color: "#BEC4BE", marginTop: 24 }}>
-            Marketing and sales, run by bots — agenticbots.dev
+            Defined mandates. Scoped authority. Recorded activity.
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ width: 10, height: 10, borderRadius: 5, background: "#97BD27" }} />
-          <div style={{ fontSize: 22, color: "#8C928C", letterSpacing: "0.08em" }}>13 BOTS · MARKETING + SALES</div>
+          <div style={{ fontSize: 22, color: "#8C928C", letterSpacing: "0.08em" }}>13 SERVICE MANDATES · 10 BOT TYPES</div>
         </div>
       </div>
     ),

@@ -5,10 +5,11 @@ import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import { PlanCta, StatSplit, FaqAccordion, SecurityBlock, AuditForm, OfferVisual } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
-import { citiesInState, fmt } from "@/lib/geo/data";
+import { citiesInState } from "@/lib/geo/data";
 import { ALL_SERVICES, getService } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ slug: string; state: string }> };
 
@@ -20,13 +21,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug, state } = await params;
   const svc = getService(slug); const st = getDatasetState(state);
   if (!svc || !st) return {};
-  const cities = allCitiesInState(state);
+  const positioning = getServicePositioning(svc.slug);
   const enriched = citiesInState(state).length > 0;
   return {
     /* absolute: the root template's " | AgenticBots" costs 14 of the 70
        chars seo-checks allows, and the long service names need them. */
     title: { absolute: `${svc.serviceName} in ${st.name} | AgenticBots` },
-    description: `${svc.serviceName} for ${st.name} businesses — ${svc.botName} deployed across ${cities.length} cities including ${cities.slice(0, 3).map((c) => c.city).join(", ")}.`,
+    description: `${svc.serviceName} across ${st.name}. ${positioning.summary} Scope is confirmed before launch.`,
     alternates: { canonical: `/services/${slug}/${state}` },
     ...(enriched ? {} : { robots: { index: false, follow: true } }),
   };
@@ -36,9 +37,8 @@ export default async function StateHub({ params }: Params) {
   const { slug, state } = await params;
   const svc = getService(slug); const st = getDatasetState(state);
   if (!svc || !st) notFound();
+  const positioning = getServicePositioning(svc.slug);
   const all = allCitiesInState(state);
-  const enrichedCities = citiesInState(state);
-  const totalBiz = enrichedCities.reduce((s, c) => s + c.businessCount, 0);
   const metroCount = new Set(all.map((c) => c.metro)).size;
   const path = `/services/${svc.serviceSlug}/${st.slug}`;
 
@@ -48,16 +48,16 @@ export default async function StateHub({ params }: Params) {
      hub already carries the full set. */
   const faqs = [
     {
-      q: `Does ${svc.botName} work the same way across all of ${st.name}?`,
-      a: `Yes — the bot deploys remotely into your existing accounts (CRM, ads, phone, calendar), so coverage does not depend on a local office. ${enrichedCities.length > 0 ? `${enrichedCities.length} ${st.name} ${enrichedCities.length === 1 ? "metro carries" : "metros carry"} a full local market read; every other city in the state deploys the same way.` : `Every city in ${st.name} deploys the same way — the fleet does not need a local presence to work locally.`}`,
+      q: `How is ${svc.serviceName.toLowerCase()} delivered across ${st.name}?`,
+      a: `${positioning.deliveryModel}. The operating model can be delivered remotely across ${st.name}; the proposal defines the systems, data and market context included for your organization.`,
     },
     {
-      q: `How fast can this go live in ${st.name}?`,
-      a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, wherever in ${st.name} you are. Every action is reviewed daily before anything runs unattended.`,
+      q: `Which systems are included?`,
+      a: `Only the systems named in the approved scope. We confirm access, data boundaries and integration requirements before implementation rather than assuming every account uses the same stack.`,
     },
     {
-      q: `Which ${st.name} city should I pick if mine is not listed?`,
-      a: `Pick the nearest metro — the system runs identically regardless of which city page you started from. ${totalBiz > 0 ? `The ${fmt.format(totalBiz)}+ businesses already mapped across ${st.name}'s focus metros give a good read on typical results for a business your size.` : `Every city page carries the same detail once you tell us where you are.`}`,
+      q: `How is authority controlled?`,
+      a: positioning.boundary,
     },
   ];
 
@@ -66,7 +66,7 @@ export default async function StateHub({ params }: Params) {
       <JsonLd data={[
         serviceLd({
           name: `${svc.serviceName} in ${st.name}`,
-          description: svc.geoIntro,
+          description: positioning.summary,
           path,
           areaServed: st.name,
         }),
@@ -97,12 +97,12 @@ export default async function StateHub({ params }: Params) {
                 here for the first time; the page previously fell back to a
                 generic templated sentence that said the same thing on all
                 663 state pages regardless of service. */}
-            <p className="body-lg mt-6 max-w-[54ch]">{svc.geoIntro}</p>
+            <p className="body-lg mt-6 max-w-[54ch]">{positioning.lead} Local market context informs the operating case; your systems, policy and acceptance criteria define the build.</p>
             <div className="mt-8 cta-row">
               <PlanCta source={`state-${svc.serviceSlug}-${st.slug}`} />
               <Link href={`/services/${svc.serviceSlug}`} className="btn btn-outline">
                 <span className="sm:hidden">Full service page</span>
-                <span className="hidden sm:inline">See the full {svc.botName} page</span>
+                <span className="hidden sm:inline">Review the national service mandate</span>
               </Link>
             </div>
             </div>
@@ -116,16 +116,16 @@ export default async function StateHub({ params }: Params) {
             so the visual language is consistent top to bottom. */}
         <StatSplit
           eyebrow="This state"
-          heading={<>What {svc.botName} covers in <span className="em-green">{st.name}.</span></>}
-          body={`${totalBiz > 0 ? `An estimated ${fmt.format(totalBiz)} businesses sit inside ${st.name}'s focus metros alone.` : `${st.name} deploys the same way as every other state — remotely, into the tools each business already runs.`} Coverage does not thin out between cities: every one of the ${all.length} on this page gets the same system.`}
+          heading={<>A national operating model with <span className="em-green">{st.name} context.</span></>}
+          body={`${positioning.summary} Location pages organize the markets we serve; the actual mandate is configured around your organization, systems and authority model.`}
           stats={[
             { value: String(all.length), label: `${st.name} cities covered` },
             { value: String(metroCount), label: metroCount === 1 ? "Metro area" : "Metro areas" },
-            { value: `${svc.implementationWeeks}w`, label: "To your first system live" },
-            { value: enrichedCities.length > 0 ? String(enrichedCities.length) : "All", label: enrichedCities.length > 0 ? "Focus metros, full local read" : "Cities, same system" },
+            { value: "Scoped", label: "Systems, data and authority" },
+            { value: "Recorded", label: "BOT ACTIVITY and decisions" },
           ]}
           source={`state-${svc.serviceSlug}-${st.slug}-statsplit`}
-          note={`${svc.botName} · deployed remotely, anywhere in ${st.name}.`}
+          note={`${svc.serviceName} · ${positioning.deliveryModel}.`}
         />
 
         <Section variant="alt" eyebrow={`${all.length} cities`} heading={`${svc.serviceName} across ${st.name}.`}
@@ -172,10 +172,10 @@ export default async function StateHub({ params }: Params) {
           id="audit"
           variant="alt"
           eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`}
-          heading={`See where your ${st.name} leads are slipping.`}
-          sub={`We review your public customer journey and identify a useful starting workflow. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}
+          heading={`Define the ${st.name} operating case for ${svc.serviceName}.`}
+          sub={`We review the public customer journey, identify a defensible starting mandate and document the next decision. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}
         >
-          <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.botName} />
+          <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.serviceName} />
         </Section>
       </main>
       <Footer />

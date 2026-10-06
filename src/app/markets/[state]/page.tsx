@@ -10,6 +10,7 @@ import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { getState as getEnrichedState, citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
 import { ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ state: string }> };
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const hasEnriched = Boolean(getEnrichedState(state));
   return {
     title: `${st.name} markets`,
-    description: `Agent systems for ${st.name} businesses — ${cities.length} cities including ${top}: every call answered, every quote followed up, 24/7.`,
+    description: `Governed BOT operating mandates for ${st.name} businesses across ${cities.length} cities, including ${top}.`,
     alternates: { canonical: `/markets/${state}` },
     ...(hasEnriched ? {} : { robots: { index: false, follow: true } }),
   };
@@ -65,11 +66,10 @@ export default async function StateMarketPage({ params }: Params) {
               <div>
                 <p className="eyebrow mb-5">{st.name} <span className="eyebrow-dim">· {cities.length} cities · {metros.size} metro cluster{metros.size > 1 ? "s" : ""}</span></p>
                 <h1 className="display-hero max-w-[20ch] text-balance">
-                  Agent systems for {st.name} businesses.
+                  A governed BOT operating layer for {st.name}.
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">
-                  Every call answered, every quote followed up, ads and CRM worked continuously —
-                  deployed remotely, wired into the tools you already use, anywhere in {st.name}.
+                  National delivery with {st.name} market context. Every engagement defines the operating mandate, systems, authority and review cadence before launch.
                 </p>
                 <div className="mt-8"><PlanCta source={`markets-${st.slug}`} /></div>
               </div>
@@ -117,7 +117,7 @@ export default async function StateMarketPage({ params }: Params) {
                 <Link key={s.slug} href={enriched ? serviceGeoHref(s, st.slug) : serviceHref(s)} className="group card-cell p-6">
                   <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
                   <span className="mt-2 flex items-center gap-1.5 text-[12.5px] text-[var(--text-muted)]">
-                    {s.botName}
+                    {getServicePositioning(s.slug).deliveryModel}
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </Link>

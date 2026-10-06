@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
-  AuditForm, PlanCta, CityVignette, ProofBar, FaqAccordion,
+  AuditForm, PlanCta, CityVignette, FaqAccordion,
   BotFactory, StackStrip, StatSplit, JoinBand,
 } from "@/components/marketing";
 import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
@@ -13,6 +13,8 @@ import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, serviceGeoHref } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { BOT_CATALOG } from "@/config/bot-catalog";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ state: string; city: string }> };
 
@@ -25,12 +27,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const rec = getDatasetCity(state, city);
   if (!rec) return {};
   const enriched = isEnriched(state, city);
-  const ct = enriched ? getCity(state, city) : undefined;
   return {
     title: `${rec.city}, ${rec.state_abbr} — market hub`,
-    description: ct
-      ? `BOT systems for ${ct.name} businesses — PPC, SEO, CRM and speed-to-lead, with the local market read from ${ct.districts[0]} to ${ct.districts[ct.districts.length - 1]}.`
-      : `BOT systems for ${rec.city}, ${rec.state_abbr} businesses — PPC, SEO, CRM and speed-to-lead across the ${rec.metro} metro. $499 BOT workflow audit.`,
+    description: `A governed BOT operating layer for ${rec.city}, ${rec.state_abbr}. Thirteen managed service mandates delivered through ${BOT_CATALOG.length} deployable BOT types.`,
     alternates: { canonical: `/markets/${state}/${city}` },
     /* Structural pages stay out of the index until their market is
        enriched — release schedule, docs/PROGRAMMATIC-SEO-PLAN.md §6. */
@@ -56,7 +55,7 @@ export default async function CityMarketHub({ params }: Params) {
   const vignetteLabels = ct ? ct.districts : rec.surrounding.slice(0, 5).map((s0) => s0.city);
 
   const faqs = [
-    { q: `Do you work with ${rec.city} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro. Every sequence is scheduled on your local hours, not ours.` },
+    { q: `Can the operating model be delivered remotely in ${rec.city}?`, a: `Yes. The proposal defines the systems, data, access and service levels included for your organization. We do not assume every business uses the same technology stack.` },
     { q: `How fast can this go live in ${rec.city}?`, a: `The proposal confirms timing after we understand your workflow, integrations and access requirements. A monitored launch includes human approval controls for external changes.` },
     { q: `What does it cost?`, a: `One BOT is $7,500 setup plus $2,500/month. Growth starts at $15,000 setup plus $3,500/month for a scoped 3–5 BOT system, with expansion quoted separately. Enterprise is custom. Usage, support and contract terms are defined in your proposal.` },
   ];
@@ -66,7 +65,7 @@ export default async function CityMarketHub({ params }: Params) {
       <JsonLd data={[
         serviceLd({
           name: `Agentic marketing & sales systems in ${rec.city}, ${rec.state_abbr}`,
-          description: ct?.character ?? `BOT systems for ${rec.city} businesses across the ${rec.metro} metro.`,
+          description: `Governed marketing, revenue and customer-operation mandates for businesses across the ${rec.metro} metro.`,
           path: `/markets/${state}/${city}`,
           areaServed: `${rec.city}, ${rec.state}`,
         }),
@@ -94,34 +93,35 @@ export default async function CityMarketHub({ params }: Params) {
               <div>
                 <p className="eyebrow mb-5">The {rec.city} market <span className="eyebrow-dim">· {rec.state_abbr} · {rec.metro} metro</span></p>
                 <h1 className="display-hero max-w-[22ch] text-balance">
-                  Bots that get {rec.city}{enriched ? "" : `, ${rec.state_abbr}`} businesses customers.
+                  A governed BOT operating layer for {rec.city}{enriched ? "" : `, ${rec.state_abbr}`}.
                 </h1>
                 {ct ? (
                   <>
                     <p className="body-lg mt-6 max-w-[54ch]">{ct.character}</p>
                     <p className="body-base mt-4 max-w-[54ch]">
                       From {ct.districts.slice(0, -1).join(", ")} to {ct.districts[ct.districts.length - 1]},
-                      the fleet runs the same way: continuously, inside the tools you already pay for,
-                      tuned to how {ct.industries[0]} and {ct.industries[1]} customers here actually buy.
+                      local market context informs the operating case. Your systems, policies and commercial priorities define the deployment.
                     </p>
                   </>
                 ) : (
                   <>
                     <p className="body-lg mt-6 max-w-[54ch]">
-                      Connected workflows for calls, quotes, ads and CRM —
-                      built the same way for {rec.city} as for every market we serve, wired into the
-                      tools you already use.
+                      Connect demand, revenue and customer operations through managed service mandates with defined ownership, authority and review.
                     </p>
                     <p className="body-base mt-4 max-w-[54ch]">
-                      We deploy remotely across the {rec.metro} metro. Tell us what you sell and the
-                      {AUDIT_OFFER.priceLabel} BOT workflow audit comes back mapped to your market within {AUDIT_OFFER.turnaround} of payment.
+                      We operate remotely across the {rec.metro} metro. The {AUDIT_OFFER.priceLabel} BOT workflow audit identifies a defensible starting mandate and the decisions required before implementation.
                     </p>
                   </>
                 )}
                 <div className="mt-8"><PlanCta source={`market-hub-${rec.city_slug}`} /></div>
                 <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
-              <BotFactory place={rec.city} />
+              <BotFactory place={rec.city} stations={[
+                { label: "Mandate accepted", meta: "Defined" },
+                { label: "Authority policy loaded", meta: "Scoped" },
+                { label: "Approval queue reviewed", meta: "Human" },
+                { label: "BOT ACTIVITY written", meta: "Recorded" },
+              ]} />
             </div>
           </Container>
         </section>
@@ -149,10 +149,8 @@ export default async function CityMarketHub({ params }: Params) {
           </section>
         )}
 
-        <ProofBar />
-
         {/* All services × this city */}
-        <Section variant="alt" eyebrow={`Services in ${rec.city}`} heading={`Every bot, deployed for ${rec.city}.`}>
+        <Section variant="alt" eyebrow={`Services in ${rec.city}`} heading={`Thirteen managed mandates. One governed operating model.`}>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {ALL_SERVICES.map((s) => (
               <Link
@@ -160,11 +158,11 @@ export default async function CityMarketHub({ params }: Params) {
                 href={serviceGeoHref(s, st.slug, rec.city_slug)}
                 className="group card-cell p-7"
               >
-                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{s.botName}</p>
+                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{getServicePositioning(s.slug).deliveryModel}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
                   {s.name}
                 </p>
-                <p className="body-sm mt-2 min-h-[2.6em]">{s.hook}</p>
+                <p className="body-sm mt-2 min-h-[2.6em]">{getServicePositioning(s.slug).summary}</p>
                 <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)]">
                   {rec.city} details
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -197,8 +195,7 @@ export default async function CityMarketHub({ params }: Params) {
                 <CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={vignetteLabels} />
               </div>
               <p className="body-base max-w-[52ch]">
-                The fleet deploys remotely across the {rec.metro} metro — everything runs inside
-                your existing accounts, scheduled on your local hours, wherever your customers are.
+                The operating model can be delivered remotely across the {rec.metro} metro. The deployment uses only the systems, data and authority defined in your approved scope.
               </p>
             </div>
           </Section>
@@ -206,14 +203,14 @@ export default async function CityMarketHub({ params }: Params) {
 
         {/* ── Big-number stat split. ── */}
         <StatSplit
-          eyebrow={`${rec.city} deployment`}
-          heading={<>One fleet, every job — <span className="em-green">tuned to {rec.city}.</span></>}
-          body={`Ads, SEO, CRM and speed-to-lead run as one system for your ${rec.city} business — built, monitored and tuned continuously, inside the accounts you already own. You stay the owner of every account and every result.`}
+          eyebrow={`${rec.city} operating model`}
+          heading={<>One control model across <span className="em-green">every mandate.</span></>}
+          body={`Select the service mandates that match your operating priorities. Each deployment defines systems, authority, approvals and reporting before BOT RUNS begin.`}
           stats={[
             { value: "2 days", label: "Paid audit turnaround after payment, business days" },
             { value: "Scoped", label: "Workflow, integrations and capacity agreed" },
             { value: "Human", label: "Approval for external changes" },
-            { value: "13", label: "Bots in the fleet, deployed as you need them" },
+            { value: String(BOT_CATALOG.length), label: "Deployable BOT types across 13 mandates" },
           ]}
           source={`market-hub-${rec.city_slug}-statsplit`}
           note="Implementation timing and operating scope confirmed in your proposal."
@@ -240,8 +237,8 @@ export default async function CityMarketHub({ params }: Params) {
         </Section>
 
         <JoinBand
-          heading={<>Integrate agentic bots to swarm your <span className="em-green">marketing and sales tasks.</span></>}
-          sub={`One ${AUDIT_OFFER.priceLabel} BOT workflow audit — mapped to the ${rec.metro} metro, not a template.`}
+          heading={<>Define the first BOT mandate for <span className="em-green">your operating model.</span></>}
+          sub={`The ${AUDIT_OFFER.priceLabel} BOT workflow audit documents the strongest starting point, decision context and next step for your ${rec.metro} operation.`}
           source={`market-hub-${rec.city_slug}-joinband`}
         />
 

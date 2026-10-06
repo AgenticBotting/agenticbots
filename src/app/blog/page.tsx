@@ -7,7 +7,7 @@ import { Header, Footer } from "@/components/layout";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Plain writing on agentic marketing and sales — what works, what does not, and what the hype leaves out.",
+    "Research and operating notes on governed BOTS across demand, revenue and customer operations.",
   alternates: { canonical: "/blog" },
 };
 
@@ -22,11 +22,10 @@ export default function BlogIndexPage() {
             <div className="mx-auto max-w-[52ch] text-center">
               <p className="eyebrow mb-4">Writing</p>
               <h1 className="display-hero text-balance">
-                No hype, <span className="em-green">no hedging.</span>
+                Operating notes for <span className="em-green">serious BOT programs.</span>
               </h1>
               <p className="body-base mt-4 text-pretty">
-                What we have actually seen work across marketing and sales automation,
-                including the parts vendors leave out.
+                Clear analysis of mandates, control models, workflow design and the operating decisions required for production BOTS.
               </p>
               {/* The conversion surface the index was missing — every other
                   page on the site asks for something; this one just had

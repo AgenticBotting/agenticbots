@@ -20,15 +20,15 @@ import { AUDIT_OFFER } from "@/config/marketing-offer";
 type Option = { value: string; label: string; desc: string };
 
 const TIMING: Option[] = [
-  { value: "Bleeding now", label: "Right now", desc: "We are losing leads this week" },
-  { value: "This quarter", label: "This quarter", desc: "Budgeted, planning the build" },
-  { value: "Exploring", label: "Exploring", desc: "Working out what it would take" },
+  { value: "Immediate priority", label: "Immediate priority", desc: "An active operating constraint needs attention" },
+  { value: "This quarter", label: "This quarter", desc: "Budget and internal ownership are being defined" },
+  { value: "Strategic review", label: "Strategic review", desc: "We are evaluating the operating case" },
 ];
 
 const SIDES: Option[] = [
-  { value: "Marketing", label: "Getting found", desc: "Not enough people asking about us" },
-  { value: "Sales", label: "Closing the work", desc: "Leads come in and go cold" },
-  { value: "Both", label: "Both ends", desc: "Not sure where it breaks" },
+  { value: "Demand operations", label: "Demand operations", desc: "Visibility, acquisition and market coverage" },
+  { value: "Revenue operations", label: "Revenue operations", desc: "Response, pipeline and commercial execution" },
+  { value: "Cross-functional", label: "Cross-functional", desc: "The constraint crosses teams or systems" },
 ];
 
 export function BotPlanForm({
@@ -61,13 +61,14 @@ export function BotPlanForm({
   const current = steps[stepIndex];
 
   const focusOptions: Option[] = useMemo(() => {
-    if (side === "Both" || !side) {
-      return ALL_CATEGORIES.slice(0, 6).map((c) => ({ value: c.name, label: c.botName, desc: c.outcome }));
+    if (side === "Cross-functional" || !side) {
+      return ALL_CATEGORIES.slice(0, 6).map((c) => ({ value: c.name, label: c.name, desc: c.outcome }));
     }
-    const pillar = CATALOG.find((p) => p.name.toLowerCase().startsWith(side.toLowerCase()));
+    const pillarName = side === "Demand operations" ? "marketing" : "sales";
+    const pillar = CATALOG.find((p) => p.name.toLowerCase().startsWith(pillarName));
     return (pillar?.categories ?? ALL_CATEGORIES)
       .slice(0, 6)
-      .map((c) => ({ value: c.name, label: c.botName, desc: c.outcome }));
+      .map((c) => ({ value: c.name, label: c.name, desc: c.outcome }));
   }, [side]);
 
   const options: Option[] =
@@ -138,10 +139,10 @@ export function BotPlanForm({
   }
 
   const QUESTION: Record<string, { eyebrow: string; ask: string }> = {
-    side: { eyebrow: "Question 1", ask: "Where is it breaking?" },
-    focus: { eyebrow: "Question 2", ask: "What needs the most help?" },
-    timing: { eyebrow: defaultFocus ? "Question 1" : "Question 3", ask: "How soon do you need this?" },
-    contact: { eyebrow: "Last step", ask: "Where should we send the audit?" },
+    side: { eyebrow: "Question 1", ask: "Which operating area has priority?" },
+    focus: { eyebrow: "Question 2", ask: "Which mandate should we evaluate?" },
+    timing: { eyebrow: defaultFocus ? "Question 1" : "Question 3", ask: "What is the decision horizon?" },
+    contact: { eyebrow: "Last step", ask: "Where should we deliver the audit?" },
   };
 
   return (

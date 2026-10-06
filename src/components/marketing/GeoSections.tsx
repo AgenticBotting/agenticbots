@@ -92,10 +92,10 @@ export function AgentConsole({
 
 /* ─────────────────────────── Stack strip ─────────────────────────── */
 
-const STACK = ["Google Ads", "Meta", "HubSpot", "Salesforce", "Twilio", "Slack", "Google Analytics", "Stripe"];
+const STACK = ["Approved source systems", "Client-owned data", "Authority policy", "Approval queue", "BOT ACTIVITY", "Management reporting"];
 
 /** The wireframes' logo bar, kept honest: the tools the bots deploy into. */
-export function StackStrip({ tools = STACK, label = "Deploys into the tools you already use" }: { tools?: string[]; label?: string } = {}) {
+export function StackStrip({ tools = STACK, label = "Operating architecture" }: { tools?: string[]; label?: string } = {}) {
   return (
     <div className="border-b border-[var(--border)] bg-white">
       <Container className="py-5 flex flex-wrap items-center gap-x-8 gap-y-3">

@@ -21,9 +21,9 @@ import { AUDIT_OFFER } from "@/config/marketing-offer";
 type Picks = { side?: string; bot?: string; timing?: string };
 
 const TIMING = [
-  { value: "now", label: "Bleeding now", desc: "Losing leads this week" },
-  { value: "quarter", label: "This quarter", desc: "Budgeted, planning the build" },
-  { value: "exploring", label: "Exploring", desc: "Working out what it would take" },
+  { value: "now", label: "Immediate priority", desc: "An active operating constraint needs attention" },
+  { value: "quarter", label: "This quarter", desc: "Budget and internal ownership are being defined" },
+  { value: "exploring", label: "Strategic review", desc: "We are evaluating the operating case" },
 ];
 
 const TOTAL = 4;
@@ -157,7 +157,7 @@ export function BotPlanFlow() {
                 </button>
               </div>
             ) : step === 0 ? (
-              <Step title="Which side needs the most help?" sub="Pick the one that hurts more right now.">
+              <Step title="Which operating area has priority?" sub="Choose the area where a defined mandate would create the most operating capacity.">
                 <div className="grid sm:grid-cols-2 gap-3">
                   {CATALOG.map((p) => (
                     <CardBtn
@@ -168,33 +168,33 @@ export function BotPlanFlow() {
                     />
                   ))}
                   <CardBtn
-                    label="Both"
-                    desc="Leaking on both ends"
+                    label="Cross-functional"
+                    desc="The constraint crosses teams or systems"
                     onClick={() => pick("side", "Both")}
                     className="sm:col-span-2"
                   />
                 </div>
               </Step>
             ) : step === 1 ? (
-              <Step title="What is actually broken?" sub="Closest match is fine — we will confirm in the plan.">
+              <Step title="Which mandate should we evaluate?" sub="Choose the closest fit; scope and authority are confirmed in the audit.">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {(sidePillar ? sidePillar.categories : CATALOG.flatMap((p) => p.categories)).map((c) => (
                     <CardBtn
                       key={`${c.pillar}-${c.slug}`}
-                      label={c.botName}
-                      desc={c.name}
+                      label={c.name}
+                      desc={c.outcome}
                       onClick={() => pick("bot", c.name)}
                     />
                   ))}
                   <CardBtn
-                    label="Not sure"
-                    desc="Tell me what I need"
+                    label="Architecture review"
+                    desc="Evaluate the constraint across mandates"
                     onClick={() => pick("bot", "Not sure yet")}
                   />
                 </div>
               </Step>
             ) : step === 2 ? (
-              <Step title="How urgent is it?" sub="This sets where you land in the queue, nothing else.">
+              <Step title="What is the decision horizon?" sub="This helps us frame the recommendations and next decision.">
                 <div className="grid sm:grid-cols-3 gap-3">
                   {TIMING.map((t) => (
                     <CardBtn
@@ -207,7 +207,7 @@ export function BotPlanFlow() {
                 </div>
               </Step>
             ) : (
-              <Step title="Where should we send it?" sub="Three fields. No call required to get the plan.">
+              <Step title="Where should we deliver it?" sub="Provide the business contact responsible for the operating decision.">
                 <form onSubmit={submit} className="max-w-[460px]">
                   <div className="space-y-4">
                     <Labeled label="Name" required>

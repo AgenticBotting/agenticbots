@@ -12,9 +12,9 @@ import { getOffer } from "@/lib/offers";
 import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, getService, serviceHref, type Service } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
-import { rotatedValueProp, rotatedCta } from "@/lib/geo/seo-rotation";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ slug: string; state: string; city: string }> };
 
@@ -33,14 +33,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const rec = getDatasetCity(state, city);
   if (!svc || !rec) return {};
   const enriched = isEnriched(state, city);
-  const ct = enriched ? getCity(state, city) : undefined;
+  const positioning = getServicePositioning(svc.slug);
   return {
     /* absolute: at 13 services x 924 cities the " | AgenticBots" suffix
        pushed the longest combinations past the 70-char cap. */
     title: { absolute: `${svc.serviceName} Company in ${rec.city}, ${rec.state_abbr}` },
-    description: ct
-      ? `${svc.serviceName} for ${ct.name} businesses — BOT systems that run continuously across a ${fmt.format(ct.businessCount)}-business metro. First system live in ~${svc.implementationWeeks} weeks.`
-      : `${svc.serviceName} for ${rec.city}, ${rec.state_abbr} businesses — ${svc.botName} runs continuously across the ${rec.metro} metro, live in ~${svc.implementationWeeks} weeks.`,
+    description: `${svc.serviceName} in ${rec.city}, ${rec.state_abbr}. ${positioning.summary} Scope is confirmed before launch.`,
     alternates: { canonical: `/services/${slug}/${state}/${city}` },
     /* Structural markets stay out of the index until enriched —
        release schedule, docs/PROGRAMMATIC-SEO-PLAN.md §6. */
@@ -61,6 +59,7 @@ export default async function CityPage({ params }: Params) {
 
   const ct = getCity(state, city);
   if (!ct) notFound();
+  const positioning = getServicePositioning(svc.slug);
   const category = svc;
   const near = nearbyCities(ct, 6);
   const dominant = ct.industries[0];
@@ -68,9 +67,9 @@ export default async function CityPage({ params }: Params) {
   /* Composite, per-page-distinct content: market numbers, industry mix,
      the hand-written local note, and a dominant-industry scenario. */
   const faqs = [
-    { q: `Do you work with ${ct.name} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely. ${ct.name} is in ${ct.timezone.replace("America/", "").replace("_", " ")} time and every sequence is scheduled against your local hours, not ours.` },
-    { q: `How competitive is ${svc.serviceName.toLowerCase()} in ${ct.name}?`, a: `${ct.name}'s local market is ${ct.competition}. Local-service CPCs in this metro typically run $${ct.cpcBand[0]}–$${ct.cpcBand[1]} (estimated band), which is exactly why the follow-up side of the funnel — the part that costs nothing per click — is usually the cheaper win.` },
-    { q: `How fast can this go live for a ${dominant} business?`, a: `The typical build is ~${svc.implementationWeeks} weeks to a first system in monitored mode. ${dominant[0].toUpperCase() + dominant.slice(1)} intake flows are common in ${ct.name} and rarely need custom work.` },
+    { q: `How is ${svc.serviceName.toLowerCase()} delivered in ${ct.name}?`, a: `${positioning.deliveryModel}. The service can be operated remotely, but the mandate is configured around your systems, market and approval policy.` },
+    { q: `How does local market data affect the build?`, a: `${ct.name} market data provides planning context for account density, competition and customer behavior. It does not substitute for an audit of your own demand, pipeline and operating constraints.` },
+    { q: `What authority does the system receive?`, a: positioning.boundary },
   ];
 
   return (
@@ -105,45 +104,44 @@ export default async function CityPage({ params }: Params) {
                 <h1 className="display-hero max-w-[24ch] text-balance">
                   {svc.headlinePattern.replace("{city}", ct.name).replace("{st}", ct.stateAbbr)}
                 </h1>
-                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
-                <p className="body-lg mt-5 max-w-[54ch]">{svc.intro}</p>
+                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{positioning.subhead}</p>
+                <p className="body-lg mt-5 max-w-[54ch]">{positioning.lead}</p>
                 <p className="body-base mt-4 max-w-[54ch]">
-                  <span className="font-semibold text-[var(--accent-text)]">{rotatedValueProp(svc, ct.slug)}</span>
-                  {" — "}from {ct.districts[0]} to {ct.districts[ct.districts.length - 1]}, wherever your {ct.name} customers are.
+                  Local context from {ct.districts[0]} to {ct.districts[ct.districts.length - 1]} informs the operating case. Your systems, policies and acceptance criteria determine the implementation.
                 </p>
                 <div className="mt-8 cta-row">
                   <PlanCta source={`local-${svc.slug}-${ct.slug}`} />
                   {category && (
                     <Link href={serviceHref(svc)} className="btn btn-outline">
-                      How {svc.botName} works
+                      Review the national service mandate
                     </Link>
                   )}
                 </div>
                 <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               <AgentConsole
-                botName={svc.botName}
-                feed={getOffer(svc.slug)?.feed}
+                botName={positioning.deliveryModel}
+                feed={() => positioning.scope.slice(0, 4).map((item, i) => ({ t: `0${i + 1}`, body: item }))}
                 cityName={ct.name}
                 places={ct.districts}
-                stat={{ value: svc.baseline[0].value, label: svc.baseline[0].metric }}
+                stat={{ value: "Scoped", label: "Mandate and authority" }}
               />
             </div>
           </Container>
         </section>
 
-        <StackStrip tools={getOffer(svc.slug)?.tools} label={`${svc.botName} plugs into`} />
+        <StackStrip tools={["Approved source systems", "Client-owned data", "Authority policy", "Approval queue", "BOT ACTIVITY", "Management reporting"]} label={`${svc.serviceName} operating architecture`} />
 
         {/* This bot's own work, named for this market. */}
         {category && (
           <Section
             variant="alt"
             size="sm"
-            eyebrow={`${svc.botName} in ${ct.name}`}
-            heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+            eyebrow={`${svc.serviceName} in ${ct.name}`}
+            heading={<>A defined mandate, <span className="em-green">operated with control.</span></>}
           >
             <div className="-mx-5 sm:-mx-8">
-              <TaskConveyor tasks={category.capabilities} />
+              <TaskConveyor tasks={positioning.scope} />
             </div>
           </Section>
         )}
@@ -154,12 +152,12 @@ export default async function CityPage({ params }: Params) {
           <Section variant="light">
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
               <div>
-                <p className="eyebrow mb-4">{getOffer(svc.slug)!.signature.eyebrow} · {ct.name}</p>
+                <p className="eyebrow mb-4">Managed operating view · {ct.name}</p>
                 <h2 className="display-xl text-balance">
-                  {getOffer(svc.slug)!.signature.heading} <span className="em-green">{getOffer(svc.slug)!.signature.accent}</span>
+                  Control the mandate. <span className="em-green">Preserve the evidence.</span>
                 </h2>
-                <p className="body-lg mt-5 max-w-[46ch]">{getOffer(svc.slug)!.signature.sub}</p>
-                <p className="body-sm mt-4">Best for: {getOffer(svc.slug)!.bestFor}.</p>
+                <p className="body-lg mt-5 max-w-[46ch]">{positioning.execution}</p>
+                <p className="body-sm mt-4">Delivery model: {positioning.deliveryModel}.</p>
               </div>
               <OfferVisual slug={svc.slug} />
             </div>
@@ -175,7 +173,7 @@ export default async function CityPage({ params }: Params) {
                 ["Businesses in metro", `~${fmt.format(ct.businessCount)} est.`],
                 ["Local-service CPC band", `$${ct.cpcBand[0]}–$${ct.cpcBand[1]} est.`],
                 ["Agency competition", ct.competition],
-                ["Typical build", `${svc.implementationWeeks} weeks`],
+                ["Operating scope", "Proposal-defined"],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{k}</dt>
@@ -193,14 +191,13 @@ export default async function CityPage({ params }: Params) {
         {category && (
           <ZigZag
             eyebrow="What changes"
-            heading={<>Same {ct.name} business. <span className="em-green">Different week.</span></>}
-            botName={svc.botName}
-            rows={category.contrast.map((c, i) => ({
-              label: `${svc.botName} · ${ct.name} · ${category.highlights[i]?.title ?? svc.serviceName}`,
-              title: category.highlights[i]?.title ?? svc.serviceName,
-              today: c.today,
-              after: c.after,
-            }))}
+            heading={<>A clearer operating model for <span className="em-green">{ct.name}.</span></>}
+            botName={positioning.deliveryModel}
+            rows={[
+              { label: `${svc.serviceName} · Ownership`, title: "Defined ownership", today: "Work moves between people and systems without one accountable operating path.", after: "The mandate names the inputs, owner, acceptance criteria and escalation path." },
+              { label: `${svc.serviceName} · Authority`, title: "Controlled authority", today: "Teams rely on informal access and inconsistent review before external changes.", after: positioning.boundary },
+              { label: `${svc.serviceName} · Evidence`, title: "A management record", today: "Activity is difficult to reconstruct across tools, inboxes and handoffs.", after: "BOT RUNS, decisions, exceptions and approved actions remain visible for review." },
+            ]}
           />
         )}
 
@@ -222,9 +219,7 @@ export default async function CityPage({ params }: Params) {
               <div>
                 <p className="display-md mb-3">For a {dominant} business here</p>
                 <p className="body-base">
-                  {dominant[0].toUpperCase() + dominant.slice(1)} is {ct.name}&apos;s dominant vertical, which sets
-                  the shape of the build: {svc.botName} tuned to how {dominant} customers actually buy, with{" "}
-                  {ct.industries.slice(1, 3).join(" and ")} intake patterns covered from day one.
+                  {dominant[0].toUpperCase() + dominant.slice(1)} is a significant local category, but the market profile is planning context only. The final mandate is derived from your actual customer journey, systems, policies and commercial priorities.
                 </p>
               </div>
             </div>
@@ -233,26 +228,27 @@ export default async function CityPage({ params }: Params) {
 
         {/* ── Big-number stat split. ── */}
         <StatSplit
-          eyebrow="The complete system"
-          heading={<>{svc.serviceName} for {ct.name} — <span className="em-green">end to end.</span></>}
-          body={`${category?.outcome ?? svc.hook} ${svc.botName} runs the whole loop for your ${ct.name} business — built, monitored and tuned continuously, on ${ct.timezone.replace("America/", "").replace("_", " ")} hours, inside the accounts you already own.`}
+          eyebrow="Operating model"
+          heading={<>{svc.serviceName} for {ct.name} — <span className="em-green">defined before launch.</span></>}
+          body={`${positioning.summary} ${positioning.execution} The proposal confirms the systems, authority, service levels and review cadence for your organization.`}
           stats={[
-            { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
-            { value: "24/7", label: "Coverage — nights, weekends and holidays" },
-            ...svc.baseline.filter((b) => b.value !== "24/7").slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+            { value: "Defined", label: "Mandate and acceptance criteria" },
+            { value: "Scoped", label: "Systems, data and authority" },
+            { value: "Approved", label: "External actions and changes" },
+            { value: "Recorded", label: "BOT ACTIVITY and exceptions" },
           ]}
           source={`local-${svc.slug}-${ct.slug}-statsplit`}
-          note="No per-seat pricing. No percentage of ad spend. No lock-in."
+          note={`${positioning.deliveryModel} · implementation and operating terms confirmed in the proposal.`}
         />
 
         {/* Other services in this city — the highest-leverage internal-link
             block from the Lot Sealers playbook. */}
-        <Section variant="light" size="sm" eyebrow={`Also running in ${ct.name}`}
-          heading={`Other bots ${ct.name} businesses deploy.`}>
+        <Section variant="light" size="sm" eyebrow={`Related mandates in ${ct.name}`}
+          heading={`Adjacent operating capabilities.`}>
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {ALL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
               <Link key={o.slug} href={`/services/${o.serviceSlug}/${st.slug}/${ct.slug}`} className="group card-cell p-6">
-                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
+                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{getServicePositioning(o.slug).deliveryModel}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
                   {o.serviceName} in {ct.name}
                 </p>
@@ -290,10 +286,10 @@ export default async function CityPage({ params }: Params) {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`See where ${ct.name} leads are slipping.`}
-          sub={`We review your public customer journey and identify a useful starting workflow. ${rotatedCta(svc.slug, ct.slug)}`}>
+        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`Define the ${ct.name} operating case for ${svc.serviceName}.`}
+          sub={`We review the public customer journey, identify a defensible starting mandate and document the next decision. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}>
           <div>
-            <AuditForm source={`local-${svc.slug}-${ct.slug}-form`} focus={svc.botName} />
+            <AuditForm source={`local-${svc.slug}-${ct.slug}-form`} focus={svc.serviceName} />
           </div>
         </Section>
       </main>
@@ -307,12 +303,11 @@ export default async function CityPage({ params }: Params) {
 
 
 import type { DatasetCity, DatasetState } from "@/lib/geo/dataset";
-import { rotatedValueProp as rvp, rotatedCta as rcta } from "@/lib/geo/seo-rotation";
-
 function StructuralCityService({ svc, st, rec }: {
   svc: Service; st: DatasetState; rec: DatasetCity;
 }) {
   const category = svc;
+  const positioning = getServicePositioning(svc.slug);
   const surrounding = rec.surrounding
     .filter((s0) => ALL_CITIES.some((x) => x.city_slug === s0.slug && x.state_slug === rec.state_slug))
     .slice(0, 5);
@@ -320,8 +315,8 @@ function StructuralCityService({ svc, st, rec }: {
   const consolePlaces = vignetteLabels.length ? vignetteLabels : [rec.metro];
 
   const faqs = [
-    { q: `Do you serve ${rec.city} remotely?`, a: `Yes — ${svc.botName} runs inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro, on your local hours.` },
-    { q: `How fast can ${svc.serviceName.toLowerCase()} go live in ${rec.city}?`, a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
+    { q: `How is ${svc.serviceName.toLowerCase()} delivered in ${rec.city}?`, a: `${positioning.deliveryModel}. The service can be operated remotely across the ${rec.metro} metro, with the systems, data and market context confirmed in the proposal.` },
+    { q: `What authority does the system receive?`, a: positioning.boundary },
     { q: `What does it cost?`, a: `The BOT workflow audit is ${AUDIT_OFFER.priceLabel}. A managed deployment has a one-time build fee, then a monthly fee to run and tune. Systems start at $2,500 a month with scope confirmed before implementation.` },
   ];
 
@@ -362,45 +357,44 @@ function StructuralCityService({ svc, st, rec }: {
                 <h1 className="display-hero max-w-[24ch] text-balance">
                   {svc.headlinePattern.replace("{city}", rec.city).replace("{st}", rec.state_abbr)}
                 </h1>
-                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{svc.hook}</p>
-                <p className="body-lg mt-5 max-w-[54ch]">{svc.intro}</p>
+                <p className="display-lg mt-3 !font-medium text-[var(--accent-text)]">{positioning.subhead}</p>
+                <p className="body-lg mt-5 max-w-[54ch]">{positioning.lead}</p>
                 <p className="body-base mt-4 max-w-[54ch]">
-                  <span className="font-semibold text-[var(--accent-text)]">{rvp(svc, rec.city_slug)}</span>
-                  {" — "}deployed remotely for {rec.city} businesses, wired into the tools you already use.
+                  The {rec.metro} market provides local planning context. Your own customer journey, systems, policies and acceptance criteria determine the implementation.
                 </p>
                 <div className="mt-8 cta-row">
                   <PlanCta source={`local-${svc.slug}-${rec.city_slug}`} />
                   {category && (
                     <Link href={serviceHref(svc)} className="btn btn-outline">
-                      How {svc.botName} works
+                      Review the national service mandate
                     </Link>
                   )}
                 </div>
                 <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               <AgentConsole
-                botName={svc.botName}
-                feed={getOffer(svc.slug)?.feed}
+                botName={positioning.deliveryModel}
+                feed={() => positioning.scope.slice(0, 4).map((item, i) => ({ t: `0${i + 1}`, body: item }))}
                 cityName={rec.city}
                 places={consolePlaces}
-                stat={{ value: svc.baseline[0].value, label: svc.baseline[0].metric }}
+                stat={{ value: "Scoped", label: "Mandate and authority" }}
               />
             </div>
           </Container>
         </section>
 
-        <StackStrip tools={getOffer(svc.slug)?.tools} label={`${svc.botName} plugs into`} />
+        <StackStrip tools={["Approved source systems", "Client-owned data", "Authority policy", "Approval queue", "BOT ACTIVITY", "Management reporting"]} label={`${svc.serviceName} operating architecture`} />
 
         {/* This bot's own work, named for this market. */}
         {category && (
           <Section
             variant="alt"
             size="sm"
-            eyebrow={`${svc.botName} in ${rec.city}`}
-            heading={<>Every one of these, <span className="em-green">continuously.</span></>}
+            eyebrow={`${svc.serviceName} in ${rec.city}`}
+            heading={<>A defined mandate, <span className="em-green">operated with control.</span></>}
           >
             <div className="-mx-5 sm:-mx-8">
-              <TaskConveyor tasks={category.capabilities} />
+              <TaskConveyor tasks={positioning.scope} />
             </div>
           </Section>
         )}
@@ -412,12 +406,12 @@ function StructuralCityService({ svc, st, rec }: {
           <Section variant="light">
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
               <div>
-                <p className="eyebrow mb-4">{getOffer(svc.slug)!.signature.eyebrow} · {rec.city}</p>
+                <p className="eyebrow mb-4">Managed operating view · {rec.city}</p>
                 <h2 className="display-xl text-balance">
-                  {getOffer(svc.slug)!.signature.heading} <span className="em-green">{getOffer(svc.slug)!.signature.accent}</span>
+                  Control the mandate. <span className="em-green">Preserve the evidence.</span>
                 </h2>
-                <p className="body-lg mt-5 max-w-[46ch]">{getOffer(svc.slug)!.signature.sub}</p>
-                <p className="body-sm mt-4">Best for: {getOffer(svc.slug)!.bestFor}.</p>
+                <p className="body-lg mt-5 max-w-[46ch]">{positioning.execution}</p>
+                <p className="body-sm mt-4">Delivery model: {positioning.deliveryModel}.</p>
               </div>
               <OfferVisual slug={svc.slug} />
             </div>
@@ -427,14 +421,13 @@ function StructuralCityService({ svc, st, rec }: {
         {category && (
           <ZigZag
             eyebrow="What changes"
-            heading={<>Same {rec.city} business. <span className="em-green">Different week.</span></>}
-            botName={svc.botName}
-            rows={category.contrast.map((c, i) => ({
-              label: `${svc.botName} · ${rec.city} · ${category.highlights[i]?.title ?? svc.serviceName}`,
-              title: category.highlights[i]?.title ?? svc.serviceName,
-              today: c.today,
-              after: c.after,
-            }))}
+            heading={<>A clearer operating model for <span className="em-green">{rec.city}.</span></>}
+            botName={positioning.deliveryModel}
+            rows={[
+              { label: `${svc.serviceName} · Ownership`, title: "Defined ownership", today: "Work moves between people and systems without one accountable operating path.", after: "The mandate names the inputs, owner, acceptance criteria and escalation path." },
+              { label: `${svc.serviceName} · Authority`, title: "Controlled authority", today: "Teams rely on informal access and inconsistent review before external changes.", after: positioning.boundary },
+              { label: `${svc.serviceName} · Evidence`, title: "A management record", today: "Activity is difficult to reconstruct across tools, inboxes and handoffs.", after: "BOT RUNS, decisions, exceptions and approved actions remain visible for review." },
+            ]}
           />
         )}
 
@@ -446,9 +439,7 @@ function StructuralCityService({ svc, st, rec }: {
             </div>
             <div>
               <p className="body-base max-w-[52ch]">
-                {svc.botName} deploys remotely across the {rec.metro} metro — everything runs
-                inside your existing accounts, scheduled on your local hours, wherever your
-                customers are.
+                {svc.serviceName} can be operated remotely across the {rec.metro} metro. The deployment uses only the systems, data and authority defined in your approved scope.
               </p>
               {surrounding.length > 0 && (
                 <div className="mt-7 flex flex-wrap gap-3">
@@ -469,25 +460,26 @@ function StructuralCityService({ svc, st, rec }: {
 
         {/* ── Big-number stat split. ── */}
         <StatSplit
-          eyebrow="The complete system"
-          heading={<>{svc.serviceName} for {rec.city} — <span className="em-green">end to end.</span></>}
-          body={`${category?.outcome ?? svc.hook} ${svc.botName} runs the whole loop for your ${rec.city} business — built, monitored and tuned continuously, inside the accounts you already own.`}
+          eyebrow="Operating model"
+          heading={<>{svc.serviceName} for {rec.city} — <span className="em-green">defined before launch.</span></>}
+          body={`${positioning.summary} ${positioning.execution} The proposal confirms the systems, authority, service levels and review cadence for your organization.`}
           stats={[
-            { value: `${svc.implementationWeeks}w`, label: "To your first system live, in monitored mode" },
-            { value: "24/7", label: "Coverage — nights, weekends and holidays" },
-            ...svc.baseline.filter((b) => b.value !== "24/7").slice(0, 2).map((b) => ({ value: b.value, label: b.metric })),
+            { value: "Defined", label: "Mandate and acceptance criteria" },
+            { value: "Scoped", label: "Systems, data and authority" },
+            { value: "Approved", label: "External actions and changes" },
+            { value: "Recorded", label: "BOT ACTIVITY and exceptions" },
           ]}
           source={`local-${svc.slug}-${rec.city_slug}-statsplit`}
-          note="No per-seat pricing. No percentage of ad spend. No lock-in."
+          note={`${positioning.deliveryModel} · implementation and operating terms confirmed in the proposal.`}
         />
 
         {/* Other services, same city — every internal link keeps the city. */}
-        <Section variant="light" size="sm" eyebrow={`Also running in ${rec.city}`}
-          heading={`Other bots ${rec.city} businesses deploy.`}>
+        <Section variant="light" size="sm" eyebrow={`Related mandates in ${rec.city}`}
+          heading="Adjacent operating capabilities.">
           <div className="grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
             {ALL_SERVICES.filter((o) => o.slug !== svc.slug).map((o) => (
               <Link key={o.slug} href={`/services/${o.serviceSlug}/${st.slug}/${rec.city_slug}`} className="group card-cell p-6">
-                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{o.botName}</p>
+                <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{getServicePositioning(o.slug).deliveryModel}</p>
                 <p className="display-md mt-2 group-hover:text-[var(--accent-text)] transition-colors">
                   {o.serviceName} in {rec.city}
                 </p>
@@ -510,10 +502,10 @@ function StructuralCityService({ svc, st, rec }: {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`See where ${rec.city} leads are slipping.`}
-          sub={`We review your public customer journey and identify a useful starting workflow. ${rcta(svc.slug, rec.city_slug)}`}>
+        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`Define the ${rec.city} operating case for ${svc.serviceName}.`}
+          sub={`We review the public customer journey, identify a defensible starting mandate and document the next decision. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}>
           <div>
-            <AuditForm source={`local-${svc.slug}-${rec.city_slug}-form`} focus={svc.botName} />
+            <AuditForm source={`local-${svc.slug}-${rec.city_slug}-form`} focus={svc.serviceName} />
           </div>
         </Section>
       </main>

@@ -5,6 +5,7 @@ import { Container } from "@/components/ui";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { SORTED_POSTS } from "@/lib/posts";
 import { CITIES, STATES, citiesInState } from "@/lib/geo/data";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 export const metadata: Metadata = {
   title: "Site map",
@@ -24,7 +25,7 @@ export default function SiteMapPage() {
 
           <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div>
-              <h2 className="display-md border-b border-[var(--border)] pb-2 mb-4">Bots</h2>
+              <h2 className="display-md border-b border-[var(--border)] pb-2 mb-4">Service mandates</h2>
               {CATALOG.map((p) => (
                 <div key={p.slug} className="mb-5">
                   <Link href={`/${p.slug}`} className="text-[14px] font-semibold hover:text-[var(--accent-text)]">{p.name}</Link>
@@ -32,7 +33,7 @@ export default function SiteMapPage() {
                     {p.categories.map((c) => (
                       <li key={c.slug}>
                         <Link href={serviceHref(c)} className="text-[13.5px] text-[var(--text-secondary)] hover:text-[var(--accent-text)]">
-                          {c.botName} — {c.name}
+                          {c.name} — {getServicePositioning(c.slug).deliveryModel}
                         </Link>
                       </li>
                     ))}

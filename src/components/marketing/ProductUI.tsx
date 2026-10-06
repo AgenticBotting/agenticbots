@@ -135,7 +135,7 @@ export function ActivityLog({ title, crumb, rows, summary }: {
               {i === 0 ? <CircleDot className="w-2.5 h-2.5 text-white" /> : <Check className="w-2.5 h-2.5 text-[var(--accent-text)]" strokeWidth={3} />}
             </span>
             <span className="text-[13px] leading-snug text-[var(--text-body)]">{r.body}</span>
-            <span className="text-[11.5px] tabular-nums text-[var(--text-muted)] whitespace-nowrap pt-px">{r.t} ago</span>
+            <span className="text-[11.5px] tabular-nums text-[var(--text-muted)] whitespace-nowrap pt-px">{r.t}</span>
           </li>
         ))}
       </ol>

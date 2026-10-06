@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, regionSlug, type Region } from "@/lib/geo/regions";
@@ -290,8 +291,9 @@ export function Header() {
                           {category.slug === START_SLUG && (
                             <span className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-text)]">Recommended starting point</span>
                           )}
-                          <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{category.botName}</span>
-                          <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{category.outcome}</span>
+                          <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{category.name}</span>
+                          <span className="mono text-[9.5px] uppercase tracking-[0.08em] text-[var(--text-muted)]">{getServicePositioning(category.slug).deliveryModel}</span>
+                          <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{getServicePositioning(category.slug).summary}</span>
                           <span className="mt-auto flex items-center justify-between pt-2 text-[12px] font-semibold text-[var(--foreground)]">
                             Review BOT
                             <ArrowRight className="h-4 w-4 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
@@ -430,7 +432,7 @@ export function Header() {
                 >
                   {st.items.map((c) => (
                     <MobileRow key={c.slug} href={serviceHref(c)} onGo={closeMobile} meta={c.slug === START_SLUG ? "Start here" : undefined} boxed>
-                      {c.botName}
+                      {c.name}
                     </MobileRow>
                   ))}
                 </MobileGroup>

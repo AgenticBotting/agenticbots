@@ -106,7 +106,7 @@ export function PostOptin({
           </span>
           <p className="display-md">Get more like this</p>
           <p className="body-sm mt-2">
-            What running agent fleets in production actually teaches us. No spam.
+            Notes on governed BOT operations, workflow design and commercial systems.
           </p>
           <form onSubmit={onSubmit} className="mt-5 space-y-2.5">
             <input

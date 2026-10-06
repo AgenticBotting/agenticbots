@@ -8,10 +8,10 @@ import { ActivityLog } from "./ProductUI";
  */
 
 const DEFAULT_STATIONS = [
-  { label: "Answered a missed call by text", meta: "38s" },
-  { label: "Followed up on an open quote", meta: "12m" },
-  { label: "Booked an estimate on the calendar", meta: "26m" },
-  { label: "Logged every conversation to the CRM", meta: "41m" },
+  { label: "Operating mandate accepted", meta: "2m" },
+  { label: "System access reviewed", meta: "14m" },
+  { label: "Approval policy loaded", meta: "37m" },
+  { label: "BOT ACTIVITY record opened", meta: "1h" },
 ];
 
 export function BotFactory({

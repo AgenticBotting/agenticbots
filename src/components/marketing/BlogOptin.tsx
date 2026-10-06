@@ -72,11 +72,10 @@ export function BlogOptin({
             <p className="eyebrow eyebrow-dim">{AUDIT_OFFER.priceLabel} · {AUDIT_OFFER.turnaround}</p>
 
             <h3 className="display-lg mt-3 text-balance">
-              Where is your business losing customers?
+              Which operating constraint deserves a defined mandate?
             </h3>
             <p className="body-sm mt-3 text-pretty">
-              Tell us what you sell. We map every point between a lead arriving and a
-              job closing where people drop out, and name the bots that fix it.
+              Give us the business context. We review the public customer journey, identify a defensible starting mandate and document the next decision.
             </p>
 
             <form onSubmit={onSubmit} className="mx-auto mt-7 max-w-[460px]">

@@ -2,6 +2,14 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Backend-aligned enterprise copy audit — 2026-10-06
+
+The backend catalog is now the source of truth for public service architecture. It contains 10 deployable BOT types and 9 versioned skills. The website retains 13 commercial service mandates, with Email Marketing, Conversion Rate Optimization and Inbound Lead Handling correctly presented as combinations of existing BOTS, skills and scoped implementation rather than standalone BOT types.
+
+Enterprise positioning records now define the delivery model, operating scope and authority boundary for every service. Those records drive the services index, national service pages, state and city service pages, market hubs, desktop and mobile navigation, intake flows, sitemap labels and social cards. Location pages use local data as planning context and no longer present metro counts, CPC estimates or business counts as evidence of likely client outcomes.
+
+Active sales surfaces no longer use synthetic KPI charts, universal `<60s`/`24/7` promises, fixed implementation timelines, autonomous sending/publishing/CRM claims or assumed third-party integrations. Visuals instead show mandate definition, authority, approvals, exceptions and BOT ACTIVITY. The capability mapping and copy rules are recorded in `docs/SERVICE_CAPABILITY_AUDIT.md`.
+
 ## Enterprise positioning refinement — 2026-10-06
 
 Homepage and national service-page language now targets established residential and commercial contractors, typically above $2M in annual revenue. The core vocabulary is operating mandate, managed deployment, authority, governance, reviewable activity and coordinated revenue lifecycle. Consumer-style phrases such as “autopilot,” “not one idle” and “different week” were removed from the primary experience.
@@ -58,6 +66,7 @@ The hero and residential/commercial sections use lightweight, code-rendered inte
 - Light service surfaces and paid-audit positioning passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, in-app full-page visual review, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
 - Outcome-first Services navigation passed live browser review at 1440px: three initial outcome lanes, focused service results, working return navigation and no console errors. The final premium pass removed icon tiles, background watermarks, BOT-count labels, floating card shadows and the tinted promo band. It uses a single framed decision surface and compact audit prompt. It also passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build with link, SEO and topic gates.
 - Service Areas navigation passed live browser review at 1440px: all five region lanes rendered with correct counts, Southwest revealed four state destinations, Miami search returned the canonical market route, the search empty state retained paid-audit language, and no console errors appeared. The final premium pass replaced floating region and state cards with unified framed grids and aligned the audit prompt with Services. It passed the same typecheck, lint, 173-test and full production-build suite, including link, SEO and topic gates.
+- Backend-aligned enterprise copy passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed. Read-only localhost checks confirmed the Email mandate renders as Outbound + Reactivation BOTS, CRO renders as Analytics BOT with scoped implementation, and the Miami market hub states 13 mandates across 10 deployable BOT types. In-app browser attachment was rejected by the browser security layer, so no new screenshot review was recorded in this pass.
 
 ## Follow-on evidence work
 

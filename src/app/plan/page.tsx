@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 };
 
 const INCLUDED = [
-  { t: "Where you are leaking", b: "The specific points between a lead arriving and a job closing where you are losing people." },
-  { t: "Which bots fix it", b: "Named, in priority order, with what each one connects to in your existing stack." },
-  { t: "What to validate", b: "The data needed to understand whether the proposed workflow is worth implementing." },
-  { t: "What it takes", b: "The next discovery steps before a scoped proposal confirms build timing and costs." },
+  { t: "The operating constraint", b: "The point in the customer or commercial workflow that deserves executive attention." },
+  { t: "The recommended mandate", b: "The service scope and BOT configuration that provide the strongest defensible starting point." },
+  { t: "The control requirements", b: "The systems, data, authority and approvals that must be defined before implementation." },
+  { t: "The next decision", b: "The discovery steps required for a proposal to confirm implementation timing and commercial scope." },
 ];
 
 export default function PlanPage() {
@@ -44,9 +44,9 @@ export default function PlanPage() {
           <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
             <div>
               <p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} · {AUDIT_OFFER.turnaround}</p>
-              <h1 className="display-hero text-balance">Find your <span className="em-green">first BOT opportunity.</span></h1>
+              <h1 className="display-hero text-balance">Define the first <span className="em-green">BOT mandate.</span></h1>
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                Tell us about your business. We review the public customer journey and identify a useful starting workflow. We confirm scope and payment before work begins.
+                Give us the business context behind the operating constraint. We review the public customer journey and document a defensible starting mandate. Scope and payment are confirmed before work begins.
               </p>
 
               <ul className="mt-10 space-y-6">
@@ -62,8 +62,7 @@ export default function PlanPage() {
               </ul>
 
               <p className="body-sm mt-10 pt-8 border-t border-[var(--border)] max-w-[44ch]">
-                The plan is yours to keep. If you want to build it in-house, or hand it
-                to someone else, that is a fine outcome.
+                The written findings remain yours. They are designed to support an informed implementation decision, whether or not AgenticBots delivers the next phase.
               </p>
             </div>
 

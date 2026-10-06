@@ -23,7 +23,7 @@ describe("Bot catalog", () => {
       expect([b.displayName, b.serviceRoute]).toEqual(want[b.key]);
       expect(ALL_SERVICES.some((s) => `/services/${s.serviceSlug}` === b.serviceRoute && s.outcome === b.shortDescription)).toBe(true);
     }
-    expect(BOT_CATALOG.find((b) => b.key === "ads")!.shortDescription).toBe("Your ad budget goes to the searches that actually book work.");
+    expect(BOT_CATALOG.find((b) => b.key === "ads")!.shortDescription).toBe("Advertising spend is governed through a defined operating cadence and authority model.");
   });
   it("never calls a worker an Agent in product labels", () => {
     for (const b of BOT_CATALOG) expect(b.displayName).not.toMatch(/agent/i);

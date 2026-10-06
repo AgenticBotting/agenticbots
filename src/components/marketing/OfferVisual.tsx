@@ -19,19 +19,19 @@ type Spec = {
 };
 
 const SPECS: Record<string, Spec> = {
-  "paid-media":      { label: "Cost per booked job", value: "$80", delta: "down 41% in 12 weeks", caption: "Search terms reviewed daily", kind: "line", series: [136, 131, 119, 108, 101, 96, 92, 88, 86, 84, 81, 80], axis: ["Week 1", "Week 12"] },
-  seo:               { label: "Calls from Google", value: "61/mo", delta: "up from 18", caption: "Rankings checked daily", kind: "line", series: [18, 19, 22, 24, 27, 31, 35, 40, 44, 49, 55, 61], axis: ["Week 1", "Week 12"] },
-  content:           { label: "Profile views", value: "8.4k", delta: "up 3.1× in 12 weeks", caption: "Posts published every week", kind: "line", series: [2.1, 2.3, 2.2, 2.9, 3.4, 3.9, 4.6, 5.2, 6.1, 6.8, 7.5, 8.4], axis: ["Week 1", "Week 12"] },
-  email:             { label: "Quote reply rate", value: "26%", delta: "up from 8%", caption: "Every open quote followed up", kind: "bars", series: [8, 11, 13, 16, 18, 21, 23, 26], axis: ["Week 1", "Week 8"] },
-  cro:               { label: "Form conversion", value: "5.4%", delta: "up from 3.1%", caption: "Tests run to significance", kind: "line", series: [3.1, 3.3, 3.6, 4.0, 4.3, 4.6, 4.8, 5.0, 5.1, 5.3, 5.4, 5.4], axis: ["Day 1", "Day 12"] },
-  analytics:         { label: "Booked jobs per week", value: "31", delta: "up from 19", caption: "One report every Monday", kind: "bars", series: [19, 21, 20, 24, 23, 26, 25, 31], axis: ["Week 1", "Week 8"] },
-  "lead-generation": { label: "Verified accounts", value: "42", delta: "delivered this week", caption: "Property managers, GCs, facilities", kind: "bars", series: [18, 24, 27, 31, 33, 36, 39, 42], axis: ["Week 1", "Week 8"] },
-  outbound:          { label: "Positive replies", value: "9/wk", delta: "up from 2", caption: "Walk-throughs booked automatically", kind: "bars", series: [2, 3, 3, 5, 4, 6, 7, 9], axis: ["Week 1", "Week 8"] },
-  inbound:           { label: "Median first reply", value: "38s", delta: "down from 3h 12m", caption: "Every call, form and text", kind: "line", series: [192, 120, 64, 22, 6, 2, 1.2, 0.9, 0.7, 0.66, 0.64, 0.63], axis: ["Before", "With the bot"] },
-  crm:               { label: "Open pipeline", value: "$184k", delta: "every job up to date", caption: "Logged without anyone typing", kind: "line", series: [118, 124, 129, 133, 140, 146, 151, 158, 164, 171, 178, 184], axis: ["Week 1", "Week 12"] },
-  enablement:        { label: "Time to quote", value: "41 min", delta: "down from 3.2 days", caption: "Followed up until signed", kind: "line", series: [77, 70, 58, 44, 30, 18, 9, 4, 2, 1.2, 0.8, 0.7], axis: ["Week 1", "Week 12"] },
-  reviews:           { label: "Google rating", value: "4.8★", delta: "112 reviews, up from 64", caption: "Every finished job asked", kind: "line", series: [64, 66, 69, 74, 80, 87, 93, 99, 104, 108, 112], axis: ["April", "September"] },
-  reactivation:      { label: "Revenue from past customers", value: "$38k", delta: "this season, no ad spend", caption: "Reminders timed to the season", kind: "bars", series: [2.1, 4.3, 3.8, 5.6, 6.4, 4.9, 5.5, 5.8], axis: ["Week 1", "Week 8"] },
+  "paid-media":      { label: "Paid-media change control", value: "Approved", delta: "Budget authority remains explicit", caption: "Analysis → proposal → approval → record", kind: "line", series: [1, 2, 2, 3, 4, 4, 5, 6], axis: ["Signal", "Decision record"] },
+  seo:               { label: "Search operating roadmap", value: "Defined", delta: "Publishing remains approval-gated", caption: "Monitoring → priority → review → publish", kind: "line", series: [1, 1, 2, 3, 3, 4, 5, 6], axis: ["Observation", "Recorded action"] },
+  content:           { label: "Editorial workflow", value: "Governed", delta: "Approved sources and review stages", caption: "Source → draft → review → distribution", kind: "line", series: [1, 2, 2, 3, 4, 5, 5, 6], axis: ["Source", "Distribution"] },
+  email:             { label: "Lifecycle communication", value: "Controlled", delta: "Consent and suppression enforced", caption: "Audience → approval → delivery → response", kind: "bars", series: [1, 2, 3, 4, 5, 6], axis: ["Audience", "Handoff"] },
+  cro:               { label: "Experiment program", value: "Documented", delta: "Implementation separately approved", caption: "Observe → prioritize → test → decide", kind: "line", series: [1, 2, 2, 3, 4, 4, 5, 6], axis: ["Hypothesis", "Decision"] },
+  analytics:         { label: "Management reporting", value: "Reviewable", delta: "Definitions and assumptions remain visible", caption: "Source → reconcile → exception → report", kind: "bars", series: [1, 2, 3, 4, 5, 6], axis: ["Source", "Management view"] },
+  "lead-generation": { label: "Prospecting mandate", value: "Qualified", delta: "ICP and budgets govern research", caption: "Market → account → buyer → handoff", kind: "bars", series: [1, 2, 3, 4, 5, 6], axis: ["Market", "Governed handoff"] },
+  outbound:          { label: "Outbound authority", value: "Approved", delta: "Suppression checked before delivery", caption: "Audience → draft → approve → route", kind: "bars", series: [1, 2, 3, 4, 5, 6], axis: ["Audience", "Reply routing"] },
+  inbound:           { label: "Inbound operating path", value: "Scoped", delta: "Channels and service levels are explicit", caption: "Signal → qualify → schedule → record", kind: "line", series: [1, 2, 2, 3, 4, 5, 5, 6], axis: ["Signal", "System of record"] },
+  crm:               { label: "CRM write authority", value: "Controlled", delta: "Updates follow the approval policy", caption: "Detect → prepare → approve → write", kind: "line", series: [1, 1, 2, 3, 4, 4, 5, 6], axis: ["Exception", "Recorded update"] },
+  enablement:        { label: "Proposal workflow", value: "Governed", delta: "Scope and pricing use approved inputs", caption: "Inputs → draft → review → deliver", kind: "line", series: [1, 2, 2, 3, 4, 5, 5, 6], axis: ["Approved inputs", "Status handoff"] },
+  reviews:           { label: "Customer-care workflow", value: "Approved", delta: "Sensitive feedback routes to people", caption: "Eligibility → draft → review → publish", kind: "line", series: [1, 2, 2, 3, 4, 4, 5, 6], axis: ["Eligibility", "Recorded action"] },
+  reactivation:      { label: "Reactivation mandate", value: "Eligible", delta: "History, consent and timing govern action", caption: "Review → segment → approve → route", kind: "bars", series: [1, 2, 3, 4, 5, 6], axis: ["History", "Response routing"] },
 };
 
 const W = 480, H = 160, PAD = 4;

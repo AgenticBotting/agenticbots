@@ -6,8 +6,8 @@ import { BOT_PATH } from "@/components/ui/BotFace";
  * Replaces three prose cards; the copy is now captions on the diagram.
  */
 
-const INPUTS = ["missed call", "web form", "ad click", "email reply", "dm"];
-const OUTPUTS = ["booked call", "quote sent", "crm updated", "follow-up queued", "report"];
+const INPUTS = ["market signal", "customer request", "system event", "team decision", "policy change"];
+const OUTPUTS = ["proposed action", "approval request", "system handoff", "exception queue", "activity record"];
 
 const W = 1120, H = 460;
 const CX = W / 2, CY = H / 2 - 10;
@@ -24,7 +24,7 @@ export function SignalFlow() {
   return (
     <div className="relative">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img"
-        aria-label="Diagram: missed calls, web forms, ad clicks, email replies and DMs flow into the bot, which watches, acts and reports — producing booked calls, sent quotes, updated CRM records, queued follow-ups and one report.">
+        aria-label="Diagram: market signals, customer requests, system events, team decisions and policy changes enter a governed BOT workflow that produces proposed actions, approval requests, system handoffs, exception queues and activity records.">
         <defs>
           {/* Work travels the wires: a dash sliding along each path. */}
           <style>{`
@@ -67,10 +67,10 @@ export function SignalFlow() {
             <path fillRule="evenodd" clipRule="evenodd" d={BOT_PATH} fill="var(--color-accent-500)" />
           </g>
           <text x="96" y="86" textAnchor="middle" fontSize="11" fontFamily="var(--font-mono)" fill="var(--color-ink-300)" letterSpacing="1.5">
-            WATCHES · ACTS
+            READS · PREPARES
           </text>
           <text x="96" y="104" textAnchor="middle" fontSize="11" fontFamily="var(--font-mono)" fill="var(--color-ink-300)" letterSpacing="1.5">
-            · REPORTS
+            · RECORDS
           </text>
         </g>
 
@@ -86,9 +86,9 @@ export function SignalFlow() {
       {/* The three-beat caption row — all that remains of the old prose. */}
       <dl className="mt-8 grid sm:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
         {[
-          ["01 · watches", "Your ads, inbox, forms, phone and CRM — every hour."],
-          ["02 · acts", "Replies, books, bids and logs in seconds, by your rules."],
-          ["03 · reports", "One plain-English view of what it did and what came back."],
+          ["01 · observes", "Approved systems and inputs enter one defined operating path."],
+          ["02 · governs", "Authority and approval policy determine what can proceed."],
+          ["03 · records", "BOT RUNS, decisions and exceptions remain visible for review."],
         ].map(([t, b]) => (
           <div key={t} className="card-cell px-6 py-5">
             <dt className="mono text-[11px] uppercase tracking-[0.11em] text-[var(--accent-text)]">{t}</dt>

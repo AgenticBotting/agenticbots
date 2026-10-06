@@ -1,22 +1,14 @@
 /**
  * The capability band under the hero.
  *
- * These are targets a full deployment is built to hit, not measured
- * client results — we are new and say so in the band itself. The framing
- * is confident rather than apologetic: this is what the system does when
- * it is running, stated plainly, with the caveat owned up front instead
- * of buried in a footnote.
- *
- * Swap in verified numbers when the first client reports them, and the
- * eyebrow changes from "built to do" to "does".
+ * A compact statement of the controls present in a managed deployment.
+ * It intentionally avoids synthetic targets while client proof develops.
  */
-import { CountUp } from "@/components/ui";
-
 const PROOF = [
-  { v: "38", unit: "%", l: "More jobs booked", sub: "Inside the first 60 days" },
-  { v: "41", unit: "s", l: "To the first reply", sub: "Any hour, any day" },
-  { v: "6.2", unit: "k", l: "Agent actions a week", sub: "Every one of them logged" },
-  { v: "0", unit: "", l: "Leads left overnight", sub: "Nights, weekends, holidays" },
+  { v: "Defined", l: "Operating mandate", sub: "Inputs, owners and acceptance criteria" },
+  { v: "Scoped", l: "System authority", sub: "Access and boundaries agreed before launch" },
+  { v: "Approved", l: "External action", sub: "Human control where the policy requires it" },
+  { v: "Recorded", l: "BOT ACTIVITY", sub: "Runs, decisions and exceptions remain reviewable" },
 ];
 
 export function ProofBar() {
@@ -24,9 +16,9 @@ export function ProofBar() {
     <section className="border-b border-[var(--border)] bg-[var(--bg-alt)]">
       <div className="container-site section-pad-sm">
         <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3">
-          <p className="eyebrow">What a full deployment is built to do</p>
+          <p className="eyebrow">Control model</p>
           <p className="mono text-[10.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
-            Targets · not client results · we are new and say so
+            The operating standard for a managed deployment
           </p>
         </div>
 
@@ -42,15 +34,7 @@ export function ProofBar() {
               className="bg-[var(--bg-alt)] py-8 pl-0 pr-5 even:pl-5 lg:pl-8 lg:pr-6 lg:first:pl-0"
             >
               <dt className="flex items-baseline">
-                <CountUp
-                  value={p.v}
-                  className="text-[clamp(2.5rem,4.4vw,3.5rem)] font-semibold tracking-[-0.045em] leading-[0.9] tabular-nums text-[var(--foreground)]"
-                />
-                {p.unit && (
-                  <span className="text-[clamp(1.4rem,2.2vw,1.9rem)] font-semibold tracking-[-0.03em] leading-none text-[var(--accent-text)]">
-                    {p.unit}
-                  </span>
-                )}
+                <span className="text-[clamp(1.6rem,3vw,2.4rem)] font-semibold tracking-[-0.04em] leading-[0.95] text-[var(--foreground)]">{p.v}</span>
               </dt>
               <dd className="mt-4">
                 <span className="block text-[15px] font-semibold tracking-[-0.015em] leading-snug">

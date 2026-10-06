@@ -9,11 +9,12 @@ import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { ALL_STATES, ALL_CITIES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, regionSlug } from "@/lib/geo/regions";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 export const metadata: Metadata = {
   title: "Markets we serve",
   description:
-    "Agent systems across the country — every state, organized by region, each city with its own market hub.",
+    "Governed BOT operating mandates across the country, organized by region, state and metro.",
   alternates: { canonical: "/markets" },
 };
 
@@ -30,11 +31,10 @@ export default function MarketsIndex() {
               <div>
                 <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {ALL_CITIES.length} cities · {ALL_STATES.length} states</span></p>
                 <h1 className="display-hero max-w-[20ch] text-balance">
-                  Deployed where your customers are.
+                  National delivery. Local operating context.
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">
-                  The fleet deploys remotely, so coverage is national — organized here by region,
-                  then state, then metro. Every market page carries its own coverage detail.
+                  AgenticBots operates nationally. These pages organize service availability and local planning context by region, state and metro; each engagement is scoped to the client&apos;s systems and authority model.
                 </p>
                 <div className="mt-8"><PlanCta source="markets-index" /></div>
               </div>
@@ -86,7 +86,7 @@ export default function MarketsIndex() {
             {ALL_SERVICES.map((s) => (
               <Link key={s.slug} href={serviceHref(s)} className="group card-cell p-6">
                 <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
-                <span className="block body-xs mt-2">{s.botName} · every market</span>
+                <span className="block body-xs mt-2">{getServicePositioning(s.slug).deliveryModel} · national delivery</span>
               </Link>
             ))}
           </div>

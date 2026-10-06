@@ -15,6 +15,7 @@ import {
   regionSlug,
   siblingRegions,
 } from "@/lib/geo/regions";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ region: string }> };
 
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const top = states.slice(0, 3).map((st) => st.name).join(", ");
   return {
     title: `${region} markets`,
-    description: `Agent systems across the ${region} — ${states.length} states and ${cities} cities including ${top}: every call answered, every quote followed up, 24/7.`,
+    description: `Governed BOT operating mandates across the ${region}: ${states.length} states and ${cities} cities, including ${top}.`,
     alternates: { canonical: `/markets/region/${slug}` },
   };
 }
@@ -77,11 +78,10 @@ export default async function RegionMarketPage({ params }: Params) {
                   <span className="eyebrow-dim"> · {states.length} states · {cities} cities</span>
                 </p>
                 <h1 className="display-hero max-w-[20ch] text-balance">
-                  Agent systems across the {region}.
+                  Governed BOT operations across the {region}.
                 </h1>
                 <p className="body-lg mt-6 max-w-[54ch]">
-                  The fleet deploys remotely, so coverage does not depend on a local office.
-                  Pick your state below — every market page carries its own coverage detail.
+                  National delivery does not depend on a local office. Use the state and city pages below to review coverage and local planning context.
                 </p>
                 <div className="mt-8"><PlanCta source={`markets-region-${slug}`} /></div>
               </div>
@@ -121,7 +121,7 @@ export default async function RegionMarketPage({ params }: Params) {
             {ALL_SERVICES.map((s) => (
               <Link key={s.slug} href={serviceHref(s)} className="group card-cell p-6">
                 <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
-                <span className="block body-xs mt-2">{s.botName} · every market</span>
+                <span className="block body-xs mt-2">{getServicePositioning(s.slug).deliveryModel} · national delivery</span>
               </Link>
             ))}
           </div>

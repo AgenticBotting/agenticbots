@@ -42,10 +42,10 @@ export const metadata: Metadata = {
   keywords: [
     "agentic bots",
     "AI marketing automation",
-    "AI sales agents",
+    "AI sales bots",
     "lead generation bots",
     "AI SDR",
-    "marketing agents",
+    "marketing bots",
     "revenue operations automation",
   ],
   openGraph: {

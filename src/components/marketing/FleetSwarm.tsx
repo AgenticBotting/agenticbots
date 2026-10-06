@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { BOT_VIEWBOX, BOT_BODY_PATH, BOT_EYE_PATHS } from "@/components/ui/BotFace";
 import { ALL_SERVICES, serviceHref } from "@/lib/catalog";
+import { getServicePositioning } from "@/lib/service-positioning";
 
 /**
- * The portfolio, all at once — a status-board view of all thirteen BOT
- * capabilities, rather than a claim that a real client system is running.
+ * The portfolio, all at once — a status-board view of all thirteen service
+ * mandates, rather than a claim that a real client system is running.
  * `SignalFlow` explains the loop; this is what it looks like turned on.
  *
  * Every animation is CSS-only and desynced by a per-index negative delay
@@ -18,10 +19,11 @@ export function FleetSwarm() {
   return (
     <ul
       className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-px bg-[var(--border)] border border-[var(--border)]"
-      aria-label="All thirteen managed BOT capabilities"
+      aria-label="All thirteen managed service mandates"
     >
-      {ALL_SERVICES.map((s, i) => (
-        <li key={s.serviceSlug} className="flex">
+      {ALL_SERVICES.map((s, i) => {
+        const positioning = getServicePositioning(s.slug);
+        return <li key={s.serviceSlug} className="flex">
           <Link href={serviceHref(s)} className="group card-cell w-full flex flex-col gap-3 p-5">
             <div className="flex items-center justify-between">
               <span
@@ -49,8 +51,10 @@ export function FleetSwarm() {
             </div>
 
             <span className="display-md !text-[14.5px] group-hover:text-[var(--accent-text)] transition-colors">
-              {s.botName}
+              {s.serviceName}
             </span>
+
+            <span className="mono text-[9.5px] uppercase tracking-[0.08em] text-[var(--text-muted)]">{positioning.deliveryModel}</span>
 
             {/* Two capability lines, opposite animation phase, in the same
                 box — the cell quietly swaps its own status line forever. */}
@@ -59,21 +63,21 @@ export function FleetSwarm() {
                 className="swarm-line absolute inset-0 mono text-[10.5px] leading-[15px] text-[var(--text-muted)] truncate"
                 style={{ animationDelay: `${i * -0.5}s` }}
               >
-                {s.capabilities[0]}
+                {positioning.scope[0]}
               </span>
               <span
                 className="swarm-line absolute inset-0 mono text-[10.5px] leading-[15px] text-[var(--text-muted)] truncate"
                 style={{ animationDelay: `${i * -0.5 - 3.5}s` }}
               >
-                {s.capabilities[1] ?? s.capabilities[0]}
+                {positioning.scope[1] ?? positioning.scope[0]}
               </span>
             </span>
             {/* The real (unanimated) line for anyone reading with a screen
                 reader or reduced motion — the two above are decorative. */}
-            <span className="sr-only">{s.capabilities.slice(0, 2).join(" · ")}</span>
+            <span className="sr-only">{positioning.scope.slice(0, 2).join(" · ")}</span>
           </Link>
-        </li>
-      ))}
+        </li>;
+      })}
     </ul>
   );
 }
