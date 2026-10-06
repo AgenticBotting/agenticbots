@@ -36,8 +36,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-3 lg:col-span-1 lg:pr-6">
             <Logo height={32} className="mb-6" />
             <p className="text-[14px] leading-[1.75] text-ink-300 mb-7 max-w-[38ch]">
-              Agentic bots for growth. Marketing bots that create demand, sales bots
-              that capture revenue — built, connected and run for you.
+              A coordinated BOT workforce for marketing, sales and customer operations — built, connected and managed for you.
             </p>
             <a
               href="mailto:hello@agenticbots.dev"
@@ -121,9 +120,9 @@ export function Footer() {
         {/* Optin strip */}
         <div className="rounded-none border border-ink-700 bg-ink-800 px-6 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center gap-5 justify-between mb-10">
           <div>
-            <p className="display-md text-white">Get your free lead leak audit.</p>
+            <p className="display-md text-white">Find your first BOT opportunity.</p>
             <p className="text-[13.5px] text-ink-400 mt-1.5">
-              We test how fast your business answers a new lead and send you the scorecard.
+              Initial workflow recommendations within two business days. No call required.
             </p>
           </div>
           <Link href="/#audit" className="btn btn-primary shrink-0">
@@ -135,9 +134,7 @@ export function Footer() {
         <div className="pt-8 border-t border-ink-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-[12.5px] text-ink-400">
             © {year} AgenticBots. All rights reserved.{" "}
-            <span className="hidden sm:inline" title="It has never once asked for a raise.">
-              This footer was assembled by a bot that does not celebrate its own birthday.
-            </span>
+
           </p>
           <ul className="flex items-center gap-6">
             {LEGAL.map((l) => (

@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 /**
- * The primary CTA: the free lead leak audit. Scrolls to the page's own
+ * The primary CTA: the free BOT opportunity audit. Scrolls to the page's own
  * audit form when there is one, otherwise goes to the homepage form.
  */
 export function PlanCta({
@@ -32,7 +32,7 @@ export function PlanCta({
     <button type="button" onClick={() => {
       track("cta_clicked", { source, label });
       const el = document.getElementById("audit");
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (el) el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
       else router.push("/#audit");
     }} className={cn("btn", cls, className)}>
       {label}

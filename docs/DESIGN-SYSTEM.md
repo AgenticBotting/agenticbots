@@ -104,3 +104,11 @@ Script: OKLCH+WCAG math in-repo (to be promoted into CI in Phase 10). Any FAIL i
 ## Type & shape (pre-existing, unchanged in Phase 1)
 
 Geist 600 display / Geist body / Geist Mono micro-labels · zero radius, diagonal `.notch` cut · dark surfaces limited to header, footer, StatBand.
+
+## Managed workforce marketing pass — 2026-10-06
+
+The homepage, pricing, About and How it works retain Geist and the olive/near-black identity. Section structure uses open columns, editorial photography, restrained bordered records and clear deliverables rather than repeated promotional cards. Growth receives a quiet accent line; no unsupported popularity badge.
+
+New scoped classes in `globals.css`: `workforce-*`, `hero-*`, `story-*`, `workflow-*`, `system-*`, `governance-*`, `audience-*`, `delivery-*`, `pricing-*`, `founding-note`, `coverage-*`. Overlay and shadow tokens derive from existing ink colors.
+
+The workflow stage is sticky on desktop, with compact spacing below 800 px viewport height. On mobile it becomes a static manual walkthrough. Entrance motion uses opacity/transform only; reduced motion disables it and automatic chapter progression. Photography stays still. All examples are visibly illustrative; no decorative infinite BOT motion on the rebuilt core pages.

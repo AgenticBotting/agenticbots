@@ -3,20 +3,20 @@ import Link from "next/link";
 import { Check, ArrowLeft } from "lucide-react";
 import { Footer } from "@/components/layout";
 import { Container, Logo } from "@/components/ui";
-import { BotPlanForm } from "@/components/marketing";
+import { AuditForm } from "@/components/marketing";
 
 export const metadata: Metadata = {
-  title: "Get your bot plan",
+  title: "Get your BOT opportunity audit",
   description:
-    "Tell us what you sell and where it is getting stuck. We map which bots fix it and send the plan back within one business day — free, no call required.",
+    "Tell us what you sell and where it is getting stuck. We map which bots fix it and send the plan back within two business days — free, no call required.",
   alternates: { canonical: "/plan" },
 };
 
 const INCLUDED = [
   { t: "Where you are leaking", b: "The specific points between a lead arriving and a job closing where you are losing people." },
   { t: "Which bots fix it", b: "Named, in priority order, with what each one connects to in your existing stack." },
-  { t: "What it is worth", b: "A rough number on what each fix is worth against your current volume — so you can judge the order." },
-  { t: "What it takes", b: "Build time, what we need from you, and what it costs to run. No surprises later." },
+  { t: "What to validate", b: "The data needed to understand whether the proposed workflow is worth implementing." },
+  { t: "What it takes", b: "The next discovery steps before a scoped proposal confirms build timing and costs." },
 ];
 
 export default function PlanPage() {
@@ -42,11 +42,10 @@ export default function PlanPage() {
         <Container className="py-14 sm:py-20">
           <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
             <div>
-              <p className="eyebrow mb-5">Free · one business day</p>
-              <h1 className="display-hero text-balance">Get your <span className="em-green">bot plan.</span></h1>
+              <p className="eyebrow mb-5">Free · two business days</p>
+              <h1 className="display-hero text-balance">Find your <span className="em-green">first BOT opportunity.</span></h1>
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                Three clicks and two fields. We map your business against the thirteen
-                bots and send back a written plan. No call required to get it.
+                Tell us about your business. We review the public customer journey and identify a useful starting workflow. No call required.
               </p>
 
               <ul className="mt-10 space-y-6">
@@ -67,7 +66,7 @@ export default function PlanPage() {
               </p>
             </div>
 
-            <BotPlanForm source="plan-page" className="bg-white" />
+            <AuditForm source="plan-page" className="bg-white" />
           </div>
         </Container>
       </main>

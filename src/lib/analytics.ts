@@ -21,7 +21,10 @@ export type EventName =
   | "nav_mega_opened"
   | "roster_bot_focused"
   | "market_searched"
-  | "guide_requested";
+  | "guide_requested"
+  | "workflow_step_viewed"
+  | "workflow_example_approved"
+  | "audit_form_started";
 
 declare global {
   interface Window {

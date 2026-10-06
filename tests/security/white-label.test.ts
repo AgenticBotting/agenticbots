@@ -14,6 +14,15 @@ import { CLIENT_FORBIDDEN_TERMS } from "@/server/redact";
  * scripts/white-label-scan.mjs additionally scans the built browser bundles.
  */
 const CLIENT_SOURCES = [
+  "src/app/page.tsx",
+  "src/app/pricing/page.tsx",
+  "src/app/about/page.tsx",
+  "src/app/how-it-works/page.tsx",
+  "src/components/marketing/BotWorkflowStory.tsx",
+  "src/components/marketing/PricingCards.tsx",
+  "src/components/marketing/AuditForm.tsx",
+  "src/config/marketing-offer.ts",
+  "src/lib/marketing/workflow-example.ts",
   "src/app/portal",
   "src/components/platform/portal.tsx",
   "src/components/platform/RequestBox.tsx",

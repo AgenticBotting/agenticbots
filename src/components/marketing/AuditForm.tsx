@@ -1,26 +1,23 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 import { cn } from "@/lib/utils";
 
-/**
- * The homepage's one conversion surface: the free Lead Leak Audit.
- * We secret-shop the contractor's own lead flow (form, call, after-hours)
- * and send back a scorecard. Posts to the same /api/plan endpoint as the
- * bot-plan console; trade, volume and phone ride along in `goal`.
- */
+/** Requests a free workflow audit through the existing lead intake endpoint. */
 
 const TRADES = ["Residential", "Commercial", "Both"] as const;
 const VOLUME = ["Under 25", "25–75", "75–200", "200+"] as const;
 
 export function AuditForm({ source = "home-audit", focus, className }: { source?: string; focus?: string; className?: string }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", website: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", website: "", goal: "" });
   const [trade, setTrade] = useState<string>("");
   const [volume, setVolume] = useState<string>("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const started = useRef(false);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -35,8 +32,9 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
           email: form.email,
           website: form.website,
           company: form.website,
-          focus: focus ? `Lead Leak Audit · ${focus}` : "Lead Leak Audit",
+          focus: focus ? `${AUDIT_OFFER.name} · ${focus}` : AUDIT_OFFER.name,
           goal: [
+            form.goal,
             trade && `Work: ${trade}`,
             volume && `Leads/mo: ${volume}`,
             form.phone && `Phone: ${form.phone}`,
@@ -46,7 +44,6 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setError(data.error || "Something went wrong. Try again."); setState("error"); return; }
-      track("plan_form_submitted", { source, focus: "Lead Leak Audit" });
       setState("done");
     } catch {
       setError("Network error. Try again.");
@@ -56,12 +53,12 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
 
   return (
     <div className={cn("@container border border-[var(--border-strong)] bg-white", className)}>
-      <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4 flex items-center justify-between gap-4">
+      <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <p className="mono text-[10.5px] uppercase tracking-[0.13em] text-ink-300">
-          Lead leak audit
-          <span className="text-accent-400">{" · "}{state === "done" ? "Booked" : "Free"}</span>
+          {AUDIT_OFFER.name}
+          <span className="text-accent-400">{" · "}{state === "done" ? "Received" : "Free"}</span>
         </p>
-        <p className="mono text-[10px] uppercase tracking-[0.1em] text-ink-400">Back in 2 business days</p>
+        <p className="mono text-[10px] uppercase tracking-[0.1em] text-ink-400">Within {AUDIT_OFFER.turnaround}</p>
       </div>
       <div className="h-px rule-agent" />
 
@@ -71,14 +68,14 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
             <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 notch">
               <Check className="w-6 h-6" strokeWidth={3} />
             </span>
-            <h3 className="display-lg mt-5">You&apos;re on the list.</h3>
+            <h3 className="display-lg mt-5">Your request is in.</h3>
             <p className="body-base mt-3 max-w-[44ch] mx-auto">
-              Over the next two business days we&apos;ll test how fast your business answers a new lead.
-              Your scorecard lands at {form.email}.
+              We’ll review your business and identify a useful starting workflow.
+              Your initial recommendations will arrive at {form.email} within {AUDIT_OFFER.turnaround}.
             </p>
           </div>
         ) : (
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} onFocus={() => { if (!started.current) { started.current = true; track("audit_form_started", { source }); } }}>
             <div className="grid @lg:grid-cols-2 gap-4">
               <Field label="Name" required>
                 <input className="field" required autoComplete="name" placeholder="Jordan Reyes"
@@ -98,6 +95,8 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
               </Field>
             </div>
 
+            <div className="mt-6"><Field label="Where does work get stuck?" hint="Optional"><textarea className="field min-h-[94px] resize-y" maxLength={1200} placeholder="Missed calls, quote follow-up, CRM updates…" value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })} /></Field></div>
+
             <Choice label="What kind of work?" options={TRADES} value={trade} onChange={setTrade} />
             <Choice label="New leads a month" options={VOLUME} value={volume} onChange={setVolume} />
 
@@ -109,7 +108,7 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
                   : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
               </button>
-              <p className="body-sm">No call required. No sales sequence.</p>
+              <p className="body-sm">No call required. No obligation.</p>
             </div>
           </form>
         )}

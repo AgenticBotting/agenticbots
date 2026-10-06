@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const NEXT = [
   { n: "01", t: "We read it", b: "Every request is reviewed by a person, usually same day." },
   { n: "02", t: "We map it", b: "Your business gets matched against the thirteen bots and put in priority order." },
-  { n: "03", t: "You get the plan", b: "Written, in your inbox, within one business day. Call optional." },
+  { n: "03", t: "You get the plan", b: "Written, in your inbox, within two business days. Call optional." },
 ];
 
 export default function ThanksPage() {
@@ -29,7 +29,7 @@ export default function ThanksPage() {
             </span>
             <h1 className="display-hero mt-7 text-balance">Request <span className="em-green">received.</span></h1>
             <p className="body-lg mt-5">
-              Your bot plan is in the queue. Here is exactly what happens next.
+              Your BOT opportunity audit is in the queue. Here is exactly what happens next.
             </p>
           </div>
 

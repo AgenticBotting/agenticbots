@@ -118,7 +118,7 @@ export default async function CityPage({ params }: Params) {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free lead leak audit. Scorecard back in two business days.</p>
+                <p className="body-sm mt-5">Free BOT opportunity audit. Initial recommendations in two business days.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
@@ -289,8 +289,8 @@ export default async function CityPage({ params }: Params) {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow="Free lead leak audit" heading={`See where ${ct.name} leads are slipping.`}
-          sub={`We test your lead flow like a new customer would and send you a scorecard. ${rotatedCta(svc.slug, ct.slug)}`}>
+        <Section id="audit" variant="light" eyebrow="Free BOT opportunity audit" heading={`See where ${ct.name} leads are slipping.`}
+          sub={`We review your public customer journey and identify a useful starting workflow. ${rotatedCta(svc.slug, ct.slug)}`}>
           <div>
             <AuditForm source={`local-${svc.slug}-${ct.slug}-form`} focus={svc.botName} />
           </div>
@@ -375,7 +375,7 @@ function StructuralCityService({ svc, st, rec }: {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free lead leak audit. Scorecard back in two business days.</p>
+                <p className="body-sm mt-5">Free BOT opportunity audit. Initial recommendations in two business days.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
@@ -509,8 +509,8 @@ function StructuralCityService({ svc, st, rec }: {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow="Free lead leak audit" heading={`See where ${rec.city} leads are slipping.`}
-          sub={`We test your lead flow like a new customer would and send you a scorecard. ${rcta(svc.slug, rec.city_slug)}`}>
+        <Section id="audit" variant="light" eyebrow="Free BOT opportunity audit" heading={`See where ${rec.city} leads are slipping.`}
+          sub={`We review your public customer journey and identify a useful starting workflow. ${rcta(svc.slug, rec.city_slug)}`}>
           <div>
             <AuditForm source={`local-${svc.slug}-${rec.city_slug}-form`} focus={svc.botName} />
           </div>

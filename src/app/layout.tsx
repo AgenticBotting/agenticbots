@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { BotPlanFlow, ExitIntent, RogueBot, ConsoleGreeting } from "@/components/marketing";
+import { BotPlanFlow, ConsoleGreeting } from "@/components/marketing";
 import { MarketingOnly } from "@/components/marketing/MarketingOnly";
 import Script from "next/script";
 import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
@@ -34,11 +34,11 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AgenticBots — Agentic bots get you customers",
+    default: "AgenticBots — A coordinated BOT workforce",
     template: "%s | AgenticBots",
   },
   description:
-    "We build and run the bots that find your customers and follow up until they buy — ads, SEO, email, outbound and CRM, handled continuously.",
+    "A managed BOT workforce for contractors. Connect marketing, sales and customer operations with defined workflows, human approvals and reviewable activity.",
   keywords: [
     "agentic bots",
     "AI marketing automation",
@@ -53,15 +53,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "AgenticBots",
     url: SITE_URL,
-    title: "AgenticBots — Agentic bots get you customers",
+    title: "AgenticBots — A coordinated BOT workforce",
     description:
-      "Marketing bots that find your customers. Sales bots that follow up until they buy.",
+      "Specialized BOTS, connected workflows and ongoing operation for contractors and local service businesses.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgenticBots — Agentic bots get you customers",
+    title: "AgenticBots — A coordinated BOT workforce",
     description:
-      "Marketing bots that find your customers. Sales bots that follow up until they buy.",
+      "Specialized BOTS, connected workflows and ongoing operation for contractors and local service businesses.",
   },
   robots: {
     index: true,
@@ -78,8 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <MarketingOnly>
           <BotPlanFlow />
-          <ExitIntent />
-          <RogueBot />
           <ConsoleGreeting />
         </MarketingOnly>
         {process.env.NEXT_PUBLIC_UMAMI_URL && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (

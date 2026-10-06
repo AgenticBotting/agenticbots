@@ -170,9 +170,9 @@ export default async function StateHub({ params }: Params) {
         <Section
           id="audit"
           variant="alt"
-          eyebrow="Free lead leak audit"
+          eyebrow="Free BOT opportunity audit"
           heading={`See where your ${st.name} leads are slipping.`}
-          sub="We test your lead flow like a new customer would and send you a scorecard. Free, and yours to keep."
+          sub="We review your public customer journey and identify a useful starting workflow. Free, and yours to keep."
         >
           <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.botName} />
         </Section>

@@ -1,225 +1,39 @@
 import type { Metadata } from "next";
-import { Search, Plug, Rocket, RefreshCw } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd, breadcrumbLd } from "@/components/JsonLd";
-import { Container, Reveal, SectionHeader } from "@/components/ui";
-import { BotPlanForm, StatBand, FaqAccordion, PlanCta, Timeline, AuditLogPanel, ProblemDiagram } from "@/components/marketing";
+import { Container } from "@/components/ui/Container";
+import { AuditForm } from "@/components/marketing/AuditForm";
+import { FaqAccordion } from "@/components/marketing/FaqAccordion";
+import { BotWorkflowStory } from "@/components/marketing/BotWorkflowStory";
 
 export const metadata: Metadata = {
-  title: "How it works",
-  description:
-    "Audit, connect, launch, tune. How AgenticBots gets your first bot live in about two weeks and keeps it improving.",
+  title: "How your BOT workforce works",
+  description: "Discover, connect, test and operate. A scoped BOT system with human approvals, a monitored launch and ongoing maintenance.",
   alternates: { canonical: "/how-it-works" },
 };
 
 const PHASES = [
-  {
-    icon: Search,
-    n: "01",
-    t: "Audit",
-    lead: "Days 1–4",
-    b: "We map every way a customer can reach you and everything that happens after. Ad accounts, forms, phone, inbox, CRM stages. The output is a written picture of where people are dropping out and what each drop is costing.",
-    bullets: [
-      "90 days of ad, form and call data reviewed",
-      "Every lead path traced end to end",
-      "Leaks ranked by what fixing them is worth",
-      "You keep the map either way",
-    ],
-  },
-  {
-    icon: Plug,
-    n: "02",
-    t: "Connect",
-    lead: "Week 1–2",
-    b: "The first bot gets built against your actual process — the questions you ask, the info you capture, the stages you use — then wired into the tools you already run. Nothing gets replaced and nothing gets migrated.",
-    bullets: [
-      "Built from your real intake process, not a template",
-      "Connected to your CRM, calendar, phone and ad accounts",
-      "Escalation rules defined before launch",
-      "You approve the behavior before it touches a lead",
-    ],
-  },
-  {
-    icon: Rocket,
-    n: "03",
-    t: "Launch",
-    lead: "Week 2–3",
-    b: "It goes live in monitored mode against real traffic. Every action is logged and reviewed daily for the first two weeks, so edge cases get caught by us rather than by a customer.",
-    bullets: [
-      "Monitored mode before full autonomy",
-      "Daily review for the first two weeks",
-      "Rollback available at any point",
-      "Handoff to a human on anything unclear",
-    ],
-  },
-  {
-    icon: RefreshCw,
-    n: "04",
-    t: "Tune",
-    lead: "Ongoing",
-    b: "Weekly passes on what the bot did and what came back. Rules tightened, budget shifted, copy revised. When the first bot is holding, the next one gets scoped.",
-    bullets: [
-      "Weekly optimization against real results",
-      "One plain-language report, not a dashboard",
-      "New bots added only once the last proves out",
-      "Everything we build stays yours",
-    ],
-  },
+  ["Discover & define", "Map your process, identify a useful starting workflow and agree on deliverables. Your proposal confirms integrations, costs, access requirements and launch timing."],
+  ["Connect & configure", "Build around your existing tools and business rules. Configure the BOTS, define the handoffs and establish the approval and escalation policies."],
+  ["Test & launch", "Review behavior against agreed acceptance criteria, then begin a monitored rollout. Human approval controls remain in place for actions that change external systems."],
+  ["Operate & improve", "Monitor the agreed workflows, handle issues, maintain connections and review activity. Expansion is scoped and approved before additional work is added."],
 ];
-
 const FAQ = [
-  { q: "What do you need from me to start?", a: "Read access to your ad accounts, CRM and analytics, plus about an hour of your time to walk through how leads actually get handled today. That is enough for the audit." },
-  { q: "What if the audit says we do not need bots?", a: "Then it says that. Sometimes the fix is a tracking problem or a staffing problem, and we will tell you. You keep the map." },
-  { q: "How long until the first bot is fully autonomous?", a: "Usually three to four weeks total — a few days of audit, one to two weeks of build, and about two weeks in monitored mode before it runs on its own." },
-  { q: "Do you work month to month?", a: "Yes. Builds are scoped as a project; the ongoing run and tuning is monthly with no long lock-in. If it is not producing, you should be able to leave." },
-  { q: "What happens if a bot does something wrong?", a: "Every action is logged, escalation rules are set before launch, and rollback is available at any point. In monitored mode nothing reaches a customer without review." },
-  { q: "Can you work with our in-house team?", a: "Often the best setup. We build and run the bots; your team keeps the relationships and the judgment calls the bots hand off." },
+  { q: "What do you need for the free audit?", a: "Your website and a little context about the work you do. We review the public customer journey and identify an initial workflow opportunity. Detailed discovery and account access come after you agree on a project." },
+  { q: "When will the first BOT go live?", a: "Build timing depends on the workflow, integrations and account access. We confirm the timeline in your proposal. The free initial audit comes back within two business days." },
+  { q: "Can the BOTS act without my approval?", a: "Sending, publishing, changing ads and writing to connected systems require an authorized human approval. BOTS can prepare work and recommendations; they cannot approve their own actions." },
+  { q: "What if something needs attention?", a: "The system records activity and surfaces issues for review. Monitoring, maintenance, escalation and support expectations are defined in the agreed operating scope." },
+  { q: "Can you work with our in-house team?", a: "Yes. We build and operate the agreed BOT workflows while your team manages customer relationships, approval decisions and business priorities." },
+  { q: "Who owns the business accounts?", a: "Your business accounts and customer relationships remain yours. Data handling, access, contract terms and the handover process are agreed before launch." },
 ];
 
 export default function HowItWorksPage() {
-  return (
-    <>
-      <JsonLd data={[faqLd(FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/how-it-works" }])]} />
-      <Header />
-      <main>
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-16 sm:py-20">
-            <Reveal>
-              <p className="eyebrow mb-5">The process</p>
-              <h1 className="display-hero max-w-[16ch] text-balance">
-                First bot live in <span className="em-green">about two weeks.</span>
-              </h1>
-              <p className="body-lg mt-6 max-w-[54ch] text-pretty">
-                No six-month discovery phase. We find the biggest leak, build the bot that
-                plugs it, run it in monitored mode until it is safe, then let it work.
-              </p>
-              <div className="mt-9">
-                <PlanCta source="how-it-works-hero" />
-              </div>
-            </Reveal>
-          </Container>
-        </section>
-
-        <ProblemDiagram />
-
-        <section className="section-pad-sm border-b border-[var(--border)]">
-          <Container>
-            <Timeline />
-          </Container>
-        </section>
-
-        <section className="section-pad border-b border-[var(--border)]">
-          <Container>
-            <div className="space-y-px bg-[var(--border)] border border-[var(--border)] rounded-none overflow-hidden">
-              {PHASES.map((p, i) => {
-                const Icon = p.icon;
-                return (
-                  <Reveal key={p.n} delay={i * 0.05}>
-                    <div className="bg-white grid lg:grid-cols-[auto_1fr_1fr] gap-8 lg:gap-12 p-8 sm:p-10">
-                      <div className="lg:w-32">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-none bg-ink-950 text-white">
-                          <Icon className="w-4.5 h-4.5" />
-                        </span>
-                        <p
-                          className="mt-4 text-[12px] text-[var(--text-muted)] mono"
-                        >
-                          {p.n} · {p.lead}
-                        </p>
-                      </div>
-                      <div>
-                        <h2 className="display-xl">{p.t}</h2>
-                        <p className="body-base mt-4 max-w-[46ch]">{p.b}</p>
-                      </div>
-                      <ul className="space-y-3 lg:pt-2">
-                        {p.bullets.map((b) => (
-                          <li
-                            key={b}
-                            className="flex items-start gap-3 text-[14px] text-[var(--text-secondary)]"
-                          >
-                            <span className="mt-2 h-1 w-1 shrink-0 bg-[var(--accent-text)]" />
-                            {b}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-          </Container>
-        </section>
-
-        <StatBand
-          eyebrow="What to expect"
-          title="Slow enough to be safe. Fast enough to matter."
-          metrics={[
-            { value: "4 days", label: "Audit turnaround, start to written map" },
-            { value: "2 wks", label: "Typical build to first bot in monitored mode" },
-            { value: "Weekly", label: "Tuning passes for as long as it runs" },
-          ]}
-        />
-
-        <section className="section-pad bg-ink-900 on-dark border-b border-ink-700">
-          <Container>
-            <div className="max-w-[62ch]">
-              <p className="eyebrow mb-4">Security &amp; governance</p>
-              <h2 className="display-xl text-balance">Autonomy you can audit.</h2>
-            </div>
-            <div className="mt-12 grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-16 items-start">
-              <ul className="border-t border-ink-700">
-                {[
-                  ["Your data stays in your accounts", "scoped credentials you can revoke"],
-                  ["Human-in-the-loop by default", "explicit escalation rules, monitored launch"],
-                  ["Every action logged", "what, when, on which record, and why"],
-                  ["Rollback, always", "pause any bot instantly, nothing breaks"],
-                  ["Least-privilege access", "read-only wherever writing isn't required"],
-                  ["DPA on request", "procurement-ready documentation"],
-                ].map(([t, d], i) => (
-                  <li key={t} className="grid grid-cols-[32px_1fr] gap-4 py-[1.05rem] border-b border-ink-700">
-                    <span className="mono text-[11px] tabular-nums text-ink-400 pt-1">0{i + 1}</span>
-                    <span>
-                      <span className="block text-[15px] font-medium text-white tracking-[-0.01em]">{t}</span>
-                      <span className="block text-[13px] text-ink-400 mt-0.5">{d}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <AuditLogPanel />
-            </div>
-          </Container>
-        </section>
-
-        <section className="section-pad border-b border-[var(--border)]">
-          <Container>
-            <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16">
-              <Reveal>
-                <SectionHeader eyebrow="Questions" title="Before you start." />
-              </Reveal>
-              <Reveal delay={0.08}>
-                <FaqAccordion items={FAQ} />
-              </Reveal>
-            </div>
-          </Container>
-        </section>
-
-        <section className="section-pad">
-          <Container>
-            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
-              <Reveal>
-                <SectionHeader
-                  eyebrow="Step zero"
-                  title="It starts with the audit."
-                  copy="Tell us what you sell and where it is getting stuck. The map comes back within one business day, free, and it is yours regardless of what you do next."
-                />
-              </Reveal>
-              <Reveal delay={0.08}>
-                <BotPlanForm source="how-it-works" />
-              </Reveal>
-            </div>
-          </Container>
-        </section>
-      </main>
-      <Footer />
-    </>
-  );
+  return <><JsonLd data={[faqLd(FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/how-it-works" }])]} /><Header /><main>
+    <section className="section-pad border-b border-[var(--border)]"><Container><p className="eyebrow mb-5">The process</p><div className="system-intro"><h1 className="display-hero max-w-[18ch]">A defined process.<br /><span className="em-green">A connected system.</span></h1><div><p className="body-lg max-w-[44ch]">Start with one useful workflow. Agree on what it should do, connect it to your tools and test it before a monitored launch.</p><a href="#audit" className="btn btn-primary mt-7">Get your free audit</a></div></div></Container></section>
+    <BotWorkflowStory />
+    <section className="section-pad border-b border-[var(--border)] bg-[var(--bg-alt)]"><Container><h2 className="display-xl mb-10">From discovery<br />to ongoing operation.</h2><ol className="delivery-rows">{PHASES.map(([title, copy], index) => <li key={title}><span>0{index + 1}</span><h3 className="display-lg">{title}</h3><p className="body-base">{copy}</p></li>)}</ol></Container></section>
+    <section className="section-pad workforce-governance on-dark"><Container><div className="system-intro"><h2 className="display-xl max-w-[20ch]">Control is part<br />of the design.</h2><div><p className="body-lg text-ink-200 max-w-[45ch]">Access is defined by organization and role. Work that changes connected systems waits for human approval. BOT ACTIVITY records runs, decisions and outcomes for review.</p><p className="body-sm text-ink-400 mt-5">Architecture and operating approach. Your proposal defines the controls, integrations and support included in your deployment.</p></div></div></Container></section>
+    <section className="section-pad border-b border-[var(--border)]"><Container><div className="grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-10 lg:gap-16"><h2 className="display-xl">Before you start.</h2><FaqAccordion items={FAQ} /></div></Container></section>
+    <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16"><div><p className="eyebrow mb-5">Step zero</p><h2 className="display-xl">Find the right<br />starting workflow.</h2><p className="body-lg mt-5 max-w-[43ch]">Tell us where your business gets stuck. The free BOT opportunity audit comes back within two business days. No call required.</p></div><AuditForm source="how-it-works" /></div></Container></section>
+  </main><Footer /></>;
 }

@@ -10,7 +10,6 @@ import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion, regionSlug, type Region } from "@/lib/geo/regions";
 import { MarketSearch } from "./MarketSearch";
-import { BotOrbit } from "@/components/marketing/BotOrbit";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
 import { track } from "@/lib/analytics";
@@ -18,8 +17,6 @@ import { track } from "@/lib/analytics";
 const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Founding clients", href: "/#founding" },
-  { label: "Blog", href: "/blog" },
 ];
 
 type MenuId = "services" | "areas" | null;
@@ -28,8 +25,8 @@ type MenuId = "services" | "areas" | null;
    marketing vs. sales. Speed-to-Lead is pulled out as the starting point. */
 const START_SLUG = "inbound";
 const STAGES: { id: string; title: string; blurb: string; slugs: string[] }[] = [
-  { id: "found", title: "Get found", blurb: "Show up first on Google and in the map pack, so the phone rings.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
-  { id: "close", title: "Close more jobs", blurb: "Answer every lead in seconds and follow up until it books.", slugs: ["inbound", "cro", "email", "enablement"] },
+  { id: "found", title: "Get found", blurb: "Build visibility across search, content and paid media.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
+  { id: "close", title: "Close more jobs", blurb: "Prepare responses and follow-up across your sales process.", slugs: ["inbound", "cro", "email", "enablement"] },
   { id: "repeat", title: "Win repeat work", blurb: "Bring past customers back and know what is working.", slugs: ["reactivation", "crm", "analytics"] },
 ];
 
@@ -37,7 +34,6 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
-  const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const [mobileRegion, setMobileRegion] = useState<Region | null>(null);
@@ -65,7 +61,11 @@ export function Header() {
 
   useEffect(() => {
     if (!openMenu) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      navRef.current?.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')?.focus();
+      closeMenu();
+    };
     const onClick = (e: MouseEvent) => {
       const t = e.target as Node;
       if (!navRef.current?.contains(t) && !panelRef.current?.contains(t)) closeMenu();
@@ -81,7 +81,6 @@ export function Header() {
   function closeMenu() {
     setOpenMenu(null);
     setSelectedRegion(null);
-    setSelectedStage(null);
   }
 
   function toggleMenu(id: Exclude<MenuId, null>) {
@@ -91,7 +90,6 @@ export function Header() {
     setOpenMenu(id);
   }
 
-  const stageSel = selectedStage;
   const stages = STAGES.map((st) => ({
     ...st,
     items: st.slugs.map((sl) => ALL_CATEGORIES.find((c) => c.slug === sl)).filter((c): c is NonNullable<typeof c> => !!c),
@@ -106,7 +104,7 @@ export function Header() {
       <div className="hidden lg:block bg-[var(--header-bar)] border-b border-white/[0.06]">
         <div className="container-bleed">
           <div className="flex items-center justify-between h-9">
-            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-300">Agentic bots for growth</span>
+            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-300">A coordinated BOT workforce</span>
             <a
               href="mailto:hello@agenticbots.dev"
               className="inline-flex items-center gap-2 text-[13px] text-ink-400 hover:text-white transition-colors"
@@ -123,34 +121,6 @@ export function Header() {
         <div className="container-bleed">
           <div
             ref={navRef}
-            /* At lg the row becomes a 5-column grid: [logo][spacer][nav]
-               [spacer][cta], not a 3-column `1fr auto 1fr`. The 3-column
-               version — whether via a plain grid or `position:absolute;
-               left:50%` — centers nav on the row's true midpoint, which
-               is mathematically centered but visually lopsided whenever
-               logo and the CTA cluster are different widths (they always
-               are here: 226px vs 183px with one button, 312px with two).
-               Measured: 86px of gap asymmetry at 1440px+, 43px the other
-               direction at the lg-only tier.
-
-               A first attempt tried forcing BOTH outer tracks to an equal
-               `minmax(edge-w, 1fr)` width, which turned out not to fix
-               it: making the TRACKS equal doesn't make the GAPS equal
-               when the CONTENT inside them still differs — the slack in
-               each track is (track width − that track's own content
-               width), and with logo and the CTA cluster genuinely
-               different sizes, that slack came out unequal by exactly
-               the same 86px regardless.
-
-               The actual fix is two dedicated, empty spacer tracks
-               (`1fr` each) that carry no content of their own. An empty
-               track's size floor is zero — there's no logo-vs-CTA
-               content asymmetry to inherit — so two `1fr` tracks with
-               nothing in them are guaranteed an equal, growing share of
-               whatever space is left, and THAT's what sits between logo
-               and nav, and between nav and the CTA cluster. Logo, nav and
-               the CTA cluster each keep their own natural `auto` width;
-               nothing about them needs to match anything else. */
             className="grid grid-cols-[auto_1fr_auto] items-center h-[76px] lg:h-[84px] gap-2 sm:gap-3 lg:grid-cols-[auto_minmax(16px,1fr)_auto_minmax(16px,1fr)_auto]"
           >
             <Link
@@ -190,9 +160,9 @@ export function Header() {
                 too-tight fit failing as a real overflow instead of
                 silently wrapping "Service areas" onto two lines the way
                 it did earlier. */}
-            <nav className="hidden lg:flex shrink-0 items-center gap-8 whitespace-nowrap">
-              <MenuTrigger label="Services" open={openMenu === "services"} onClick={() => toggleMenu("services")} />
-              <MenuTrigger label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
+            <nav className="hidden lg:flex shrink-0 items-center gap-5 xl:gap-7 whitespace-nowrap">
+              <MenuTrigger panelId="services-menu" label="Services" open={openMenu === "services"} onClick={() => toggleMenu("services")} />
+              <MenuTrigger panelId="areas-menu" label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -217,60 +187,13 @@ export function Header() {
                 always sits flush against the row's true right edge
                 regardless of its own content width. */}
             <div className="justify-self-end flex items-center gap-2 sm:gap-3 lg:shrink-0">
-              {/* Green body, black eyes — the header rides on ink-950, so a
-                  cutout-eyed bot would lose its face against the dark. */}
-              {/* The breakpoint lives on this wrapper, not on BotOrbit.
-                  BotOrbit hardcodes `inline-flex` and cn() is a plain join,
-                  so a `hidden` passed through would lose to it on CSS source
-                  order — leaving the CTA visible on phones and shoving the
-                  row past the viewport. Below sm the drawer's pinned CTA
-                  covers this. */}
-              <div className="hidden sm:block">
-                <BotOrbit tone="text-accent-500" eyes="text-ink-950">
-                  <Link
-                    href="/#audit"
-                    onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
-                    className="btn btn-primary h-11"
-                  >
-                    Get your free audit
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </BotOrbit>
-              </div>
-
-              {/* xl, not lg: nav is now truly centered on the row (see
-                  its comment), and that position depends only on the
-                  row's own midpoint — extra room at the far edges from
-                  going full-bleed doesn't move that midpoint, so it
-                  doesn't buy this any safety either. Measured at 1024px
-                  with both buttons shown: nav's own right edge lands 62px
-                  into this cluster; at 1150px the gap is a bare 1px, too
-                  thin to trust. xl (1280px) is the first step with real
-                  margin (50px+), so "Get your bot plan" alone still
-                  carries 1024–1279px. */}
               <Link
-                href="/contact"
-                onClick={closeMenu}
-                className="hidden xl:inline-flex btn h-11 border-[var(--color-accent-500)] text-white hover:bg-[var(--color-accent-500)] hover:text-ink-950"
+                href="/#audit"
+                onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
+                className="btn btn-primary h-11 px-3 sm:px-5 text-[12.5px] sm:text-[14px]"
               >
-                Contact us
+                Free audit <ArrowRight className="hidden sm:block w-4 h-4" />
               </Link>
-
-              {/* Phone CTA. No icon and a smaller label than the desktop
-                  button, to share the row with the mark and the menu button.
-                  `.btn` lives in @layer components, so these utilities
-                  override it without !important. */}
-              <div className="sm:hidden">
-                <BotOrbit tone="text-accent-500" eyes="text-ink-950">
-                  <Link
-                    href="/#audit"
-                    onClick={() => { closeMenu(); track("cta_clicked", { source: "header-mobile", label: "audit" }); }}
-                    className="btn btn-primary h-11 px-3 text-[12.5px]"
-                  >
-                    Free audit
-                  </Link>
-                </BotOrbit>
-              </div>
               <button
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
@@ -282,75 +205,39 @@ export function Header() {
           </div>
         </div>
 
-        {/* ── Mega: Services — step 1 pick an outcome, step 2 pick the bot ── */}
+        {/* Direct service links keep each destination one click away. */}
         {openMenu === "services" && (
-          <MegaPanel ref={panelRef}>
-            {(() => {
-              const st = stages.find((x) => x.id === stageSel);
-              if (!st) {
-                return (
-                  <>
-                    <MegaHeader eyebrow="Services · Step 1 of 2" title="What do you need more of?" />
-                    <ul className="grid grid-cols-3 gap-3">
-                      {stages.map((x, i) => (
-                        <li key={x.id} className="flex">
-                          <button
-                            onClick={() => setSelectedStage(x.id)}
-                            className="group w-full flex flex-col justify-between gap-8 p-6 min-h-[188px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                          >
-                            <span>
-                              <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{i + 1}</span>
-                              <span className="block display-lg mt-2">{x.title}</span>
-                              <span className="block mt-2 text-[14px] leading-relaxed text-[var(--text-secondary)]">{x.blurb}</span>
-                            </span>
-                            <span className="flex items-center justify-between">
-                              <span className="text-[13px] font-medium text-[var(--text-muted)] truncate">
-                                {x.items.map((c) => c.botName.replace(/ Bot$/, "")).join(" · ")}
-                              </span>
-                              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
-                            </span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                );
-              }
-              return (
-                <>
-                  <StepBack onBack={() => setSelectedStage(null)} backLabel="All outcomes"
-                    eyebrow={`${st.title.toUpperCase()} · Step 2 of 2`} title={st.blurb} />
-                  <ul className={cn("grid gap-3", st.items.length > 4 ? "grid-cols-3" : "grid-cols-2 xl:grid-cols-4")}>
-                    {st.items.map((c) => (
-                      <li key={c.slug} className="flex">
-                        <Link
-                          href={serviceHref(c)}
-                          onClick={closeMenu}
-                          className={cn(
-                            "group relative w-full flex flex-col gap-2 p-5 border hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                            c.slug === START_SLUG ? "bg-ink-950 border-ink-950 on-dark" : "bg-white border-[var(--border)] hover:border-ink-950"
-                          )}
-                        >
-                          {c.slug === START_SLUG && (
-                            <span className="mono text-[10px] uppercase tracking-[0.12em] text-accent-400">Start here</span>
-                          )}
-                          <span className={cn("display-md !text-[16px]", c.slug === START_SLUG ? "text-white" : "group-hover:text-[var(--accent-text)] transition-colors")}>{c.botName}</span>
-                          <span className={cn("text-[13px] leading-snug", c.slug === START_SLUG ? "text-ink-300" : "text-[var(--text-secondary)]")}>{c.outcome}</span>
-                          <ArrowRight className={cn("w-4 h-4 mt-auto pt-1 transition-transform duration-200 group-hover:translate-x-1", c.slug === START_SLUG ? "text-accent-400" : "text-[var(--accent-text)]")} />
+          <MegaPanel id="services-menu" ref={panelRef}>
+            <MegaHeader eyebrow="The BOT workforce" title="Choose the work you want to improve." />
+            <div className="grid grid-cols-3 gap-8">
+              {stages.map((stage) => (
+                <div key={stage.id}>
+                  <h3 className="display-md">{stage.title}</h3>
+                  <p className="body-sm mt-2 mb-5 min-h-[44px]">{stage.blurb}</p>
+                  <ul className="border-t border-[var(--border)]">
+                    {stage.items.map((category) => (
+                      <li key={category.slug}>
+                        <Link href={serviceHref(category)} onClick={closeMenu}
+                          className="group flex items-center justify-between gap-3 py-3 border-b border-[var(--border)] text-[14px] font-medium hover:text-[var(--accent-text)]">
+                          <span>{category.botName}{category.slug === START_SLUG && <span className="block text-[11px] font-normal text-[var(--accent-text)]">A focused starting point</span>}</span>
+                          <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
                         </Link>
                       </li>
                     ))}
                   </ul>
-                </>
-              );
-            })()}
-            <MegaFooter onAct={closeMenu} label="Not sure where to start?" text="We usually recommend starting with Speed-to-Lead. The free audit shows where your leads are slipping before you pick anything." />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between gap-6 mt-6 pt-5 border-t border-[var(--border)] text-[13px]">
+              <div className="flex gap-6"><Link href="/marketing" onClick={closeMenu}>All marketing BOTS →</Link><Link href="/sales" onClick={closeMenu}>All sales BOTS →</Link></div>
+              <div className="flex gap-6"><Link href="/about" onClick={closeMenu}>About</Link><Link href="/blog" onClick={closeMenu}>Insights</Link></div>
+            </div>
           </MegaPanel>
         )}
 
         {/* ── Mega: Service areas — region cards, then that region's states ── */}
         {openMenu === "areas" && (
-          <MegaPanel ref={panelRef}>
+          <MegaPanel id="areas-menu" ref={panelRef}>
             <div className="mb-7 max-w-[520px]">
               <MarketSearch onNavigate={closeMenu} />
             </div>
@@ -425,7 +312,7 @@ export function Header() {
             <MegaFooter
               onAct={closeMenu}
               label="Don't see your market?"
-              text="We work with contractors anywhere in the US. Start with the free audit and we'll test your lead flow wherever you are."
+              text="We work with contractors anywhere in the US. Start with the free audit and we’ll map a useful starting workflow for your business."
             />
           </MegaPanel>
         )}
@@ -528,7 +415,7 @@ export function Header() {
               </MobileGroup>
 
               <ul className="py-5 space-y-2">
-                {NAV_LINKS.map((l) => (
+                {[...NAV_LINKS, { label: "About", href: "/about" }, { label: "Blog", href: "/blog" }, { label: "Founding clients", href: "/#founding" }].map((l) => (
                   <MobileRow key={l.href} href={l.href} onGo={closeMobile} boxed strong>
                     {l.label}
                   </MobileRow>
@@ -570,12 +457,13 @@ export function Header() {
 
 /* ───────────────────────────  Primitives  ─────────────────────────── */
 
-function MenuTrigger({ label, open, onClick }: { label: string; open: boolean; onClick: () => void }) {
+function MenuTrigger({ label, open, onClick, panelId }: { label: string; open: boolean; onClick: () => void; panelId: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-expanded={open}
+      aria-controls={open ? panelId : undefined}
       className={cn(
         "nav-link inline-flex items-center gap-1.5 transition-colors",
         open ? "text-white" : "text-ink-200 hover:text-white"
@@ -587,14 +475,15 @@ function MenuTrigger({ label, open, onClick }: { label: string; open: boolean; o
   );
 }
 
-const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
-  function MegaPanel({ children }, ref) {
+const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode; id: string }>(
+  function MegaPanel({ children, id }, ref) {
     return (
       <div
         ref={ref}
+        id={id}
         className="hidden lg:block absolute left-0 right-0 bg-white border-b border-[var(--border)] shadow-mega animate-fade-up"
       >
-        <div className="container-site py-10 max-h-[calc(100vh-140px)] overflow-y-auto">{children}</div>
+        <div className="container-site py-8 max-h-[calc(100vh-140px)] overflow-y-auto">{children}</div>
       </div>
     );
   }
@@ -634,7 +523,7 @@ function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string;
       <div className="max-w-[52ch]">
         <p className="mb-1.5 eyebrow">{label ?? "Not sure which one you need?"}</p>
         <p className="text-[13.5px] leading-relaxed text-[var(--text-secondary)]">
-          {text ?? "Most businesses need two or three, not thirteen. Tell us what is getting stuck and we will map it — free, in one business day."}
+          {text ?? "Tell us what is getting stuck. The free BOT opportunity audit comes back within two business days."}
         </p>
       </div>
       <div className="flex items-center gap-3 flex-wrap">

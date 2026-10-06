@@ -86,7 +86,7 @@ export default async function ServiceHub({ params }: Params) {
                     <span className="hidden sm:inline">See everything included</span>
                   </Link>
                 </div>
-                <p className="body-sm mt-5">Free audit of your lead flow. Scorecard back in two business days.</p>
+                <p className="body-sm mt-5">Free audit of your lead flow. Initial recommendations in two business days.</p>
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
               <OfferVisual slug={svc.slug} />
@@ -254,11 +254,10 @@ export default async function ServiceHub({ params }: Params) {
           <Container>
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <div>
-                <p className="eyebrow mb-4">Free lead leak audit</p>
+                <p className="eyebrow mb-4">Free BOT opportunity audit</p>
                 <h2 className="display-xl text-balance">See what {svc.botName} would fix in your business.</h2>
                 <p className="body-lg mt-5 max-w-[46ch]">
-                  We test your lead flow the way a new customer would and send back a short scorecard:
-                  response times, missed follow-ups, and where {svc.name.toLowerCase()} fits in. Free, and yours to keep.
+                  We review your public customer journey and identify where {svc.name.toLowerCase()} fits into a useful BOT workflow. Initial recommendations within two business days, free and yours to keep.
                 </p>
               </div>
               <AuditForm source={`service-${svc.serviceSlug}-form`} focus={svc.botName} />

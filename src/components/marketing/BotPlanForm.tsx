@@ -129,7 +129,6 @@ export function BotPlanForm({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setError(data.error || "Something went wrong. Try again."); setState("error"); return; }
-      track("plan_form_submitted", { source, focus: focus ?? "Not sure yet" });
       setState("done");
     } catch {
       setError("Network error. Try again.");
@@ -141,7 +140,7 @@ export function BotPlanForm({
     side: { eyebrow: "Question 1", ask: "Where is it breaking?" },
     focus: { eyebrow: "Question 2", ask: "What needs the most help?" },
     timing: { eyebrow: defaultFocus ? "Question 1" : "Question 3", ask: "How soon do you need this?" },
-    contact: { eyebrow: "Last step", ask: "Where do we send the plan?" },
+    contact: { eyebrow: "Last step", ask: "Where should we send the audit?" },
   };
 
   return (
@@ -150,7 +149,7 @@ export function BotPlanForm({
       <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
           <p className="mono text-[10.5px] uppercase tracking-[0.13em] text-ink-300">
-            Bot plan
+            BOT opportunity audit
             <span className="text-accent-400">
               {" · "}{state === "done" ? "Queued" : "Configuring"}
             </span>
@@ -195,7 +194,7 @@ export function BotPlanForm({
             </span>
             <h3 className="display-lg mt-5">Got it.</h3>
             <p className="body-base mt-3 max-w-[44ch] mx-auto">
-              Your plan is being written now — it lands at {form.email} within one business day.
+              Your request is received. Initial recommendations will arrive at {form.email} within two business days.
               No pitch deck, no sales sequence you did not ask for.
             </p>
           </div>
@@ -290,10 +289,10 @@ export function BotPlanForm({
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary sm:min-w-[260px]">
                     {state === "sending"
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                      : <>Get my bot plan <ArrowRight className="w-4 h-4" /></>}
+                      : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
                   </button>
                   <p className="body-sm">
-                    One business day. No spam, no sales sequence you did not ask for.
+                    Two business days. No spam, no sales sequence you did not ask for.
                   </p>
                 </div>
               </form>

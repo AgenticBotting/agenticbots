@@ -119,7 +119,7 @@ export function BotPlanFlow() {
                 </button>
               )}
               <span id="bot-plan-title" className="label-caps text-[var(--text-muted)] truncate">
-                {state === "done" ? "Done" : `Get your bot plan — step ${step + 1} of ${TOTAL}`}
+                {state === "done" ? "Done" : `Get your BOT opportunity audit — step ${step + 1} of ${TOTAL}`}
               </span>
             </div>
             <button
@@ -149,7 +149,7 @@ export function BotPlanFlow() {
                 </span>
                 <h2 className="display-xl mt-6">You are in the queue.</h2>
                 <p className="body-base mt-4 max-w-[46ch] mx-auto">
-                  Your bot plan lands at {form.email} within one business day. A real
+                  Your BOT opportunity audit arrives at {form.email} within two business days. A real
                   person reads it first — no automated deck.
                 </p>
                 <button onClick={close} className="btn btn-secondary mt-8">
@@ -238,10 +238,10 @@ export function BotPlanFlow() {
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full mt-6">
                     {state === "sending"
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                      : <>Send me the plan <ArrowRight className="w-4 h-4" /></>}
+                      : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
                   </button>
                   <p className="body-xs mt-4">
-                    One business day. No spam, no sequence you did not ask for.
+                    Two business days. No spam, no sequence you did not ask for.
                   </p>
                 </form>
               </Step>

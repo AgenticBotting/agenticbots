@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section } from "@/components/ui";
 import {
-  BotPlanForm, PlanCta, CityVignette, ProofBar, FaqAccordion,
+  AuditForm, PlanCta, CityVignette, ProofBar, FaqAccordion,
   BotFactory, StackStrip, StatSplit, JoinBand,
 } from "@/components/marketing";
 import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: `${rec.city}, ${rec.state_abbr} — market hub`,
     description: ct
-      ? `Agent systems for ${ct.name} businesses — PPC, SEO, CRM and speed-to-lead, with the local market read from ${ct.districts[0]} to ${ct.districts[ct.districts.length - 1]}.`
-      : `Agent systems for ${rec.city}, ${rec.state_abbr} businesses — PPC, SEO, CRM and speed-to-lead across the ${rec.metro} metro. Free plan in one business day.`,
+      ? `BOT systems for ${ct.name} businesses — PPC, SEO, CRM and speed-to-lead, with the local market read from ${ct.districts[0]} to ${ct.districts[ct.districts.length - 1]}.`
+      : `BOT systems for ${rec.city}, ${rec.state_abbr} businesses — PPC, SEO, CRM and speed-to-lead across the ${rec.metro} metro. Free BOT opportunity audit in two business days.`,
     alternates: { canonical: `/markets/${state}/${city}` },
     /* Structural pages stay out of the index until their market is
        enriched — release schedule, docs/PROGRAMMATIC-SEO-PLAN.md §6. */
@@ -56,8 +56,8 @@ export default async function CityMarketHub({ params }: Params) {
 
   const faqs = [
     { q: `Do you work with ${rec.city} businesses remotely?`, a: `Yes — the bots run inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro. Every sequence is scheduled on your local hours, not ours.` },
-    { q: `How fast can this go live in ${rec.city}?`, a: `The typical build is about two weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
-    { q: `What does it cost?`, a: `A one-time build fee for getting your bots right, then a monthly fee to run and tune them — no per-seat pricing, no percentage of ad spend, no lock-in. The free plan comes back with numbers for your situation.` },
+    { q: `How fast can this go live in ${rec.city}?`, a: `The proposal confirms timing after we understand your workflow, integrations and access requirements. A monitored launch includes human approval controls for external changes.` },
+    { q: `What does it cost?`, a: `One BOT is $7,500 setup plus $2,500/month. Growth starts at $15,000 setup plus $3,500/month for a scoped 3–5 BOT system, with expansion quoted separately. Enterprise is custom. Usage, support and contract terms are defined in your proposal.` },
   ];
 
   return (
@@ -65,7 +65,7 @@ export default async function CityMarketHub({ params }: Params) {
       <JsonLd data={[
         serviceLd({
           name: `Agentic marketing & sales systems in ${rec.city}, ${rec.state_abbr}`,
-          description: ct?.character ?? `Agent systems for ${rec.city} businesses across the ${rec.metro} metro.`,
+          description: ct?.character ?? `BOT systems for ${rec.city} businesses across the ${rec.metro} metro.`,
           path: `/markets/${state}/${city}`,
           areaServed: `${rec.city}, ${rec.state}`,
         }),
@@ -107,18 +107,18 @@ export default async function CityMarketHub({ params }: Params) {
                 ) : (
                   <>
                     <p className="body-lg mt-6 max-w-[54ch]">
-                      Every call answered, every quote followed up, ads and CRM worked continuously —
+                      Connected workflows for calls, quotes, ads and CRM —
                       built the same way for {rec.city} as for every market we serve, wired into the
                       tools you already use.
                     </p>
                     <p className="body-base mt-4 max-w-[54ch]">
                       We deploy remotely across the {rec.metro} metro. Tell us what you sell and the
-                      free plan comes back mapped to your market within one business day.
+                      free BOT opportunity audit comes back mapped to your market within two business days.
                     </p>
                   </>
                 )}
                 <div className="mt-8"><PlanCta source={`market-hub-${rec.city_slug}`} /></div>
-                <p className="body-sm mt-5">Free plan back in one business day. No call required.</p>
+                <p className="body-sm mt-5">Free BOT opportunity audit back in two business days. No call required.</p>
               </div>
               <BotFactory place={rec.city} />
             </div>
@@ -209,13 +209,13 @@ export default async function CityMarketHub({ params }: Params) {
           heading={<>One fleet, every job — <span className="em-green">tuned to {rec.city}.</span></>}
           body={`Ads, SEO, CRM and speed-to-lead run as one system for your ${rec.city} business — built, monitored and tuned continuously, inside the accounts you already own. You stay the owner of every account and every result.`}
           stats={[
-            { value: "2w", label: "Typical first system live, monitored" },
-            { value: "24/7", label: "Nights, weekends and holidays covered" },
-            { value: "<60s", label: "First response to any inbound lead" },
+            { value: "2 days", label: "Initial free audit turnaround, business days" },
+            { value: "Scoped", label: "Workflow, integrations and capacity agreed" },
+            { value: "Human", label: "Approval for external changes" },
             { value: "13", label: "Bots in the fleet, deployed as you need them" },
           ]}
           source={`market-hub-${rec.city_slug}-statsplit`}
-          note="No per-seat pricing. No percentage of ad spend. No lock-in."
+          note="Implementation timing and operating scope confirmed in your proposal."
         />
 
         {near.length > 0 && (
@@ -240,14 +240,14 @@ export default async function CityMarketHub({ params }: Params) {
 
         <JoinBand
           heading={<>Integrate agentic bots to swarm your <span className="em-green">marketing and sales tasks.</span></>}
-          sub={`One conversation, one free plan — mapped to the ${rec.metro} metro, not a template.`}
+          sub={`One conversation, one free BOT opportunity audit — mapped to the ${rec.metro} metro, not a template.`}
           source={`market-hub-${rec.city_slug}-joinband`}
         />
 
-        <Section variant="alt" eyebrow="Start here" heading={`Get the ${rec.city} bot plan.`}
-          sub="Tell us what you sell and where it is getting stuck. The plan comes back mapped to this market — free, one business day.">
+        <Section id="audit" variant="alt" eyebrow="Start here" heading={`Get the ${rec.city} BOT opportunity audit.`}
+          sub="Tell us what you sell and where it is getting stuck. The plan comes back mapped to this market — free, two business days.">
           <div>
-            <BotPlanForm source={`market-hub-${rec.city_slug}-form`} />
+            <AuditForm source={`market-hub-${rec.city_slug}-form`} />
           </div>
         </Section>
       </main>
