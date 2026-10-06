@@ -3,10 +3,8 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
 import {
   Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight, MapPin,
-  RefreshCw, Search, Target, Workflow,
 } from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
@@ -29,10 +27,10 @@ type MenuId = "services" | "areas" | null;
 /* The 13 bots, grouped by the job a contractor needs done — not by
    marketing vs. sales. Speed-to-Lead is pulled out as the starting point. */
 const START_SLUG = "inbound";
-const STAGES: { id: string; title: string; kicker: string; blurb: string; icon: LucideIcon; slugs: string[] }[] = [
-  { id: "found", title: "Get found", kicker: "Demand capture", blurb: "Build visibility across search, content and paid media.", icon: Search, slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
-  { id: "close", title: "Close more jobs", kicker: "Revenue conversion", blurb: "Prepare responses and follow-up across your sales process.", icon: Target, slugs: ["inbound", "cro", "email", "enablement"] },
-  { id: "repeat", title: "Win repeat work", kicker: "Customer value", blurb: "Bring past customers back and know what is working.", icon: RefreshCw, slugs: ["reactivation", "crm", "analytics"] },
+const STAGES: { id: string; title: string; blurb: string; slugs: string[] }[] = [
+  { id: "found", title: "Get found", blurb: "Build visibility across search, content and paid media.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
+  { id: "close", title: "Close more jobs", blurb: "Prepare responses and follow-up across your sales process.", slugs: ["inbound", "cro", "email", "enablement"] },
+  { id: "repeat", title: "Win repeat work", blurb: "Bring past customers back and know what is working.", slugs: ["reactivation", "crm", "analytics"] },
 ];
 
 export function Header() {
@@ -224,42 +222,35 @@ export function Header() {
               if (!stage) {
                 return (
                   <>
-                    <MegaHeader eyebrow="Services · Step 1 of 2" title="Choose the business outcome you want to improve." />
-                    <ul className="grid grid-cols-3 gap-3">
+                    <div className="mb-7 grid grid-cols-[minmax(320px,.82fr)_minmax(0,1.18fr)] items-end gap-12">
+                      <div>
+                        <p className="eyebrow mb-2">Managed BOT systems</p>
+                        <h3 className="display-lg !text-[30px] max-w-[26ch]">
+                          Choose the outcome. We architect the operating layer.
+                        </h3>
+                      </div>
+                      <p className="max-w-[54ch] justify-self-end text-[15px] leading-relaxed text-[var(--text-secondary)]">
+                        Start with one business priority. Explore the specialist BOTS, workflows and controls designed around it.
+                      </p>
+                    </div>
+                    <ul className="grid grid-cols-3 divide-x divide-[var(--border)] border-y border-[var(--border-strong)]">
                       {stages.map((item, index) => {
-                        const StageIcon = item.icon;
                         return (
                           <li key={item.id} className="flex">
                             <button
                               type="button"
                               onClick={() => setSelectedStage(item.id)}
-                              className="group relative w-full min-h-[214px] overflow-hidden border border-[var(--border)] bg-white p-6 text-left hover:border-[var(--color-accent-600)] hover:bg-[var(--bg-alt)] hover:-translate-y-1 hover:shadow-lift transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                              className="group relative w-full min-h-[224px] overflow-hidden bg-white px-7 py-6 text-left transition-colors duration-300 hover:bg-[var(--bg-alt)] focus-visible:z-10"
                             >
-                              <StageIcon
-                                aria-hidden="true"
-                                strokeWidth={1}
-                                className="absolute -right-7 -bottom-9 h-36 w-36 text-[var(--color-accent-700)] opacity-[0.045] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-x-2 group-hover:-translate-y-2 group-hover:opacity-[0.09]"
-                              />
-                              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-0 bg-[var(--color-accent-500)] transition-transform duration-300 group-hover:scale-x-100" />
-                              <span className="relative z-10 flex h-full flex-col">
-                                <span className="flex items-start justify-between gap-4">
-                                  <span>
-                                    <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{index + 1}</span>
-                                    <span className="mt-1.5 block mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--text-muted)]">{item.kicker}</span>
-                                  </span>
-                                  <span className="grid h-10 w-10 place-items-center border border-[var(--border-tint)] bg-[var(--bg-tint)] text-[var(--accent-text)] transition-colors duration-300 group-hover:bg-[var(--color-accent-500)] group-hover:text-[var(--accent-ink)]">
-                                    <StageIcon aria-hidden="true" className="h-4.5 w-4.5" strokeWidth={1.75} />
-                                  </span>
-                                </span>
-                                <span className="mt-7 block display-lg !text-[25px] transition-colors group-hover:text-[var(--accent-text)]">{item.title}</span>
-                                <span className="mt-2 block max-w-[31ch] text-[14px] leading-relaxed text-[var(--text-secondary)]">{item.blurb}</span>
+                              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-[var(--color-accent-500)] transition-transform duration-300 group-hover:scale-x-100" />
+                              <span className="flex h-full flex-col">
+                                <span className="mono text-[10px] tracking-[0.12em] text-[var(--text-muted)]">0{index + 1}</span>
+                                <span className="mt-8 block display-lg !text-[28px] transition-colors group-hover:text-[var(--accent-text)]">{item.title}</span>
+                                <span className="mt-3 block max-w-[29ch] text-[14px] leading-relaxed text-[var(--text-secondary)]">{item.blurb}</span>
                                 <span className="mt-auto flex items-center justify-between gap-4 pt-7">
-                                  <span className="mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
-                                    {item.items.length} specialized BOTS
-                                  </span>
-                                  <span className="inline-flex items-center gap-2 text-[12.5px] font-semibold text-[var(--accent-text)]">
-                                    View services
-                                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                                  <span className="text-[12.5px] font-semibold text-[var(--foreground)]">Explore workflows</span>
+                                  <span className="grid h-9 w-9 place-items-center bg-ink-950 text-white transition-colors duration-200 group-hover:bg-[var(--color-accent-500)] group-hover:text-[var(--accent-ink)]">
+                                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                                   </span>
                                 </span>
                               </span>
@@ -280,17 +271,20 @@ export function Header() {
                     eyebrow={`${stage.title.toUpperCase()} · Step 2 of 2`}
                     title={stage.blurb}
                   />
-                  <ul className={cn("grid gap-3", stage.items.length > 4 ? "grid-cols-3" : "grid-cols-2 xl:grid-cols-4")}>
+                  <ul className={cn(
+                    "grid gap-px border border-[var(--border-strong)] bg-[var(--border)]",
+                    stage.items.length > 4 ? "grid-cols-3" : stage.items.length === 4 ? "grid-cols-4" : "grid-cols-3",
+                  )}>
                     {stage.items.map((category) => (
                       <li key={category.slug} className="flex">
                         <Link
                           href={serviceHref(category)}
                           onClick={closeMenu}
                           className={cn(
-                            "group relative w-full flex flex-col gap-2 p-5 border bg-white hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                            "group relative w-full min-h-[142px] flex flex-col gap-2 bg-white p-5 transition-colors duration-200 hover:bg-[var(--bg-alt)]",
                             category.slug === START_SLUG
-                              ? "border-[var(--color-accent-600)] bg-[var(--bg-tint)]"
-                              : "border-[var(--border)] hover:border-ink-950",
+                              ? "shadow-[inset_0_2px_0_var(--color-accent-500)]"
+                              : "",
                           )}
                         >
                           {category.slug === START_SLUG && (
@@ -298,7 +292,10 @@ export function Header() {
                           )}
                           <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{category.botName}</span>
                           <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{category.outcome}</span>
-                          <ArrowRight className="w-4 h-4 mt-auto pt-1 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                          <span className="mt-auto flex items-center justify-between pt-2 text-[12px] font-semibold text-[var(--foreground)]">
+                            Review BOT
+                            <ArrowRight className="h-4 w-4 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                          </span>
                         </Link>
                       </li>
                     ))}
@@ -571,15 +568,6 @@ const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode; id: st
   }
 );
 
-function MegaHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div className="mb-7 pb-4 border-b border-[var(--border)]">
-      <p className="mb-1.5 eyebrow">{eyebrow}</p>
-      <h3 className="display-md">{title}</h3>
-    </div>
-  );
-}
-
 function StepBack({ onBack, backLabel, eyebrow, title }: {
   onBack: () => void; backLabel: string; eyebrow: string; title: string;
 }) {
@@ -601,26 +589,14 @@ function StepBack({ onBack, backLabel, eyebrow, title }: {
 
 function ServiceMenuFooter({ onAct }: { onAct: () => void }) {
   return (
-    <div className="relative mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-8 overflow-hidden border border-[var(--border-tint)] bg-[var(--bg-tint)] px-6 py-5">
-      <Workflow
-        aria-hidden="true"
-        strokeWidth={1}
-        className="absolute -bottom-16 right-[27%] h-48 w-48 text-[var(--color-accent-700)] opacity-[0.045]"
-      />
-      <div className="relative z-10 max-w-[60ch]">
-        <p className="eyebrow mb-1.5">Not sure where to start?</p>
-        <p className="display-md">Find the first workflow worth fixing.</p>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
-          The {AUDIT_OFFER.priceLabel} audit identifies the strongest starting point before you choose a service.
-        </p>
+    <div className="mt-7 flex items-center justify-between gap-8 border-t border-[var(--border)] pt-5">
+      <div className="max-w-[68ch] text-[13px] leading-relaxed text-[var(--text-secondary)]">
+        <span className="font-semibold text-[var(--foreground)]">Need the first mandate mapped?</span>{" "}
+        The {AUDIT_OFFER.priceLabel} workflow audit identifies the highest-value place to begin.
       </div>
-      <div className="relative z-10 flex items-center gap-3">
-        <Link href="/how-it-works" onClick={onAct} className="btn btn-outline bg-white">
-          How it works
-        </Link>
-        <Link href="/#audit" onClick={onAct} className="btn btn-primary min-w-[230px] justify-between">
-          <span>Find my first BOT</span>
-          <span className="mono text-[9px] uppercase tracking-[0.08em]">{AUDIT_OFFER.priceLabel} audit</span>
+      <div className="flex shrink-0 items-center">
+        <Link href="/#audit" onClick={onAct} className="btn btn-primary">
+          Find my first BOT
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
