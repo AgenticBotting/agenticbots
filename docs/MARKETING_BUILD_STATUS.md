@@ -18,7 +18,7 @@ The visual work remains UI- and CSS-driven: no stock photography, generated peop
 
 - Homepage rebuilt around a coordinated BOT workforce, code-rendered system visuals, a guided workflow, operating controls, delivery, pricing and a paid workflow audit.
 - Pricing, About and How it works follow the same offer and visual language. The About page names Nick Thomson without inventing a biography or client history.
-- Service mega menu exposes all 13 canonical service destinations in one panel, grouped by business goal. Four primary navigation choices: Services, Service areas, How it works, Pricing. Regional/state drill-down, market search, city coverage, canonical URLs, sitemaps and footer links retained.
+- The Services mega menu uses a two-step outcome flow: three initial cards for Get found, Close more jobs and Win repeat work, followed by the relevant BOT services after selection. Four primary navigation choices remain: Services, Service areas, How it works and Pricing. Regional/state drill-down, market search, city coverage, canonical URLs, sitemaps and footer links are retained.
 - Automatic exit-intent promotion and roaming BOT mascot removed from the global layout. Existing explicitly invoked plan flow remains available.
 - Public intake copy aligned to a **$499 BOT workflow audit** with written findings within **two business days after payment**. The form requests the audit without charging immediately; scope and payment are confirmed before work begins. Existing `/api/plan` delivery endpoint retained. Audit form adds optional process context; successful conversion counting remains server-side rather than duplicated in the audit/legacy form.
 
@@ -55,6 +55,7 @@ The hero and residential/commercial sections use lightweight, code-rendered inte
 - Enterprise positioning validation passed `npm run typecheck`, `npm run lint` with zero errors, all 172 tests and the full Webpack production build. All 13,753 static outputs generated; link integrity, metadata uniqueness and topic gates passed.
 - Service-page visual refinement passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 172 tests, in-app full-page visual review, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
 - Light service surfaces and paid-audit positioning passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, in-app full-page visual review, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
+- Outcome-first Services navigation passed live browser review at 1440px: three initial cards, focused service results, working return navigation and no console errors. It also passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build with link, SEO and topic gates.
 
 ## Follow-on evidence work
 

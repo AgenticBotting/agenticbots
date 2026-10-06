@@ -35,6 +35,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
+  const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const [mobileRegion, setMobileRegion] = useState<Region | null>(null);
@@ -82,15 +83,18 @@ export function Header() {
   function closeMenu() {
     setOpenMenu(null);
     setSelectedRegion(null);
+    setSelectedStage(null);
   }
 
   function toggleMenu(id: Exclude<MenuId, null>) {
     if (openMenu === id) { closeMenu(); return; }
     track("nav_mega_opened", { menu: id });
     setSelectedRegion(null);
+    setSelectedStage(null);
     setOpenMenu(id);
   }
 
+  const stageSel = selectedStage;
   const stages = STAGES.map((st) => ({
     ...st,
     items: st.slugs.map((sl) => ALL_CATEGORIES.find((c) => c.slug === sl)).filter((c): c is NonNullable<typeof c> => !!c),
@@ -208,33 +212,81 @@ export function Header() {
           </div>
         </div>
 
-        {/* Direct service links keep each destination one click away. */}
+        {/* ── Mega: Services — step 1 pick an outcome, step 2 pick the BOT ── */}
         {openMenu === "services" && (
           <MegaPanel id="services-menu" ref={panelRef}>
-            <MegaHeader eyebrow="The BOT workforce" title="Choose the work you want to improve." />
-            <div className="grid grid-cols-3 gap-8">
-              {stages.map((stage) => (
-                <div key={stage.id}>
-                  <h3 className="display-md">{stage.title}</h3>
-                  <p className="body-sm mt-2 mb-5 min-h-[44px]">{stage.blurb}</p>
-                  <ul className="border-t border-[var(--border)]">
+            {(() => {
+              const stage = stages.find((item) => item.id === stageSel);
+              if (!stage) {
+                return (
+                  <>
+                    <MegaHeader eyebrow="Services · Step 1 of 2" title="Choose the business outcome you want to improve." />
+                    <ul className="grid grid-cols-3 gap-3">
+                      {stages.map((item, index) => (
+                        <li key={item.id} className="flex">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedStage(item.id)}
+                            className="group w-full flex flex-col justify-between gap-8 p-6 min-h-[188px] text-left border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          >
+                            <span>
+                              <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--accent-text)]">0{index + 1}</span>
+                              <span className="block display-lg mt-2">{item.title}</span>
+                              <span className="block mt-2 text-[14px] leading-relaxed text-[var(--text-secondary)]">{item.blurb}</span>
+                            </span>
+                            <span className="flex items-center justify-between gap-4">
+                              <span className="text-[13px] font-medium text-[var(--text-muted)] truncate">
+                                {item.items.map((category) => category.botName.replace(/ Bot$/, "")).join(" · ")}
+                              </span>
+                              <ArrowRight className="w-4 h-4 shrink-0 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                );
+              }
+
+              return (
+                <>
+                  <StepBack
+                    onBack={() => setSelectedStage(null)}
+                    backLabel="All outcomes"
+                    eyebrow={`${stage.title.toUpperCase()} · Step 2 of 2`}
+                    title={stage.blurb}
+                  />
+                  <ul className={cn("grid gap-3", stage.items.length > 4 ? "grid-cols-3" : "grid-cols-2 xl:grid-cols-4")}>
                     {stage.items.map((category) => (
-                      <li key={category.slug}>
-                        <Link href={serviceHref(category)} onClick={closeMenu}
-                          className="group flex items-center justify-between gap-3 py-3 border-b border-[var(--border)] text-[14px] font-medium hover:text-[var(--accent-text)]">
-                          <span>{category.botName}{category.slug === START_SLUG && <span className="block text-[11px] font-normal text-[var(--accent-text)]">A focused starting point</span>}</span>
-                          <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
+                      <li key={category.slug} className="flex">
+                        <Link
+                          href={serviceHref(category)}
+                          onClick={closeMenu}
+                          className={cn(
+                            "group relative w-full flex flex-col gap-2 p-5 border bg-white hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                            category.slug === START_SLUG
+                              ? "border-[var(--color-accent-600)] bg-[var(--bg-tint)]"
+                              : "border-[var(--border)] hover:border-ink-950",
+                          )}
+                        >
+                          {category.slug === START_SLUG && (
+                            <span className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent-text)]">Recommended starting point</span>
+                          )}
+                          <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{category.botName}</span>
+                          <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{category.outcome}</span>
+                          <ArrowRight className="w-4 h-4 mt-auto pt-1 text-[var(--accent-text)] transition-transform duration-200 group-hover:translate-x-1" />
                         </Link>
                       </li>
                     ))}
                   </ul>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-between gap-6 mt-6 pt-5 border-t border-[var(--border)] text-[13px]">
-              <div className="flex gap-6"><Link href="/marketing" onClick={closeMenu}>All marketing BOTS →</Link><Link href="/sales" onClick={closeMenu}>All sales BOTS →</Link></div>
-              <div className="flex gap-6"><Link href="/about" onClick={closeMenu}>About</Link><Link href="/blog" onClick={closeMenu}>Insights</Link></div>
-            </div>
+                </>
+              );
+            })()}
+            <MegaFooter
+              onAct={closeMenu}
+              label="Not sure where to start?"
+              text={`The ${AUDIT_OFFER.priceLabel} BOT workflow audit identifies the highest-value starting point before you choose a service.`}
+            />
           </MegaPanel>
         )}
 
