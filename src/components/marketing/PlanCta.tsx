@@ -4,14 +4,15 @@ import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 /**
- * The primary CTA: the BOT workflow assessment. Scrolls to the page's own
- * assessment form when there is one, otherwise goes to the homepage form.
+ * The primary CTA: the paid BOT workflow audit. Scrolls to the page's own
+ * audit form when there is one, otherwise goes to the homepage form.
  */
 export function PlanCta({
   source,
-  label = "Request a workflow assessment",
+  label = AUDIT_OFFER.cta,
   variant = "primary",
   className,
 }: {

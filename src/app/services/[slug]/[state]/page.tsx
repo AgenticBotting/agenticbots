@@ -8,6 +8,7 @@ import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, getService } from "@/lib/catalog";
 import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 type Params = { params: Promise<{ slug: string; state: string }> };
 
@@ -170,9 +171,9 @@ export default async function StateHub({ params }: Params) {
         <Section
           id="audit"
           variant="alt"
-          eyebrow="Free BOT opportunity audit"
+          eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`}
           heading={`See where your ${st.name} leads are slipping.`}
-          sub="We review your public customer journey and identify a useful starting workflow. Free, and yours to keep."
+          sub={`We review your public customer journey and identify a useful starting workflow. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}
         >
           <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.botName} />
         </Section>

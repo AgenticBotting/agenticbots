@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { AuditForm } from "@/components/marketing/AuditForm";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { PricingCards } from "@/components/marketing/PricingCards";
-import { PRICING_FAQ, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
+import { AUDIT_OFFER, PRICING_FAQ, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
 
 const [entry, growth] = MARKETING_PLANS;
 
@@ -27,6 +27,6 @@ export default function PricingPage() {
     ].map(([title, description], index) => <li key={title}><span>0{index + 1}</span><h3 className="display-lg">{title}</h3><p className="body-base">{description}</p></li>)}</ol></Container></section>
     <section className="section-pad workforce-governance on-dark"><Container><div className="system-intro"><h2 className="display-xl max-w-[19ch]">The retainer keeps<br />the system working.</h2><ul className="space-y-4 max-w-[47ch]">{["Monitoring and issue handling for the agreed workflows", "Maintenance and tuning as your process evolves", "Activity reporting and a regular results review", "Expansion planned and quoted before new work begins"].map((text) => <li key={text} className="flex items-start gap-3 text-ink-200"><Check size={17} className="shrink-0 text-accent-400 mt-1" />{text}</li>)}</ul></div></Container></section>
     <section className="section-pad border-b border-[var(--border)]"><Container><div className="grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-10 lg:gap-16"><h2 className="display-xl max-w-[19ch]">Know what<br />you are buying.</h2><FaqAccordion items={PRICING_FAQ} /></div></Container></section>
-    <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16 items-start"><div><h2 className="display-xl max-w-[18ch]">Find the right<br />starting workflow.</h2><p className="body-lg mt-5 max-w-[43ch]">The free BOT opportunity audit comes back within two business days. You get initial recommendations before deciding what to build.</p><p className="body-sm mt-6">No call required. Scope and costs agreed before implementation.</p></div><AuditForm source="pricing" /></div></Container></section>
+    <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16 items-start"><div><p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} workflow audit</p><h2 className="display-xl max-w-[18ch]">Find the right<br />starting workflow.</h2><p className="body-lg mt-5 max-w-[43ch]">The BOT workflow audit delivers written findings within two business days of payment, before you decide what to build.</p><p className="body-sm mt-6">No charge today. We confirm scope and payment before the audit begins.</p></div><AuditForm source="pricing" /></div></Container></section>
   </main><Footer /></>;
 }

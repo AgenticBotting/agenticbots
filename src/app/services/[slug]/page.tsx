@@ -7,7 +7,7 @@ import { Container, Section } from "@/components/ui";
 import { ArrowRight } from "lucide-react";
 import {
   AuditForm, PlanCta, FaqAccordion, SecurityBlock, ActivityLog,
-  StackStrip, StatSplit, FeatureTriad, TaskConveyor, OfferVisual, OperatingTransition,
+  StackStrip, StatSplit, FeatureTriad, TaskConveyor, OfferVisual, OperatingTransition, ServiceAtmosphere,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState } from "@/lib/geo/data";
@@ -17,6 +17,7 @@ import { ALL_SERVICES, ALL_CATEGORIES, getService, serviceHref } from "@/lib/cat
 import { getOffer } from "@/lib/offers";
 import { renderHeadline } from "@/lib/headline";
 import { getServicePositioning } from "@/lib/service-positioning";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -64,8 +65,9 @@ export default async function ServiceHub({ params }: Params) {
       <Header />
       <main className="service-hub">
         {/* ── Hero: promise left, the bot's console right. ── */}
-        <section className="service-hero on-dark">
+        <section className="service-hero">
           <Container className="service-hero-container">
+            <ServiceAtmosphere slug={svc.slug} />
             <span className="service-hero-number" aria-hidden="true">{svc.index}</span>
             <div className="service-hero-grid">
               <div className="service-hero-copy">
@@ -95,7 +97,7 @@ export default async function ServiceHub({ params }: Params) {
                     <span className="hidden sm:inline">See everything included</span>
                   </Link>
                 </div>
-                <p className="body-sm mt-5">No-cost workflow assessment. Initial findings within two business days.</p>
+                <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
               <div className="service-hero-visual">
@@ -284,10 +286,10 @@ export default async function ServiceHub({ params }: Params) {
           <Container>
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <div>
-                <p className="eyebrow mb-4">Workflow assessment</p>
+                <p className="eyebrow mb-4">{AUDIT_OFFER.priceLabel} workflow audit</p>
                 <h2 className="display-xl text-balance">Define the business case for {svc.botName}.</h2>
                 <p className="body-lg mt-5 max-w-[46ch]">
-                  We review the relevant customer journey, operating constraints and systems to determine whether {svc.name.toLowerCase()} supports a credible managed workflow. Initial findings arrive within two business days.
+                  We review the relevant customer journey, operating constraints and systems to determine whether {svc.name.toLowerCase()} supports a credible managed workflow. Written findings arrive within {AUDIT_OFFER.turnaround} of payment.
                 </p>
               </div>
               <AuditForm source={`service-${svc.serviceSlug}-form`} focus={svc.botName} />

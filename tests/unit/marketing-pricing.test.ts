@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { PricingCards } from "@/components/marketing/PricingCards";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 describe("public pricing offer", () => {
   it("shows setup and monthly costs together, with scoped Growth expansion", () => {
@@ -21,5 +22,11 @@ describe("public pricing offer", () => {
     expect(html.match(/href="\/pricing#audit"/g)).toHaveLength(3);
     expect(html).not.toContain("checkout");
     expect(html).not.toMatch(/most popular|guaranteed|unlimited/i);
+  });
+
+  it("positions the workflow audit as a paid qualification product", () => {
+    expect(AUDIT_OFFER.price).toBe(499);
+    expect(AUDIT_OFFER.cta).toContain("$499");
+    expect(AUDIT_OFFER.name).toBe("BOT workflow audit");
   });
 });

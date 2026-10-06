@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section, BotIndex } from "@/components/ui";
-import { PlanCta, BotFactory, SignalFlow, FleetSwarm } from "@/components/marketing";
+import { PlanCta, BotFactory, SignalFlow, FleetSwarm, ServiceAtmosphere } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { getServicePositioning } from "@/lib/service-positioning";
@@ -25,8 +25,9 @@ export default function ServicesIndex() {
       ])} />
       <Header />
       <main className="service-hub">
-        <section className="service-hero services-index-hero on-dark">
+        <section className="service-hero services-index-hero">
           <Container className="service-hero-container">
+            <ServiceAtmosphere />
             <span className="service-hero-number" aria-hidden="true">13</span>
             <div className="service-hero-grid">
               <div className="service-hero-copy">

@@ -87,7 +87,7 @@ export function LeakCalculator() {
 
         <a href="#audit" onClick={() => track("cta_clicked", { source: "calculator", label: "audit" })}
           className="btn btn-primary mt-8 self-start">
-          Find my real number — free audit <ArrowRight className="w-4 h-4" />
+          Request the $499 audit <ArrowRight className="w-4 h-4" />
         </a>
         <p className="mt-auto pt-7 text-[11.5px] leading-relaxed text-ink-400">
           Rough estimate. Assumes roughly 5% of leads go cold with an under-5-minute reply, 20% within the hour,

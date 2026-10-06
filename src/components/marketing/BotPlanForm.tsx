@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { CATALOG, ALL_CATEGORIES } from "@/lib/catalog";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 /**
  * The site's conversion surface — a point-and-click configurator, not a
@@ -149,7 +150,7 @@ export function BotPlanForm({
       <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
           <p className="mono text-[10.5px] uppercase tracking-[0.13em] text-ink-300">
-            BOT opportunity audit
+            {AUDIT_OFFER.priceLabel} BOT workflow audit
             <span className="text-accent-400">
               {" · "}{state === "done" ? "Queued" : "Configuring"}
             </span>
@@ -289,10 +290,10 @@ export function BotPlanForm({
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary sm:min-w-[260px]">
                     {state === "sending"
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                      : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
+                      : <>Request my {AUDIT_OFFER.priceLabel} audit <ArrowRight className="w-4 h-4" /></>}
                   </button>
                   <p className="body-sm">
-                    Two business days. No spam, no sales sequence you did not ask for.
+                    No charge today. Scope and payment confirmed first.
                   </p>
                 </div>
               </form>

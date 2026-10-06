@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 /**
  * The fuller lead-gen ask on the blog — end of a post and foot of the index.
@@ -61,14 +62,14 @@ export function BlogOptin({
               <Check className="w-4.5 h-4.5" strokeWidth={3} />
             </span>
             <h3 role="status" className="display-lg">You&apos;re on the list.</h3>
-            <p className="body-sm mt-2">Your BOT opportunity audit arrives within two business days.</p>
+            <p className="body-sm mt-2">We will confirm the {AUDIT_OFFER.priceLabel} audit scope and payment step by email.</p>
           </>
         ) : (
           <>
             {/* A short rule instead of a colored eyebrow: the label stays
                 metadata-quiet and the block still opens with a mark. */}
             <span aria-hidden className="mx-auto mb-5 block h-px w-10 bg-[var(--border-strong)]" />
-            <p className="eyebrow eyebrow-dim">Free · two business days</p>
+            <p className="eyebrow eyebrow-dim">{AUDIT_OFFER.priceLabel} · {AUDIT_OFFER.turnaround}</p>
 
             <h3 className="display-lg mt-3 text-balance">
               Where is your business losing customers?
@@ -98,7 +99,7 @@ export function BlogOptin({
               <button type="submit" disabled={state === "sending"} className="btn btn-primary mt-3 w-full">
                 {state === "sending"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                  : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
+                  : <>Request my {AUDIT_OFFER.priceLabel} audit <ArrowRight className="w-4 h-4" /></>}
               </button>
 
               {state === "error" && (

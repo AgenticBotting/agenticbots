@@ -3,6 +3,7 @@ import { Mail, ArrowRight } from "lucide-react";
 import { Logo, BotPattern } from "@/components/ui";
 import { CATALOG, serviceHref } from "@/lib/catalog";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 const COMPANY = [
   { label: "How it works", href: "/how-it-works" },
@@ -122,11 +123,11 @@ export function Footer() {
           <div>
             <p className="display-md text-white">Find your first BOT opportunity.</p>
             <p className="text-[13.5px] text-ink-400 mt-1.5">
-              Initial workflow recommendations within two business days. No call required.
+              A focused operating review with written findings within two business days of payment.
             </p>
           </div>
           <Link href="/#audit" className="btn btn-primary shrink-0">
-            Request a workflow assessment
+            {AUDIT_OFFER.cta}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

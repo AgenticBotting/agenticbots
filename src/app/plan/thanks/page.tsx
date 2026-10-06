@@ -29,7 +29,7 @@ export default function ThanksPage() {
             </span>
             <h1 className="display-hero mt-7 text-balance">Request <span className="em-green">received.</span></h1>
             <p className="body-lg mt-5">
-              Your BOT opportunity audit is in the queue. Here is exactly what happens next.
+              Your BOT workflow audit request is in the queue. We will confirm scope and payment before the review begins.
             </p>
           </div>
 

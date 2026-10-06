@@ -7,6 +7,7 @@ import { BOT_PLAN_EVENT } from "@/lib/lead-flow";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 /**
  * Full-screen multi-step bot plan flow.
@@ -119,7 +120,7 @@ export function BotPlanFlow() {
                 </button>
               )}
               <span id="bot-plan-title" className="label-caps text-[var(--text-muted)] truncate">
-                {state === "done" ? "Done" : `Get your BOT opportunity audit — step ${step + 1} of ${TOTAL}`}
+                {state === "done" ? "Done" : `${AUDIT_OFFER.priceLabel} BOT workflow audit — step ${step + 1} of ${TOTAL}`}
               </span>
             </div>
             <button
@@ -149,8 +150,7 @@ export function BotPlanFlow() {
                 </span>
                 <h2 className="display-xl mt-6">You are in the queue.</h2>
                 <p className="body-base mt-4 max-w-[46ch] mx-auto">
-                  Your BOT opportunity audit arrives at {form.email} within two business days. A real
-                  person reads it first — no automated deck.
+                  We will confirm scope and payment by email. Written findings arrive at {form.email} within {AUDIT_OFFER.turnaround} of payment.
                 </p>
                 <button onClick={close} className="btn btn-secondary mt-8">
                   Back to the site
@@ -238,10 +238,10 @@ export function BotPlanFlow() {
                   <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full mt-6">
                     {state === "sending"
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                      : <>Get my free audit <ArrowRight className="w-4 h-4" /></>}
+                      : <>Request my {AUDIT_OFFER.priceLabel} audit <ArrowRight className="w-4 h-4" /></>}
                   </button>
                   <p className="body-xs mt-4">
-                    Two business days. No spam, no sequence you did not ask for.
+                    No charge today. Scope and payment confirmed first.
                   </p>
                 </form>
               </Step>

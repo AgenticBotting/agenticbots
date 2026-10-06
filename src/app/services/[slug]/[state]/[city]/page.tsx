@@ -14,6 +14,7 @@ import { ALL_SERVICES, getService, serviceHref, type Service } from "@/lib/catal
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 import { rotatedValueProp, rotatedCta } from "@/lib/geo/seo-rotation";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 type Params = { params: Promise<{ slug: string; state: string; city: string }> };
 
@@ -118,7 +119,7 @@ export default async function CityPage({ params }: Params) {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free BOT opportunity audit. Initial recommendations in two business days.</p>
+                <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
@@ -289,7 +290,7 @@ export default async function CityPage({ params }: Params) {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow="Free BOT opportunity audit" heading={`See where ${ct.name} leads are slipping.`}
+        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`See where ${ct.name} leads are slipping.`}
           sub={`We review your public customer journey and identify a useful starting workflow. ${rotatedCta(svc.slug, ct.slug)}`}>
           <div>
             <AuditForm source={`local-${svc.slug}-${ct.slug}-form`} focus={svc.botName} />
@@ -321,7 +322,7 @@ function StructuralCityService({ svc, st, rec }: {
   const faqs = [
     { q: `Do you serve ${rec.city} remotely?`, a: `Yes — ${svc.botName} runs inside your existing accounts (CRM, ads, phone, calendar), so everything deploys remotely, anywhere in the ${rec.metro} metro, on your local hours.` },
     { q: `How fast can ${svc.serviceName.toLowerCase()} go live in ${rec.city}?`, a: `The typical build is about ${svc.implementationWeeks} weeks to a first system running in monitored mode, with every action reviewed daily before it goes fully autonomous.` },
-    { q: `What does it cost?`, a: `A one-time build fee, then a monthly fee to run and tune — no per-seat pricing, no percentage of ad spend, no lock-in. Systems start at $2,500 a month, and the free audit shows what your leak is worth before you spend anything.` },
+    { q: `What does it cost?`, a: `The BOT workflow audit is ${AUDIT_OFFER.priceLabel}. A managed deployment has a one-time build fee, then a monthly fee to run and tune. Systems start at $2,500 a month with scope confirmed before implementation.` },
   ];
 
   return (
@@ -375,7 +376,7 @@ function StructuralCityService({ svc, st, rec }: {
                     </Link>
                   )}
                 </div>
-                <p className="body-sm mt-5">Free BOT opportunity audit. Initial recommendations in two business days.</p>
+                <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               <AgentConsole
                 botName={svc.botName}
@@ -509,7 +510,7 @@ function StructuralCityService({ svc, st, rec }: {
           <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
         </Section>
 
-        <Section id="audit" variant="light" eyebrow="Free BOT opportunity audit" heading={`See where ${rec.city} leads are slipping.`}
+        <Section id="audit" variant="light" eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`} heading={`See where ${rec.city} leads are slipping.`}
           sub={`We review your public customer journey and identify a useful starting workflow. ${rcta(svc.slug, rec.city_slug)}`}>
           <div>
             <AuditForm source={`local-${svc.slug}-${rec.city_slug}-form`} focus={svc.botName} />

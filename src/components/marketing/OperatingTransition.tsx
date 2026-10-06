@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Database, ShieldCheck, Workflow } from "lucide-react";
 
 import { Container } from "@/components/ui";
 
@@ -16,7 +16,12 @@ export function OperatingTransition({
   rows: TransitionRow[];
 }) {
   return (
-    <section className="service-transition on-dark">
+    <section className="service-transition">
+      <div className="service-transition-atmosphere" aria-hidden="true">
+        <Workflow />
+        <ShieldCheck />
+        <Database />
+      </div>
       <Container>
         <div className="service-transition-layout">
           <div className="service-transition-heading">

@@ -13,6 +13,7 @@ import { MarketSearch } from "./MarketSearch";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
 import { track } from "@/lib/analytics";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
@@ -192,7 +193,9 @@ export function Header() {
                 onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
                 className="btn btn-primary h-11 px-3 sm:px-5 text-[12.5px] sm:text-[14px]"
               >
-                Free audit <ArrowRight className="hidden sm:block w-4 h-4" />
+                <span className="sm:hidden">{AUDIT_OFFER.priceLabel} audit</span>
+                <span className="hidden sm:inline">{AUDIT_OFFER.shortCta}</span>
+                <ArrowRight className="hidden sm:block w-4 h-4" />
               </Link>
               <button
                 onClick={() => setMobileOpen(true)}
@@ -312,7 +315,7 @@ export function Header() {
             <MegaFooter
               onAct={closeMenu}
               label="Don't see your market?"
-              text="We deliver managed BOT systems for established contractors across the US. Start with a workflow assessment to define the operating case."
+              text="We deliver managed BOT systems for established contractors across the US. Start with a $499 BOT workflow audit to define the operating case."
             />
           </MegaPanel>
         )}
@@ -438,7 +441,7 @@ export function Header() {
               onClick={closeMobile}
               className="btn btn-primary w-full"
             >
-              Request an assessment
+              {AUDIT_OFFER.cta}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -531,7 +534,7 @@ function MegaFooter({ onAct, label, text }: { onAct: () => void; label?: string;
           How it works
         </Link>
         <Link href="/#audit" onClick={onAct} className="btn btn-primary">
-          Request an assessment
+          {AUDIT_OFFER.cta}
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

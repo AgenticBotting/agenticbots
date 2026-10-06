@@ -12,6 +12,7 @@ import { JsonLd, breadcrumbLd, serviceLd, faqLd } from "@/components/JsonLd";
 import { getCity, nearbyCities, fmt } from "@/lib/geo/data";
 import { ALL_SERVICES, serviceGeoHref } from "@/lib/catalog";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 type Params = { params: Promise<{ state: string; city: string }> };
 
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: `${rec.city}, ${rec.state_abbr} — market hub`,
     description: ct
       ? `BOT systems for ${ct.name} businesses — PPC, SEO, CRM and speed-to-lead, with the local market read from ${ct.districts[0]} to ${ct.districts[ct.districts.length - 1]}.`
-      : `BOT systems for ${rec.city}, ${rec.state_abbr} businesses — PPC, SEO, CRM and speed-to-lead across the ${rec.metro} metro. Free BOT opportunity audit in two business days.`,
+      : `BOT systems for ${rec.city}, ${rec.state_abbr} businesses — PPC, SEO, CRM and speed-to-lead across the ${rec.metro} metro. $499 BOT workflow audit.`,
     alternates: { canonical: `/markets/${state}/${city}` },
     /* Structural pages stay out of the index until their market is
        enriched — release schedule, docs/PROGRAMMATIC-SEO-PLAN.md §6. */
@@ -113,12 +114,12 @@ export default async function CityMarketHub({ params }: Params) {
                     </p>
                     <p className="body-base mt-4 max-w-[54ch]">
                       We deploy remotely across the {rec.metro} metro. Tell us what you sell and the
-                      free BOT opportunity audit comes back mapped to your market within two business days.
+                      {AUDIT_OFFER.priceLabel} BOT workflow audit comes back mapped to your market within {AUDIT_OFFER.turnaround} of payment.
                     </p>
                   </>
                 )}
                 <div className="mt-8"><PlanCta source={`market-hub-${rec.city_slug}`} /></div>
-                <p className="body-sm mt-5">Free BOT opportunity audit back in two business days. No call required.</p>
+                <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} BOT workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               <BotFactory place={rec.city} />
             </div>
@@ -209,7 +210,7 @@ export default async function CityMarketHub({ params }: Params) {
           heading={<>One fleet, every job — <span className="em-green">tuned to {rec.city}.</span></>}
           body={`Ads, SEO, CRM and speed-to-lead run as one system for your ${rec.city} business — built, monitored and tuned continuously, inside the accounts you already own. You stay the owner of every account and every result.`}
           stats={[
-            { value: "2 days", label: "Initial free audit turnaround, business days" },
+            { value: "2 days", label: "Paid audit turnaround after payment, business days" },
             { value: "Scoped", label: "Workflow, integrations and capacity agreed" },
             { value: "Human", label: "Approval for external changes" },
             { value: "13", label: "Bots in the fleet, deployed as you need them" },
@@ -240,12 +241,12 @@ export default async function CityMarketHub({ params }: Params) {
 
         <JoinBand
           heading={<>Integrate agentic bots to swarm your <span className="em-green">marketing and sales tasks.</span></>}
-          sub={`One conversation, one free BOT opportunity audit — mapped to the ${rec.metro} metro, not a template.`}
+          sub={`One ${AUDIT_OFFER.priceLabel} BOT workflow audit — mapped to the ${rec.metro} metro, not a template.`}
           source={`market-hub-${rec.city_slug}-joinband`}
         />
 
-        <Section id="audit" variant="alt" eyebrow="Start here" heading={`Get the ${rec.city} BOT opportunity audit.`}
-          sub="Tell us what you sell and where it is getting stuck. The plan comes back mapped to this market — free, two business days.">
+        <Section id="audit" variant="alt" eyebrow="Start here" heading={`Request the ${rec.city} BOT workflow audit.`}
+          sub={`Tell us what you sell and where it is getting stuck. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}>
           <div>
             <AuditForm source={`market-hub-${rec.city_slug}-form`} />
           </div>

@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
 import { cn } from "@/lib/utils";
 
-/** Requests a free workflow audit through the existing lead intake endpoint. */
+/** Requests the paid workflow audit through the existing lead intake endpoint. */
 
 const TRADES = ["Residential", "Commercial", "Both"] as const;
 const VOLUME = ["Under 25", "25–75", "75–200", "200+"] as const;
@@ -56,7 +56,7 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
       <div className="bg-ink-950 on-dark px-5 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <p className="mono text-[10.5px] uppercase tracking-[0.13em] text-ink-300">
           {AUDIT_OFFER.name}
-          <span className="text-accent-400">{" · "}{state === "done" ? "Received" : "No cost"}</span>
+          <span className="text-accent-400">{" · "}{state === "done" ? "Received" : AUDIT_OFFER.priceLabel}</span>
         </p>
         <p className="mono text-[10px] uppercase tracking-[0.1em] text-ink-400">Within {AUDIT_OFFER.turnaround}</p>
       </div>
@@ -68,10 +68,10 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
             <span className="mx-auto flex h-12 w-12 items-center justify-center bg-accent-500 text-ink-950 notch">
               <Check className="w-6 h-6" strokeWidth={3} />
             </span>
-            <h3 className="display-lg mt-5">Assessment request received.</h3>
+            <h3 className="display-lg mt-5">Audit request received.</h3>
             <p className="body-base mt-3 max-w-[44ch] mx-auto">
-              We’ll review your operating context and identify a credible starting workflow.
-              Initial findings will arrive at {form.email} within {AUDIT_OFFER.turnaround}.
+              We’ll confirm the scope and payment step by email, then review your operating context and identify a credible starting workflow.
+              Written findings will arrive at {form.email} within {AUDIT_OFFER.turnaround} of payment.
             </p>
           </div>
         ) : (
@@ -106,9 +106,9 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
               <button type="submit" disabled={state === "sending"} className="btn btn-primary sm:min-w-[260px]">
                 {state === "sending"
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                  : <>Request my assessment <ArrowRight className="w-4 h-4" /></>}
+                  : <>Request my {AUDIT_OFFER.priceLabel} audit <ArrowRight className="w-4 h-4" /></>}
               </button>
-              <p className="body-sm">Written findings first. No obligation.</p>
+              <p className="body-sm">No charge today. Scope confirmed first.</p>
             </div>
           </form>
         )}

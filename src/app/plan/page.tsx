@@ -4,11 +4,12 @@ import { Check, ArrowLeft } from "lucide-react";
 import { Footer } from "@/components/layout";
 import { Container, Logo } from "@/components/ui";
 import { AuditForm } from "@/components/marketing";
+import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 export const metadata: Metadata = {
-  title: "Get your BOT opportunity audit",
+  title: "Request a $499 BOT workflow audit",
   description:
-    "Tell us what you sell and where it is getting stuck. We map which bots fix it and send the plan back within two business days — free, no call required.",
+    "Request a $499 BOT workflow audit with written findings delivered within two business days of payment.",
   alternates: { canonical: "/plan" },
 };
 
@@ -42,10 +43,10 @@ export default function PlanPage() {
         <Container className="py-14 sm:py-20">
           <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
             <div>
-              <p className="eyebrow mb-5">Free · two business days</p>
+              <p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} · {AUDIT_OFFER.turnaround}</p>
               <h1 className="display-hero text-balance">Find your <span className="em-green">first BOT opportunity.</span></h1>
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                Tell us about your business. We review the public customer journey and identify a useful starting workflow. No call required.
+                Tell us about your business. We review the public customer journey and identify a useful starting workflow. We confirm scope and payment before work begins.
               </p>
 
               <ul className="mt-10 space-y-6">
