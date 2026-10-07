@@ -101,17 +101,6 @@ export default async function ServiceHub({ params }: Params) {
                     the state and city pages — reusing one paragraph across 924
                     of them is the doorway pattern the gate exists to stop. */}
                 <p className="body-lg mt-5 max-w-[54ch]">{positioning.lead}</p>
-                {offer && (
-                  <div className="service-profile">
-                    <p className="service-profile-label">Deployment profile</p>
-                    <dl>
-                      <div><dt>Best fit</dt><dd>Established service businesses with a defined operating owner</dd></div>
-                      <div><dt>BOT configuration</dt><dd>{positioning.deliveryModel}</dd></div>
-                      <div><dt>Authority</dt><dd>Scoped access and defined approval gates</dd></div>
-                      <div><dt>Operating domain</dt><dd>{svc.owns.slice(0, 2).join(" · ")}</dd></div>
-                    </dl>
-                  </div>
-                )}
                 <div className="mt-8 cta-row">
                   <PlanCta source={`service-${svc.serviceSlug}`} />
                   <Link href="#included" className="btn btn-outline">
@@ -124,12 +113,25 @@ export default async function ServiceHub({ params }: Params) {
                 <p className="body-sm mt-5">{AUDIT_OFFER.priceLabel} workflow audit. Written findings within {AUDIT_OFFER.turnaround} of payment.</p>
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
-              <div className="service-hero-visual">
-                <div className="service-hero-visual-head">
-                  <span>BOT {svc.index}</span>
-                  <span>Illustrative operating view</span>
+              <div className="service-product-stage">
+                <div className="service-hero-visual">
+                  <div className="service-hero-visual-head">
+                    <span>BOT {svc.index}</span>
+                    <span>Illustrative operating view</span>
+                  </div>
+                  <OfferVisual slug={svc.slug} />
                 </div>
-                <OfferVisual slug={svc.slug} />
+                {offer && (
+                  <div className="service-profile">
+                    <p className="service-profile-label">Deployment profile</p>
+                    <dl>
+                      <div><dt>Best fit</dt><dd>Established service businesses with a defined operating owner</dd></div>
+                      <div><dt>BOT configuration</dt><dd>{positioning.deliveryModel}</dd></div>
+                      <div><dt>Authority</dt><dd>Scoped access and defined approval gates</dd></div>
+                      <div><dt>Operating domain</dt><dd>{svc.owns.slice(0, 2).join(" · ")}</dd></div>
+                    </dl>
+                  </div>
+                )}
               </div>
             </div>
           </Container>
@@ -245,7 +247,7 @@ export default async function ServiceHub({ params }: Params) {
             <ul className="grid sm:grid-cols-3 gap-3">
               {pairs.map((c) => (
                 <li key={c.slug} className="flex">
-                  <Link href={serviceHref(c)} className="group w-full flex flex-col gap-2 p-5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all">
+                  <Link href={serviceHref(c)} className="group w-full flex flex-col gap-2 p-5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-[transform,box-shadow,border-color]">
                     <span className="display-md !text-[16px] group-hover:text-[var(--accent-text)] transition-colors">{c.name}</span>
                     <span className="text-[13px] leading-snug text-[var(--text-secondary)]">{getServicePositioning(c.slug).summary}</span>
                     <ArrowRight className="w-4 h-4 mt-auto pt-1 text-[var(--accent-text)] group-hover:translate-x-1 transition-transform" />

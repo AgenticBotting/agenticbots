@@ -42,52 +42,70 @@ export function HeroSystemVisual() {
         <span className="system-ready"><i aria-hidden="true" /> System ready</span>
       </figcaption>
       <div className="hero-system-body">
-        <div className="system-intake">
-          <span className="system-icon"><MessageSquareText size={18} /></span>
+        <aside className="system-workspace-rail" aria-label="Workflow configuration">
           <div>
-            <p>New service enquiry</p>
-            <span>Website · details received</span>
+            <span>Active mandate</span>
+            <strong>Inbound response</strong>
           </div>
-          <span className="system-intake-state">Captured</span>
-        </div>
+          <ol>
+            {HERO_STEPS.map((step, index) => (
+              <li key={step.label} className={index === 1 ? "is-active" : undefined}>
+                <span>0{index + 1}</span>
+                {step.label}
+              </li>
+            ))}
+          </ol>
+          <p><ShieldCheck size={14} /> Approval policy active</p>
+        </aside>
 
-        <div className="system-route" aria-label="Receive, prepare, approve and record">
-          {HERO_STEPS.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <div className="system-route-step" key={step.label}>
-                <div className="system-route-node">
-                  <span><Icon size={19} /></span>
-                  <strong>{step.label}</strong>
-                  <small>{step.detail}</small>
-                </div>
-                {index < HERO_STEPS.length - 1 && (
-                  <div className="system-route-link" aria-hidden="true">
-                    <i style={{ animationDelay: index * 0.55 + "s" }} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="system-review">
-          <div className="system-review-copy">
-            <span className="system-icon is-dark"><FileCheck2 size={18} /></span>
+        <div className="system-workspace-main">
+          <div className="system-intake">
+            <span className="system-icon"><MessageSquareText size={18} /></span>
             <div>
-              <p>Proposed next step</p>
-              <span>Prepared for a person to review</span>
+              <p>New service enquiry</p>
+              <span>Website · details received</span>
+            </div>
+            <span className="system-intake-state">Captured</span>
+          </div>
+
+          <div className="system-route" aria-label="Receive, prepare, approve and record">
+            {HERO_STEPS.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div className="system-route-step" key={step.label}>
+                  <div className="system-route-node">
+                    <span><Icon size={19} /></span>
+                    <strong>{step.label}</strong>
+                    <small>{step.detail}</small>
+                  </div>
+                  {index < HERO_STEPS.length - 1 && (
+                    <div className="system-route-link" aria-hidden="true">
+                      <i style={{ animationDelay: index * 0.55 + "s" }} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="system-review">
+            <div className="system-review-copy">
+              <span className="system-icon is-dark"><FileCheck2 size={18} /></span>
+              <div>
+                <p>Proposed next step</p>
+                <span>Prepared for a person to review</span>
+              </div>
+            </div>
+            <div className="system-review-actions" aria-hidden="true">
+              <span>Revise</span>
+              <strong><Check size={14} /> Approve</strong>
             </div>
           </div>
-          <div className="system-review-actions" aria-hidden="true">
-            <span>Revise</span>
-            <strong><Check size={14} /> Approve</strong>
-          </div>
-        </div>
 
-        <div className="system-visual-note">
-          <ShieldCheck size={15} />
-          External actions wait for approval
+          <div className="system-visual-note">
+            <ShieldCheck size={15} />
+            External actions wait for approval
+          </div>
         </div>
       </div>
     </figure>

@@ -16,6 +16,8 @@ The services portfolio and all 13 national service pages now use a light, trustw
 
 Marketing and platform headings use Bricolage Grotesque for a bolder, more distinctive display voice. Geist remains the body and interface face, and Geist Mono remains the technical/data face. Navigation, buttons, inputs and chips intentionally stay in Geist so the new character is concentrated in headings rather than applied across every control.
 
+The homepage and national service heroes now follow a product-canvas narrative: centered display copy, a wide code-rendered operating workspace, soft olive atmosphere and a restrained capability or deployment rail. Service-specific operating views remain intact across all 13 mandates, but the interface now anchors the hero instead of sitting in a conventional right-hand card. This direction is derived structurally from the owner-provided references and uses the existing AgenticBots palette, content and UI components rather than copying outside assets.
+
 ## 1. Where things are
 
 | | |

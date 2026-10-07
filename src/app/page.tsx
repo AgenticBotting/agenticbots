@@ -33,16 +33,23 @@ function Hero() {
   return (
     <section className="workforce-hero">
       <Container>
-        <div className="workforce-hero-grid">
+        <div className="workforce-hero-shell">
           <div className="hero-copy">
             <p className="eyebrow mb-6">Managed automation for established contractors</p>
-            <h1>Your operating model.<br />Extended by a<br /><span>BOT workforce.</span></h1>
-            <p className="body-lg mt-6 max-w-[47ch]">We design, deploy and operate specialized BOTS across demand generation, revenue operations and customer lifecycle workflows—within your existing systems and controls.</p>
+            <h1>Your operating model, extended by a <span>BOT workforce.</span></h1>
+            <p className="body-lg mt-6">We design, deploy and operate specialized BOTS across demand generation, revenue operations and customer lifecycle workflows—within your existing systems and controls.</p>
             <div className="hero-actions mt-8"><a href="#audit" className="btn btn-primary">{AUDIT_OFFER.cta} <ArrowRight size={17} /></a><a href="#demo" className="hero-demo-link">Review the operating model <ArrowRight size={16} /></a></div>
             <p className="body-sm mt-5">Begin with one governed workflow. Expand into a coordinated operating system.</p>
-            <div className="hero-service-signals"><span><Layers3 size={15} /> Scoped integrations</span><span><ShieldCheck size={15} /> Human authorization gates</span><span><Settings2 size={15} /> Continuous operation</span></div>
           </div>
-          <HeroSystemVisual />
+          <div className="home-hero-stage">
+            <span className="home-hero-halo" aria-hidden="true" />
+            <HeroSystemVisual />
+            <dl className="home-hero-proof">
+              <div><dt><Layers3 size={15} /> Systems</dt><dd>Scoped integrations</dd></div>
+              <div><dt><ShieldCheck size={15} /> Authority</dt><dd>Human approval gates</dd></div>
+              <div><dt><Settings2 size={15} /> Operation</dt><dd>Managed continuously</dd></div>
+            </dl>
+          </div>
         </div>
       </Container>
       <div className="hero-bottom-strip"><Container><p>Single workflow → Multi-BOT system → Enterprise deployment</p><Link href="/pricing">Engagements from {formatPlanPrice(entry.setup)} setup · {formatPlanPrice(entry.monthly)}/month <ArrowRight size={15} /></Link></Container></div>

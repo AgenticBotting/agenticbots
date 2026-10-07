@@ -44,12 +44,14 @@ export default function ServicesIndex() {
                 </p>
                 <div className="mt-8"><PlanCta source="services-index" /></div>
               </div>
-              <div className="service-hero-visual">
-                <div className="service-hero-visual-head">
-                  <span>Managed service portfolio</span>
-                  <span>Illustrative activity</span>
+              <div className="service-product-stage">
+                <div className="service-hero-visual">
+                  <div className="service-hero-visual-head">
+                    <span>Managed service portfolio</span>
+                    <span>Illustrative activity</span>
+                  </div>
+                  <BotFactory />
                 </div>
-                <BotFactory />
               </div>
             </div>
             <dl className="services-index-standards">
@@ -108,7 +110,7 @@ export default function ServicesIndex() {
                   <li key={svc.serviceSlug} className="flex">
                     <Link
                       href={serviceHref(svc)}
-                      className="group w-full flex items-start gap-4 p-5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      className="group w-full flex items-start gap-4 p-5 border border-[var(--border)] bg-white hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-[transform,box-shadow,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                     >
                       <BotIndex index={svc.index} size="sm" tone="outline" />
                       <span className="min-w-0 flex-1">
@@ -122,7 +124,7 @@ export default function ServicesIndex() {
                           {positioning.summary}
                         </span>
                       </span>
-                      <ArrowRight className="w-4 h-4 shrink-0 mt-1 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="w-4 h-4 shrink-0 mt-1 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-[transform,color]" />
                     </Link>
                   </li>
                 );
