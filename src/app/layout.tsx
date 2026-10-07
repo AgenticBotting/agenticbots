@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ConsoleGreeting } from "@/components/marketing";
 import { MarketingOnly } from "@/components/marketing/MarketingOnly";
@@ -18,11 +18,12 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
   display: "swap",
-  axes: ["opsz", "wdth"],
+  weight: "variable",
+  axes: ["wdth"],
 });
 
 
@@ -79,7 +80,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable}`}>
       <body>
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}
