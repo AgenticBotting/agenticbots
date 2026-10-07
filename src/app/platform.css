@@ -1,8 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════
    AgenticBots platform — operator console + client portal.
 
-   Built on the site's tokens (globals.css): Geist, ink neutrals, the
-   #7FA200 accent as a SIGNAL only, zero radius, the diagonal notch.
+   Built on the site's tokens (globals.css): Bricolage display type,
+   Geist interface type, ink neutrals, the #7FA200 accent as a SIGNAL
+   only, zero radius, and the diagonal notch.
    Additions here are layout and data density, never new colors.
 
    Status vocabulary (used everywhere, never color alone — every status
@@ -14,7 +15,8 @@
    ══════════════════════════════════════════════════════════════════ */
 
 .pf { background: var(--bg-alt); min-height: 100dvh; color: var(--text-body); font-size: 14px; line-height: 1.5; font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
-.pf h1, .pf h2, .pf h3, .pf .btn, .pf button, .pf input, .pf select, .pf textarea { font-family: var(--font-display), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.pf h1, .pf h2, .pf h3 { font-family: var(--font-display), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.pf .btn, .pf button, .pf input, .pf select, .pf textarea { font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
 .pf .pf-mono, .pf .mono { font-family: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace; }
 
 /* ── Operator shell: green rail + white workspace ── */

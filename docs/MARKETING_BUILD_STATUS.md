@@ -53,6 +53,8 @@ Approval requires an explicit click in the review step. Jumping straight to the 
 
 The hero and residential/commercial sections use lightweight, code-rendered interface visuals. They make no image requests and show only illustrative workflow states, with restrained CSS handoff/status motion. The previous WebP assets remain unreferenced in `public/media` and therefore add no page transfer weight. See `docs/ASSET-BRIEF.md` for the visual direction and future real-photo guidance.
 
+Headings now use Bricolage Grotesque as a variable display face, with tighter optical sizing and heavier weights at hero scale. Geist remains the interface and reading face for navigation, controls and body copy, and Geist Mono retains the technical register. This keeps the site distinctive at first glance without making dense product or sales copy less readable.
+
 ## Validation
 
 - `npm run typecheck` passed. `npm run lint` passed with zero errors. `npm test` passed.
@@ -67,6 +69,7 @@ The hero and residential/commercial sections use lightweight, code-rendered inte
 - Outcome-first Services navigation passed live browser review at 1440px: three initial outcome lanes, focused service results, working return navigation and no console errors. The final premium pass removed icon tiles, background watermarks, BOT-count labels, floating card shadows and the tinted promo band. It uses a single framed decision surface and compact audit prompt. It also passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build with link, SEO and topic gates.
 - Service Areas navigation passed live browser review at 1440px: all five region lanes rendered with correct counts, Southwest revealed four state destinations, Miami search returned the canonical market route, the search empty state retained paid-audit language, and no console errors appeared. The final premium pass replaced floating region and state cards with unified framed grids and aligned the audit prompt with Services. It passed the same typecheck, lint, 173-test and full production-build suite, including link, SEO and topic gates.
 - Backend-aligned enterprise copy passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed. Read-only localhost checks confirmed the Email mandate renders as Outbound + Reactivation BOTS, CRO renders as Analytics BOT with scoped implementation, and the Miami market hub states 13 mandates across 10 deployable BOT types. In-app browser attachment was rejected by the browser security layer, so no new screenshot review was recorded in this pass.
+- Bricolage display typography passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity, metadata uniqueness and topic gates passed. The in-app browser security layer rejected the localhost reload, so no automated screenshot was recorded; no browser-policy bypass was attempted.
 
 ## Follow-on evidence work
 
