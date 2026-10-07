@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container, Section, BotIndex } from "@/components/ui";
-import { PlanCta, BotFactory, SignalFlow, FleetSwarm, ServiceAtmosphere } from "@/components/marketing";
+import { PlanCta, BotFactory, SignalFlow, FleetSwarm, ServiceAtmosphere, ServicePlatformConstellation } from "@/components/marketing";
 import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
 import { getServicePositioning } from "@/lib/service-positioning";
@@ -45,12 +45,15 @@ export default function ServicesIndex() {
                 <div className="mt-8"><PlanCta source="services-index" /></div>
               </div>
               <div className="service-product-stage">
-                <div className="service-hero-visual">
-                  <div className="service-hero-visual-head">
-                    <span>Managed service portfolio</span>
-                    <span>Illustrative activity</span>
+                <div className="service-system-layout">
+                  <ServicePlatformConstellation serviceName="Managed BOT portfolio" />
+                  <div className="service-hero-visual">
+                    <div className="service-hero-visual-head">
+                      <span>Managed service portfolio</span>
+                      <span>Illustrative activity</span>
+                    </div>
+                    <BotFactory />
                   </div>
-                  <BotFactory />
                 </div>
               </div>
             </div>

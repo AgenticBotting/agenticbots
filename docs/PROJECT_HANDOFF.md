@@ -18,6 +18,8 @@ Marketing and platform headings use Bricolage Grotesque for a bolder, more disti
 
 The homepage and national service heroes now follow a product-canvas narrative: centered display copy, a wide code-rendered operating workspace, soft olive atmosphere and a restrained capability or deployment rail. Service-specific operating views remain intact across all 13 mandates, but the interface now anchors the hero instead of sitting in a conventional right-hand card. This direction is derived structurally from the owner-provided references and uses the existing AgenticBots palette, content and UI components rather than copying outside assets.
 
+The service product canvas now pairs each operating view with a service-specific system constellation. Every one of the 13 mandates maps six familiar platforms around the governed BOT workflow; the portfolio page shows a cross-service set. Brand SVGs are rendered locally where the installed icon set supplies them, with restrained typographic marks elsewhere. The UI calls these “common systems in scope” and states that exact access, connection method and write authority are confirmed during the paid audit, so the visual does not claim every connection is already native or certified. Service hero and section typography is larger, the vertical rhythm is tighter, and a visible technical grid gives the light pages more product depth without returning to dark hero backgrounds.
+
 ## 1. Where things are
 
 | | |
@@ -292,14 +294,13 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 * Pre-existing lint warnings in `convex/_generated/*` and `src/components/marketing/BlogArchive.tsx` (`<img>`).
 * Production build could not be verified in the cloud workspace (Google Fonts blocked); last verified locally on 2026-10-03 before the Prospect Graph.
 
-## 17. Test / build status (2026-10-04, commit e90d63e)
+## 17. Test / build status (2026-10-07, `platform-v1`)
 
-* `npx tsc --noEmit`: clean.
-* `npx eslint .`: 0 errors, 5 pre-existing warnings.
-* `npx vitest run`: **19 files, 151 tests, all passing** (unit, integration incl. staging-chain via fake Hermes, security, prospecting ×46).
+* `npm run typecheck`: clean.
+* `npm run lint`: 0 errors, 5 pre-existing warnings.
+* `npm test`: **24 files, 174 tests, all passing**, including service-system mapping coverage for all 13 public mandates.
+* `npm run build -- --webpack`: passed; **13,753 static outputs** generated and the link-integrity, SEO and topic gates all passed.
 * Playwright E2E: not re-run since the Prospect Graph.
-* `next build`: not re-run since the Prospect Graph (fonts unreachable in the cloud workspace). Run it locally before merging.
-* Note: Vitest on the owner's Mac previously failed to load a native binding (rolldown/wasi); tests were run in a Linux clone.
 
 ## 18. Current blockers
 

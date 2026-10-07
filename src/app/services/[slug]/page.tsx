@@ -8,6 +8,7 @@ import { ArrowRight } from "lucide-react";
 import {
   AuditForm, PlanCta, FaqAccordion, SecurityBlock, ActivityLog,
   StackStrip, StatSplit, FeatureTriad, TaskConveyor, OfferVisual, OperatingTransition, ServiceAtmosphere,
+  ServicePlatformConstellation,
 } from "@/components/marketing";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState } from "@/lib/geo/data";
@@ -114,12 +115,15 @@ export default async function ServiceHub({ params }: Params) {
               </div>
               {/* The offer's own product view — no two service heroes share one. */}
               <div className="service-product-stage">
-                <div className="service-hero-visual">
-                  <div className="service-hero-visual-head">
-                    <span>BOT {svc.index}</span>
-                    <span>Illustrative operating view</span>
+                <div className="service-system-layout">
+                  <ServicePlatformConstellation slug={svc.slug} serviceName={svc.serviceName} />
+                  <div className="service-hero-visual">
+                    <div className="service-hero-visual-head">
+                      <span>BOT {svc.index}</span>
+                      <span>Illustrative operating view</span>
+                    </div>
+                    <OfferVisual slug={svc.slug} />
                   </div>
-                  <OfferVisual slug={svc.slug} />
                 </div>
                 {offer && (
                   <div className="service-profile">

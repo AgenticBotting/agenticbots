@@ -39,4 +39,5 @@ export { LeakCalculator } from "./LeakCalculator";
 export { OfferVisual } from "./OfferVisual";
 export { OperatingTransition } from "./OperatingTransition";
 export { ServiceAtmosphere } from "./ServiceAtmosphere";
+export { ServicePlatformConstellation } from "./ServicePlatformConstellation";
 export { Window, LeadInbox, ActivityLog, StepScorecard, StepConnected, StepBooked, ServiceArea } from "./ProductUI";
