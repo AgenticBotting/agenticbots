@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!industry || !isIndustryChannel(service)) return {};
   const name = industryChannelName(service);
   const path = `/industries/${industry.slug}/${service}`;
-  return { title: { absolute: agenticSearchTitle(name, industry.audience) }, description: `${name} for ${industry.audience}. A focused marketing plan, managed AI BOTS and your approval before changes. Start with a $499 workflow audit.`, alternates: { canonical: path }, robots: searchRobots(path) };
+  return { title: { absolute: agenticSearchTitle(name, industry.audience) }, description: `${name} for ${industry.audience}. A focused marketing plan, managed AI BOTS and your approval before changes. Request a proposal.`, alternates: { canonical: path }, robots: searchRobots(path) };
 }
 
 export default async function IndustryServicePage({ params }: Params) {

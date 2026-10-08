@@ -1,5 +1,6 @@
 "use client";
 
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import { useId, useState } from "react";
 import { ArrowRight, Building2, Check, FileText, GitBranch, Play, Search, ShieldCheck, Target } from "lucide-react";
 import type { BuyerJourney } from "@/lib/public-niche-types";
@@ -13,7 +14,7 @@ export function NicheBuyerFlow({ niche, buyers, brief, channel }: {
   const [replay, setReplay] = useState(0);
   const inputId = useId();
   const buyer = buyers.find(item => item.buyer === selected) ?? buyers[0];
-  if (!buyer) return <div className="nb-empty"><Target size={25} /><h3>Your customer mix defines the plan.</h3><p>This niche is in our service catalog. Its buyer relationships need further review before we present a specific audience map.</p><p>Bring examples of your best customers, the services they buy and who makes the decision. Your audit will define the initial buyer profile and the evidence needed to qualify it.</p><a href="#audit" className="btn btn-primary">Define my buyer profile<ArrowRight size={16} /></a></div>;
+  if (!buyer) return <div className="nb-empty"><Target size={25} /><h3>Your customer mix defines the plan.</h3><p>This niche is in our service catalog. Its buyer relationships need further review before we present a specific audience map.</p><p>Bring examples of your best customers, the services they buy and who makes the decision. Scoping will define the initial buyer profile and the evidence needed to qualify it.</p><ProposalLink className="btn btn-primary">Define my buyer profile<ArrowRight size={16} /></ProposalLink></div>;
   const route = routeForBuyer(buyer);
   const marketing = channel === "seo" ? { label: "Buyer questions → search content", channel: "SEO planning", action: "Use this buyer's questions to prepare service content and an enquiry path. Publication stays subject to your approval." } : channel === "ppc" ? { label: "Buyer intent → campaign brief", channel: "PPC planning", action: "Translate the approved buyer profile into search intent, service-area targeting and a campaign brief. Account and budget changes require approval." } : route;
   return <figure className="nb-flow" data-demo="true" aria-label={`${niche} buyer workflow illustration`}>

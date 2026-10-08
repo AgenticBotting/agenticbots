@@ -4,12 +4,12 @@ import { Check, ArrowLeft } from "lucide-react";
 import { Footer } from "@/components/layout";
 import { Container, Logo } from "@/components/ui";
 import { AuditForm } from "@/components/marketing";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
 export const metadata: Metadata = {
-  title: "Request a $499 BOT workflow audit",
+  title: "Request a BOT implementation proposal",
   description:
-    "Request a $499 BOT workflow audit with written findings delivered within two business days of payment.",
+    "Request a BOT implementation proposal around your goals, tools, team, budget and timeline. No payment required.",
   alternates: { canonical: "/plan" },
 };
 
@@ -43,10 +43,10 @@ export default function PlanPage() {
         <Container className="py-14 sm:py-20">
           <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
             <div>
-              <p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} · {AUDIT_OFFER.turnaround}</p>
+              <p className="eyebrow mb-5">{PROPOSAL_OFFER.name}</p>
               <h1 className="display-hero text-balance">Define the first <span className="em-green">BOT mandate.</span></h1>
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
-                Give us the business context behind the operating constraint. We review the public customer journey and document a defensible starting mandate. Scope and payment are confirmed before work begins.
+                Share your goals, current tools, team and investment range in a short guided intake. We review fit, then follow up about scope and the next step.
               </p>
 
               <ul className="mt-10 space-y-6">
@@ -62,7 +62,7 @@ export default function PlanPage() {
               </ul>
 
               <p className="body-sm mt-10 pt-8 border-t border-[var(--border)] max-w-[44ch]">
-                The written findings remain yours. They are designed to support an informed implementation decision, whether or not AgenticBots delivers the next phase.
+                No payment is required to submit a proposal request. Implementation begins only after scope, timing and commercial terms are agreed.
               </p>
             </div>
 

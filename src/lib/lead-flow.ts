@@ -9,9 +9,9 @@
 export const BOT_PLAN_EVENT = "open-bot-plan";
 
 /** Opens the multi-step bot plan flow. `source` is recorded on the lead. */
-export function openBotPlan(source = "site") {
+export function openBotPlan(source = "site", focus?: string) {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent(BOT_PLAN_EVENT, { detail: { source } }));
+  window.dispatchEvent(new CustomEvent(BOT_PLAN_EVENT, { detail: { source, focus } }));
 }
 
 /* ── Exit-intent suppression ──────────────────────────────────────── */

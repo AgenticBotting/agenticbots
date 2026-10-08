@@ -1,5 +1,6 @@
 "use client";
 
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Search, X } from "lucide-react";
@@ -22,7 +23,7 @@ export function MarketDirectory({ groups, label, placeholder, showFilters = fals
     </div>
     {showFilters && <div className="mx-region-filters" role="group" aria-label="Filter by region"><button type="button" aria-pressed={active === "all"} onClick={() => setActive("all")}>All regions</button>{groups.map(group => <button type="button" key={group.id} aria-pressed={active === group.id} onClick={() => setActive(group.id)}>{group.name}</button>)}</div>}
     <div id={resultsId} className="mx-directory-results">
-      {filtered.length ? filtered.map(group => <section key={group.id} className="mx-destination-group"><h3>{group.name}<span>{group.items.length}</span></h3><ul>{group.items.map(item => <li key={item.href}><Link href={item.href}><span><strong>{item.name}</strong>{item.detail && <small>{item.detail}</small>}</span><ArrowRight size={16} /></Link></li>)}</ul></section>) : <div className="mx-search-empty"><Search size={25} /><h3>No matching destination.</h3><p>Try a city, metro or state name from this directory. Your service area can also be discussed during the audit.</p><div><button type="button" onClick={reset}>Reset search</button><a href="#audit">Discuss your service area <ArrowRight size={15} /></a></div></div>}
+      {filtered.length ? filtered.map(group => <section key={group.id} className="mx-destination-group"><h3>{group.name}<span>{group.items.length}</span></h3><ul>{group.items.map(item => <li key={item.href}><Link href={item.href}><span><strong>{item.name}</strong>{item.detail && <small>{item.detail}</small>}</span><ArrowRight size={16} /></Link></li>)}</ul></section>) : <div className="mx-search-empty"><Search size={25} /><h3>No matching destination.</h3><p>Try a city, metro or state name from this directory. Your service area can also be discussed during proposal scoping.</p><div><button type="button" onClick={reset}>Reset search</button><ProposalLink >Discuss your service area <ArrowRight size={15} /></ProposalLink></div></div>}
     </div>
   </div>;
 }

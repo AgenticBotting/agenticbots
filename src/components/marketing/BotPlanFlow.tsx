@@ -1,302 +1,177 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { X, ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
-import { CATALOG } from "@/lib/catalog";
+import Link from "next/link";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowLeft, ArrowRight, Check, CheckCheck, Layers3, Loader2, Phone, X } from "lucide-react";
+import { Logo } from "@/components/ui";
 import { BOT_PLAN_EVENT } from "@/lib/lead-flow";
 import { track } from "@/lib/analytics";
-import { cn } from "@/lib/utils";
-import { useDialog } from "@/hooks/useDialog";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { MARKETING_CONTACT } from "@/config/marketing-contact";
+import { PROPOSAL_CHOICES as choices, emptyProposal, proposalFit, proposalStepReady, toggleProposalTool, type ProposalDraft } from "@/lib/proposal-intake";
+import { readLandingPath } from "./AcquisitionAttribution";
+import "./proposal-intake.css";
 
-/**
- * Full-screen multi-step bot plan flow.
- * Opened with `openBotPlan(source)` from anywhere.
- *
- * Steps: side of business → which bot → urgency → contact details.
- * Picking a card on steps 1–3 auto-advances; step 4 converts.
- * Card selection throughout — no dropdowns.
- */
+const STEPS = ["Priorities", "Your team", "Your tools", "Investment", "Timing", "Review & send"];
+const HEADINGS = ["What would you like to improve?", "Who will the BOTS work alongside?", "Which tools do you use today?", "Let’s align on the investment.", "When would you like to get started?", "Your next chapter starts here."];
+const NOTES = ["Choose up to three priorities. We’ll use these to focus the proposal.", "Help us understand your capacity and who currently handles the work.", "Select all that apply. No logins or account access needed.", "A clear budget helps us recommend a scope that makes sense for both sides.", "Your preferred timing helps us plan. Launch dates are confirmed after scoping.", "Review your brief and tell us where to follow up. No payment is required."];
+const CONTACT = { name: "", email: "", company: "", website: "", phone: "" };
 
-type Picks = { side?: string; bot?: string; timing?: string };
-
-const TIMING = [
-  { value: "now", label: "Immediate priority", desc: "An active operating constraint needs attention" },
-  { value: "quarter", label: "This quarter", desc: "Budget and internal ownership are being defined" },
-  { value: "exploring", label: "Strategic review", desc: "We are evaluating the operating case" },
-];
-
-const TOTAL = 4;
-
+/** One site-wide intake. Native modal provides focus containment and an inert background. */
 export function BotPlanFlow() {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const title = useRef<HTMLHeadingElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  const sending = useRef(false);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
-  const [picks, setPicks] = useState<Picks>({});
-  const [source, setSource] = useState("site");
-  const [form, setForm] = useState({ name: "", email: "", company: "" });
+  const [answers, setAnswers] = useState<ProposalDraft>(emptyProposal);
+  const [contact, setContact] = useState(CONTACT);
+  const [consent, setConsent] = useState(false);
+  const [context, setContext] = useState({ source: "site", focus: "", pagePath: "/" });
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const submitted = state === "done";
 
   useEffect(() => {
-    function onOpen(e: Event) {
-      const detail = (e as CustomEvent<{ source?: string }>).detail;
-      setSource(detail?.source ?? "site");
-      track("plan_flow_opened", { source: detail?.source ?? "site" });
+    function begin(event: Event) {
+      const detail = (event as CustomEvent<{ source?: string; focus?: string }>).detail;
+      opener.current = document.activeElement as HTMLElement | null;
+      setContext({ source: (detail?.source ?? "site").slice(0, 80), focus: (detail?.focus ?? "").slice(0, 120), pagePath: window.location.pathname });
       setOpen(true);
-      setStep(0);
-      setPicks({});
-      setState("idle");
-      setError("");
+      // An unfinished brief survives closing/reopening in this tab, never browser storage.
+      track("proposal_opened");
     }
-    window.addEventListener(BOT_PLAN_EVENT, onOpen);
-    return () => window.removeEventListener(BOT_PLAN_EVENT, onOpen);
+    window.addEventListener(BOT_PLAN_EVENT, begin);
+    return () => window.removeEventListener(BOT_PLAN_EVENT, begin);
   }, []);
 
-  const close = useCallback(() => setOpen(false), []);
-  const panelRef = useDialog(open, close);
-
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    const node = dialog.current;
+    if (!open || !node) return;
+    const previous = document.body.style.overflow;
+    node.showModal();
+    document.body.style.overflow = "hidden";
+    title.current?.focus();
+    return () => {
+      node.close();
+      document.body.style.overflow = previous;
+      if (opener.current?.isConnected) opener.current.focus();
+      else document.querySelector<HTMLElement>('.site-header-actions [data-proposal-entry]')?.focus();
+    };
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      title.current?.focus();
+      dialog.current?.querySelector(".pi-main")?.scrollTo({ top: 0 });
+    }
+  }, [step, open, submitted]);
+
+  function close() { if (!sending.current) setOpen(false); }
+  function update<K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) { setAnswers(previous => ({ ...previous, [key]: value })); }
+  function next() {
+    if (!proposalStepReady(step, answers)) return;
+    track("proposal_step_completed", { step: step + 1 });
+    setStep(step + 1);
+    setError("");
+  }
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    if (sending.current || !consent || !proposalStepReady(5, answers)) return;
+    sending.current = true;
+    setState("sending"); setError("");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch("/api/plan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({ kind: "proposal", ...contact, ...context, qualification: answers, consent, landingPath: readLandingPath() }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) { setError(result.error || "We couldn’t send your request. Your answers are still here—please try again."); setState("error"); return; }
+      setState("done");
+      track("proposal_completed");
+    } catch {
+      setError("Connection interrupted. Your answers are still here—please try again."); setState("error");
+    } finally { window.clearTimeout(timeout); sending.current = false; }
+  }
+  function reset() { setAnswers(emptyProposal()); setContact(CONTACT); setConsent(false); setStep(0); setState("idle"); setError(""); }
+  const belowMinimum = proposalFit(answers) === "below_current_minimum";
+
+  // Keep the full-screen questionnaire out of every public page's initial HTML.
   if (!open) return null;
 
-  const sidePillar = CATALOG.find((p) => p.name === picks.side);
-
-  function pick<K extends keyof Picks>(key: K, value: string) {
-    setPicks((p) => ({ ...p, [key]: value }));
-    track("plan_flow_step_completed", { step, field: key, value, source });
-    setStep((s) => s + 1);
-  }
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setState("sending");
-    try {
-      const res = await fetch("/api/plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          focus: picks.bot,
-          goal: `Side: ${picks.side} · Timing: ${TIMING.find((t) => t.value === picks.timing)?.label ?? picks.timing}`,
-          source: `flow:${source}`,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(data.error || "Something went wrong."); setState("error"); return; }
-      track("plan_flow_completed", { source, focus: picks.bot });
-      setState("done");
-    } catch {
-      setError("Network error. Try again.");
-      setState("error");
-    }
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-[80] bg-ink-950/70 backdrop-blur-sm overflow-y-auto animate-fade-in"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}
-    >
-      <div className="min-h-full flex items-start sm:items-center justify-center p-0 sm:p-6">
-        <div
-          ref={panelRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="bot-plan-title"
-          className="w-full max-w-[840px] bg-white sm:rounded-none shadow-mega min-h-screen sm:min-h-0"
-        >
-          {/* Bar */}
-          <div className="flex items-center justify-between gap-4 px-5 sm:px-8 h-16 border-b border-[var(--border)]">
-            <div className="flex items-center gap-3 min-w-0">
-              {step > 0 && state !== "done" && (
-                <button
-                  onClick={() => setStep((s) => s - 1)}
-                  className="flex items-center justify-center w-8 h-8 rounded-none border border-[var(--border)] hover:border-ink-950 transition-colors"
-                  aria-label="Back"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </button>
-              )}
-              <span id="bot-plan-title" className="label-caps text-[var(--text-muted)] truncate">
-                {state === "done" ? "Done" : `${AUDIT_OFFER.priceLabel} BOT workflow audit — step ${step + 1} of ${TOTAL}`}
-              </span>
-            </div>
-            <button
-              onClick={close}
-              className="flex items-center justify-center w-9 h-9 rounded-none hover:bg-[var(--bg-alt)] transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Progress */}
-          {state !== "done" && (
-            <div className="h-1 bg-[var(--border)]">
-              <div
-                className="h-full bg-signal-500 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                style={{ width: `${((step + 1) / TOTAL) * 100}%` }}
-              />
-            </div>
-          )}
-
-          <div className="px-5 sm:px-8 py-8 sm:py-10">
-            {state === "done" ? (
-              <div role="status" className="text-center py-6">
-                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
-                  <Check className="w-6 h-6" strokeWidth={2.5} />
-                </span>
-                <h2 className="display-xl mt-6">You are in the queue.</h2>
-                <p className="body-base mt-4 max-w-[46ch] mx-auto">
-                  We will confirm scope and payment by email. Written findings arrive at {form.email} within {AUDIT_OFFER.turnaround} of payment.
-                </p>
-                <button onClick={close} className="btn btn-secondary mt-8">
-                  Back to the site
-                </button>
-              </div>
-            ) : step === 0 ? (
-              <Step title="Which operating area has priority?" sub="Choose the area where a defined mandate would create the most operating capacity.">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {CATALOG.map((p) => (
-                    <CardBtn
-                      key={p.slug}
-                      label={p.name}
-                      desc={p.tagline}
-                      onClick={() => pick("side", p.name)}
-                    />
-                  ))}
-                  <CardBtn
-                    label="Cross-functional"
-                    desc="The constraint crosses teams or systems"
-                    onClick={() => pick("side", "Both")}
-                    className="sm:col-span-2"
-                  />
-                </div>
-              </Step>
-            ) : step === 1 ? (
-              <Step title="Which mandate should we evaluate?" sub="Choose the closest fit; scope and authority are confirmed in the audit.">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {(sidePillar ? sidePillar.categories : CATALOG.flatMap((p) => p.categories)).map((c) => (
-                    <CardBtn
-                      key={`${c.pillar}-${c.slug}`}
-                      label={c.name}
-                      desc={c.outcome}
-                      onClick={() => pick("bot", c.name)}
-                    />
-                  ))}
-                  <CardBtn
-                    label="Architecture review"
-                    desc="Evaluate the constraint across mandates"
-                    onClick={() => pick("bot", "Not sure yet")}
-                  />
-                </div>
-              </Step>
-            ) : step === 2 ? (
-              <Step title="What is the decision horizon?" sub="This helps us frame the recommendations and next decision.">
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {TIMING.map((t) => (
-                    <CardBtn
-                      key={t.value}
-                      label={t.label}
-                      desc={t.desc}
-                      onClick={() => pick("timing", t.value)}
-                    />
-                  ))}
-                </div>
-              </Step>
-            ) : (
-              <Step title="Where should we deliver it?" sub="Provide the business contact responsible for the operating decision.">
-                <form onSubmit={submit} className="max-w-[460px]">
-                  <div className="space-y-4">
-                    <Labeled label="Name" required>
-                      <input
-                        className="field" required autoFocus autoComplete="name"
-                        value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        placeholder="Jordan Reyes"
-                      />
-                    </Labeled>
-                    <Labeled label="Work email" required>
-                      <input
-                        className="field" required type="email" autoComplete="email"
-                        value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="jordan@company.com"
-                      />
-                    </Labeled>
-                    <Labeled label="Company">
-                      <input
-                        className="field" autoComplete="organization"
-                        value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })}
-                        placeholder="Company name"
-                      />
-                    </Labeled>
-                  </div>
-
-                  {state === "error" && <p role="alert" className="mt-4 text-[13.5px] text-[var(--color-danger)]">{error}</p>}
-
-                  <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full mt-6">
-                    {state === "sending"
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                      : <>Request my {AUDIT_OFFER.priceLabel} audit <ArrowRight className="w-4 h-4" /></>}
-                  </button>
-                  <p className="body-xs mt-4">
-                    No charge today. Scope and payment confirmed first.
-                  </p>
-                </form>
-              </Step>
-            )}
-          </div>
+  return <dialog ref={dialog} className="pi-dialog" aria-labelledby="proposal-title" onCancel={event => { event.preventDefault(); close(); }}>
+    <div className="pi-top"><Logo href={null} variant="dark" height={24} className="pi-logo" /><span className="pi-top-caption">Request a proposal</span><button type="button" className="pi-close" onClick={close} disabled={state === "sending"} aria-label="Close proposal"><X size={22} /></button></div>
+    <div className="pi-layout">
+      <aside className="pi-side">
+        <p className="pi-kicker">Built around your business</p><h2>A clearer path<br />to what’s next.</h2><p>Your priorities. Your tools.<br />A focused BOT implementation.</p>
+        <ol aria-label="Proposal progress">{STEPS.map((label, index) => <li key={label} aria-current={index === step && state !== "done" ? "step" : undefined} data-complete={index < step || state === "done"}><span>{index < step || state === "done" ? <Check size={15} /> : `0${index + 1}`}</span>{label}</li>)}</ol>
+        <div className="pi-side-bottom"><Layers3 size={20} /><p>Implementation starts at <strong>$7,500 setup + $2,500/month.</strong> Scope and pricing agreed before work begins.</p><a href={MARKETING_CONTACT.phoneHref}><Phone size={16} />Prefer to talk? {MARKETING_CONTACT.phone}</a></div>
+      </aside>
+      <main className="pi-main">
+        <div className="pi-content">
+          <div className="pi-progress"><span>{state === "done" ? "Request received" : `Step ${step + 1} of ${STEPS.length} · ${STEPS[step]}`}</span><span>{state === "done" ? "Complete" : "No payment required"}</span></div>
+          <div className="pi-progress-track" aria-hidden="true"><i style={{ transform: `scaleX(${state === "done" ? 1 : (step + 1) / STEPS.length})` }} /></div>
+          <h2 ref={title} tabIndex={-1} id="proposal-title">{state === "done" ? "Your brief is with our team." : HEADINGS[step]}</h2>
+          <p className="pi-intro">{state === "done" ? "We’ll review your priorities, tools and investment range, then follow up by email about fit and the next step. No work starts without an agreed scope." : NOTES[step]}</p>
+          {state === "done" ? <div className="pi-success"><CheckCheck size={34} /><h3>Proposal request received.</h3><p>This is a request for review, not a confirmed project or automated quote.</p><button className="btn btn-primary" type="button" onClick={close}>Return to the site<ArrowRight size={17} /></button><button className="pi-quiet" type="button" onClick={reset}>Start a different request</button></div> : <>
+            {step === 0 && <>
+              <Choices label="Your priorities" values={choices.goals} selected={answers.goals} multi max={3} onPick={value => update("goals", answers.goals.includes(value) ? answers.goals.filter(item => item !== value) : [...answers.goals, value])} />
+              <Choices label="Who are your customers?" values={choices.customerType} selected={answers.customerType} onPick={value => update("customerType", value)} />
+            </>}
+            {step === 1 && <>
+              <Choices label="How large is your team?" values={choices.teamSize} selected={answers.teamSize} onPick={value => update("teamSize", value)} />
+              <Choices label="Who handles marketing and sales today?" values={choices.teamModel} selected={answers.teamModel} onPick={value => update("teamModel", value)} />
+              <Choices label="Approximate annual revenue" values={choices.revenue} selected={answers.revenue} onPick={value => update("revenue", value)} />
+            </>}
+            {step === 2 && <>
+              <Choices label="Your current systems" values={choices.tools} selected={answers.tools} multi dense onPick={value => update("tools", toggleProposalTool(answers.tools, value))} />
+              {answers.tools.includes("Other tools") && <label className="pi-field">Other tools <small>(optional)</small><input className="field" value={answers.otherTools} maxLength={160} onChange={event => update("otherTools", event.target.value)} placeholder="Names only—no passwords or account details" /></label>}
+              <p className="pi-note">Tool selection helps us scope the work. Available integrations and permissions are confirmed before implementation.</p>
+            </>}
+            {step === 3 && <>
+              <div className="pi-investment"><strong>Managed implementation, not a software subscription.</strong><p>Projects start at $7,500 setup + $2,500/month. Ad spend and third-party usage are separate.</p></div>
+              <Choices label="One-time implementation budget" values={choices.setupBudget} selected={answers.setupBudget} onPick={value => update("setupBudget", value)} />
+              <Choices label="Ongoing monthly management budget" values={choices.monthlyBudget} selected={answers.monthlyBudget} onPick={value => update("monthlyBudget", value)} />
+              {belowMinimum && <div className="pi-fit-note" role="status"><strong>Our current starting point may exceed your budget.</strong><p>You can still request a fit review, or explore <Link href="/blog" onClick={close}>our resources</Link> first. We’ll be clear if a managed implementation is premature.</p></div>}
+            </>}
+            {step === 4 && <>
+              <Choices label="Preferred implementation timeline" values={choices.timeline} selected={answers.timeline} onPick={value => update("timeline", value)} />
+              <Choices label="Your role in the decision" values={choices.role} selected={answers.role} onPick={value => update("role", value)} />
+            </>}
+            {step === 5 && <form onSubmit={submit}>
+              <details className="pi-review"><summary>Review your answers <span>{answers.goals.length} priorities · {answers.tools.length} tool selections</span></summary>
+                {[
+                  ["Priorities", `${answers.goals.join(", ")} · ${answers.customerType}`],
+                  ["Team", `${answers.teamSize} · ${answers.teamModel} · ${answers.revenue} annual revenue`],
+                  ["Tools", [answers.tools.join(", "), answers.otherTools].filter(Boolean).join(" · ")],
+                  ["Investment", `${answers.setupBudget} setup · ${answers.monthlyBudget}`],
+                  ["Timing", `${answers.timeline} · ${answers.role}`],
+                ].map(([label, value], index) => <div key={label}><span><strong>{label}</strong><p>{value}</p></span><button type="button" onClick={() => setStep(index)} aria-label={`Edit ${label.toLowerCase()}`}>Edit</button></div>)}
+              </details>
+              <div className="pi-fields">{([
+                ["name", "Your name", "name", "text", true, 120], ["email", "Work email", "email", "email", true, 200],
+                ["company", "Company name", "organization", "text", true, 160], ["website", "Company website", "url", "text", false, 200],
+                ["phone", "Phone number", "tel", "tel", false, 40],
+              ] as const).map(([key, label, autoComplete, type, required, maxLength]) => <label className="pi-field" key={key}>{label} {!required && <small>(optional)</small>}<input className="field" name={key} autoComplete={autoComplete} type={type} required={required} minLength={required ? 2 : undefined} maxLength={maxLength} value={contact[key]} onChange={event => setContact(previous => ({ ...previous, [key]: event.target.value }))} /></label>)}</div>
+              <label className="pi-consent"><input type="checkbox" required checked={consent} onChange={event => setConsent(event.target.checked)} /><span>AgenticBots may contact me about this request. I’ve read the <a href="/privacy" target="_blank" rel="noreferrer">privacy policy</a>.</span></label>
+              {state === "error" && <p className="pi-error" role="alert">{error} You can also <a href={MARKETING_CONTACT.emailHref}>email us</a>.</p>}
+              <div className="pi-actions"><button type="button" className="pi-back" onClick={() => setStep(4)} disabled={state === "sending"}><ArrowLeft size={17} />Back</button><button className="btn btn-primary" type="submit" disabled={state === "sending"}>{state === "sending" ? <><Loader2 size={17} className="animate-spin" />Sending request…</> : <>{belowMinimum ? "Request a fit review" : "Request my proposal"}<ArrowRight size={17} /></>}</button></div>
+              <p className="pi-note">No payment. No obligation. Your request is reviewed before a project is proposed.</p>
+            </form>}
+            {step < 5 && <div className="pi-actions"><button className="pi-back" type="button" onClick={() => step ? setStep(step - 1) : close()}><ArrowLeft size={17} />{step ? "Back" : "Back to site"}</button><button className="btn btn-primary" type="button" disabled={!proposalStepReady(step, answers)} onClick={next}>{step === 4 ? "Review & finish" : "Continue"}<ArrowRight size={17} /></button></div>}
+          </>}
         </div>
-      </div>
+      </main>
     </div>
-  );
+  </dialog>;
 }
 
-function Step({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h2 className="display-xl text-balance">{title}</h2>
-      <p className="body-base mt-3 mb-8">{sub}</p>
-      {children}
-    </div>
-  );
-}
-
-function CardBtn({
-  label, desc, onClick, className,
-}: { label: string; desc: string; onClick: () => void; className?: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "group text-left p-5 rounded-none border border-[var(--border)] bg-white",
-        "hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift",
-        "transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-        className
-      )}
-    >
-      <span className="flex items-start justify-between gap-3">
-        <span className="min-w-0">
-          <span className="block display-md">{label}</span>
-          <span className="block mt-1 text-[12.5px] leading-snug text-[var(--text-secondary)]">
-            {desc}
-          </span>
-        </span>
-        <ArrowRight className="w-4 h-4 mt-1 shrink-0 text-[var(--accent-text)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-      </span>
-    </button>
-  );
-}
-
-function Labeled({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="block mb-1.5 text-[13px] font-medium text-[var(--text-body)]">
-        {label}{required && <span className="text-[var(--accent-text)]"> *</span>}
-      </span>
-      {children}
-    </label>
-  );
+function Choices<T extends string>({ label, values, selected, multi = false, max, dense = false, onPick }: {
+  label: string; values: readonly T[]; selected?: T | T[]; multi?: boolean; max?: number; dense?: boolean; onPick: (value: T) => void;
+}) {
+  const picked = Array.isArray(selected) ? selected : selected ? [selected] : [];
+  return <fieldset className={`pi-choices ${dense ? "pi-choices-dense" : ""}`}><legend>{label}{multi && <small>{max ? `Choose up to ${max}` : "Select all that apply"}</small>}</legend><div>{values.map(value => <label key={value} data-selected={picked.includes(value)}><input type={multi ? "checkbox" : "radio"} name={label} value={value} checked={picked.includes(value)} disabled={!!max && picked.length >= max && !picked.includes(value)} onChange={() => onPick(value)} /><span>{value}</span></label>)}</div></fieldset>;
 }

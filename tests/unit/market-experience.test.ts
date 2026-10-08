@@ -53,7 +53,8 @@ describe("geographic buying journey", () => {
     expect(html.match(/<h1[ >]/g)).toHaveLength(1);
     expect(html.match(/<h1>(.*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "")).toBe("Agentic marketing for contractors in Miami.");
     expect(html).toContain('id="audit"');
-    expect(html).toContain("$499");
+    expect(html).not.toContain("$499");
+    expect(html).toContain("Begin Step-1");
     expect(html).toContain("$7,500");
     expect(html).not.toContain("Metro population");
     expect(html).not.toContain("CPC band");

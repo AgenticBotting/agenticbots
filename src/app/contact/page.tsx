@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const FACTS = [
   { icon: Mail, t: "Direct contact", b: "Write to hello@agenticbots.dev or use the operating brief." },
   { icon: Clock, t: "Decision context", b: "Share the priority, timing and constraint behind the request." },
-  { icon: FileText, t: "A scoped next step", b: "The paid audit produces written findings before implementation is proposed." },
+  { icon: FileText, t: "A scoped next step", b: "Share your goals and constraints so we can review fit before proposing implementation." },
 ];
 
 export default function ContactPage() {

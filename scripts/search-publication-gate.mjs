@@ -38,7 +38,7 @@ function walk(dir) {
     if (own(path)) {
       const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? "";
       if ((main.match(/<h1[\s>]/g) ?? []).length !== 1) errors.push(`${path}: missing main heading`);
-      if (!main.includes('id="audit"') || !main.includes("$499")) errors.push(`${path}: missing paid-audit destination or price`);
+      if (!main.includes('id="audit"') || !main.includes("data-proposal-entry") || !main.includes("Begin Step-1")) errors.push(`${path}: missing proposal entry or conversion destination`);
       if (!main.includes('href="/')) errors.push(`${path}: missing contextual crawl path`);
       const sitemapEntry = [...sitemaps.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(match => {
         const loc = match[1].match(/<loc>([^<]+)<\/loc>/)?.[1];

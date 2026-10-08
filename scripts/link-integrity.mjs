@@ -104,11 +104,29 @@ if (existsSync(MANIFEST)) {
     if (typeof route !== "string" || !route.startsWith("/")) continue;
     if (routes.has(route)) continue;
     dynamicPatterns.push(
-      new RegExp("^" + route.replace(/\[\[?\.\.\.[^\]]+\]\]?/g, ".+").replace(/\[[^\]]+\]/g, "[^/]+") + "$")
+      new RegExp("^" + route.replace(/\/\[\[\.\.\.[^\]]+\]\]/g, "(?:/.*)?").replace(/\[\.\.\.[^\]]+\]/g, ".+").replace(/\[[^\]]+\]/g, "[^/]+") + "$")
     );
   }
 }
-const servedDynamically = (href) => dynamicPatterns.some((re) => re.test(href));
+// Catch-all families must validate their catalog segments, not merely match a route pattern.
+const publicRoutes = JSON.parse(readFileSync("src/data/public-market-routes.json", "utf8"));
+const nicheSlugs = new Set(JSON.parse(readFileSync("src/data/public-niche-routes.json", "utf8")).map(path => path.split("/").at(-1)));
+const servedDynamically = (href) => {
+  if (/^\/markets\/[^/]+\/(?:[^/]+\/)?industries(?:\/|$)/.test(href)) {
+    const [, , state, ...tail] = href.split("/");
+    if (!Object.hasOwn(publicRoutes.states, state)) return false;
+    if (tail[0] !== "industries" && !publicRoutes.states[state].includes(tail.shift())) return false;
+    if (tail.shift() !== "industries") return false;
+    if (!tail.length) return true;
+    const niche = tail[0] === "niches";
+    if (niche) tail.shift();
+    const subject = tail.shift();
+    if (!subject || !(niche ? nicheSlugs.has(subject) : publicRoutes.industries.includes(subject))) return false;
+    const service = tail.shift();
+    return !tail.length && (service === undefined || publicRoutes.services.includes(service));
+  }
+  return dynamicPatterns.some((re) => re.test(href));
+};
 
 /* Anchors only — <link> preloads and asset URLs are not page routes. */
 const ANCHOR = /<a\b[^>]*\shref="(\/[^"#?]*)"/g;

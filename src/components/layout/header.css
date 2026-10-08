@@ -1,5 +1,5 @@
 /* Keep navigation readable as the screen grows; use the middle track for links. */
-.site-header-shell { width: 100%; max-width: 1800px; margin-inline: auto; padding-inline: 20px; }
+.site-header-shell { width: 100%; margin-inline: auto; padding-inline: 20px; }
 .site-header-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; min-height: 76px; gap: 12px; }
 .site-header-logo { justify-self: start; }
 .site-primary-nav, .site-utility, .site-mega-panel { display: none; }
@@ -29,7 +29,7 @@
   .site-header-wordmark { --logo-h: 28px; }
   .site-header-shell { padding-inline: clamp(32px, 2.5vw, 48px); }
   .site-header-row { grid-template-columns: auto minmax(0, 1fr) auto; min-height: 88px; gap: clamp(24px, 2vw, 40px); }
-  .site-primary-nav { display: flex; justify-content: space-around; align-items: center; min-width: 0; gap: 14px; white-space: nowrap; }
+  .site-primary-nav { display: flex; justify-content: center; align-items: center; min-width: 0; gap: clamp(20px, 2vw, 42px); white-space: nowrap; }
   .site-primary-nav .nav-link { display: inline-flex; align-items: center; min-height: 48px; font-size: 16px; font-weight: 500; line-height: 1.4; letter-spacing: -.015em; color: #e5ebdf; position: relative; }
   .site-primary-nav .nav-link::after { content: ""; position: absolute; height: 2px; inset: auto 0 2px; background: #b8d984; transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
   .site-primary-nav .nav-link:hover, .site-primary-nav .nav-link[data-active="true"], .site-primary-nav .nav-link[aria-expanded="true"] { color: #fff; }
@@ -53,4 +53,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .site-primary-nav .nav-link::after { transition: none; }
+}
+
+@media (min-width: 1600px) {
+  .site-header-row { grid-template-columns: minmax(280px, 1fr) auto minmax(280px, 1fr); }
 }

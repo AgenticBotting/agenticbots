@@ -65,16 +65,16 @@ export default async function CityPage({ params }: Params) {
   ];
   return <>
     <JsonLd data={[serviceLd({ name: `${search.title} in ${rec.city}, ${rec.state_abbr}`, serviceType: search.label, description: search.introduction, path, areaServed: `${rec.city}, ${st.name}` }), breadcrumbLd([{ name: "Home", path: "/" }, { name: svc.serviceName, path: `/services/${svc.serviceSlug}` }, { name: st.name, path: `/services/${svc.serviceSlug}/${st.slug}` }, { name: rec.city, path }]), faqLd(faqs)]} />
-    <Header /><main className="service-experience">
+    <Header market={{ state, city }} /><main className="service-experience">
       <ServiceHero svc={svc} location={`${rec.city}, ${rec.state_abbr}`} breadcrumb={<><Link href="/">Home</Link><span>/</span><Link href={`/services/${svc.serviceSlug}`}>{svc.name}</Link><span>/</span><Link href={`/services/${svc.serviceSlug}/${st.slug}`}>{st.name}</Link><span>/</span><span>{rec.city}</span></>} />
       <ServiceBenefits svc={svc} />
       <ServiceBuyerBrief svc={svc} location={`${rec.city}, ${rec.state_abbr}`} />
       <section className="sx-section sx-local-context" data-local-brief={localBrief ? `${state}/${city}/${svc.slug}` : undefined}><Container><div className="sx-local-grid"><CityVignette name={rec.city} stateAbbr={rec.state_abbr} labels={labels} /><div className="sx-section-copy"><p className="sx-kicker">{search.label} · {rec.city}</p><h2>{localBrief ? localBrief.headline : <>A plan that reflects<br /><span>{rec.city}.</span></>}</h2>{localBrief ? <><p>{localDetail}</p><p>{localBrief.review}</p><LocalSearchSource brief={localBrief} /></> : ct ? <><p>{ct.character} {ct.localNote}</p><p className="sx-note">Local context informs the review. Your customer journey, systems and commercial priorities determine what we build.</p></> : <p>We plan around the customers and service areas your business covers in the {rec.metro} metro. Your own systems, customer history and business priorities provide the starting point.</p>}<div className="sx-local-links">{surrounding.map(n => <Link key={`${n.state}-${n.slug}`} href={`/services/${svc.serviceSlug}/${n.state}/${n.slug}`}>{search.label} in {n.name}</Link>)}<Link href={`/services/${svc.serviceSlug}/${st.slug}`}>All {st.name} markets</Link></div></div></div></Container></section>
       <ServiceScope svc={svc} /><ServiceConnections svc={svc} /><ServiceDelivery />
       <section className="sx-section"><Container><div className="sx-faq-layout"><div className="sx-section-copy"><p className="sx-kicker">Before you get started</p><h2>Local context.<br /><span>Clear responsibilities.</span></h2><p>What to expect from {svc.name.toLowerCase()} in {rec.city}.</p></div><FaqAccordion items={faqs} /></div></Container></section>
-      <IndustryLinks service={svc.slug} place={`${rec.city}, ${rec.state_abbr}`} />
+      <IndustryLinks service={svc.slug} place={`${rec.city}, ${rec.state_abbr}`} geo={{ state, city }} />
       <ServiceAudit source={`local-${svc.slug}-${rec.city_slug}-form`} focus={`${svc.name} in ${rec.city}`} />
       <section className="sx-section sx-related"><Container><div className="sx-section-copy"><p className="sx-kicker">More ways to support your business</p><h2>Explore other services<br /><span>in {rec.city}.</span></h2></div><div className="sx-related-grid">{ALL_SERVICES.filter(s => s.slug !== svc.slug).map(s => <Link key={s.slug} href={`/services/${s.serviceSlug}/${st.slug}/${rec.city_slug}`}><span><strong>{getSearchPositioning(s.slug).label} in {rec.city}</strong><p>{getServiceExperience(s.slug).benefits[0].title}</p></span><ArrowRight /></Link>)}</div><Link className="sx-text-link mt-6" href={`/markets/${st.slug}/${rec.city_slug}`}>Explore the {rec.city} market hub <ArrowRight size={16} /></Link></Container></section>
-    </main><Footer />
+    </main><Footer market={{ state, city }} />
   </>;
 }

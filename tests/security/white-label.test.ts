@@ -14,6 +14,12 @@ import { CLIENT_FORBIDDEN_TERMS } from "@/server/redact";
  * scripts/white-label-scan.mjs additionally scans the built browser bundles.
  */
 const CLIENT_SOURCES = [
+  "src/app/markets",
+  "src/components/marketing/LocalIndustryExperience.tsx",
+  "src/lib/local-market.ts",
+  "src/lib/local-market-paths.ts",
+  "src/lib/local-market-attribution.ts",
+  "src/data/public-market-routes.json",
   "src/app/page.tsx",
   "src/app/industries",
   "src/components/marketing/AcquisitionAttribution.tsx",
@@ -46,6 +52,9 @@ const CLIENT_SOURCES = [
   "src/components/marketing/MarketDirectory.tsx",
   "src/config/marketing-offer.ts",
   "src/config/marketing-contact.ts",
+  "src/lib/proposal-intake.ts",
+  "src/components/marketing/ProposalLink.tsx",
+  "src/components/marketing/BotPlanFlow.tsx",
   "src/components/layout/Header.tsx",
   "src/lib/marketing/workflow-example.ts",
   "src/lib/service-positioning.ts",

@@ -57,7 +57,7 @@ describe("search acquisition rollout", () => {
     for (const entry of urls) expect(entry.lastModified).toBe(SEARCH_PUBLICATION[new URL(entry.url).pathname].updated);
   });
 
-  it("renders all trade journeys with unique buying guidance, real scope and priced audit paths", async () => {
+  it("renders all trade journeys with unique buying guidance, real scope and proposal paths", async () => {
     expect(industryParams()).toHaveLength(6);
     expect(channelParams()).toHaveLength(12);
     const directory = renderToStaticMarkup(createElement(IndustryIndex));
@@ -78,7 +78,8 @@ describe("search acquisition rollout", () => {
         expect(detail.match(/<h1[ >]/g)).toHaveLength(1);
         expect(detail).toMatch(/<h1>Agentic (?:SEO|PPC management) <br\/><span>for /);
         expect(detail).toContain('id="audit"');
-        expect(detail).toContain("$499");
+        expect(detail).not.toContain("$499");
+        expect(detail).toContain("Begin Step-1");
         expect(detail).toContain(renderToStaticMarkup(createElement("p", null, industry[service].decisions[0].body)));
         const meta = await channelMetadata({ params: Promise.resolve({ ...params, service }) });
         expect(meta.robots).toBeUndefined();

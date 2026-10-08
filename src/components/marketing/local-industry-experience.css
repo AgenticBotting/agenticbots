@@ -1,0 +1,15 @@
+.lx-experience .sx-breadcrumb { flex-wrap: wrap; }
+.lx-experience .sx-breadcrumb > span { display: inline-flex; flex-wrap: wrap; gap: 7px; }
+.lx-experience .sx-kicker { display: flex; align-items: center; gap: 8px; }
+.lx-planning { padding: 28px; border: 1px solid var(--border); border-radius: 8px; background: white; }
+.lx-planning ul { margin: 18px 0; }
+.lx-planning li { display: flex; align-items: start; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 17px; line-height: 1.5; }
+.lx-planning li svg { flex: none; margin-top: 4px; color: var(--accent-text); }
+.lx-planning > p:not(.sx-kicker) { font-size: 15px; line-height: 1.75; color: var(--text-secondary); margin-bottom: 20px; }
+.lx-more { margin-top: 24px; border-block: 1px solid var(--border); }
+.lx-more summary { padding: 21px 0; cursor: pointer; font-size: 16px; font-weight: 500; }
+.lx-more ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 30px; padding-bottom: 22px; }
+.lx-more a { display: flex; justify-content: space-between; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+.lx-more a:hover { color: var(--accent-text); }
+.lx-more svg { flex: none; }
+@media (max-width: 767px) { .lx-more ul { grid-template-columns: minmax(0, 1fr); } .lx-planning { padding: 22px; } }

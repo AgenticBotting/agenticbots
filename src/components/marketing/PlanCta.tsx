@@ -1,43 +1,11 @@
-"use client";
-
 import { ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { track } from "@/lib/analytics";
+import { ProposalLink } from "./ProposalLink";
 import { cn } from "@/lib/utils";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
-/**
- * The primary CTA: the paid BOT workflow audit. Scrolls to the page's own
- * audit form when there is one, otherwise goes to the homepage form.
- */
-export function PlanCta({
-  source,
-  label = AUDIT_OFFER.cta,
-  variant = "primary",
-  className,
-}: {
-  source: string;
-  label?: string;
-  variant?: "primary" | "secondary" | "outline" | "onDark";
-  className?: string;
+export function PlanCta({ source, label = PROPOSAL_OFFER.cta, variant = "primary", className }: {
+  source: string; label?: string; variant?: "primary" | "secondary" | "outline" | "onDark"; className?: string;
 }) {
-  const router = useRouter();
-  const cls = {
-    primary: "btn-primary",
-    secondary: "btn-secondary",
-    outline: "btn-outline",
-    onDark: "btn-on-dark",
-  }[variant];
-
-  return (
-    <button type="button" onClick={() => {
-      track("cta_clicked", { source, label });
-      const el = document.getElementById("audit");
-      if (el) el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-      else router.push("/#audit");
-    }} className={cn("btn", cls, className)}>
-      {label}
-      <ArrowRight className="w-4 h-4" />
-    </button>
-  );
+  const cls = { primary: "btn-primary", secondary: "btn-secondary", outline: "btn-outline", onDark: "btn-on-dark" }[variant];
+  return <ProposalLink source={source} className={cn("btn", cls, className)}>{label}<ArrowRight size={16} /></ProposalLink>;
 }

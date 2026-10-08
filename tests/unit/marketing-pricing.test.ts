@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { PricingCards } from "@/components/marketing/PricingCards";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
 describe("public pricing offer", () => {
   it("shows setup and monthly costs together, with scoped Growth expansion", () => {
@@ -17,16 +17,16 @@ describe("public pricing offer", () => {
     expect(html).toContain("Custom architecture, BOT count and operating capacity.");
   });
 
-  it("routes all plan enquiries to the audit on the page displaying the offer", () => {
-    const html = renderToStaticMarkup(createElement(PricingCards, { auditHref: "/pricing#audit" }));
-    expect(html.match(/href="\/pricing#audit"/g)).toHaveLength(3);
+  it("routes all plan enquiries into the proposal intake", () => {
+    const html = renderToStaticMarkup(createElement(PricingCards));
+    expect(html.match(/href="\/plan"/g)).toHaveLength(3);
     expect(html).not.toContain("checkout");
     expect(html).not.toMatch(/most popular|guaranteed|unlimited/i);
   });
 
-  it("positions the workflow audit as a paid qualification product", () => {
-    expect(AUDIT_OFFER.price).toBe(499);
-    expect(AUDIT_OFFER.cta).toContain("$499");
-    expect(AUDIT_OFFER.name).toBe("BOT workflow audit");
+  it("positions the proposal as an unpaid qualification step", () => {
+    expect(PROPOSAL_OFFER.note).toContain("No payment required");
+    expect(PROPOSAL_OFFER.cta).toBe("Begin Step-1");
+    expect(PROPOSAL_OFFER.name).toBe("BOT implementation proposal");
   });
 });

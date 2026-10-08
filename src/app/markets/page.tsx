@@ -13,7 +13,7 @@ import { groupByRegion, regionSlug, REGIONS } from "@/lib/geo/regions";
 
 export const metadata: Metadata = {
   title: { absolute: agenticSearchTitle("marketing", "contractors", "the United States") },
-  description: "Contractor marketing services across the US. Explore local SEO, PPC and follow-up services, delivered through managed AI BOTS. Start with a $499 workflow audit.",
+  description: "Contractor marketing services across the US. Explore local SEO, PPC and follow-up services, delivered through managed AI BOTS. Request a proposal.",
   alternates: { canonical: "/markets" },
   robots: searchRobots("/markets"),
 };

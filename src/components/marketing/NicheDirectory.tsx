@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { filterNicheDirectory, type NicheDirectoryEntry, type BuyerDirectoryEntry } from "@/lib/niche-directory";
 
-export function NicheDirectory({ niches, buyers }: { niches: NicheDirectoryEntry[]; buyers: BuyerDirectoryEntry[] }) {
+export function NicheDirectory({ niches, buyers, basePath = "/industries" }: { niches: NicheDirectoryEntry[]; buyers: BuyerDirectoryEntry[]; basePath?: string }) {
   const id = useId();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -25,7 +25,7 @@ export function NicheDirectory({ niches, buyers }: { niches: NicheDirectoryEntry
       const group = results.filter(niche => niche.category === item);
       return group.length ? <details className="nd-group" key={`${item}-${filtered}`} open={filtered || index === 0}>
         <summary><span>{item}<small>{group.length} {group.length === 1 ? "niche" : "niches"}</small></span><ChevronDown size={17} /></summary>
-        <ul className="nd-list">{group.map(niche => <li key={niche.slug}><Link href={`/industries/niches/${niche.slug}`}><strong>{niche.name}</strong><small>{niche.buyers.length ? "Explore buyer roles and the marketing approach" : "Define your buyer profile and marketing approach"}</small><ArrowRight size={15} /></Link></li>)}</ul>
+        <ul className="nd-list">{group.map(niche => <li key={niche.slug}><Link href={`${basePath}/niches/${niche.slug}`}><strong>{niche.name}</strong><small>{niche.buyers.length ? "Explore buyer roles and the marketing approach" : "Define your buyer profile and marketing approach"}</small><ArrowRight size={15} /></Link></li>)}</ul>
       </details> : null;
     })}</div> : <div className="nd-empty"><h3>{buyer ? "This buyer relationship needs scoping." : "No services match these filters."}</h3><p>{buyer ? "This buyer type is in the catalog, but no included niche relationship matches your filters. We confirm the fit before recommending an audience." : "Try a broader service name or clear your category and buyer filters."}</p></div>}
     <details className="nd-buyer-glossary"><summary>Explore all {buyers.length} buyer types and typical decision-making roles</summary><p className="nd-glossary-note">A planning taxonomy, not a list of prospects. Roles and buying authority are verified for each business. Some buyer types do not yet have an included niche relationship.</p><ul className="nd-buyer-list">{buyers.map(item => <li key={item.slug}><strong>{item.name}</strong><p>{item.segment}</p><p>{item.roles.join(" · ")}</p></li>)}</ul></details>

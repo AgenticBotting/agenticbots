@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { region: slug } = await params;
   const region = regionFromSlug(slug);
   if (!region) return {};
-  return { title: { absolute: agenticSearchTitle("marketing", "contractors", `the ${region}`) }, description: `SEO, PPC and marketing services for contractors across the ${region}. Explore your market and plan managed BOT implementation with a $499 workflow audit.`, alternates: { canonical: `/markets/region/${slug}` }, robots: searchRobots(`/markets/region/${slug}`) };
+  return { title: { absolute: agenticSearchTitle("marketing", "contractors", `the ${region}`) }, description: `SEO, PPC and marketing services for contractors across the ${region}. Explore your market and plan managed BOT implementation with a proposal.`, alternates: { canonical: `/markets/region/${slug}` }, robots: searchRobots(`/markets/region/${slug}`) };
 }
 export default async function RegionMarketPage({ params }: Params) {
   const { region: slug } = await params;

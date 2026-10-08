@@ -109,7 +109,7 @@ export function ServicePlatformConstellation({
 
       <div className="platform-constellation-foot">
         <span><Workflow /> Common systems in scope</span>
-        <p>Exact access, connection method and write authority are confirmed during the workflow audit.</p>
+        <p>Exact access, connection method and write authority are confirmed during implementation scoping.</p>
       </div>
     </section>
   );

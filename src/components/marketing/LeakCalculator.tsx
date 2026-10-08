@@ -1,5 +1,6 @@
 "use client";
 
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { track } from "@/lib/analytics";
@@ -85,10 +86,10 @@ export function LeakCalculator() {
           </div>
         </dl>
 
-        <a href="#audit" onClick={() => track("cta_clicked", { source: "calculator", label: "audit" })}
+        <ProposalLink
           className="btn btn-primary mt-8 self-start">
-          Request the $499 audit <ArrowRight className="w-4 h-4" />
-        </a>
+          Begin Step-1 <ArrowRight className="w-4 h-4" />
+        </ProposalLink>
         <p className="mt-auto pt-7 text-[11.5px] leading-relaxed text-ink-400">
           Rough estimate. Assumes roughly 5% of leads go cold with an under-5-minute reply, 20% within the hour,
           35% same day and 50% next day. The audit measures your actual response time.

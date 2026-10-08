@@ -1,3 +1,4 @@
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
@@ -9,7 +10,7 @@ import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { BotWorkflowStory } from "@/components/marketing/BotWorkflowStory";
 import { HomeWorkspace } from "@/components/marketing/HomeWorkspace";
 import { HomeAuditVisual, HomeBrandMark, HomeDemandVisual, HomeFollowupVisual, HomeRetentionVisual, HomeToolOrbit } from "@/components/marketing/HomeVisuals";
-import { AUDIT_OFFER, formatPlanPrice, MARKETING_PLANS, PRICING_SCOPE_NOTE } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER, formatPlanPrice, MARKETING_PLANS, PRICING_SCOPE_NOTE } from "@/config/marketing-offer";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
 import "./home.css";
 
@@ -17,13 +18,13 @@ const entry = MARKETING_PLANS[0];
 const growth = MARKETING_PLANS[1];
 export const metadata: Metadata = {
   title: "Managed AI BOTS for contractors | AgenticBots",
-  description: "Connect your marketing, sales follow-up and customer operations with managed AI BOTS. Built for established contractors. Start with a $499 workflow audit.",
+  description: "Connect your marketing, sales follow-up and customer operations with managed AI BOTS. Built for established contractors. Request a proposal.",
   alternates: { canonical: "/" },
 };
 
 const HOME_FAQ = [
-  { q: "What do I get from the $499 audit?", a: `A focused review of your current process, existing systems and the work that needs attention. You receive written findings, a recommended starting workflow and implementation priorities within ${AUDIT_OFFER.turnaround} of payment. Any subsequent build is scoped and priced separately.` },
-  { q: "Do I need to replace my software?", a: "We design around the systems your business already uses. The audit checks what can be connected, which access is required and where custom work may be needed. Connections and permissions are confirmed before implementation." },
+  { q: "How do I request a proposal?", a: PROPOSAL_OFFER.description },
+  { q: "Do I need to replace my software?", a: "We design around the systems your business already uses. Scoping establishes what can be connected, which access is required and where custom work may be needed. Connections and permissions are confirmed before implementation." },
   { q: "Who manages the BOTS after launch?", a: "AgenticBots manages the agreed deployment, including monitoring, maintenance, tuning and activity reviews. Your team supplies business context and approves external actions. The proposal defines usage, support and the responsibilities on each side." },
   { q: "Can a BOT send messages or make changes on its own?", a: "BOTS prepare work within defined permissions. Sending messages, publishing content, changing ads and writing to connected systems require human approval. Your organization retains control of its accounts and decisions." },
   { q: "What does implementation cost?", a: `One BOT starts at ${formatPlanPrice(entry.setup)} setup plus ${formatPlanPrice(entry.monthly)}/month. Growth starts at ${formatPlanPrice(growth.setup)} setup plus ${formatPlanPrice(growth.monthly)}/month for 3–5 BOTS. Expansion to ten is quoted separately; Enterprise is custom. Ad spend and third-party usage are separate. You approve a written scope before work starts.` },
@@ -31,7 +32,7 @@ const HOME_FAQ = [
 ];
 
 function AuditLink({ label = "Find my starting point", secondary = false }: { label?: string; secondary?: boolean }) {
-  return <a href="#audit" className={`btn ${secondary ? "btn-outline" : "btn-primary"}`}>{label}<ArrowRight size={16} /></a>;
+  return <ProposalLink className={`btn ${secondary ? "btn-outline" : "btn-primary"}`}>{label}<ArrowRight size={16} /></ProposalLink>;
 }
 
 function Hero() {
@@ -44,8 +45,8 @@ function Hero() {
             <p className="ch-kicker"><span /> Managed AI for established contractors</p>
             <h1>More opportunities.<br /><span>Less manual work.</span></h1>
             <p className="ch-hero-description">Connect your marketing, sales follow-up and customer operations with AI BOTS—built, connected and managed for you.</p>
-            <div className="ch-actions"><AuditLink label="Start with a $499 audit" /><a href="#product-preview" className="btn btn-outline"><CirclePlay size={17} /> See BOTS at work</a></div>
-            <p className="ch-hero-note">A clear starting point. Written findings in two business days of payment.</p>
+            <div className="ch-actions"><AuditLink label="Begin Step-1" /><a href="#product-preview" className="btn btn-outline"><CirclePlay size={17} /> See BOTS at work</a></div>
+            <p className="ch-hero-note">Six short steps. Mostly quick choices. No payment required.</p>
           </div>
         </div>
         <div className="ch-preview-wrap"><HomeWorkspace /></div>
@@ -87,7 +88,7 @@ function ConnectedTools() {
             <span className="ch-connect-node"><HomeBrandMark name="wordpress" />WordPress</span>
             <span className="ch-connect-caption">Common systems considered during scoping</span>
           </div>
-          <div className="ch-section-copy"><p className="ch-kicker">Work with what you already use</p><h2>Your tools.<br /><span>A more connected team.</span></h2><p>Your CRM, marketing channels and service software hold valuable context. We design the workflow between them, so your people spend less time moving information around.</p><ul className="ch-check-list"><li><Check /> Plan around your existing business systems</li><li><Check /> Define access and approvals before launch</li><li><Check /> Keep your accounts and customer relationships</li></ul><p className="ch-small">Available connections, custom work and permissions are confirmed during the audit.</p><Link href="/services" className="ch-text-link">See the full service portfolio <ArrowRight size={16} /></Link></div>
+          <div className="ch-section-copy"><p className="ch-kicker">Work with what you already use</p><h2>Your tools.<br /><span>A more connected team.</span></h2><p>Your CRM, marketing channels and service software hold valuable context. We design the workflow between them, so your people spend less time moving information around.</p><ul className="ch-check-list"><li><Check /> Plan around your existing business systems</li><li><Check /> Define access and approvals before launch</li><li><Check /> Keep your accounts and customer relationships</li></ul><p className="ch-small">Available connections, custom work and permissions are confirmed during scoping.</p><Link href="/services" className="ch-text-link">See the full service portfolio <ArrowRight size={16} /></Link></div>
         </div>
       </Container>
     </section>
@@ -100,7 +101,7 @@ function HowItWorks() {
       <Container>
         <div className="ch-section-heading"><p className="ch-kicker">Built for you. Managed with you.</p><h2>You run the business.<br />We run the BOTS.</h2><p>Start with a clear plan, launch a focused workflow, and expand when it makes business sense.</p></div>
         <ol className="ch-launch-steps">
-          <li><span className="ch-step-symbol"><FileText size={25} /></span><span className="ch-feature-label">01 / Find the right starting point</span><h3>Audit the opportunity.</h3><p>The {AUDIT_OFFER.priceLabel} audit identifies where a BOT could help, what it needs and what to do first.</p><span className="ch-step-output">Written findings + recommended workflow</span></li>
+          <li><span className="ch-step-symbol"><FileText size={25} /></span><span className="ch-feature-label">01 / Find the right starting point</span><h3>Define the opportunity.</h3><p>Share your priorities, team, tools and investment range. We review fit and define the next step.</p><span className="ch-step-output">A focused proposal + agreed scope</span></li>
           <li><span className="ch-step-symbol"><Settings2 size={25} /></span><span className="ch-feature-label">02 / Build around your business</span><h3>Connect. Test. Launch.</h3><p>We configure the BOTS, connect the agreed systems and validate the workflow with your team.</p><span className="ch-step-output">Documented scope + controlled launch</span></li>
           <li><span className="ch-step-symbol"><ShieldCheck size={25} /></span><span className="ch-feature-label">03 / Keep improving</span><h3>Stay supported.</h3><p>We monitor and maintain the system. Your team reviews activity and approves the next step.</p><span className="ch-step-output">Ongoing management + regular review</span></li>
         </ol>
@@ -115,9 +116,9 @@ function Pricing() {
   return (
     <section id="pricing" className="ch-section ch-pricing">
       <Container>
-        <div className="ch-section-heading"><p className="ch-kicker">A clear investment</p><h2>Start focused.<br /><span>Build as you grow.</span></h2><p>One-time setup to build the system. Monthly management to keep it working. Your audit helps define the right scope.</p></div>
+        <div className="ch-section-heading"><p className="ch-kicker">A clear investment</p><h2>Start focused.<br /><span>Build as you grow.</span></h2><p>One-time setup to build the system. Monthly management to keep it working. Your proposal defines the scope.</p></div>
         <div className="ch-plans">
-          {MARKETING_PLANS.map((plan, index) => <article key={plan.key} className={`ch-plan ${plan.featured ? "ch-plan-featured" : ""}`}><p className="ch-plan-label">{plan.key === "one" ? "One focused workflow" : plan.key === "growth" ? "Connected workflows" : "Custom deployment"}</p><h3>{plan.name}</h3><p className="ch-plan-summary">{summaries[index]}</p><div className="ch-plan-price"><strong>{formatPlanPrice(plan.setup, plan.from)}</strong><span>{plan.setup === null ? "Setup + monthly management" : "one-time setup"}</span></div>{plan.monthly !== null && <p className="ch-monthly">+ <strong>{formatPlanPrice(plan.monthly, plan.from)}</strong> / month</p>}<p className="ch-capacity">{plan.botRange}</p><ul>{plan.features.filter((_, i) => i === 0 || i === 2 || i === 4).map(feature => <li key={feature}><Check size={15} />{feature}</li>)}</ul><AuditLink label={plan.key === "enterprise" ? "Discuss your requirements" : "Start with the $499 audit"} secondary={!plan.featured} /></article>)}
+          {MARKETING_PLANS.map((plan, index) => <article key={plan.key} className={`ch-plan ${plan.featured ? "ch-plan-featured" : ""}`}><p className="ch-plan-label">{plan.key === "one" ? "One focused workflow" : plan.key === "growth" ? "Connected workflows" : "Custom deployment"}</p><h3>{plan.name}</h3><p className="ch-plan-summary">{summaries[index]}</p><div className="ch-plan-price"><strong>{formatPlanPrice(plan.setup, plan.from)}</strong><span>{plan.setup === null ? "Setup + monthly management" : "one-time setup"}</span></div>{plan.monthly !== null && <p className="ch-monthly">+ <strong>{formatPlanPrice(plan.monthly, plan.from)}</strong> / month</p>}<p className="ch-capacity">{plan.botRange}</p><ul>{plan.features.filter((_, i) => i === 0 || i === 2 || i === 4).map(feature => <li key={feature}><Check size={15} />{feature}</li>)}</ul><AuditLink label={plan.key === "enterprise" ? "Discuss your requirements" : "Begin Step-1"} secondary={!plan.featured} /></article>)}
         </div>
         <p className="ch-pricing-note">{PRICING_SCOPE_NOTE}</p><Link href="/pricing" className="ch-text-link">Compare the full scope <ArrowRight size={16} /></Link>
       </Container>
@@ -129,7 +130,7 @@ function Audit() {
   return (
     <section id="audit" className="ch-section ch-audit">
       <Container>
-        <div className="ch-audit-heading"><p className="ch-kicker">Your first step · {AUDIT_OFFER.priceLabel}</p><h2>Know where AI belongs<br /><span>in your business.</span></h2><p>Get a practical recommendation before committing to a build. Tell us about your business; we’ll confirm the scope and payment step by email.</p></div>
+        <div className="ch-audit-heading"><p className="ch-kicker">Your first step · Request a proposal</p><h2>Know where AI belongs<br /><span>in your business.</span></h2><p>Tell us where you want the business to go. A few focused questions help us shape a realistic implementation around your team, tools and budget.</p></div>
         <div className="ch-audit-layout"><HomeAuditVisual /><AuditForm source="home-final" compact className="ch-audit-form" /></div>
         <p className="ch-audit-qualifier">For established residential and commercial contractors. Implementation starts at {formatPlanPrice(entry.setup)} setup + {formatPlanPrice(entry.monthly)}/month.</p>
       </Container>

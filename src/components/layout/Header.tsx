@@ -1,7 +1,9 @@
 "use client";
 
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
+import { localDirectoryHref, marketServiceHref, type MarketNavigation } from "@/lib/local-market-paths";
 import { usePathname } from "next/navigation";
 import {
   Menu, X, ArrowRight, ArrowLeft, Mail, Phone, MessageSquare, ChevronDown, ChevronRight,
@@ -16,7 +18,7 @@ import { MarketSearch } from "./MarketSearch";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
 import { track } from "@/lib/analytics";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 import { MARKETING_CONTACT } from "@/config/marketing-contact";
 import "./header.css";
 
@@ -38,7 +40,7 @@ const STAGES: { id: string; title: string; blurb: string; slugs: string[] }[] = 
   { id: "repeat", title: "Win repeat work", blurb: "Bring past customers back and know what is working.", slugs: ["reactivation", "crm", "analytics"] },
 ];
 
-export function Header() {
+export function Header({ market }: { market?: MarketNavigation } = {}) {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuId>(null);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
@@ -168,7 +170,7 @@ export function Header() {
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
-                  href={l.href}
+                  href={market && l.href === "/industries" ? localDirectoryHref(market) : l.href}
                   onClick={closeMenu}
                   aria-current={pathname === l.href ? "page" : undefined}
                   data-active={pathname === l.href || pathname.startsWith(`${l.href}/`)}
@@ -184,14 +186,14 @@ export function Header() {
 
             <div className="site-header-actions">
               <a href={MARKETING_CONTACT.smsHref} onClick={closeMenu} className="btn site-header-text" aria-label={`Text us at ${MARKETING_CONTACT.phone}`}><MessageSquare size={17} aria-hidden="true" />Text us</a>
-              <Link
-                href="/#audit"
-                onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
+              <ProposalLink
+                source="header"
+                onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "proposal" }); }}
                 className="btn btn-primary site-header-audit"
               >
-                {AUDIT_OFFER.shortCta}
+                {PROPOSAL_OFFER.shortCta}
                 <ArrowRight size={17} aria-hidden="true" />
-              </Link>
+              </ProposalLink>
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
@@ -271,7 +273,7 @@ export function Header() {
                     {stage.items.map((category) => (
                       <li key={category.slug} className="flex">
                         <Link
-                          href={serviceHref(category)}
+                          href={market ? marketServiceHref(serviceHref(category).split("/")[2], market) : serviceHref(category)}
                           onClick={closeMenu}
                           className={cn(
                             "group relative w-full min-h-[142px] flex flex-col gap-2 bg-white p-5 transition-colors duration-200 hover:bg-[var(--bg-alt)]",
@@ -424,7 +426,7 @@ export function Header() {
                   title={st.title}
                 >
                   {st.items.map((c) => (
-                    <MobileRow key={c.slug} href={serviceHref(c)} onGo={closeMobile} meta={c.slug === START_SLUG ? "Start here" : undefined} boxed>
+                    <MobileRow key={c.slug} href={market ? marketServiceHref(serviceHref(c).split("/")[2], market) : serviceHref(c)} onGo={closeMobile} meta={c.slug === START_SLUG ? "Start here" : undefined} boxed>
                       {c.name}
                     </MobileRow>
                   ))}
@@ -490,7 +492,7 @@ export function Header() {
 
               <ul className="py-5 space-y-2">
                 {[...NAV_LINKS, { label: "About", href: "/about" }, { label: "Founding clients", href: "/#founding" }].map((l) => (
-                  <MobileRow key={l.href} href={l.href} onGo={closeMobile} boxed strong>
+                  <MobileRow key={l.href} href={market && l.href === "/industries" ? localDirectoryHref(market) : l.href} onGo={closeMobile} boxed strong>
                     {l.label}
                   </MobileRow>
                 ))}
@@ -501,14 +503,14 @@ export function Header() {
           </div>
           {/* Thumb-zone CTA — pinned to the drawer bottom, always reachable. */}
           <div className="site-drawer-actions sticky bottom-0 inset-x-0 bg-white border-t border-[var(--border)] px-5 py-4">
-            <Link
-              href="/#audit"
+            <ProposalLink
+              source="mobile-header"
               onClick={closeMobile}
               className="btn btn-primary w-full"
             >
-              {AUDIT_OFFER.shortCta}
+              {PROPOSAL_OFFER.shortCta}
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </ProposalLink>
             <div className="site-drawer-contact-actions"><a href={MARKETING_CONTACT.smsHref} className="btn btn-outline" aria-label={`Text us at ${MARKETING_CONTACT.phone}`}><MessageSquare size={17} aria-hidden="true" />Text us</a><Link href="/contact" onClick={closeMobile} className="btn btn-outline">Contact us<ArrowRight size={16} aria-hidden="true" /></Link></div>
           </div>
         </div>
@@ -575,13 +577,13 @@ function ServiceMenuFooter({ onAct }: { onAct: () => void }) {
     <div className="mt-7 flex items-center justify-between gap-8 border-t border-[var(--border)] pt-5">
       <div className="max-w-[68ch] text-[13px] leading-relaxed text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--foreground)]">Need the first mandate mapped?</span>{" "}
-        The {AUDIT_OFFER.priceLabel} workflow audit identifies the highest-value place to begin.
+        Share your goals, tools and budget so we can define a practical starting point.
       </div>
       <div className="flex shrink-0 items-center">
-        <Link href="/#audit" onClick={onAct} className="btn btn-primary">
-          Find my first BOT
+        <ProposalLink onClick={onAct} className="btn btn-primary">
+          Begin Step-1
           <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </ProposalLink>
       </div>
     </div>
   );
@@ -592,16 +594,16 @@ function CoverageMenuFooter({ onAct }: { onAct: () => void }) {
     <div className="mt-7 flex items-center justify-between gap-8 border-t border-[var(--border)] pt-5">
       <div className="max-w-[68ch] text-[13px] leading-relaxed text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--foreground)]">Need the market case mapped?</span>{" "}
-        The {AUDIT_OFFER.priceLabel} workflow audit connects your service area to the first viable BOT mandate.{" "}
+        Your proposal connects the service area you cover to a focused BOT implementation.{" "}
         <Link href="/markets" onClick={onAct} className="font-semibold text-[var(--foreground)] underline decoration-[var(--border-strong)] underline-offset-4 hover:text-[var(--accent-text)]">
           View all markets
         </Link>
       </div>
       <div className="flex shrink-0 items-center">
-        <Link href="/#audit" onClick={onAct} className="btn btn-primary">
-          Find my first BOT
+        <ProposalLink onClick={onAct} className="btn btn-primary">
+          Begin Step-1
           <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </ProposalLink>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui/Container";
 import { AuditForm } from "@/components/marketing/AuditForm";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
 export const metadata: Metadata = {
   title: "About AgenticBots",
@@ -25,6 +25,6 @@ export default function AboutPage() {
     <section className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro"><div><p className="eyebrow mb-5">The people behind the work</p><h2 className="display-xl">Led by Nick Thomson.</h2></div><div><p className="body-lg max-w-[45ch]">You should know who is responsible for the system you are buying. Start a conversation with AgenticBots about your process, your tools and what you need to improve.</p><a href="mailto:hello@agenticbots.dev" className="inline-flex items-center gap-2 font-semibold mt-6">hello@agenticbots.dev <ArrowRight size={16} /></a></div></div></Container></section>
     <section className="section-pad border-b border-[var(--border)] bg-[var(--bg-alt)]"><Container><h2 className="display-xl mb-10">How we operate.</h2><ol className="delivery-rows">{PRINCIPLES.map(([title, copy], index) => <li key={title}><span>0{index + 1}</span><h3 className="display-lg">{title}</h3><p className="body-base">{copy}</p></li>)}</ol></Container></section>
     <section className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro"><h2 className="display-xl max-w-[20ch]">Trust grows<br />with evidence.</h2><div><p className="body-lg max-w-[45ch]">We are building our first client case studies. Our website demonstrations are fictional examples; they show the approach and do not represent measured client results.</p><p className="body-base mt-5 max-w-[48ch]">Before a build, your proposal defines the workflow, access rules, deliverables and costs. During operation, BOT ACTIVITY provides a record to review.</p><Link href="/how-it-works" className="inline-flex items-center gap-2 font-semibold mt-6">See the process <ArrowRight size={16} /></Link></div></div></Container></section>
-    <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16"><div><p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} workflow audit</p><h2 className="display-xl">Start with a useful<br />first workflow.</h2><p className="body-lg mt-5 max-w-[43ch]">The paid BOT workflow audit identifies a focused starting point for your business. Written findings arrive within {AUDIT_OFFER.turnaround} of payment.</p></div><AuditForm source="about" /></div></Container></section>
+    <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16"><div><p className="eyebrow mb-5">{PROPOSAL_OFFER.name}</p><h2 className="display-xl">Start with a useful<br />first workflow.</h2><p className="body-lg mt-5 max-w-[43ch]">{PROPOSAL_OFFER.description}</p></div><AuditForm source="about" /></div></Container></section>
   </main><Footer /></>;
 }

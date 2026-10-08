@@ -121,5 +121,5 @@ export function agenticSearchTitle(service: string, audience: string, location?:
 
 export function serviceSearchDescription(svc: Service, location?: string) {
   const copy = getSearchPositioning(svc.slug);
-  return `${copy.label}${location ? ` in ${location}` : ` for ${copy.audience}`}. Managed AI BOTS, clear scope and human approval. Start with a $499 workflow audit.`;
+  return `${copy.label}${location ? ` in ${location}` : ` for ${copy.audience}`}. Managed AI BOTS, clear scope and human approval. Request a proposal.`;
 }

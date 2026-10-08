@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { localDirectoryHref, localNicheHref, type MarketGeo } from "@/lib/local-market-paths";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui";
 import { NicheBuyerFlow } from "./NicheBuyerFlow";
@@ -14,9 +15,9 @@ export function NicheBuyerSection({ niche, channel }: { niche: PublicNiche; chan
   </Container></section>;
 }
 
-export function IndustryBuyerSection({ industry, channel }: { industry: string; channel?: "seo" | "ppc" }) {
+export function IndustryBuyerSection({ industry, channel, geo, service }: { industry: string; channel?: "seo" | "ppc"; geo?: MarketGeo; service?: string }) {
   const niche = getPublicNiche(TRADE_FEATURED_NICHE[industry]);
   if (!niche) return null;
   const specialties = tradeNiches(industry);
-  return <><NicheBuyerSection niche={niche} channel={channel} /><Container><div className="nb-specialties"><p>The map above illustrates {niche.name.toLowerCase()}. Choose your specific service to see its own buyer-planning approach.</p><details><summary>Explore all {specialties.length} services in this category</summary><ul>{specialties.map(item => <li key={item.slug}><Link href={nicheHref(item.slug)}>{item.name}</Link></li>)}</ul></details><Link href="/industries#niche-directory" className="sx-text-link">Find another service niche<ArrowRight size={15} /></Link></div></Container></>;
+  return <><NicheBuyerSection niche={niche} channel={channel} /><Container><div className="nb-specialties"><p>The map above illustrates {niche.name.toLowerCase()}. Choose your specific service to see its own buyer-planning approach.</p><details><summary>Explore all {specialties.length} services in this category</summary><ul>{specialties.map(item => <li key={item.slug}><Link href={geo ? localNicheHref(geo, item.slug, service) : nicheHref(item.slug)}>{item.name}</Link></li>)}</ul></details><Link href={geo ? `${localDirectoryHref(geo)}#niche-directory` : "/industries#niche-directory"} className="sx-text-link">Find another service niche<ArrowRight size={15} /></Link></div></Container></>;
 }

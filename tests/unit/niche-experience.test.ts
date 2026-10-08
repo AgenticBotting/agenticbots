@@ -65,7 +65,7 @@ describe("niche buying journeys", () => {
     expect(filterNicheDirectory(entries, "", "", "")).toHaveLength(341);
   });
 
-  it("renders real mapped roles, an explicitly illustrative flow and a priced audit without fabricated intent", async () => {
+  it("renders real mapped roles, an explicitly illustrative flow and a proposal without fabricated intent", async () => {
     const params = Promise.resolve({ niche: "commercial-roofing" });
     const html = renderToStaticMarkup(await NichePage({ params }));
     expect(html.match(/<h1[ >]/g)).toHaveLength(1);
@@ -75,8 +75,9 @@ describe("niche buying journeys", () => {
     expect(html).toContain("no live prospect data");
     expect(html).toContain('data-demo="true"');
     expect(html).toContain('id="audit"');
-    expect(html).toContain("$499");
-    expect(html).toContain("No charge on submission");
+    expect(html).not.toContain("$499");
+    expect(html).toContain("Begin Step-1");
+    expect(html).toContain("No payment required");
     const empty = PUBLIC_NICHES.find(niche => !niche.buyers.length)!;
     const emptyHtml = renderToStaticMarkup(await NichePage({ params: Promise.resolve({ niche: empty.slug }) }));
     expect(emptyHtml).toContain("buyer relationships need further review");

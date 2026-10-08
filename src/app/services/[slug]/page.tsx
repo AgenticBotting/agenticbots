@@ -17,7 +17,7 @@ import { ALL_SERVICES, ALL_CATEGORIES, getService, serviceHref } from "@/lib/cat
 import { getOffer } from "@/lib/offers";
 import { getServicePositioning } from "@/lib/service-positioning";
 import { getServiceExperience } from "@/lib/service-experience";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -50,7 +50,7 @@ export default async function ServiceHub({ params }: Params) {
     { q: "Which BOTS deliver this service?", a: `${positioning.deliveryModel}. We configure the service around your existing systems and the work your team needs to move forward.` },
     { q: "What stays under my control?", a: `${positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.` },
     { q: "Who manages the work after launch?", a: "AgenticBots monitors, maintains and tunes the agreed deployment. Your team reviews activity and approves external actions. Support, usage and responsibilities are defined in your proposal." },
-    { q: "What does the audit include?", a: `The ${AUDIT_OFFER.priceLabel} audit provides written findings, a recommended starting workflow and implementation priorities within ${AUDIT_OFFER.turnaround} of payment. Implementation is scoped and priced separately.` },
+    { q: "How do I request a proposal?", a: PROPOSAL_OFFER.description },
   ];
   const pairs = (getOffer(svc.slug)?.pairs ?? []).map(sl => ALL_CATEGORIES.find(c => c.slug === sl)).filter((c): c is NonNullable<typeof c> => !!c);
   return <>

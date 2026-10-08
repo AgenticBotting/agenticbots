@@ -6,15 +6,15 @@ import { Container, ButtonLink } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Request received",
-  description: "Your bot plan request is in the queue — here is what happens next.",
+  description: "What to expect after submitting a BOT implementation proposal request.",
   alternates: { canonical: "/plan/thanks" },
   robots: { index: false, follow: false },
 };
 
 const NEXT = [
-  { n: "01", t: "We read it", b: "Every request is reviewed by a person, usually same day." },
-  { n: "02", t: "We map it", b: "Your business gets matched against the thirteen bots and put in priority order." },
-  { n: "03", t: "You get the plan", b: "Written, in your inbox, within two business days. Call optional." },
+  { n: "01", t: "We read it", b: "We review your goals, team, tools and investment range." },
+  { n: "02", t: "We map it", b: "We assess the starting workflow, responsibilities and connection requirements." },
+  { n: "03", t: "You get the plan", b: "We follow up about fit, scope and next steps. Work begins only after agreement." },
 ];
 
 export default function ThanksPage() {
@@ -27,9 +27,9 @@ export default function ThanksPage() {
             <span className="flex h-11 w-11 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
               <Check className="w-5 h-5" strokeWidth={2.5} />
             </span>
-            <h1 className="display-hero mt-7 text-balance">Request <span className="em-green">received.</span></h1>
+            <h1 className="display-hero mt-7 text-balance">Your request.<br /><span className="em-green">The next step.</span></h1>
             <p className="body-lg mt-5">
-              Your BOT workflow audit request is in the queue. We will confirm scope and payment before the review begins.
+              After you submit a proposal request, our team reviews the brief and follows up by email. No payment is required to request a proposal.
             </p>
           </div>
 

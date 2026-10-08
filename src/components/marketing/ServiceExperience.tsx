@@ -1,3 +1,4 @@
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
 import { ArrowRight, Bot, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui";
@@ -7,14 +8,14 @@ import { PlatformMark } from "./ServicePlatformConstellation";
 import { getServiceExperience } from "@/lib/service-experience";
 import { getServicePositioning } from "@/lib/service-positioning";
 import { getServicePlatforms } from "@/config/service-platforms";
-import { AUDIT_OFFER, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
 import type { Service } from "@/lib/catalog";
 import type { ServiceExperience } from "@/lib/service-experience";
 import { agenticServiceLabel, getSearchPositioning } from "@/lib/search-positioning";
 import "./service-experience.css";
 
-export function ServiceAuditLink({ label = "Start with a $499 audit" }: { label?: string }) {
-  return <a href="#audit" className="btn btn-primary">{label}<ArrowRight size={16} /></a>;
+export function ServiceAuditLink({ label = "Begin Step-1" }: { label?: string }) {
+  return <ProposalLink className="btn btn-primary">{label}<ArrowRight size={16} /></ProposalLink>;
 }
 
 export function ServiceOrbit({ slug }: { slug?: string }) {
@@ -37,7 +38,7 @@ export function ServiceHero({ svc, location, breadcrumb, editorial }: {
           <h1>{editorial ? <>{editorial.heading}{" "}<br /><span>{editorial.accent}</span></> : <>{agenticServiceLabel(search.label)}{" "}<br /><span>for {search.audience}{location ? ` in ${location}` : ""}.</span></>}</h1>
           <p className="sx-lead">{editorial?.introduction ?? search.introduction}</p>
           <div className="sx-actions"><ServiceAuditLink /><a href="#service-preview" className="btn btn-outline"><CirclePlay size={16} /> See the workflow</a></div>
-          <p className="sx-note">Written findings within {AUDIT_OFFER.turnaround} of payment. Implementation scoped separately.</p>
+          <p className="sx-note">{PROPOSAL_OFFER.note}</p>
         </div></div>
         <div className="sx-preview-frame" id="service-preview"><ServiceWorkspace title={copy.workspace} botName={positioning.deliveryModel} examples={editorial?.examples ?? copy.examples} /></div>
         <div className="sx-hero-foot"><span><Bot size={15} />{positioning.deliveryModel}</span><span><Layers3 size={15} />Built around your existing tools</span><span><Settings2 size={15} />Managed by AgenticBots</span></div>
@@ -76,7 +77,7 @@ export function ServiceBenefits({ svc }: { svc: Service }) {
 export function ServiceScope({ svc }: { svc: Service }) {
   const positioning = getServicePositioning(svc.slug);
   return <section id="included" className="sx-section sx-scope"><Container>
-    <div className="sx-scope-layout"><div className="sx-section-copy"><p className="sx-kicker">What’s included</p><h2>Clear responsibilities.<br /><span>Practical deliverables.</span></h2><p>{positioning.execution}</p><a href="#audit" className="sx-text-link">Define your scope <ArrowRight size={16} /></a></div>
+    <div className="sx-scope-layout"><div className="sx-section-copy"><p className="sx-kicker">What’s included</p><h2>Clear responsibilities.<br /><span>Practical deliverables.</span></h2><p>{positioning.execution}</p><ProposalLink className="sx-text-link">Define your scope <ArrowRight size={16} /></ProposalLink></div>
       <div className="sx-scope-sheet"><div><FileText size={17} /><strong>{svc.name}</strong><span>Service scope</span></div><ul>{positioning.scope.map(item => <li key={item}><Check size={16} /><span>{item}</span></li>)}</ul><p>Exact integrations, included usage, support and acceptance criteria are agreed in your proposal.</p></div>
     </div>
     <div className="sx-control-note"><ShieldCheck size={21} /><div><strong>Your team keeps control.</strong><p>{positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.</p></div></div>
@@ -87,13 +88,13 @@ export function ServiceConnections({ svc }: { svc: Service }) {
   const platforms = getServicePlatforms(svc.slug);
   return <section id="connections" className="sx-section"><Container><div className="sx-connections-layout">
     <div className="sx-tool-map"><div className="sx-tool-orbits" aria-hidden="true"><i /><i /></div><div className="sx-tool-core"><Layers3 size={26} /><strong>Your existing tools</strong><span>One connected workflow</span></div>{platforms.map((p, i) => <div key={p.id} className={`sx-tool-node sx-tool-node-${i}`}><span><PlatformMark id={p.id} mark={p.mark} /></span><strong>{p.name}</strong></div>)}<p>Common systems considered during scoping</p></div>
-    <div className="sx-section-copy"><p className="sx-kicker">Built around your business</p><h2>Keep your tools.<br /><span>Connect the work.</span></h2><p>Your {svc.name} workflow is designed around the systems your team already uses. The audit establishes what can connect, what access is needed and where custom work belongs.</p><ul className="sx-checks"><li><Check /> Your accounts and relationships stay yours</li><li><Check /> Connection requirements confirmed up front</li><li><Check /> Clear permissions before anything goes live</li></ul><p className="sx-note">These platforms are scoping references. Available integrations and write permissions depend on your approved deployment.</p></div>
+    <div className="sx-section-copy"><p className="sx-kicker">Built around your business</p><h2>Keep your tools.<br /><span>Connect the work.</span></h2><p>Your {svc.name} workflow is designed around the systems your team already uses. Scoping establishes what can connect, what access is needed and where custom work belongs.</p><ul className="sx-checks"><li><Check /> Your accounts and relationships stay yours</li><li><Check /> Connection requirements confirmed up front</li><li><Check /> Clear permissions before anything goes live</li></ul><p className="sx-note">These platforms are scoping references. Available integrations and write permissions depend on your approved deployment.</p></div>
   </div></Container></section>;
 }
 
 export function ServiceDelivery() {
   return <section className="sx-section sx-delivery"><Container><div className="sx-section-heading"><p className="sx-kicker">A managed service from the start</p><h2>Your priorities.<br /><span>Our implementation and support.</span></h2></div><ol className="sx-delivery-steps">
-    <li><FileText size={23} /><span>01 / Audit</span><h3>Choose the right first move.</h3><p>Review your process and systems. Receive written findings and implementation priorities.</p></li>
+    <li><FileText size={23} /><span>01 / Define</span><h3>Choose the right first move.</h3><p>Share your priorities, tools, team and budget. Agree on scope before a build.</p></li>
     <li><Settings2 size={23} /><span>02 / Build</span><h3>Connect, test and launch.</h3><p>Approve a scope, configure the BOTS and validate the workflow with your team.</p></li>
     <li><ShieldCheck size={23} /><span>03 / Manage</span><h3>Keep the work supported.</h3><p>We monitor, maintain and tune the agreed deployment, with activity available for review.</p></li>
   </ol><div className="sx-investment"><div><p className="sx-kicker">Plan the investment</p><h3>Start focused. Expand by scope.</h3><p>A single defined BOT workflow starts at <strong>{formatPlanPrice(MARKETING_PLANS[0].setup)} setup + {formatPlanPrice(MARKETING_PLANS[0].monthly)}/month.</strong> Multiple-BOT services and custom connections are quoted to scope. Ad spend and third-party usage are separate.</p></div><Link href="/pricing" className="btn btn-outline">Compare plans <ArrowRight size={16} /></Link></div></Container></section>;
@@ -101,7 +102,7 @@ export function ServiceDelivery() {
 
 export function ServiceAudit({ source, focus }: { source: string; focus?: string }) {
   return <section id="audit" className="sx-section sx-audit"><Container><div className="sx-audit-layout">
-    <div className="sx-section-copy"><p className="sx-kicker">Your starting point · {AUDIT_OFFER.priceLabel}</p><h2>Know what to build.<br /><span>Before you commit.</span></h2><p>{focus ? `Discuss your priorities for ${focus}.` : "Start with the process that matters most to your business."} Get a practical recommendation, with written findings within {AUDIT_OFFER.turnaround} of payment.</p><ul className="sx-audit-outputs"><li><FileText size={18} /><div><strong>Opportunity assessment</strong><span>Where work stalls and where a BOT could help.</span></div></li><li><Layers3 size={18} /><div><strong>Recommended workflow</strong><span>The systems, inputs and approvals involved.</span></div></li><li><ArrowRight size={18} /><div><strong>Implementation priorities</strong><span>A clear next decision before investing in a build.</span></div></li></ul><p className="sx-note"><LockKeyhole size={13} /> No charge on submission. Scope and payment confirmed by email.</p></div>
+    <div className="sx-section-copy"><p className="sx-kicker">Your starting point · Request a proposal</p><h2>Know what to build.<br /><span>Before you commit.</span></h2><p>{focus ? `Discuss your priorities for ${focus}.` : "Start with the process that matters most to your business."} Share your team, tools, budget and timeline so we can assess fit and define a practical scope.</p><ul className="sx-audit-outputs"><li><FileText size={18} /><div><strong>Opportunity assessment</strong><span>Where work stalls and where a BOT could help.</span></div></li><li><Layers3 size={18} /><div><strong>Recommended workflow</strong><span>The systems, inputs and approvals involved.</span></div></li><li><ArrowRight size={18} /><div><strong>Implementation priorities</strong><span>A clear next decision before investing in a build.</span></div></li></ul><p className="sx-note"><LockKeyhole size={13} /> No payment required. You approve scope before work begins.</p></div>
     <AuditForm compact source={source} focus={focus} className="sx-audit-form" />
   </div></Container></section>;
 }

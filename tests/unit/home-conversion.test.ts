@@ -11,7 +11,7 @@ describe("homepage conversion contract", () => {
   it("keeps the current setup, monthly and expansion terms on the new homepage", () => {
     const html = renderToStaticMarkup(createElement(HomePage));
     expect(html.match(/<h1[ >]/g)).toHaveLength(1);
-    for (const price of ["$499", "$7,500", "$2,500", "From $15,000", "From $3,500"]) {
+    for (const price of ["$7,500", "$2,500", "From $15,000", "From $3,500"]) {
       expect(html).toContain(price);
     }
     expect(html).toContain("ten BOTS are not included at the starting retainer");
@@ -19,17 +19,14 @@ describe("homepage conversion contract", () => {
     expect(html).toContain('id="audit"');
   });
 
-  it("keeps core intake fields required while optional qualification stays disclosed", () => {
+  it("opens a single qualified proposal flow without a duplicate inline form", () => {
     const html = renderToStaticMarkup(createElement(AuditForm, { compact: true }));
-    expect(html.match(/<input[^>]*required=""/g)).toHaveLength(3);
-    const details = html.match(/<details>([\s\S]*?)<\/details>/)?.[1];
-    expect(details).toContain("Phone");
-    expect(details).toContain("New leads a month");
-    expect(details).not.toContain('required=""');
-    expect(html).toContain("No charge today. Scope confirmed first.");
-    const full = renderToStaticMarkup(createElement(AuditForm));
-    expect(full).not.toContain("<details>");
-    expect(full).toContain("New leads a month");
+    expect(html).toContain('href="/plan"');
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).toContain("Begin Step-1");
+    expect(html).toContain("No payment required.");
+    expect(html).not.toContain("<form");
+    expect(html).not.toContain("$499");
   });
 
   it("identifies the workspace as fictional and exposes only local preview controls", () => {

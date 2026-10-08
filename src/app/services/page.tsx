@@ -4,7 +4,7 @@ import { ServicePortfolio } from "@/components/marketing/ServicePortfolio";
 
 export const metadata: Metadata = {
   title: "Managed BOT services for established contractors",
-  description: "Explore managed AI BOTS for marketing, sales follow-up and customer operations. Built around your existing systems. Start with a $499 workflow audit.",
+  description: "Explore managed AI BOTS for marketing, sales follow-up and customer operations. Built around your existing systems. Request a proposal.",
   alternates: { canonical: "/services" },
 };
 

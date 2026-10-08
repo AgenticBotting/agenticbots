@@ -16,11 +16,11 @@ function pick<T>(items: T[], seed: string, offset = 0): T {
 }
 
 const CTA_BANK = [
-  "The $499 audit includes a written scorecard that is yours to keep.",
+  "Request a proposal around your goals, tools and implementation budget.",
   "No call required before scope confirmation.",
   "Find the operating leaks in this market before committing to implementation.",
   "Your operating constraints are mapped before implementation.",
-  "Written findings arrive within two business days of payment.",
+  "Your goals, tools and budget shape the proposed scope.",
 ];
 
 /* The bank lives on the service record. There is deliberately no

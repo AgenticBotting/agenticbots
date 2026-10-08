@@ -280,7 +280,7 @@ export function JoinBand({
   heading,
   sub,
   source,
-  note = "$499 audit · written findings within two business days of payment",
+  note = "Request a proposal · no payment required",
 }: {
   heading: React.ReactNode;
   sub?: string;

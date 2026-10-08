@@ -2,6 +2,20 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Location-preserving trade and niche navigation — 2026-10-08
+
+State/city industry links now open dedicated local trade, niche and selected-service pages. The journey retains geography, taxonomy and service through buyer specialties, related services, shared header/footer and nearby territories. All 51 state destinations use actual state service routes, including unenriched states. Uses the approved shared design, real catalog guidance and public buyer maps; no fabricated local evidence. New route families validate catalog/geography combinations and render on demand with ten build-time samples. All new intersections remain noindex and outside sitemaps pending distinct-intent/content review; index eligibility remains 584. Details: `docs/LOCAL_INDUSTRY_ROUTING.md`.
+
+Validation: 228 tests across 36 files passed; typecheck passed; lint passed with zero errors and five pre-existing warnings. The final production build passed with 14,123 static outputs. Link integrity, metadata SEO, topic and publication gates passed: 14,077 rendered pages plus 105 dynamic routes, 14,039 acquisition pages and 584 index-eligible destinations. All 179 browser bundle files passed the white-label scan. Browser checks confirmed Buckeye → HVAC → SEO → Commercial HVAC SEO, contextual mega-menu links, 390px layouts without overflow and the local proposal entry. Temporary viewport changes were reset and the QA tab closed. No live email submission, deployment or push occurred.
+
+## Proposal intake and full-width header — 2026-10-08
+
+The owner-approved proposal funnel supersedes the $499 paid audit throughout public entry points, metadata and FAQs. **Begin Step-1** opens a full-screen native dialog, with six short steps collecting priorities/customer mix, team/revenue, current tools, separate setup/monthly budgets, timing/decision role, and reviewed contact details/consent. The existing plan pricing is preserved; below-minimum requests receive a clear fit message. Most responses are quick selections; only name, work email and company require typing. Closing/reopening preserves the in-memory brief. Header logo/actions now sit at opposite viewport gutters with navigation centered.
+
+All existing page entry components lead into the same flow. The proposal API validates allowlisted bounded answers, preserves the full brief in the inbox request, requires explicit consent and excludes qualification/identity fields from analytics. Demo mode blocks external delivery; absent/failed inbox delivery cannot report success. No auto-subscription, paid AI calls, CRM writes or real test messages. The modal is absent from initial page HTML. Architecture and launch prerequisites: `docs/PROPOSAL_INTAKE.md`.
+
+Validation: included in the final 228-test, 36-file suite and successful production gates above. Browser checks covered all six steps through review, exclusive tool choices, low-budget fit messaging, edit/back, draft preservation, Escape/focus return, drawer handoff and 320/390/1280/2560px layouts. Header navigation is centered at 2560px with 48px outer gutters. Email delivery was tested with mocks only; live deliverability remains unexercised. Nothing deployed or pushed.
+
 ## Header legibility and direct contact — 2026-10-08
 
 Replaced the shared header's two large spacer columns with a distributed navigation track inside a balanced 1800px shell. Desktop navigation uses 16px Geist, increasing to 18px on large screens, with higher-contrast labels, visible current-section treatment and 48px targets. The utility bar now shows the owner-supplied 561-717-2777 as a native call link beside email and Contact us. An outlined Text us button sits next to the paid-audit CTA. Links use `tel:+15617172777` and `sms:+15617172777`; the website sends nothing. Shared public details live in `src/config/marketing-contact.ts`.

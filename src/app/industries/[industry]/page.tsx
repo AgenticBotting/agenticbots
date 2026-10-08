@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const industry = getIndustry(slug);
   if (!industry) return {};
   const path = `/industries/${industry.slug}`;
-  return { title: { absolute: agenticSearchTitle("marketing", industry.audience) }, description: `Marketing for ${industry.audience}: SEO, PPC and connected follow-up through managed AI BOTS. Clear scope and human approval. Start with a $499 audit.`, alternates: { canonical: path }, robots: searchRobots(path) };
+  return { title: { absolute: agenticSearchTitle("marketing", industry.audience) }, description: `Marketing for ${industry.audience}: SEO, PPC and connected follow-up through managed AI BOTS. Clear scope and human approval. Request a proposal.`, alternates: { canonical: path }, robots: searchRobots(path) };
 }
 
 export default async function IndustryPage({ params }: Params) {

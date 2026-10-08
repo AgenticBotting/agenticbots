@@ -9,6 +9,10 @@
 
 export type EventName =
   | "cta_clicked"
+  | "proposal_opened"
+  | "proposal_step_completed"
+  | "proposal_completed"
+  | "proposal_received"
   | "plan_flow_opened"
   | "plan_flow_step_completed"
   | "plan_flow_completed"

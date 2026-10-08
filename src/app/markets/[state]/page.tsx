@@ -9,7 +9,6 @@ import { Header, Footer } from "@/components/layout";
 import { JsonLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { MarketHero, MarketPlanning, MarketCoverage, MarketServices, MarketTools, MarketFaq, MarketNearby, marketFaqs } from "@/components/marketing/MarketExperience";
 import { ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
-import { citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
 import { ALL_STATES, allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
 import { regionOf, regionSlug } from "@/lib/geo/regions";
 import { STATE_SEARCH_BRIEFS } from "@/lib/local-search-briefs";
@@ -21,7 +20,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { state } = await params;
   const st = getDatasetState(state);
   if (!st) return {};
-  return { title: { absolute: agenticSearchTitle("marketing", "contractors", st.slug === "district-of-columbia" ? "the District of Columbia" : st.name) }, description: `SEO, PPC and marketing services for contractors in ${st.name}. Managed AI BOTS connect campaigns and follow-up. Start with a $499 workflow audit.`, alternates: { canonical: `/markets/${state}` }, robots: searchRobots(`/markets/${state}`) };
+  return { title: { absolute: agenticSearchTitle("marketing", "contractors", st.slug === "district-of-columbia" ? "the District of Columbia" : st.name) }, description: `SEO, PPC and marketing services for contractors in ${st.name}. Managed AI BOTS connect campaigns and follow-up. Request a proposal.`, alternates: { canonical: `/markets/${state}` }, robots: searchRobots(`/markets/${state}`) };
 }
 export default async function StateMarketPage({ params }: Params) {
   const { state } = await params;
@@ -35,13 +34,12 @@ export default async function StateMarketPage({ params }: Params) {
     groups.get(city.metro_slug)!.items.push({ name: city.city, href: `/markets/${st.slug}/${city.city_slug}`, search: `${st.name} ${st.abbr}` });
   }
   const region = regionOf(st.slug);
-  const serviceState = enrichedCitiesInState(state).length ? state : undefined;
   const siblings = ALL_STATES.filter(item => item.slug !== st.slug && regionOf(item.slug) === region).slice(0, 4);
-  return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }, { name: st.name, path: `/markets/${st.slug}` }]), faqLd(marketFaqs(place))]} /><Header />
+  return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }, { name: st.name, path: `/markets/${st.slug}` }]), faqLd(marketFaqs(place))]} /><Header market={{ state }} />
     <main className="service-experience market-experience">
       <MarketHero eyebrow={`Managed marketing · ${st.name}`} heading="Agentic marketing" accent={`for contractors in ${place}.`} description={`SEO, paid advertising and customer follow-up for the trades in ${st.name}. We build and manage the BOTS behind the work, using your existing systems and approval process.`} place={st.name} areas={cities.slice(0, 4).map(city => city.city)} areaLabel="Local service areas" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets", href: "/markets" }, { name: region, href: `/markets/region/${regionSlug(region)}` }, { name: st.name }]} directory />
       <MarketCoverage heading={`Find your city in ${place}.`} description={`Explore ${cities.length} city ${cities.length === 1 ? "destination" : "destinations"}, grouped by metro. Start locally or discuss a workflow spanning several locations.`} groups={[...groups.values()]} label={`Search ${st.name} cities and metros`} placeholder="City or metro name…"><Link href="#services" className="sx-text-link">View {st.name} services<ArrowRight size={16} /></Link></MarketCoverage>
-      <MarketServices place={place} state={serviceState} /><MarketPlanning place={place} text={STATE_SEARCH_BRIEFS[state]} /><IndustryLinks place={place} /><MarketTools /><ServiceDelivery /><MarketFaq place={place} /><ServiceAudit source={`markets-${st.slug}`} focus={`your business in ${place}`} />
+      <MarketServices place={place} state={state} /><MarketPlanning place={place} text={STATE_SEARCH_BRIEFS[state]} /><IndustryLinks place={place} geo={{ state }} /><MarketTools /><ServiceDelivery /><MarketFaq place={place} /><ServiceAudit source={`markets-${st.slug}`} focus={`your business in ${place}`} />
       <MarketNearby title={`More of the ${region}.`} links={siblings.map(item => ({ name: item.name, href: `/markets/${item.slug}` }))} parent={{ name: `All ${region} markets`, href: `/markets/region/${regionSlug(region)}` }} />
-    </main><Footer /></>;
+    </main><Footer market={{ state }} /></>;
 }

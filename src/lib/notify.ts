@@ -1,3 +1,6 @@
+import "server-only";
+import { assertLive } from "@/server/env";
+
 /**
  * Outbound notification for bot-plan requests.
  *
@@ -14,6 +17,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "hello@agenticbots.dev";
 
 export interface PlanRequest {
+  kind?: "proposal";
   name: string;
   email: string;
   company?: string;
@@ -21,9 +25,14 @@ export interface PlanRequest {
   focus?: string;
   goal?: string;
   source?: string;
+  pagePath?: string;
 }
 
 type SinkResult = { ok: boolean; skipped?: boolean; error?: string };
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
+}
 
 async function toMailerLite(req: PlanRequest): Promise<SinkResult> {
   if (!MAILERLITE_API_KEY) return { ok: true, skipped: true };
@@ -68,15 +77,16 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
     ["Focus", req.focus],
     ["Goal", req.goal],
     ["Source", req.source],
+    ["Page", req.pagePath],
   ].filter(([, v]) => Boolean(v));
 
   const html = `
-    <h2 style="font-family:system-ui;margin:0 0 16px">New bot plan request</h2>
+    <h2 style="font-family:system-ui;margin:0 0 16px">${req.kind === "proposal" ? "New BOT implementation proposal request" : "New BOT plan request"}</h2>
     <table style="font-family:system-ui;font-size:14px;border-collapse:collapse">
       ${rows
         .map(
           ([k, v]) =>
-            `<tr><td style="padding:6px 16px 6px 0;color:#6B7A8C">${k}</td><td style="padding:6px 0"><strong>${v}</strong></td></tr>`
+            `<tr><td style="padding:6px 16px 6px 0;color:#6B7A8C">${escapeHtml(k ?? "")}</td><td style="padding:6px 0;white-space:pre-line"><strong>${escapeHtml(v ?? "")}</strong></td></tr>`
         )
         .join("")}
     </table>`;
@@ -92,7 +102,7 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
         from: FROM_EMAIL,
         to: CONTACT_EMAIL,
         reply_to: req.email,
-        subject: `Bot plan request — ${req.name}${req.company ? ` (${req.company})` : ""}`,
+        subject: `${req.kind === "proposal" ? "BOT proposal request" : "BOT plan request"} — ${req.name}${req.company ? ` (${req.company})` : ""}`,
         html,
       }),
     });
@@ -113,6 +123,14 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
  * visitor read a success message for a request that reached no one.
  */
 export async function deliverPlanRequest(req: PlanRequest): Promise<{ ok: boolean }> {
+  assertLive("deliver website enquiry");
+  if (req.kind === "proposal") {
+    // The complete qualification brief must reach the inbox. A subscriber-only
+    // sink drops these answers and would imply marketing consent not given here.
+    if (!RESEND_API_KEY) return { ok: false };
+    const result = await toInbox(req);
+    return { ok: result.ok && !result.skipped };
+  }
   const [list, inbox] = await Promise.all([toMailerLite(req), toInbox(req)]);
 
   for (const [label, r] of [["mailerlite", list], ["resend", inbox]] as const) {

@@ -1,9 +1,11 @@
+import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
+import { localDirectoryHref, marketServiceHref, type MarketNavigation } from "@/lib/local-market-paths";
 import { Mail, ArrowRight } from "lucide-react";
 import { Logo, BotPattern } from "@/components/ui";
 import { CATALOG, serviceHref } from "@/lib/catalog";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { PROPOSAL_OFFER } from "@/config/marketing-offer";
 
 const COMPANY = [
   { label: "Industries", href: "/industries" },
@@ -20,7 +22,7 @@ const LEGAL = [
   { label: "Site map", href: "/site-map" },
 ];
 
-export function Footer() {
+export function Footer({ market }: { market?: MarketNavigation } = {}) {
   const year = new Date().getFullYear();
 
   return (
@@ -62,7 +64,7 @@ export function Footer() {
                 {pillar.categories.map((c) => (
                   <li key={c.slug}>
                     <Link
-                      href={serviceHref(c)}
+                      href={market ? marketServiceHref(serviceHref(c).split("/")[2], market) : serviceHref(c)}
                       className="text-[13.5px] text-ink-300 hover:text-white transition-colors"
                     >
                       {c.name}
@@ -108,7 +110,7 @@ export function Footer() {
               {COMPANY.map((l) => (
                 <li key={l.href}>
                   <Link
-                    href={l.href}
+                    href={market && l.href === "/industries" ? localDirectoryHref(market) : l.href}
                     className="text-[13.5px] text-ink-300 hover:text-white transition-colors"
                   >
                     {l.label}
@@ -124,13 +126,13 @@ export function Footer() {
           <div>
             <p className="display-md text-white">Find your first BOT opportunity.</p>
             <p className="text-[13.5px] text-ink-400 mt-1.5">
-              A focused operating review with written findings within two business days of payment.
+              Tell us your priorities, tools and budget. We’ll review the fit and next step.
             </p>
           </div>
-          <Link href="/#audit" className="btn btn-primary shrink-0">
-            {AUDIT_OFFER.cta}
+          <ProposalLink className="btn btn-primary shrink-0">
+            {PROPOSAL_OFFER.cta}
             <ArrowRight className="w-4 h-4" />
-          </Link>
+          </ProposalLink>
         </div>
 
         <div className="pt-8 border-t border-ink-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -142,7 +144,7 @@ export function Footer() {
             {LEGAL.map((l) => (
               <li key={l.href}>
                 <Link
-                  href={l.href}
+                  href={market && l.href === "/industries" ? localDirectoryHref(market) : l.href}
                   className="text-[12.5px] text-ink-400 hover:text-ink-200 transition-colors"
                 >
                   {l.label}

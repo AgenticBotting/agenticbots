@@ -141,7 +141,7 @@ export function MarketSearch({
       {q.trim().length >= 2 && hits.length === 0 && (
         <p className={cn("absolute inset-x-0 top-full z-10 border border-t-0 px-4 py-3 text-[13px] shadow-mega",
           dark ? "border-[var(--header-line)] bg-[var(--header-bar)] text-ink-400" : "border-[var(--border-strong)] bg-white text-[var(--text-secondary)]")}>
-          No match yet. Tell us where you operate and we&apos;ll confirm coverage during the $499 workflow audit.
+          No match yet. Tell us where you operate and we&apos;ll confirm coverage during proposal scoping.
         </p>
       )}
     </div>

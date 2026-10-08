@@ -1,11 +1,10 @@
 /** Public commercial terms. Shared by the homepage and pricing page. */
-export const AUDIT_OFFER = {
-  name: "BOT workflow audit",
-  price: 499,
-  priceLabel: "$499",
-  turnaround: "two business days",
-  cta: "Request a $499 workflow audit",
-  shortCta: "BOT audit · $499",
+export const PROPOSAL_OFFER = {
+  name: "BOT implementation proposal",
+  cta: "Begin Step-1",
+  shortCta: "Begin Step-1",
+  note: "No payment required. Scope and pricing agreed before work begins.",
+  description: "Tell us your priorities, tools, team, budget and preferred timeline. We review the fit, then follow up about the scope and next step. No payment is required to request a proposal.",
 } as const;
 
 export const MARKETING_PLANS = [
@@ -41,5 +40,5 @@ export const PRICING_FAQ = [
   { q: "What does the retainer cover?", a: "Operating and maintaining the agreed system: monitoring, tuning, issue handling and reporting. Included usage, integrations and support are written into your proposal so you can see exactly what is covered." },
   { q: "Are ad spend and usage charges included?", a: "Ad spend is separate and paid through your own accounts. Third-party usage charges and any included allowance are specified in the proposal. Additional paid usage requires approval." },
   { q: "What stays under my control?", a: "Your customer relationships and business accounts remain yours. Access, approval rules, data handling and the handover process are defined before launch. Sending, publishing, changing ads and writing to connected systems require human approval." },
-  { q: "Do I need to choose a package now?", a: `No. The ${AUDIT_OFFER.priceLabel} ${AUDIT_OFFER.name} identifies a credible starting workflow before you select an implementation package. You receive written findings within ${AUDIT_OFFER.turnaround}. Implementation timing is confirmed after we understand your scope.` },
+  { q: "Do I need to choose a package now?", a: "No. Begin with a proposal request. Share your goals, tools, team, budget and timeline so we can review fit and define the right starting scope. You approve the proposal before implementation begins." },
 ];

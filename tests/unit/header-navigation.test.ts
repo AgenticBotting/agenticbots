@@ -7,7 +7,7 @@ const route = vi.hoisted(() => ({ pathname: "/industries/niches/commercial-roofi
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
 
 describe("public header navigation", () => {
-  it("offers distinct call, text, contact and paid-audit paths without precomposing a message", () => {
+  it("offers distinct call, text, contact and proposal paths without precomposing a message", () => {
     const html = renderToStaticMarkup(createElement(Header));
     expect(html).toContain('href="tel:+15617172777"');
     expect(html).toContain('aria-label="Call 561-717-2777"');
@@ -16,8 +16,8 @@ describe("public header navigation", () => {
     expect(html).not.toContain("sms:+15617172777?");
     expect(html).toContain('href="mailto:hello@agenticbots.dev"');
     expect(html).toContain('href="/contact"');
-    expect(html).toContain('href="/#audit"');
-    expect(html).toContain("BOT audit · $499");
+    expect(html).toContain('href="/plan"');
+    expect(html).toContain("Begin Step-1");
   });
 
   it("retains outcome/location menus and exposes industries and the blog once in primary navigation", () => {

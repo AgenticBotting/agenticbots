@@ -3,6 +3,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { deliverPlanRequest } from "@/lib/notify";
 import { acquisitionEventContext } from "@/lib/acquisition-attribution";
 import { trackServer } from "@/lib/analytics";
+import { proposalBrief, proposalRequestSchema } from "@/lib/proposal-intake";
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
@@ -37,6 +38,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
   const b = body as Record<string, unknown>;
+  // Intentionally public acquisition endpoint: no tenant records are read or mutated.
+  // A visitor must explicitly submit a complete, consented brief; no automatic outreach.
+  if (b.kind === "proposal") {
+    const parsed = proposalRequestSchema.safeParse(b);
+    if (!parsed.success) return NextResponse.json({ error: "Please complete the required choices and contact details, then agree to be contacted about your request." }, { status: 400 });
+    const lead = parsed.data;
+    try {
+      const { ok } = await deliverPlanRequest({
+        kind: "proposal", name: lead.name, email: lead.email, company: lead.company,
+        website: lead.website, focus: lead.focus || "BOT implementation proposal",
+        goal: proposalBrief(lead.qualification, lead.phone), source: lead.source,
+        pagePath: acquisitionEventContext(lead.pagePath, undefined).page,
+      });
+      if (!ok) return NextResponse.json({ error: "We couldn’t deliver your request. Your answers are still here. Please retry or email hello@agenticbots.dev." }, { status: 502 });
+      await trackServer("proposal_received", { ...acquisitionEventContext(lead.pagePath, lead.landingPath), request_received: true });
+      return NextResponse.json({ success: true });
+    } catch {
+      return NextResponse.json({ error: "We couldn’t deliver your request. Please retry or contact us directly." }, { status: 503 });
+    }
+  }
+  if (b.kind !== undefined) return NextResponse.json({ error: "Invalid request type." }, { status: 400 });
   const name = str(b.name, 120);
   const email = str(b.email, 200);
   const company = str(b.company, 160);

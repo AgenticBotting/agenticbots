@@ -43,12 +43,12 @@ export default async function StateHub({ params }: Params) {
   const path = `/services/${svc.serviceSlug}/${st.slug}`;
   const faqs = [
     { q: `How do you deliver ${svc.name.toLowerCase()} across ${st.name}?`, a: `${positioning.deliveryModel}. The service can be delivered remotely across ${st.name}. Your proposal defines the systems, data and local context included in the engagement.` },
-    { q: "Do I need different software?", a: "We plan around your existing tools. The audit checks the access, connection requirements and custom work involved before implementation." },
+    { q: "Do I need different software?", a: "We plan around your existing tools. Scoping checks the access, connection requirements and custom work involved before implementation." },
     { q: "What remains under my control?", a: `${positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.` },
   ];
   return <>
     <JsonLd data={[serviceLd({ name: `${search.title} in ${st.name}`, serviceType: search.label, description: search.introduction, path, areaServed: st.name }), breadcrumbLd([{ name: "Home", path: "/" }, { name: svc.serviceName, path: `/services/${svc.serviceSlug}` }, { name: st.name, path }]), faqLd(faqs)]} />
-    <Header /><main className="service-experience">
+    <Header market={{ state }} /><main className="service-experience">
       <ServiceHero svc={svc} location={st.name} breadcrumb={<><Link href="/">Home</Link><span>/</span><Link href={`/services/${svc.serviceSlug}`}>{svc.name}</Link><span>/</span><span>{st.name}</span></>} />
       <ServiceBenefits svc={svc} />
       <ServiceBuyerBrief svc={svc} location={st.name} />
@@ -56,8 +56,8 @@ export default async function StateHub({ params }: Params) {
       <section className="sx-section"><Container><div className="sx-section-heading"><p className="sx-kicker">Local coverage · {cities.length} city destinations</p><h2>{svc.name},<br /><span>across {st.name}.</span></h2><p>Explore your metro and city. Local context informs the plan; your systems and business priorities define the implementation.</p></div><div className="sx-market-links">{metros.map(([metro, list]) => <div key={metro} className="sx-market-group"><h3>{metro} metro</h3><ul>{list.map(city => <li key={city.city_slug}><Link href={`${path}/${city.city_slug}`}>{city.city}</Link></li>)}</ul></div>)}</div></Container></section>
       <ServiceConnections svc={svc} /><ServiceDelivery />
       <section className="sx-section"><Container><div className="sx-faq-layout"><div className="sx-section-copy"><p className="sx-kicker">Questions about delivery</p><h2>Built around<br /><span>your business in {st.name}.</span></h2><p>A local service area, a clearly defined scope, and one team managing the work.</p></div><FaqAccordion items={faqs} /></div></Container></section>
-      <IndustryLinks service={svc.slug} place={st.name} />
+      <IndustryLinks service={svc.slug} place={st.name} geo={{ state }} />
       <ServiceAudit source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={`${svc.name} in ${st.name}`} />
-    </main><Footer />
+    </main><Footer market={{ state }} />
   </>;
 }
