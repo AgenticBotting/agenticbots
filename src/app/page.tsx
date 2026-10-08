@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Fingerprint, Layers3, Settings2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, Fingerprint, Layers3 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container } from "@/components/ui/Container";
@@ -8,6 +8,8 @@ import { AuditForm } from "@/components/marketing/AuditForm";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { BotWorkflowStory } from "@/components/marketing/BotWorkflowStory";
 import { PricingCards } from "@/components/marketing/PricingCards";
+import { ServicePlatformConstellation } from "@/components/marketing/ServicePlatformConstellation";
+import { StackStrip } from "@/components/marketing/GeoSections";
 import { CoverageSystemVisual, HeroSystemVisual } from "@/components/marketing/WorkforceSystemVisuals";
 import { AUDIT_OFFER, formatPlanPrice, MARKETING_PLANS } from "@/config/marketing-offer";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
@@ -31,23 +33,38 @@ const HOME_FAQ = [
 
 function Hero() {
   return (
-    <section className="workforce-hero">
+    <section className="workforce-hero home-command-hero">
       <Container>
         <div className="workforce-hero-shell">
-          <div className="hero-copy">
-            <p className="eyebrow mb-6">Managed automation for established contractors</p>
-            <h1>Your operating model, extended by a <span>BOT workforce.</span></h1>
-            <p className="body-lg mt-6">We design, deploy and operate specialized BOTS across demand generation, revenue operations and customer lifecycle workflows—within your existing systems and controls.</p>
-            <div className="hero-actions mt-8"><a href="#audit" className="btn btn-primary">{AUDIT_OFFER.cta} <ArrowRight size={17} /></a><a href="#demo" className="hero-demo-link">Review the operating model <ArrowRight size={16} /></a></div>
-            <p className="body-sm mt-5">Begin with one governed workflow. Expand into a coordinated operating system.</p>
+          <div className="home-command-intro">
+            <div className="hero-copy">
+              <p className="eyebrow mb-6">Managed automation for established contractors</p>
+              <h1>Your operating model, extended by a <span>BOT workforce.</span></h1>
+            </div>
+            <div className="home-command-brief">
+              <p className="body-lg">We design, deploy and operate specialized BOTS across demand generation, revenue operations and customer lifecycle workflows—within your existing systems and controls.</p>
+              <div className="hero-actions mt-8">
+                <a href="#audit" className="btn btn-primary">{AUDIT_OFFER.cta} <ArrowRight size={17} /></a>
+                <a href="#demo" className="hero-demo-link">Review the operating model <ArrowRight size={16} /></a>
+              </div>
+              <dl className="home-command-facts">
+                <div><dt>Entry point</dt><dd>One governed workflow</dd></div>
+                <div><dt>Scale path</dt><dd>Coordinated multi-BOT system</dd></div>
+                <div><dt>Operating model</dt><dd>Managed continuously</dd></div>
+              </dl>
+            </div>
           </div>
           <div className="home-hero-stage">
             <span className="home-hero-halo" aria-hidden="true" />
-            <HeroSystemVisual />
+            <div className="home-system-layout">
+              <ServicePlatformConstellation serviceName="Revenue operating system" />
+              <HeroSystemVisual />
+            </div>
             <dl className="home-hero-proof">
-              <div><dt><Layers3 size={15} /> Systems</dt><dd>Scoped integrations</dd></div>
-              <div><dt><ShieldCheck size={15} /> Authority</dt><dd>Human approval gates</dd></div>
-              <div><dt><Settings2 size={15} /> Operation</dt><dd>Managed continuously</dd></div>
+              <div><dt>01 · Mandate</dt><dd>Defined workflow ownership</dd></div>
+              <div><dt>02 · Systems</dt><dd>Scoped connections and access</dd></div>
+              <div><dt>03 · Authority</dt><dd>Human approval gates</dd></div>
+              <div><dt>04 · Activity</dt><dd>Reviewable operating record</dd></div>
             </dl>
           </div>
         </div>
@@ -63,7 +80,34 @@ function ManagedSystem() {
     { title: "Revenue execution", copy: "Connect response, follow-through, CRM administration and proposal workflows while preserving defined approval authority.", href: "/sales", label: "Review revenue-operations BOTS", roles: "Inbound · Outbound · CRM · Proposals" },
     { title: "Management visibility", copy: "Bring operating activity, exceptions and outcomes into a consistent review process that supports accountable decisions.", href: "/services/agentic-analytics", label: "Review analytics operations", roles: "Analytics · Reputation · Reactivation" },
   ];
-  return <section className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro"><h2 className="display-xl max-w-[21ch]">One operating layer.<br /><span className="em-green">Across the revenue lifecycle.</span></h2><p className="body-lg max-w-[45ch]">Demand generation, sales execution and customer operations share data, decisions and handoffs. We engineer the workflow between them and remain accountable for its operation.</p></div><div className="system-outcomes">{jobs.map((job, index) => <article key={job.title}><span className="system-index">0{index + 1}</span><h3 className="display-lg">{job.title}</h3><p className="body-base mt-4">{job.copy}</p><p className="system-roles">{job.roles}</p><Link href={job.href} className="inline-flex items-center gap-2 text-[14px] font-semibold">{job.label}<ArrowRight size={16} /></Link></article>)}</div></Container></section>;
+  return (
+    <section className="home-operating-system section-pad border-b border-[var(--border)]">
+      <Container>
+        <div className="home-operating-layout">
+          <div className="home-operating-heading">
+            <p className="eyebrow mb-5">Coordinated operating system</p>
+            <h2 className="display-xl max-w-[21ch]">One operating layer across the <span className="em-green">revenue lifecycle.</span></h2>
+            <p className="body-lg mt-6 max-w-[42ch]">Demand generation, sales execution and customer operations share data, decisions and handoffs. We engineer the workflow between them and remain accountable for its operation.</p>
+            <Link href="/services" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-7">Review all service mandates <ArrowRight size={16} /></Link>
+          </div>
+          <ol className="home-operating-lanes">
+            {jobs.map((job, index) => (
+              <li key={job.title}>
+                <span className="system-index">0{index + 1}</span>
+                <div>
+                  <p className="home-operating-status">Managed mandate</p>
+                  <h3 className="display-lg">{job.title}</h3>
+                  <p className="body-base mt-3">{job.copy}</p>
+                  <p className="system-roles">{job.roles}</p>
+                </div>
+                <Link href={job.href} aria-label={job.label}><ArrowRight size={18} /></Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </Container>
+    </section>
+  );
 }
 
 function Governance() {
@@ -96,5 +140,5 @@ function Audit() {
 }
 
 export default function HomePage() {
-  return <><JsonLd data={[faqLd(HOME_FAQ)]} /><Header /><main><Hero /><BotWorkflowStory /><ManagedSystem /><Governance /><WhoFor /><Delivery /><section id="pricing" className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro mb-12"><h2 className="display-xl max-w-[20ch]">A controlled entry point.<br /><span className="em-green">A system designed to scale.</span></h2><p className="body-lg max-w-[45ch]">Select the initial operating mandate. Expand only after the workflow is stable, governed and producing reviewable activity.</p></div><PricingCards /><Link href="/pricing" className="inline-flex items-center gap-2 mt-6 text-[14px] font-semibold">Review commercial terms and scope <ArrowRight size={16} /></Link></Container></section><Founding /><section className="section-pad border-b border-[var(--border)]"><Container><div className="grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-10 lg:gap-16"><h2 className="display-xl max-w-[18ch]">Commercial and<br />operating questions.</h2><FaqAccordion items={HOME_FAQ} /></div></Container></section><Audit /><section className="section-pad-sm border-t border-[var(--border)] bg-[var(--bg-alt)]"><Container><div className="coverage-intro"><div><h2 className="display-md">National delivery. Local market context.</h2><p className="body-sm mt-3">Managed deployments for established contractors across the United States.</p></div><Link href="/markets" className="inline-flex items-center gap-2 text-[14px] font-semibold">Review market coverage <ArrowRight size={16} /></Link></div><ul className="coverage-links">{REGIONS.map((region) => <li key={region}><Link href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link></li>)}</ul></Container></section></main><Footer /></>;
+  return <><JsonLd data={[faqLd(HOME_FAQ)]} /><Header /><main className="home-overhaul"><Hero /><StackStrip tools={["Client-owned systems", "Workflow policy", "BOT orchestration", "Approval queue", "BOT ACTIVITY", "Management reporting"]} label="Managed operating architecture" /><ManagedSystem /><BotWorkflowStory /><Governance /><WhoFor /><Delivery /><section id="pricing" className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro mb-12"><h2 className="display-xl max-w-[20ch]">A controlled entry point.<br /><span className="em-green">A system designed to scale.</span></h2><p className="body-lg max-w-[45ch]">Select the initial operating mandate. Expand only after the workflow is stable, governed and producing reviewable activity.</p></div><PricingCards /><Link href="/pricing" className="inline-flex items-center gap-2 mt-6 text-[14px] font-semibold">Review commercial terms and scope <ArrowRight size={16} /></Link></Container></section><Founding /><section className="section-pad border-b border-[var(--border)]"><Container><div className="grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-10 lg:gap-16"><h2 className="display-xl max-w-[18ch]">Commercial and<br />operating questions.</h2><FaqAccordion items={HOME_FAQ} /></div></Container></section><Audit /><section className="section-pad-sm border-t border-[var(--border)] bg-[var(--bg-alt)]"><Container><div className="coverage-intro"><div><h2 className="display-md">National delivery. Local market context.</h2><p className="body-sm mt-3">Managed deployments for established contractors across the United States.</p></div><Link href="/markets" className="inline-flex items-center gap-2 text-[14px] font-semibold">Review market coverage <ArrowRight size={16} /></Link></div><ul className="coverage-links">{REGIONS.map((region) => <li key={region}><Link href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link></li>)}</ul></Container></section></main><Footer /></>;
 }

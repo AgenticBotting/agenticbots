@@ -61,6 +61,8 @@ The service canvas now presents the surrounding software landscape as part of th
 
 Service-page hierarchy is also denser: larger hero and section typography, shorter vertical gaps, a wider two-part product canvas, more visible technical gridwork and restrained transform-only floating motion. The operating view and platform map now appear together, followed by the existing mandate, execution, transition, governance and audit chapters. Mobile replaces the orbit with a compact two-column system grid, and reduced-motion preferences disable the ambient movement.
 
+The homepage now shares that service-page product language. The centered marketing hero has been replaced by an asymmetric operating brief and a wide two-part canvas that combines the representative software landscape with the governed workflow UI. A four-column deployment record and architecture strip establish the system before the page moves into three stacked operating-mandate lanes. The overview now precedes the detailed workflow walkthrough, so visitors understand what the platform covers before exploring how one workflow runs. Tablet and mobile layouts collapse the hero brief, canvas and operating lanes into a deliberate single-column sequence.
+
 ## Validation
 
 - `npm run typecheck` passed. `npm run lint` passed with zero errors. `npm test` passed.
@@ -82,6 +84,7 @@ Service-page hierarchy is also denser: larger hero and section typography, short
 - The restoration of the original Geist typography passed the same typecheck, lint, 174-test and full Webpack production-build suite. All 13,753 static outputs generated; link integrity, metadata uniqueness and topic gates passed.
 - Product-canvas homepage and service layouts passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 173 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
 - Service system constellations and the denser service hierarchy passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 174 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
+- The homepage product-system overhaul passed `npm run typecheck`, `npm run lint` with zero errors and the same five existing warnings, all 174 tests, and the full Webpack production build. All 13,753 static outputs generated; link integrity passed for 13,707 prerendered routes plus 100 dynamic routes, SEO checks passed, and the 13-service/521-page topic gate passed.
 
 ## Follow-on evidence work
 

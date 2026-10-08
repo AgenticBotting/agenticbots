@@ -20,6 +20,8 @@ The homepage and national service heroes now follow a product-canvas narrative: 
 
 The service product canvas now pairs each operating view with a service-specific system constellation. Every one of the 13 mandates maps six familiar platforms around the governed BOT workflow; the portfolio page shows a cross-service set. Brand SVGs are rendered locally where the installed icon set supplies them, with restrained typographic marks elsewhere. The UI calls these “common systems in scope” and states that exact access, connection method and write authority are confirmed during the paid audit, so the visual does not claim every connection is already native or certified. Service hero and section typography is larger, the vertical rhythm is tighter, and a visible technical grid gives the light pages more product depth without returning to dark hero backgrounds.
 
+The homepage now uses the same product-system depth as the national service pages. Its hero is an asymmetric operating brief followed by a two-part technical canvas: a representative platform constellation and the governed workflow interface. A four-part mandate/systems/authority/activity record and an architecture strip establish the operating model before the page moves into three stacked service-mandate lanes and the detailed workflow demonstration. The lower governance, audience, delivery, pricing, FAQ, audit and national-coverage sections remain intact.
+
 ## 1. Where things are
 
 | | |
