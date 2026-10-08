@@ -4,7 +4,13 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
-## Latest marketing update — 2026-10-06
+## Latest marketing update — 2026-10-08
+
+The approved homepage design now extends across the service directory, Marketing and Sales portfolios, all 13 national service pages, and state/city service variants. The current service sequence is: benefit-led hero → interactive fictional task workspace → three service-specific benefits → actual deliverables and approval boundary → relevant tools → delivery and investment → FAQ → compact $499 audit form. Existing regional, city, nearby-market and related-service destinations remain available. Local character/vignettes, canonical URLs and indexability rules are retained. The previous service chart, deployment-profile and repeated governance layouts described below are superseded by this shared implementation in `ServiceExperience`, `ServiceWorkspace`, `ServicePortfolio` and `service-experience.css`. New copy/examples live in `src/lib/service-experience.ts`; backend-aligned scope and authority still come from `service-positioning.ts`.
+
+Homepage buttons now use a 3px radius (previously 7px); service buttons match. Original Geist, the approved homepage layout, existing navigation and commercial terms are preserved. The illustrative workspace is local-only and manually controlled, with no external calls. Per-service platform references reuse bundled marks and retain the integration-scoping caveat. Browser review now works and covered desktop, tablet and narrow mobile layouts, task selection, audit anchors, native form validation and optional qualification fields without submitting a real lead. See `docs/SERVICE_DESIGN_AUDIT.md` and `docs/MARKETING_BUILD_STATUS.md` for this pass and verification.
+
+### Earlier marketing foundation
 
 The public service architecture is now aligned to the backend catalog. The platform has **10 deployable BOT types and 9 versioned skills**; the website presents **13 managed service mandates** that combine those BOTS, skills, integrations and human operating work. Email, conversion optimization and inbound response are explicitly described as cross-BOT or BOT-plus-implementation mandates rather than invented standalone BOT types. National, state and city service pages, market pages, navigation, forms, contact, plan, blog and social-card copy now use enterprise procurement language: defined mandate, scoped authority, approval gates and recorded BOT ACTIVITY. Synthetic KPI charts, universal response-time/availability promises and assumed integrations were removed from the active sales surfaces. The source-of-truth audit and full service mapping are in `docs/SERVICE_CAPABILITY_AUDIT.md`.
 

@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
-import { Container, Section } from "@/components/ui";
-import { PlanCta, StatSplit, FaqAccordion, SecurityBlock, AuditForm, OfferVisual } from "@/components/marketing";
+import { Container } from "@/components/ui";
+import { FaqAccordion } from "@/components/marketing/FaqAccordion";
+import { ServiceHero, ServiceBenefits, ServiceScope, ServiceConnections, ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
 import { citiesInState } from "@/lib/geo/data";
 import { ALL_SERVICES, getService } from "@/lib/catalog";
-import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
-import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { ALL_STATES, allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
 import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ slug: string; state: string }> };
@@ -38,147 +38,24 @@ export default async function StateHub({ params }: Params) {
   const svc = getService(slug); const st = getDatasetState(state);
   if (!svc || !st) notFound();
   const positioning = getServicePositioning(svc.slug);
-  const all = allCitiesInState(state);
-  const metroCount = new Set(all.map((c) => c.metro)).size;
+  const cities = allCitiesInState(state);
+  const metros = [...new Map(cities.map(c => [c.metro, cities.filter(x => x.metro === c.metro)])).entries()];
   const path = `/services/${svc.serviceSlug}/${st.slug}`;
-
-  /* Composite, state-distinct FAQ — the same technique the city tier uses
-     (real numbers computed for this record, not a paragraph copied from
-     the hub). Kept to three: this tier's job is breadth and trust, the
-     hub already carries the full set. */
   const faqs = [
-    {
-      q: `How is ${svc.serviceName.toLowerCase()} delivered across ${st.name}?`,
-      a: `${positioning.deliveryModel}. The operating model can be delivered remotely across ${st.name}; the proposal defines the systems, data and market context included for your organization.`,
-    },
-    {
-      q: `Which systems are included?`,
-      a: `Only the systems named in the approved scope. We confirm access, data boundaries and integration requirements before implementation rather than assuming every account uses the same stack.`,
-    },
-    {
-      q: `How is authority controlled?`,
-      a: positioning.boundary,
-    },
+    { q: `How do you deliver ${svc.name.toLowerCase()} across ${st.name}?`, a: `${positioning.deliveryModel}. The service can be delivered remotely across ${st.name}. Your proposal defines the systems, data and local context included in the engagement.` },
+    { q: "Do I need different software?", a: "We plan around your existing tools. The audit checks the access, connection requirements and custom work involved before implementation." },
+    { q: "What remains under my control?", a: `${positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.` },
   ];
-
-  return (
-    <>
-      <JsonLd data={[
-        serviceLd({
-          name: `${svc.serviceName} in ${st.name}`,
-          description: positioning.summary,
-          path,
-          areaServed: st.name,
-        }),
-        breadcrumbLd([
-          { name: "Home", path: "/" },
-          { name: svc.serviceName, path: `/services/${svc.serviceSlug}` },
-          { name: st.name, path },
-        ]),
-        faqLd(faqs),
-      ]} />
-      <Header />
-      <main>
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-16">
-            <nav className="mb-8 flex items-center gap-2 text-[12.5px] text-[var(--text-muted)]">
-              <Link href="/" className="hover:text-[var(--foreground)]">Home</Link><span>/</span>
-              <Link href={`/services/${svc.serviceSlug}`} className="hover:text-[var(--foreground)]">{svc.serviceName}</Link><span>/</span>
-              <span className="text-[var(--text-body)]">{st.name}</span>
-            </nav>
-            <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
-            <div>
-            <p className="eyebrow mb-5">{svc.serviceName} <span className="eyebrow-dim">· {st.name} · {all.length} cities</span></p>
-            <h1 className="display-hero max-w-[20ch] text-balance">
-              {svc.serviceName} across {st.name}.
-            </h1>
-            {/* `geoIntro` — the lede authored specifically for state/city
-                tiers, distinct from the hub's national `intro`. Wiring it up
-                here for the first time; the page previously fell back to a
-                generic templated sentence that said the same thing on all
-                663 state pages regardless of service. */}
-            <p className="body-lg mt-6 max-w-[54ch]">{positioning.lead} Local market context informs the operating case; your systems, policy and acceptance criteria define the build.</p>
-            <div className="mt-8 cta-row">
-              <PlanCta source={`state-${svc.serviceSlug}-${st.slug}`} />
-              <Link href={`/services/${svc.serviceSlug}`} className="btn btn-outline">
-                <span className="sm:hidden">Full service page</span>
-                <span className="hidden sm:inline">Review the national service mandate</span>
-              </Link>
-            </div>
-            </div>
-            <OfferVisual slug={svc.slug} />
-            </div>
-          </Container>
-        </section>
-
-        {/* Real numbers for this state, not the hub's national metrics —
-            the same StatSplit component the hub and city tiers already use,
-            so the visual language is consistent top to bottom. */}
-        <StatSplit
-          eyebrow="This state"
-          heading={<>A national operating model with <span className="em-green">{st.name} context.</span></>}
-          body={`${positioning.summary} Location pages organize the markets we serve; the actual mandate is configured around your organization, systems and authority model.`}
-          stats={[
-            { value: String(all.length), label: `${st.name} cities covered` },
-            { value: String(metroCount), label: metroCount === 1 ? "Metro area" : "Metro areas" },
-            { value: "Scoped", label: "Systems, data and authority" },
-            { value: "Recorded", label: "BOT ACTIVITY and decisions" },
-          ]}
-          source={`state-${svc.serviceSlug}-${st.slug}-statsplit`}
-          note={`${svc.serviceName} · ${positioning.deliveryModel}.`}
-        />
-
-        <Section variant="alt" eyebrow={`${all.length} cities`} heading={`${svc.serviceName} across ${st.name}.`}
-          sub="Grouped by metro — every city links to its own service page.">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[...new Map(all.map((c) => [c.metro, all.filter((x) => x.metro === c.metro)])).entries()].map(([metro, list]) => (
-              <div key={metro} className="border border-[var(--border)] bg-white p-5">
-                <p className="flex items-baseline justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--border)]">
-                  <span className="display-md !text-[15px]">{metro} metro</span>
-                  <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                    {list.length} {list.length > 1 ? "cities" : "city"}
-                  </span>
-                </p>
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-                  {list.map((c) => (
-                    <li key={c.city_slug}>
-                      <Link
-                        href={`/services/${svc.serviceSlug}/${st.slug}/${c.city_slug}`}
-                        className="group flex items-center gap-1.5 py-1 text-[13px] text-[var(--text-body)] hover:text-[var(--accent-text)] transition-colors"
-                      >
-                        <span className="truncate">{c.city}</span>
-                        {isEnriched(c.state_slug, c.city_slug) && (
-                          <span className="h-1.5 w-1.5 shrink-0 bg-accent-500" title="Focus market" />
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* Trust — the same governance block the hub runs. Generic, no
-            service-specific terms (verified against owns/excludes), so it
-            carries zero cannibalization risk repeated at state scale. */}
-        <SecurityBlock />
-
-        <Section variant="light" eyebrow="Questions" heading={`${svc.serviceName} in ${st.name}, specifically.`}>
-          <div className="max-w-[760px]"><FaqAccordion items={faqs} /></div>
-        </Section>
-
-        <Section
-          id="audit"
-          variant="alt"
-          eyebrow={`${AUDIT_OFFER.priceLabel} BOT workflow audit`}
-          heading={`Define the ${st.name} operating case for ${svc.serviceName}.`}
-          sub={`We review the public customer journey, identify a defensible starting mandate and document the next decision. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment.`}
-        >
-          <AuditForm source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={svc.serviceName} />
-        </Section>
-      </main>
-      <Footer />
-    </>
-  );
+  return <>
+    <JsonLd data={[serviceLd({ name: `${svc.serviceName} in ${st.name}`, description: positioning.summary, path, areaServed: st.name }), breadcrumbLd([{ name: "Home", path: "/" }, { name: svc.serviceName, path: `/services/${svc.serviceSlug}` }, { name: st.name, path }]), faqLd(faqs)]} />
+    <Header /><main className="service-experience">
+      <ServiceHero svc={svc} location={st.name} breadcrumb={<><Link href="/">Home</Link><span>/</span><Link href={`/services/${svc.serviceSlug}`}>{svc.name}</Link><span>/</span><span>{st.name}</span></>} />
+      <ServiceBenefits svc={svc} />
+      <ServiceScope svc={svc} />
+      <section className="sx-section"><Container><div className="sx-section-heading"><p className="sx-kicker">Local coverage · {cities.length} city destinations</p><h2>{svc.name},<br /><span>across {st.name}.</span></h2><p>Explore your metro and city. Local context informs the plan; your systems and business priorities define the implementation.</p></div><div className="sx-market-links">{metros.map(([metro, list]) => <div key={metro} className="sx-market-group"><h3>{metro} metro</h3><ul>{list.map(city => <li key={city.city_slug}><Link href={`${path}/${city.city_slug}`}>{city.city}</Link></li>)}</ul></div>)}</div></Container></section>
+      <ServiceConnections svc={svc} /><ServiceDelivery />
+      <section className="sx-section"><Container><div className="sx-faq-layout"><div className="sx-section-copy"><p className="sx-kicker">Questions about delivery</p><h2>Built around<br /><span>your business in {st.name}.</span></h2><p>A local service area, a clearly defined scope, and one team managing the work.</p></div><FaqAccordion items={faqs} /></div></Container></section>
+      <ServiceAudit source={`state-bottom-${svc.serviceSlug}-${st.slug}`} focus={`${svc.name} in ${st.name}`} />
+    </main><Footer />
+  </>;
 }

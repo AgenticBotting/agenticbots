@@ -47,7 +47,7 @@ const BRAND_ICONS: Partial<Record<PlatformId, SimpleIcon>> = {
   zoho: siZoho,
 };
 
-function PlatformMark({ id, mark }: { id: PlatformId; mark: string }) {
+export function PlatformMark({ id, mark }: { id: PlatformId; mark: string }) {
   const icon = BRAND_ICONS[id];
   if (!icon) return <span className="platform-node-letter">{mark}</span>;
 
