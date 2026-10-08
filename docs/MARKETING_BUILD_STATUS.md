@@ -2,6 +2,16 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Service-niche and buyer intelligence — 2026-10-08
+
+The public experience now includes the admin catalog's 341 service niches and 137 buyer types. Added a searchable directory, 341 dedicated niche pages, and interactive buyer-role workflows on the six existing trade hubs and twelve SEO/PPC pages. The flow connects service fit, evidence, GTM and approval without simulating live prospect activity. Only accepted catalog relationships are included: 228 niches have mapped audiences; 113 need buyer-profile scoping. All buyer definitions remain browsable. Shared market/service industry links point to the expanded directory. Design retains Geist, olive/white, controlled radii and finite CSS motion with a reduced-motion fallback.
+
+An operator-only read-only projection exports allowed vocabulary from shared ontology tables into static public files. It excludes private data, internal IDs, providers and metrics; it does not change backend records. The full catalog stays out of client imports, and only a slim route list is used for niche acquisition attribution. All new niche routes stay `noindex, follow` and outside the sitemap pending editorial review; eligibility remains 584. Details: `docs/PUBLIC_NICHE_BUYER_EXPERIENCE.md`.
+
+Validation: typecheck passed; lint has zero errors and five existing warnings; 207 tests across 32 files passed. Final `npm run build -- --webpack` passed with 14,113 static outputs and gates covering 14,067 rendered routes plus 103 dynamic routes. Internal links, metadata uniqueness/budgets, one H1, canonical alignment and search publication checks pass; 584 routes remain eligible. All 174 scanned browser bundle files pass the white-label scan. Existing middleware deprecation and legacy topic-coverage notes remain.
+
+Browser review covered desktop, 768px, 390px and 320px: commercial roofing buyer/role switching, stable replay focus, the HVAC SEO-specific flow, directory search, unmapped-buyer empty states, filter reset, all 341 initial HTML links and the unmapped charter-boats page. Audit anchors and empty required-field validation passed without submitting a request. No horizontal overflow or browser console errors were observed in the checked views. New service-choice layouts and responsive pipeline reading order were visually inspected; reduced-motion behavior is explicitly defined in CSS. No new dependencies, generated images, live provider calls, backend data changes, pushes or deployments.
+
 ## Agentic headline refinement — 2026-10-08
 
 Applied the owner’s natural sentence direction to market, state, city, service and trade H1s and search titles. Miami now reads “Agentic marketing for contractors in Miami.” Service and niche examples include “Agentic PPC management for contractors in Miami, FL” and “Agentic SEO for HVAC companies.” The shared title formatter preserves acronyms and full place names, removing optional brand/audience wording when needed for the existing 70-character editorial budget. H1s retain the complete sentence. Repeated “Agentic” eyebrow copy is replaced by a short managed-service explanation. Approved styling, routes, crawl paths, indexing eligibility, paid-audit terms and capability scope are unchanged. No CTR or ranking lift is claimed.

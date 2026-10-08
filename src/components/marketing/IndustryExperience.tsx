@@ -12,7 +12,7 @@ import "./industry-experience.css";
 export function IndustryLinks({ service, place }: { service?: string; place?: string }) {
   const channel = service === "seo" ? "seo" : service === "paid-media" ? "ppc" : undefined;
   return <section className="ix-trades"><Container>
-    <div className="ix-trades-heading"><div><p className="sx-kicker">Built for the trades</p><h2>{place ? `Marketing for the work you do in ${place}.` : "Find the approach for your business."}</h2></div><Link href="/industries" className="sx-text-link">Explore industries<ArrowRight size={16} /></Link></div>
+    <div className="ix-trades-heading"><div><p className="sx-kicker">Built for the trades</p><h2>{place ? `Marketing for the work you do in ${place}.` : "Find the approach for your business."}</h2></div><Link href="/industries#niche-directory" className="sx-text-link">Explore all service niches & buyer types<ArrowRight size={16} /></Link></div>
     <ul>{INDUSTRIES.map(industry => <li key={industry.slug}><Link href={`/industries/${industry.slug}${channel ? `/${channel}` : ""}`}>{industry.name}{channel ? ` ${industryChannelName(channel)}` : " marketing"}<ArrowRight size={15} /></Link></li>)}</ul>
   </Container></section>;
 }

@@ -11,6 +11,7 @@ import { INDUSTRIES, INDUSTRY_CHANNELS, getIndustry, isIndustryChannel, industry
 import { getService } from "@/lib/catalog";
 import { agenticSearchTitle, agenticServiceLabel } from "@/lib/search-positioning";
 import { searchRobots } from "@/lib/search-publication";
+import { IndustryBuyerSection } from "@/components/marketing/NicheExperience";
 
 type Params = { params: Promise<{ industry: string; service: string }> };
 export function generateStaticParams() { return INDUSTRIES.flatMap(industry => INDUSTRY_CHANNELS.map(service => ({ industry: industry.slug, service }))); }
@@ -37,7 +38,7 @@ export default async function IndustryServicePage({ params }: Params) {
   return <><JsonLd data={[serviceLd({ name: `${industry.name} ${name}`, description: brief.introduction, path, areaServed: "United States", serviceType: name }), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Industries", path: "/industries" }, { name: industry.name, path: `/industries/${industry.slug}` }, { name, path }]), faqLd(industryFaqs(industry, service))]} /><Header />
     <main className="service-experience">
       <ServiceHero svc={svc} editorial={{ heading: agenticServiceLabel(name), accent: `for ${industry.audience}.`, introduction: brief.introduction, examples }} breadcrumb={<><Link href="/">Home</Link><span>/</span><Link href="/industries">Industries</Link><span>/</span><Link href={`/industries/${industry.slug}`}>{industry.name}</Link><span>/</span><span aria-current="page">{name}</span></>} />
-      <IndustryServiceBrief industry={industry} channel={service} /><ServiceScope svc={svc} /><IndustryOperations industry={industry} /><ServiceConnections svc={svc} /><ServiceDelivery /><IndustryFaq industry={industry} channel={service} />
+      <IndustryServiceBrief industry={industry} channel={service} /><IndustryBuyerSection industry={industry.slug} channel={service} /><ServiceScope svc={svc} /><IndustryOperations industry={industry} /><ServiceConnections svc={svc} /><ServiceDelivery /><IndustryFaq industry={industry} channel={service} />
       <ServiceAudit source={`industry-${industry.slug}-${service}`} focus={`${industry.name} ${name}`} />
       <section className="sx-section sx-related"><Container><div className="sx-section-copy"><p className="sx-kicker">Continue exploring</p><h2>The next part<br /><span>of your marketing plan.</span></h2></div><div className="sx-related-grid">
         <Link href={`/industries/${industry.slug}`}><span><strong>{industry.name} marketing</strong><p>The full approach for your trade.</p></span><ArrowRight /></Link>
