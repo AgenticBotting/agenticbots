@@ -1,143 +1,140 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Fingerprint, Layers3 } from "lucide-react";
+import { ArrowRight, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { JsonLd, faqLd } from "@/components/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { AuditForm } from "@/components/marketing/AuditForm";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { BotWorkflowStory } from "@/components/marketing/BotWorkflowStory";
-import { PricingCards } from "@/components/marketing/PricingCards";
-import { ServicePlatformConstellation } from "@/components/marketing/ServicePlatformConstellation";
-import { StackStrip } from "@/components/marketing/GeoSections";
-import { CoverageSystemVisual, HeroSystemVisual } from "@/components/marketing/WorkforceSystemVisuals";
-import { AUDIT_OFFER, formatPlanPrice, MARKETING_PLANS } from "@/config/marketing-offer";
+import { HomeWorkspace } from "@/components/marketing/HomeWorkspace";
+import { HomeAuditVisual, HomeBrandMark, HomeDemandVisual, HomeFollowupVisual, HomeRetentionVisual, HomeToolOrbit } from "@/components/marketing/HomeVisuals";
+import { AUDIT_OFFER, formatPlanPrice, MARKETING_PLANS, PRICING_SCOPE_NOTE } from "@/config/marketing-offer";
 import { REGIONS, regionSlug } from "@/lib/geo/regions";
+import "./home.css";
 
 const entry = MARKETING_PLANS[0];
 const growth = MARKETING_PLANS[1];
 export const metadata: Metadata = {
-  title: "Managed BOT systems for established contractors",
-  description: "AgenticBots designs, deploys and operates governed BOT systems for established residential and commercial contractors. Setup from $7,500.",
+  title: "Managed AI BOTS for contractors | AgenticBots",
+  description: "Connect your marketing, sales follow-up and customer operations with managed AI BOTS. Built for established contractors. Start with a $499 workflow audit.",
   alternates: { canonical: "/" },
 };
 
 const HOME_FAQ = [
-  { q: "What exactly am I buying?", a: "A managed operating capability: workflow design, BOT configuration, scoped integrations, acceptance testing, controlled launch and ongoing operation. Begin with one defined process or deploy a coordinated system across demand generation, revenue operations and customer lifecycle workflows." },
-  { q: "What does it cost?", a: `One BOT starts at ${formatPlanPrice(entry.setup)} setup and ${formatPlanPrice(entry.monthly)} a month. Growth starts at ${formatPlanPrice(growth.setup)} setup and ${formatPlanPrice(growth.monthly)} a month for a scoped system of 3–5 BOTS, with expansion to ten quoted separately. Enterprise is custom. Included usage, third-party charges and support are defined in your proposal.` },
-  { q: "Do I have to replace my current systems?", a: "The deployment is designed around your current systems of record. The audit identifies required connections, and the proposal documents integration scope, access requirements and operating boundaries before implementation." },
-  { q: "How quickly can we start?", a: `The initial ${AUDIT_OFFER.name} comes back within ${AUDIT_OFFER.turnaround}. Build and launch timing depends on the workflow, account access and integration requirements; we confirm it in your proposal.` },
-  { q: "How is BOT authority controlled?", a: "Authority is defined by workflow. External communications, publishing, advertising changes and writes to connected systems follow explicit approval policies. BOTS prepare and coordinate work; authorized people retain decision rights." },
-  { q: "Are the examples on this page real client results?", a: "No. The workflow and interface visuals are illustrative demonstrations with a fictional account. We are developing our first client case studies and do not present demonstrations as measured results." },
+  { q: "What do I get from the $499 audit?", a: `A focused review of your current process, existing systems and the work that needs attention. You receive written findings, a recommended starting workflow and implementation priorities within ${AUDIT_OFFER.turnaround} of payment. Any subsequent build is scoped and priced separately.` },
+  { q: "Do I need to replace my software?", a: "We design around the systems your business already uses. The audit checks what can be connected, which access is required and where custom work may be needed. Connections and permissions are confirmed before implementation." },
+  { q: "Who manages the BOTS after launch?", a: "AgenticBots manages the agreed deployment, including monitoring, maintenance, tuning and activity reviews. Your team supplies business context and approves external actions. The proposal defines usage, support and the responsibilities on each side." },
+  { q: "Can a BOT send messages or make changes on its own?", a: "BOTS prepare work within defined permissions. Sending messages, publishing content, changing ads and writing to connected systems require human approval. Your organization retains control of its accounts and decisions." },
+  { q: "What does implementation cost?", a: `One BOT starts at ${formatPlanPrice(entry.setup)} setup plus ${formatPlanPrice(entry.monthly)}/month. Growth starts at ${formatPlanPrice(growth.setup)} setup plus ${formatPlanPrice(growth.monthly)}/month for 3–5 BOTS. Expansion to ten is quoted separately; Enterprise is custom. Ad spend and third-party usage are separate. You approve a written scope before work starts.` },
+  { q: "Are the previews real customer results?", a: "The interfaces show illustrative workflows with fictional data, not measured client results. They explain how the service works. Client case studies will be published when results are measured and approved for release." },
 ];
+
+function AuditLink({ label = "Find my starting point", secondary = false }: { label?: string; secondary?: boolean }) {
+  return <a href="#audit" className={`btn ${secondary ? "btn-outline" : "btn-primary"}`}>{label}<ArrowRight size={16} /></a>;
+}
 
 function Hero() {
   return (
-    <section className="workforce-hero home-command-hero">
+    <section className="ch-hero">
       <Container>
-        <div className="workforce-hero-shell">
-          <div className="home-command-intro">
-            <div className="hero-copy">
-              <p className="eyebrow mb-6">Managed automation for established contractors</p>
-              <h1>Your operating model, extended by a <span>BOT workforce.</span></h1>
-            </div>
-            <div className="home-command-brief">
-              <p className="body-lg">We design, deploy and operate specialized BOTS across demand generation, revenue operations and customer lifecycle workflows—within your existing systems and controls.</p>
-              <div className="hero-actions mt-8">
-                <a href="#audit" className="btn btn-primary">{AUDIT_OFFER.cta} <ArrowRight size={17} /></a>
-                <a href="#demo" className="hero-demo-link">Review the operating model <ArrowRight size={16} /></a>
-              </div>
-              <dl className="home-command-facts">
-                <div><dt>Entry point</dt><dd>One governed workflow</dd></div>
-                <div><dt>Scale path</dt><dd>Coordinated multi-BOT system</dd></div>
-                <div><dt>Operating model</dt><dd>Managed continuously</dd></div>
-              </dl>
-            </div>
-          </div>
-          <div className="home-hero-stage">
-            <span className="home-hero-halo" aria-hidden="true" />
-            <div className="home-system-layout">
-              <ServicePlatformConstellation serviceName="Revenue operating system" />
-              <HeroSystemVisual />
-            </div>
-            <dl className="home-hero-proof">
-              <div><dt>01 · Mandate</dt><dd>Defined workflow ownership</dd></div>
-              <div><dt>02 · Systems</dt><dd>Scoped connections and access</dd></div>
-              <div><dt>03 · Authority</dt><dd>Human approval gates</dd></div>
-              <div><dt>04 · Activity</dt><dd>Reviewable operating record</dd></div>
-            </dl>
+        <div className="ch-hero-intro">
+          <HomeToolOrbit />
+          <div className="ch-hero-copy">
+            <p className="ch-kicker"><span /> Managed AI for established contractors</p>
+            <h1>More opportunities.<br /><span>Less manual work.</span></h1>
+            <p className="ch-hero-description">Connect your marketing, sales follow-up and customer operations with AI BOTS—built, connected and managed for you.</p>
+            <div className="ch-actions"><AuditLink label="Start with a $499 audit" /><a href="#product-preview" className="btn btn-outline"><CirclePlay size={17} /> See BOTS at work</a></div>
+            <p className="ch-hero-note">A clear starting point. Written findings in two business days of payment.</p>
           </div>
         </div>
+        <div className="ch-preview-wrap"><HomeWorkspace /></div>
+        <div className="ch-fit-line"><p>Built for residential and commercial contractors <strong>typically doing $2M+ a year.</strong></p><Link href="/pricing">Implementation from {formatPlanPrice(entry.setup)} + {formatPlanPrice(entry.monthly)}/mo <ArrowRight size={14} /></Link></div>
       </Container>
-      <div className="hero-bottom-strip"><Container><p>Single workflow → Multi-BOT system → Enterprise deployment</p><Link href="/pricing">Engagements from {formatPlanPrice(entry.setup)} setup · {formatPlanPrice(entry.monthly)}/month <ArrowRight size={15} /></Link></Container></div>
     </section>
   );
 }
 
-function ManagedSystem() {
-  const jobs = [
-    { title: "Demand generation", copy: "Coordinate search, paid media, content and prospecting through a shared market strategy and operating cadence.", href: "/marketing", label: "Review demand-generation BOTS", roles: "SEO · Paid media · Content · Prospecting" },
-    { title: "Revenue execution", copy: "Connect response, follow-through, CRM administration and proposal workflows while preserving defined approval authority.", href: "/sales", label: "Review revenue-operations BOTS", roles: "Inbound · Outbound · CRM · Proposals" },
-    { title: "Management visibility", copy: "Bring operating activity, exceptions and outcomes into a consistent review process that supports accountable decisions.", href: "/services/agentic-analytics", label: "Review analytics operations", roles: "Analytics · Reputation · Reactivation" },
-  ];
+function Outcomes() {
   return (
-    <section className="home-operating-system section-pad border-b border-[var(--border)]">
+    <section id="outcomes" className="ch-section ch-outcomes">
       <Container>
-        <div className="home-operating-layout">
-          <div className="home-operating-heading">
-            <p className="eyebrow mb-5">Coordinated operating system</p>
-            <h2 className="display-xl max-w-[21ch]">One operating layer across the <span className="em-green">revenue lifecycle.</span></h2>
-            <p className="body-lg mt-6 max-w-[42ch]">Demand generation, sales execution and customer operations share data, decisions and handoffs. We engineer the workflow between them and remain accountable for its operation.</p>
-            <Link href="/services" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-7">Review all service mandates <ArrowRight size={16} /></Link>
+        <div className="ch-section-heading"><p className="ch-kicker">Give your team room to grow</p><h2>Keep the opportunity.<br />Lose the busywork.</h2><p>From the first search to the next service visit, put a consistent process behind the work that grows your business.</p></div>
+        <div className="ch-benefit-grid">
+          <article className="ch-benefit ch-benefit-demand"><HomeDemandVisual /><div className="ch-benefit-copy"><span className="ch-feature-label">01 / Build demand</span><h3>Be there when customers look.</h3><p>Bring search, advertising and content into one managed plan, with work prepared for your team to review.</p><Link href="/marketing">Explore marketing BOTS <ArrowRight size={16} /></Link></div></article>
+          <article className="ch-benefit ch-benefit-followup"><HomeFollowupVisual /><div className="ch-benefit-copy"><span className="ch-feature-label">02 / Move sales forward</span><h3>Give every enquiry a next step.</h3><p>Prepare relevant responses, proposal follow-ups and CRM updates so your team can focus on the customer.</p><Link href="/sales">Explore sales BOTS <ArrowRight size={16} /></Link></div></article>
+          <article className="ch-benefit ch-benefit-retention"><div className="ch-benefit-copy"><span className="ch-feature-label">03 / Grow customer value</span><h3>The next opportunity may<br />already know your name.</h3><p>Turn customer history into timely follow-up, review requests and reactivation campaigns—with your team approving outreach.</p><Link href="/services/agentic-customer-reactivation">Explore customer reactivation <ArrowRight size={16} /></Link></div><HomeRetentionVisual /></article>
+        </div>
+        <div className="ch-inline-cta"><p>Start with the process that matters most to your business.</p><AuditLink /></div>
+      </Container>
+    </section>
+  );
+}
+
+function ConnectedTools() {
+  return (
+    <section className="ch-section ch-connections">
+      <Container>
+        <div className="ch-split">
+          <div className="ch-connect-visual" aria-label="Examples of software considered during integration scoping">
+            <div className="ch-connect-orbits" aria-hidden="true"><i /><i /></div>
+            <span className="ch-connect-hub"><Layers3 size={28} /><strong>Your business</strong><small>One connected workflow</small></span>
+            <span className="ch-connect-node"><HomeBrandMark name="hubspot" />HubSpot</span>
+            <span className="ch-connect-node"><span className="ch-wordmark">Salesforce</span></span>
+            <span className="ch-connect-node"><span className="ch-wordmark">ServiceTitan</span></span>
+            <span className="ch-connect-node"><span className="ch-wordmark">Jobber</span></span>
+            <span className="ch-connect-node"><HomeBrandMark name="ads" />Google Ads</span>
+            <span className="ch-connect-node"><HomeBrandMark name="wordpress" />WordPress</span>
+            <span className="ch-connect-caption">Common systems considered during scoping</span>
           </div>
-          <ol className="home-operating-lanes">
-            {jobs.map((job, index) => (
-              <li key={job.title}>
-                <span className="system-index">0{index + 1}</span>
-                <div>
-                  <p className="home-operating-status">Managed mandate</p>
-                  <h3 className="display-lg">{job.title}</h3>
-                  <p className="body-base mt-3">{job.copy}</p>
-                  <p className="system-roles">{job.roles}</p>
-                </div>
-                <Link href={job.href} aria-label={job.label}><ArrowRight size={18} /></Link>
-              </li>
-            ))}
-          </ol>
+          <div className="ch-section-copy"><p className="ch-kicker">Work with what you already use</p><h2>Your tools.<br /><span>A more connected team.</span></h2><p>Your CRM, marketing channels and service software hold valuable context. We design the workflow between them, so your people spend less time moving information around.</p><ul className="ch-check-list"><li><Check /> Plan around your existing business systems</li><li><Check /> Define access and approvals before launch</li><li><Check /> Keep your accounts and customer relationships</li></ul><p className="ch-small">Available connections, custom work and permissions are confirmed during the audit.</p><Link href="/services" className="ch-text-link">See the full service portfolio <ArrowRight size={16} /></Link></div>
         </div>
       </Container>
     </section>
   );
 }
 
-function Governance() {
-  return <section id="infrastructure" className="workforce-governance section-pad on-dark"><Container><div className="governance-layout"><div className="governance-copy"><p className="eyebrow-dark mb-5">Governance by design</p><h2 className="display-xl max-w-[18ch]">Control is part<br />of the architecture.</h2><p className="body-lg text-ink-300 mt-6 max-w-[44ch]">Each BOT operates within a defined mandate, access model and approval policy. The system expands operational capacity while authorized people retain decision rights.</p><div className="governance-principles" aria-label="Operating principles"><span>Scoped access</span><span>Human authority</span><span>Reviewable activity</span></div><Link href="/how-it-works" className="btn btn-on-dark mt-8">Review the operating model <ArrowRight size={16} /></Link></div><div className="governance-record"><div className="governance-record-head"><Fingerprint size={20} /><span>Governed client environment</span><small>CONTROL PLANE</small></div><div className="governance-record-core"><Layers3 size={31} /><p>Coordinated BOT system</p><span>Defined roles, controls and workflow ownership</span></div><dl>{[
-    ["Dedicated client environment", "Client access and data are separated by organization."],
-    ["Human approval controls", "External changes wait for an authorized person."],
-    ["Reviewable BOT ACTIVITY", "Runs, decisions and outcomes have a recorded trail."],
-    ["Ongoing operation", "Monitoring, tuning and maintenance are part of the service."],
-  ].map(([title, description]) => <div key={title}><dt><Check size={15} />{title}</dt><dd>{description}</dd></div>)}</dl><p className="governance-record-note">Architecture and service approach · scope confirmed before launch</p></div></div></Container></section>;
+function HowItWorks() {
+  return (
+    <section id="how-it-works" className="ch-section ch-launch">
+      <Container>
+        <div className="ch-section-heading"><p className="ch-kicker">Built for you. Managed with you.</p><h2>You run the business.<br />We run the BOTS.</h2><p>Start with a clear plan, launch a focused workflow, and expand when it makes business sense.</p></div>
+        <ol className="ch-launch-steps">
+          <li><span className="ch-step-symbol"><FileText size={25} /></span><span className="ch-feature-label">01 / Find the right starting point</span><h3>Audit the opportunity.</h3><p>The {AUDIT_OFFER.priceLabel} audit identifies where a BOT could help, what it needs and what to do first.</p><span className="ch-step-output">Written findings + recommended workflow</span></li>
+          <li><span className="ch-step-symbol"><Settings2 size={25} /></span><span className="ch-feature-label">02 / Build around your business</span><h3>Connect. Test. Launch.</h3><p>We configure the BOTS, connect the agreed systems and validate the workflow with your team.</p><span className="ch-step-output">Documented scope + controlled launch</span></li>
+          <li><span className="ch-step-symbol"><ShieldCheck size={25} /></span><span className="ch-feature-label">03 / Keep improving</span><h3>Stay supported.</h3><p>We monitor and maintain the system. Your team reviews activity and approves the next step.</p><span className="ch-step-output">Ongoing management + regular review</span></li>
+        </ol>
+        <div className="ch-managed-note"><LockKeyhole size={18} /><p><strong>Your decisions stay yours.</strong> BOTS prepare the work. People approve messages, publishing, ad changes and updates to connected systems.</p><Link href="/how-it-works">How it works <ArrowRight size={15} /></Link></div>
+      </Container>
+    </section>
+  );
 }
 
-function WhoFor() {
-  return <section className="home-audience section-pad border-b border-[var(--border)]"><Container><div className="home-audience-frame"><div className="audience-layout"><CoverageSystemVisual /><div><p className="eyebrow mb-5">Built for established contractors</p><h2 className="display-xl max-w-[18ch]">Operational leverage for firms with real complexity.</h2><p className="body-lg mt-6 max-w-[45ch]">Designed for residential and commercial contractors typically operating above $2M in annual revenue, where disconnected systems and inconsistent execution create material operating drag.</p><div className="audience-fit"><span>BEST FIT</span><strong>Multiple systems · recurring handoffs · accountable managers</strong></div><div className="audience-trades"><div><h3 className="display-md">Residential service organizations</h3><p className="body-sm mt-2">Roofing · HVAC · plumbing · electrical · remodeling</p></div><div><h3 className="display-md">Commercial contracting organizations</h3><p className="body-sm mt-2">General contractors · specialty trades · facilities services</p></div></div><a href="#audit" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Identify the first operating workflow <ArrowRight size={16} /></a></div></div></div></Container></section>;
-}
-
-function Delivery() {
-  const phases = [
-    ["Assess & architect", "Document the current process, operating constraints, integration requirements and acceptance criteria before implementation begins.", "Current-state map", "Accepted operating mandate"],
-    ["Configure & validate", "Establish scoped access, decision rules and test coverage against representative workflows and exception cases.", "Connected test environment", "Acceptance criteria passed"],
-    ["Launch & operate", "Move through a monitored release, ongoing performance review and governed expansion as priorities change.", "Managed production workflow", "Ongoing review cadence"],
-  ];
-  return <section className="home-delivery section-pad border-b border-[var(--border)]"><Container><div className="home-delivery-shell"><div className="system-intro"><div><p className="eyebrow mb-5">Deployment discipline</p><h2 className="display-xl max-w-[22ch]">Implementation is scoped.<br />Operation is continuous.</h2></div><p className="body-lg max-w-[45ch]">The setup engagement establishes the operating system. The monthly retainer provides monitoring, maintenance and controlled improvement against the agreed mandate.</p></div><div className="delivery-console-head"><span>DEPLOYMENT SEQUENCE</span><span>THREE CONTROLLED PHASES</span></div><ol className="delivery-rows">{phases.map(([title, description, output, gate], index) => <li key={title}><span>0{index + 1}</span><div><h3 className="display-lg">{title}</h3><p className="body-base">{description}</p></div><dl><div><dt>Operating output</dt><dd>{output}</dd></div><div><dt>Control gate</dt><dd>{gate}</dd></div></dl></li>)}</ol></div></Container></section>;
-}
-
-function Founding() {
-  return <section id="founding" className="home-evidence section-pad-sm border-b border-[var(--border)]"><Container><div className="founding-note"><div><p className="eyebrow mb-3">Evidence standard</p><p className="display-md">Claims should survive scrutiny.</p></div><p className="body-base max-w-[57ch]">Interface demonstrations explain the operating model. Client outcomes will be published only when they are measured, attributable and approved for release.</p><Link href="/about" className="inline-flex items-center gap-2 text-[14px] font-semibold">Our operating principles <ArrowRight size={16} /></Link></div></Container></section>;
+function Pricing() {
+  const summaries = ["Put one important process on a reliable footing.", "Coordinate the work across several BOTS and systems.", "Build around multiple teams, locations or complex requirements."];
+  return (
+    <section id="pricing" className="ch-section ch-pricing">
+      <Container>
+        <div className="ch-section-heading"><p className="ch-kicker">A clear investment</p><h2>Start focused.<br /><span>Build as you grow.</span></h2><p>One-time setup to build the system. Monthly management to keep it working. Your audit helps define the right scope.</p></div>
+        <div className="ch-plans">
+          {MARKETING_PLANS.map((plan, index) => <article key={plan.key} className={`ch-plan ${plan.featured ? "ch-plan-featured" : ""}`}><p className="ch-plan-label">{plan.key === "one" ? "One focused workflow" : plan.key === "growth" ? "Connected workflows" : "Custom deployment"}</p><h3>{plan.name}</h3><p className="ch-plan-summary">{summaries[index]}</p><div className="ch-plan-price"><strong>{formatPlanPrice(plan.setup, plan.from)}</strong><span>{plan.setup === null ? "Setup + monthly management" : "one-time setup"}</span></div>{plan.monthly !== null && <p className="ch-monthly">+ <strong>{formatPlanPrice(plan.monthly, plan.from)}</strong> / month</p>}<p className="ch-capacity">{plan.botRange}</p><ul>{plan.features.filter((_, i) => i === 0 || i === 2 || i === 4).map(feature => <li key={feature}><Check size={15} />{feature}</li>)}</ul><AuditLink label={plan.key === "enterprise" ? "Discuss your requirements" : "Start with the $499 audit"} secondary={!plan.featured} /></article>)}
+        </div>
+        <p className="ch-pricing-note">{PRICING_SCOPE_NOTE}</p><Link href="/pricing" className="ch-text-link">Compare the full scope <ArrowRight size={16} /></Link>
+      </Container>
+    </section>
+  );
 }
 
 function Audit() {
-  return <section id="audit" className="home-audit section-pad"><Container><div className="home-audit-shell"><div className="home-audit-copy"><p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} workflow audit</p><h2 className="display-xl max-w-[18ch]">Define the business case for your first BOT.</h2><p className="body-lg mt-5 max-w-[45ch]">We review the customer journey, operating constraints and existing systems to identify a focused workflow with a credible path to implementation.</p><ol className="audit-deliverables">{["Written findings within two business days of payment", "Focused operating review before a sales conversation", "Documented scope before implementation begins"].map((text, index) => <li key={text}><span>0{index + 1}</span>{text}</li>)}</ol><p className="body-sm mt-7">The audit is {AUDIT_OFFER.priceLabel}. Managed BOT engagements begin at {formatPlanPrice(entry.setup)} setup + {formatPlanPrice(entry.monthly)}/month.</p></div><AuditForm source="home-final" /></div></Container></section>;
+  return (
+    <section id="audit" className="ch-section ch-audit">
+      <Container>
+        <div className="ch-audit-heading"><p className="ch-kicker">Your first step · {AUDIT_OFFER.priceLabel}</p><h2>Know where AI belongs<br /><span>in your business.</span></h2><p>Get a practical recommendation before committing to a build. Tell us about your business; we’ll confirm the scope and payment step by email.</p></div>
+        <div className="ch-audit-layout"><HomeAuditVisual /><AuditForm source="home-final" compact className="ch-audit-form" /></div>
+        <p className="ch-audit-qualifier">For established residential and commercial contractors. Implementation starts at {formatPlanPrice(entry.setup)} setup + {formatPlanPrice(entry.monthly)}/month.</p>
+      </Container>
+    </section>
+  );
 }
 
 export default function HomePage() {
@@ -145,67 +142,16 @@ export default function HomePage() {
     <>
       <JsonLd data={[faqLd(HOME_FAQ)]} />
       <Header />
-      <main className="home-overhaul">
+      <main className="conversion-home">
         <Hero />
-        <StackStrip
-          tools={["Client-owned systems", "Workflow policy", "BOT orchestration", "Approval queue", "BOT ACTIVITY", "Management reporting"]}
-          label="Managed operating architecture"
-        />
-        <ManagedSystem />
-        <BotWorkflowStory />
-        <Governance />
-        <WhoFor />
-        <Delivery />
-
-        <section id="pricing" className="home-pricing section-pad border-b border-[var(--border)]">
-          <Container>
-            <div className="home-pricing-shell">
-              <div className="system-intro mb-12">
-                <div>
-                  <p className="eyebrow mb-5">Commercial model</p>
-                  <h2 className="display-xl max-w-[20ch]">A controlled entry point.<br /><span className="em-green">A system designed to scale.</span></h2>
-                </div>
-                <p className="body-lg max-w-[45ch]">Select the initial operating mandate. Expand only after the workflow is stable, governed and producing reviewable activity.</p>
-              </div>
-              <PricingCards />
-              <div className="home-pricing-foot">
-                <span>Scope, integrations, included usage and support are documented before launch.</span>
-                <Link href="/pricing">Review commercial terms and scope <ArrowRight size={16} /></Link>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        <Founding />
-
-        <section className="home-faq section-pad border-b border-[var(--border)]">
-          <Container>
-            <div className="home-faq-layout">
-              <div className="home-faq-heading">
-                <p className="eyebrow mb-5">Decision support</p>
-                <h2 className="display-xl max-w-[18ch]">Commercial and<br />operating questions.</h2>
-                <p className="body-base mt-5 max-w-[38ch]">Direct answers on scope, authority, timing and commercial structure before you commit to implementation.</p>
-              </div>
-              <FaqAccordion items={HOME_FAQ} />
-            </div>
-          </Container>
-        </section>
-
+        <Outcomes />
+        <ConnectedTools />
+        <div className="ch-demo-section"><BotWorkflowStory /><Container><div className="ch-demo-trust"><span><ShieldCheck size={17} /> Human approval</span><span><LockKeyhole size={17} /> Scoped access</span><span><FileText size={17} /> Recorded BOT ACTIVITY</span></div></Container></div>
+        <HowItWorks />
+        <Pricing />
+        <section className="ch-section ch-faq"><Container><div className="ch-faq-grid"><div className="ch-section-copy"><p className="ch-kicker">Before you get started</p><h2>Good questions.<br />Clear answers.</h2><p>Understand what you’re buying, what stays in your control, and what happens next.</p><Link href="/about" className="ch-text-link">Meet AgenticBots <ArrowRight size={16} /></Link></div><FaqAccordion items={HOME_FAQ} /></div></Container></section>
         <Audit />
-
-        <section className="home-coverage section-pad-sm border-t border-[var(--border)]">
-          <Container>
-            <div className="coverage-intro">
-              <div>
-                <p className="eyebrow mb-3">National operating reach</p>
-                <h2 className="display-md">National delivery. Local market context.</h2>
-                <p className="body-sm mt-3">Managed deployments for established contractors across the United States.</p>
-              </div>
-              <Link href="/markets" className="inline-flex items-center gap-2 text-[14px] font-semibold">Review market coverage <ArrowRight size={16} /></Link>
-            </div>
-            <ul className="coverage-links">{REGIONS.map((region) => <li key={region}><Link href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link></li>)}</ul>
-          </Container>
-        </section>
+        <section className="ch-markets"><Container><div><h2>Local understanding. National reach.</h2><Link href="/markets" className="ch-text-link">Explore your market <ArrowRight size={16} /></Link></div><nav aria-label="Regional service coverage">{REGIONS.map(region => <Link key={region} href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link>)}</nav></Container></section>
       </main>
       <Footer />
     </>

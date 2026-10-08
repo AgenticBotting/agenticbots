@@ -2,6 +2,12 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Reference-led homepage conversion overhaul — 2026-10-08
+
+The current homepage supersedes the earlier asymmetric operating-brief layout. It applies the owner’s Deflexai and Earnify references through a centered benefit-led hero, visible interactive product preview, three UI-led outcome panels, tool constellation, manually controlled workflow, simple launch steps, transparent pricing, focused FAQ and a concrete audit deliverable beside a shorter form. Original Geist and the olive/white palette remain. Service pages and shared navigation remain intact.
+
+The headline now reads “More opportunities. Less manual work.” The primary action is the $499 workflow audit; the secondary action previews the product. Required name, email and website inputs remain, while phone, trade and volume move behind optional disclosure on the homepage only. Fictional examples are labeled and cannot trigger external work. Shared commercial terms and approval controls are preserved. Full audit, reference analysis and conversion hypotheses: `docs/HOMEPAGE_CONVERSION_AUDIT.md`.
+
 ## Backend-aligned enterprise copy audit — 2026-10-06
 
 The backend catalog is now the source of truth for public service architecture. It contains 10 deployable BOT types and 9 versioned skills. The website retains 13 commercial service mandates, with Email Marketing, Conversion Rate Optimization and Inbound Lead Handling correctly presented as combinations of existing BOTS, skills and scoped implementation rather than standalone BOT types.
@@ -45,9 +51,9 @@ The proposal defines usage, access, support, integrations and acceptance criteri
 
 ## Interaction and accessibility
 
-`BotWorkflowStory` is a fictional local-only example (`demo: true`) with Receive → Prepare → Approve → Record steps. On desktop a narrow, centered IntersectionObserver updates the stage while the visitor scrolls; manual buttons remain available. The four scenes occupy one shared grid track, keeping the stage height constant while content crossfades. On smaller screens the stage is static and controlled by the buttons. Reduced-motion preferences disable automatic advancement and transitions. No messages, bookings, CRM writes or runtime calls are made by the example.
+`BotWorkflowStory` is a fictional local-only example (`demo: true`) with manually selected Receive → Prepare → Approve → Record steps. The four scenes occupy one shared grid track, keeping the stage height constant while content crossfades. Reduced-motion preferences disable transitions. No messages, bookings, CRM writes or runtime calls are made by the example.
 
-Approval requires an explicit click in the review step. Jumping straight to the record retains a waiting state; reset clears approval. A pure reducer has regression tests for these transitions and for preserving manual selection against programmatic scroll updates. Deliberate wheel/touch/scroll-key input resumes the narrative. Desktop menus expose expanded state and panel associations; Escape closes the panel and returns focus to the trigger. Existing mobile dialog focus handling retained.
+Approval requires an explicit click in the review step. Jumping straight to the record retains a waiting state; reset clears approval. A pure reducer has regression tests for approval and reset behavior. Scrolling does not change the selected step. Desktop menus expose expanded state and panel associations; Escape closes the panel and returns focus to the trigger. Existing mobile dialog focus handling retained.
 
 ## Visual system
 
@@ -67,8 +73,9 @@ The full homepage has since been audited and rebuilt as one buying journey. The 
 
 ## Validation
 
+- The reference-led homepage conversion overhaul passed typecheck, lint with zero errors and the same five existing warnings, all 177 tests across 25 files, and `npm run build -- --webpack`. All 13,753 static outputs generated; internal-link, SEO and topic gates passed. Live homepage HTTP returned 200; its rendered HTML has one H1, no duplicate IDs and no unresolved in-page anchors. The in-app browser remained on a prior connection-error document and blocked inspection under its URL security policy. A manual refresh was requested; final desktop/mobile visual and interactive checks could not be completed in this pass. No real lead was submitted.
 - `npm run typecheck` passed. `npm run lint` passed with zero errors. `npm test` passed.
-- Latest complete test run: 24 files, 173 tests passed, including workflow decision/reset, code-rendered visual, enterprise service-positioning coverage, public price/scope rendering coverage and the paid-audit offer contract.
+- Latest complete test run: 25 files, 177 tests passed, including workflow decision/reset, code-rendered visual, enterprise service-positioning coverage, public price/scope rendering coverage and the paid-audit offer contract.
 - Lint: zero errors; five existing warnings (four generated Convex directives and one BlogArchive image warning).
 - Browser QA from the original pass: homepage at 320, 390, 1024 and 1280 px; pricing at 390 px; no horizontal overflow at tested sizes. Mobile region → state navigation works; Florida hub retains 66 city destinations. Manual approval, skipped approval, reset, form required-field validation and browser error checks exercised without submitting a real lead. The stable scrollytelling and code-rendered visual revision is rechecked below.
 - Final production verification passed with `npm run build -- --webpack`, including prebuild and postbuild gates. 13,753 static outputs generated; internal-link and SEO checks passed across 13,707 prerendered pages plus 100 dynamic routes. Topic gate passed for 13 services, 521 indexable topic/scope pages and 26 redirects. The default compiler was blocked from binding its local CSS helper port; Webpack was used for the final build. Existing middleware deprecation, Edge dependency warnings and topic-coverage notes remain.

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const TRADES = ["Residential", "Commercial", "Both"] as const;
 const VOLUME = ["Under 25", "25–75", "75–200", "200+"] as const;
 
-export function AuditForm({ source = "home-audit", focus, className }: { source?: string; focus?: string; className?: string }) {
+export function AuditForm({ source = "home-audit", focus, className, compact = false }: { source?: string; focus?: string; className?: string; compact?: boolean }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", website: "", goal: "" });
   const [trade, setTrade] = useState<string>("");
   const [volume, setVolume] = useState<string>("");
@@ -89,16 +89,15 @@ export function AuditForm({ source = "home-audit", focus, className }: { source?
                 <input className="field" required autoComplete="url" placeholder="reyesroofing.com"
                   value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
               </Field>
-              <Field label="Phone" hint="Optional">
+              {!compact && <Field label="Phone" hint="Optional">
                 <input className="field" type="tel" autoComplete="tel" placeholder="(561) 555-0142"
                   value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </Field>
+              </Field>}
             </div>
 
-            <div className="mt-6"><Field label="Which operating process needs attention?" hint="Optional"><textarea className="field min-h-[94px] resize-y" maxLength={1200} placeholder="Inbound response, proposal follow-through, CRM administration…" value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })} /></Field></div>
+            <div className="mt-6"><Field label={compact ? "Where does work slow down?" : "Which operating process needs attention?"} hint="Optional"><textarea className="field min-h-[94px] resize-y" maxLength={1200} placeholder={compact ? "Lead follow-up, marketing, customer outreach…" : "Inbound response, proposal follow-through, CRM administration…"} value={form.goal} onChange={(e) => setForm({ ...form, goal: e.target.value })} /></Field></div>
 
-            <Choice label="What kind of work?" options={TRADES} value={trade} onChange={setTrade} />
-            <Choice label="New leads a month" options={VOLUME} value={volume} onChange={setVolume} />
+            {compact ? <details><summary>Add a little more context (optional)</summary><Field label="Phone" hint="Optional"><input className="field" type="tel" autoComplete="tel" placeholder="(561) 555-0142" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></Field><Choice label="What kind of work?" options={TRADES} value={trade} onChange={setTrade} /><Choice label="New leads a month" options={VOLUME} value={volume} onChange={setVolume} /></details> : <><Choice label="What kind of work?" options={TRADES} value={trade} onChange={setTrade} /><Choice label="New leads a month" options={VOLUME} value={volume} onChange={setVolume} /></>}
 
             {state === "error" && <p role="alert" className="mt-4 text-[13.5px] text-[var(--color-danger)]">{error}</p>}
 

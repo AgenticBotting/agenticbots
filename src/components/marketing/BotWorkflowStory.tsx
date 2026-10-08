@@ -25,26 +25,26 @@ import {
 const CHAPTERS = [
   {
     name: "Receive",
-    title: "Capture every qualified signal.",
-    copy: "A call or form enters one governed workflow. The BOT consolidates the relevant details and establishes ownership without relying on manual inbox review.",
+    title: "Bring the enquiry into focus.",
+    copy: "A call or form starts the workflow. Relevant customer details are brought together for the next step.",
     icon: PhoneMissed,
   },
   {
     name: "Prepare",
-    title: "Assemble the operating context.",
-    copy: "Service area, customer requirements and internal policy shape the proposed response. Context moves with the workflow across every BOT handoff.",
+    title: "Prepare a relevant response.",
+    copy: "The BOT uses the request, your service area and your business rules to draft a useful reply.",
     icon: MessageSquare,
   },
   {
     name: "Approve",
-    title: "Keep authority with your team.",
-    copy: "The proposed communication and appointment pause at a defined authorization gate before any external message or system update occurs.",
+    title: "Let your team make the call.",
+    copy: "Your team reviews the proposed message and appointment before anything is sent or updated.",
     icon: ShieldCheck,
   },
   {
     name: "Record",
-    title: "Maintain a reviewable record.",
-    copy: "BOT ACTIVITY records the decision, next step and current owner so management can review completed work, exceptions and pending approvals.",
+    title: "Know what happened next.",
+    copy: "Review the decision, the next step and who owns it in BOT ACTIVITY. Context stays with the work.",
     icon: ClipboardCheck,
   },
 ] as const;
@@ -65,11 +65,11 @@ export function BotWorkflowStory() {
       <Container>
         <div className="story-heading">
           <div>
-            <p className="eyebrow mb-4">A governed operating workflow</p>
-            <h2 className="display-xl max-w-[20ch]">See the operating<br />model in motion.</h2>
+            <p className="eyebrow mb-4">See how the work moves</p>
+            <h2 className="display-xl max-w-[20ch]">Less chasing.<br />More follow-through.</h2>
           </div>
           <p className="body-lg max-w-[43ch]">
-            One enquiry moves through defined roles, authorization gates and activity records. Each BOT has a mandate; your organization retains control.
+            Follow a customer enquiry from arrival to a prepared response. Select a step to see what the BOT handles and where your team decides.
           </p>
         </div>
 
