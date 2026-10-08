@@ -1,98 +1,30 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Container, Section } from "@/components/ui";
-import { BotFactory } from "@/components/marketing";
-import { PlanCta } from "@/components/marketing";
-import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
-import { ALL_SERVICES, serviceHref } from "@/lib/catalog";
+import { JsonLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
+import { MarketHero, MarketCoverage, MarketServices, MarketTools, MarketFaq, MarketNearby, marketFaqs } from "@/components/marketing/MarketExperience";
+import { ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { ALL_STATES, ALL_CITIES, allCitiesInState } from "@/lib/geo/dataset";
-import { groupByRegion, regionSlug } from "@/lib/geo/regions";
-import { getServicePositioning } from "@/lib/service-positioning";
+import { groupByRegion, regionSlug, REGIONS } from "@/lib/geo/regions";
 
 export const metadata: Metadata = {
   title: "Markets we serve",
-  description:
-    "Governed BOT operating mandates across the country, organized by region, state and metro.",
+  description: "Managed AI BOTS for local service businesses across the United States. Explore your region, state and city, then start with a $499 workflow audit.",
   alternates: { canonical: "/markets" },
 };
 
 export default function MarketsIndex() {
-  const regions = groupByRegion(ALL_STATES);
-  return (
-    <>
-      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }])} />
-      <Header />
-      <main>
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-14 sm:py-16">
-            <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
-              <div>
-                <p className="eyebrow mb-5">Markets <span className="eyebrow-dim">· {ALL_CITIES.length} cities · {ALL_STATES.length} states</span></p>
-                <h1 className="display-hero max-w-[20ch] text-balance">
-                  National delivery. Local operating context.
-                </h1>
-                <p className="body-lg mt-6 max-w-[54ch]">
-                  AgenticBots operates nationally. These pages organize service availability and local planning context by region, state and metro; each engagement is scoped to the client&apos;s systems and authority model.
-                </p>
-                <div className="mt-8"><PlanCta source="markets-index" /></div>
-              </div>
-              <BotFactory />
-            </div>
-          </Container>
-        </section>
-
-        {regions.map(({ region, states }) => (
-          <Section
-            key={region}
-            id={region.toLowerCase()}
-            variant="alt"
-            size="sm"
-            eyebrow={<span className="inline-flex items-center gap-2"><MapPin className="w-3 h-3" />{region}</span>}
-            heading={`${region} markets.`}
-            cta={
-              <Link
-                href={`/markets/region/${regionSlug(region)}`}
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-text)] hover:gap-2.5 transition-all"
-              >
-                All {region} markets
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            }
-          >
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {states.map((st) => {
-                const cities = allCitiesInState(st.slug);
-                return (
-                  <Link key={st.slug} href={`/markets/${st.slug}`}
-                    className="group border border-[var(--border)] bg-white p-5 hover:border-ink-950 hover:-translate-y-0.5 hover:shadow-lift transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
-                    <span className="flex items-center justify-between gap-3">
-                      <span className="display-md !text-[15px] group-hover:text-[var(--accent-text)] transition-colors">{st.name}</span>
-                      <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-text)] group-hover:translate-x-0.5 transition-all" />
-                    </span>
-                    <span className="mt-1.5 block mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                      {cities.length} cities
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </Section>
-        ))}
-
-        <Section variant="light" size="sm" eyebrow="By service" heading="Or start from the service.">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {ALL_SERVICES.map((s) => (
-              <Link key={s.slug} href={serviceHref(s)} className="group card-cell p-6">
-                <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
-                <span className="block body-xs mt-2">{getServicePositioning(s.slug).deliveryModel} · national delivery</span>
-              </Link>
-            ))}
-          </div>
-        </Section>
-      </main>
-      <Footer />
-    </>
-  );
+  const groups = groupByRegion(ALL_STATES).map(({ region, states }) => ({
+    id: regionSlug(region), name: region,
+    items: states.map(st => ({ name: st.name, href: `/markets/${st.slug}`, detail: `${allCitiesInState(st.slug).length} city ${allCitiesInState(st.slug).length === 1 ? "destination" : "destinations"}`, search: st.abbr })),
+    searchItems: states.flatMap(st => allCitiesInState(st.slug).map(city => ({ name: `${city.city}, ${st.abbr}`, href: `/markets/${st.slug}/${city.city_slug}`, detail: st.name, search: city.metro }))),
+  }));
+  return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }]), faqLd(marketFaqs("the United States"))]} /><Header />
+    <main className="service-experience market-experience">
+      <MarketHero eyebrow="Managed AI BOTS · National delivery" heading="Built for your business." accent="Wherever you operate." description="Connect your marketing, sales and customer operations with BOTS built around your tools, your team and the markets you serve." place="United States" areas={[...REGIONS]} areaLabel="Regional coverage" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets" }]} directory />
+      <MarketCoverage heading="Find your market. Plan your next move." description={`Explore ${ALL_CITIES.length} city destinations across 50 states and Washington, DC. Search for your city or choose a state to explore.`} groups={groups} label="Search cities and states" placeholder="City, state or metro name…" showFilters><Link href="/services" className="sx-text-link">Browse by service<ArrowRight size={16} /></Link></MarketCoverage>
+      <MarketServices /><MarketTools /><ServiceDelivery /><MarketFaq place="the United States" /><ServiceAudit source="markets-index" focus="your service area" />
+      <MarketNearby title="Explore by region." links={REGIONS.map(region => ({ name: region, href: `/markets/region/${regionSlug(region)}` }))} parent={{ name: "All services", href: "/services" }} />
+    </main><Footer /></>;
 }

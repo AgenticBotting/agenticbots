@@ -1,132 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
-import { Container, Section } from "@/components/ui";
-import { BotFactory } from "@/components/marketing";
-import { PlanCta } from "@/components/marketing";
-import { JsonLd, breadcrumbLd } from "@/components/JsonLd";
+import { JsonLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
+import { MarketHero, MarketCoverage, MarketServices, MarketTools, MarketFaq, MarketNearby, marketFaqs } from "@/components/marketing/MarketExperience";
+import { ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { getState as getEnrichedState, citiesInState as enrichedCitiesInState } from "@/lib/geo/data";
-import { ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
-import { ALL_STATES, allCitiesInState, getDatasetState, isEnriched } from "@/lib/geo/dataset";
-import { getServicePositioning } from "@/lib/service-positioning";
+import { ALL_STATES, allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
+import { regionOf, regionSlug } from "@/lib/geo/regions";
+import type { MarketGroup } from "@/lib/market-experience";
 
 type Params = { params: Promise<{ state: string }> };
-
-export function generateStaticParams() {
-  return ALL_STATES.map((st) => ({ state: st.slug }));
-}
-
+export function generateStaticParams() { return ALL_STATES.map(st => ({ state: st.slug })); }
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { state } = await params;
   const st = getDatasetState(state);
   if (!st) return {};
-  const cities = allCitiesInState(state);
-  const top = cities.slice(0, 3).map((c) => c.city).join(", ");
-  const hasEnriched = Boolean(getEnrichedState(state));
-  return {
-    title: `${st.name} markets`,
-    description: `Governed BOT operating mandates for ${st.name} businesses across ${cities.length} cities, including ${top}.`,
-    alternates: { canonical: `/markets/${state}` },
-    ...(hasEnriched ? {} : { robots: { index: false, follow: true } }),
-  };
+  return { title: `${st.name} markets`, description: `Managed AI BOTS for ${st.name} businesses. Explore local services for marketing, sales and customer operations. Start with a $499 audit.`, alternates: { canonical: `/markets/${state}` }, ...(getEnrichedState(state) ? {} : { robots: { index: false, follow: true } }) };
 }
-
 export default async function StateMarketPage({ params }: Params) {
   const { state } = await params;
   const st = getDatasetState(state);
   if (!st) notFound();
   const cities = allCitiesInState(state);
-
-  /* Group by metro cluster — the dataset's own structure. */
-  const metros = new Map<string, typeof cities>();
-  for (const c of cities) {
-    if (!metros.has(c.metro)) metros.set(c.metro, []);
-    metros.get(c.metro)!.push(c);
+  const place = st.slug === "district-of-columbia" ? "the District of Columbia" : st.name;
+  const groups = new Map<string, MarketGroup>();
+  for (const city of cities) {
+    if (!groups.has(city.metro_slug)) groups.set(city.metro_slug, { id: city.metro_slug, name: `${city.metro} metro`, items: [] });
+    groups.get(city.metro_slug)!.items.push({ name: city.city, href: `/markets/${st.slug}/${city.city_slug}`, search: `${st.name} ${st.abbr}` });
   }
-
-  return (
-    <>
-      <JsonLd data={breadcrumbLd([
-        { name: "Home", path: "/" },
-        { name: "Markets", path: "/markets" },
-        { name: st.name, path: `/markets/${st.slug}` },
-      ])} />
-      <Header />
-      <main>
-        <section className="border-b border-[var(--border)]">
-          <Container className="py-14 sm:py-16">
-            <nav className="mb-8 flex items-center gap-2 text-[12.5px] text-[var(--text-muted)]">
-              <Link href="/" className="hover:text-[var(--foreground)]">Home</Link><span>/</span>
-              <Link href="/markets" className="hover:text-[var(--foreground)]">Markets</Link><span>/</span>
-              <span className="text-[var(--text-body)]">{st.name}</span>
-            </nav>
-            <div className="grid lg:grid-cols-[1fr_0.95fr] gap-12 lg:gap-16 items-center">
-              <div>
-                <p className="eyebrow mb-5">{st.name} <span className="eyebrow-dim">· {cities.length} cities · {metros.size} metro cluster{metros.size > 1 ? "s" : ""}</span></p>
-                <h1 className="display-hero max-w-[20ch] text-balance">
-                  A governed BOT operating layer for {st.name}.
-                </h1>
-                <p className="body-lg mt-6 max-w-[54ch]">
-                  National delivery with {st.name} market context. Every engagement defines the operating mandate, systems, authority and review cadence before launch.
-                </p>
-                <div className="mt-8"><PlanCta source={`markets-${st.slug}`} /></div>
-              </div>
-              <BotFactory place={st.name} />
-            </div>
-          </Container>
-        </section>
-
-        <Section variant="alt" eyebrow={`${cities.length} cities`} heading={`Where we deploy in ${st.name}.`}
-          sub="Grouped by metro — pick yours, or the nearest cluster.">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[...metros.entries()].map(([metro, list]) => (
-              <div key={metro} className="border border-[var(--border)] bg-white p-5">
-                <p className="flex items-baseline justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--border)]">
-                  <span className="display-md !text-[15px]">{metro} metro</span>
-                  <span className="mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                    {list.length} {list.length > 1 ? "cities" : "city"}
-                  </span>
-                </p>
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-                  {list.map((c) => (
-                    <li key={c.city_slug}>
-                      <Link
-                        href={`/markets/${st.slug}/${c.city_slug}`}
-                        className="group flex items-center gap-1.5 py-1 text-[13px] text-[var(--text-body)] hover:text-[var(--accent-text)] transition-colors"
-                      >
-                        <span className="truncate">{c.city}</span>
-                        {isEnriched(c.state_slug, c.city_slug) && (
-                          <span className="h-1.5 w-1.5 shrink-0 bg-accent-500" title="Full market profile" />
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        <Section variant="light" size="sm" eyebrow="Services" heading={`Every service, everywhere in ${st.name}.`}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--border)] border border-[var(--border)]">
-            {ALL_SERVICES.map((s) => {
-              const enriched = enrichedCitiesInState(state).length > 0;
-              return (
-                <Link key={s.slug} href={enriched ? serviceGeoHref(s, st.slug) : serviceHref(s)} className="group card-cell p-6">
-                  <span className="display-md group-hover:text-[var(--accent-text)] transition-colors">{s.name}</span>
-                  <span className="mt-2 flex items-center gap-1.5 text-[12.5px] text-[var(--text-muted)]">
-                    {getServicePositioning(s.slug).deliveryModel}
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </Section>
-      </main>
-      <Footer />
-    </>
-  );
+  const region = regionOf(st.slug);
+  const serviceState = enrichedCitiesInState(state).length ? state : undefined;
+  const siblings = ALL_STATES.filter(item => item.slug !== st.slug && regionOf(item.slug) === region).slice(0, 4);
+  return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }, { name: st.name, path: `/markets/${st.slug}` }]), faqLd(marketFaqs(place))]} /><Header />
+    <main className="service-experience market-experience">
+      <MarketHero eyebrow={`Managed AI BOTS · ${st.name}`} heading="More capacity for" accent={`your business in ${place}.`} description={`Bring marketing, sales follow-up and customer operations together. Managed BOTS built around your ${st.name} service area, existing tools and team.`} place={st.name} areas={cities.slice(0, 4).map(city => city.city)} areaLabel="Local service areas" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets", href: "/markets" }, { name: region, href: `/markets/region/${regionSlug(region)}` }, { name: st.name }]} directory />
+      <MarketCoverage heading={`Find your city in ${place}.`} description={`Explore ${cities.length} city ${cities.length === 1 ? "destination" : "destinations"}, grouped by metro. Start locally or discuss a workflow spanning several locations.`} groups={[...groups.values()]} label={`Search ${st.name} cities and metros`} placeholder="City or metro name…"><Link href="#services" className="sx-text-link">View {st.name} services<ArrowRight size={16} /></Link></MarketCoverage>
+      <MarketServices place={place} state={serviceState} /><MarketTools /><ServiceDelivery /><MarketFaq place={place} /><ServiceAudit source={`markets-${st.slug}`} focus={`your business in ${place}`} />
+      <MarketNearby title={`More of the ${region}.`} links={siblings.map(item => ({ name: item.name, href: `/markets/${item.slug}` }))} parent={{ name: `All ${region} markets`, href: `/markets/region/${regionSlug(region)}` }} />
+    </main><Footer /></>;
 }
