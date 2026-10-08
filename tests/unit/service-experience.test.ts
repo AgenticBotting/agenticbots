@@ -43,6 +43,7 @@ describe("service buying journey", () => {
       const html = renderToStaticMarkup(await ServicePage({ params: Promise.resolve({ slug: svc.serviceSlug }) }));
       expect(html.match(/<h1[ >]/g)).toHaveLength(1);
       expect(html).toContain("$499");
+      expect(html).toMatch(/<h1>Agentic .+ <br\/><span>for /);
       expect(html).toContain("$7,500");
       expect(html).toContain("$2,500");
       expect(html).toContain("human approval");

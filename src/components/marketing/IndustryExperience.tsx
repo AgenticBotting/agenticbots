@@ -21,8 +21,8 @@ export function IndustryHero({ industry }: { industry: Industry }) {
   return <section className="sx-hero"><Container>
     <nav className="sx-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/industries">Industries</Link><span>/</span><span aria-current="page">{industry.name}</span></nav>
     <div className="sx-hero-intro"><ServiceOrbit /><div className="sx-hero-copy">
-      <p className="sx-kicker"><span className="sx-dot" />Agentic marketing implementation</p>
-      <h1>{industry.name} marketing.<br /><span>Built around your business.</span></h1>
+      <p className="sx-kicker"><span className="sx-dot" />Managed BOTS · Built around your business</p>
+      <h1>Agentic marketing{" "}<br /><span>for {industry.audience}.</span></h1>
       <p className="sx-lead">{industry.introduction}</p>
       <div className="sx-actions"><ServiceAuditLink /><a href="#marketing-plan" className="btn btn-outline">Explore the approach<ArrowRight size={16} /></a></div>
       <p className="sx-note">For established {industry.audience}. Start with a {AUDIT_OFFER.priceLabel} workflow audit.</p>

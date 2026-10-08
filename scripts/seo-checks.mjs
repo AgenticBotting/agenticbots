@@ -7,6 +7,7 @@
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { metadataText } from "./lib/metadata-text.mjs";
 
 const ROOT = ".next/server/app";
 const pages = [];
@@ -34,8 +35,8 @@ for (const p of pages) {
   const route = flat(p.slice(ROOT.length, -5));
   if (route.includes("_not-found") || route.includes("_global-error") || route.includes("/design")) continue;
 
-  const title = flat(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "");
-  const desc = flat(html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "");
+  const title = flat(metadataText(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ""));
+  const desc = flat(metadataText(html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? ""));
   const h1s = (html.match(/<h1[\s>]/g) || []).length;
   const canon = flat(html.match(/rel="canonical" href="([^"]*)"/)?.[1] ?? "");
 

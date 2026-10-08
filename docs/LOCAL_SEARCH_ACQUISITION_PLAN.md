@@ -2,6 +2,14 @@
 
 Prepared October 8, 2026. Status: the initial acquisition rollout below is implemented locally on `platform-v1`, following owner approval. Not pushed or deployed. The original audit and longer-term roadmap remain below as historical context.
 
+## Owner-approved headline refinement — October 8, 2026
+
+The owner selected **“Agentic marketing for contractors in Miami”** as the lead headline pattern. This supersedes the conventional-first H1 recommendation in the original audit below. The implemented market, service and trade templates now lead with “Agentic” while preserving a recognizable service, audience and location in a natural sentence. Examples: “Agentic marketing for contractors in Arizona,” “Agentic PPC management for contractors in Miami, FL,” and “Agentic SEO for HVAC companies.” National and regional wording follows the same approach.
+
+Search titles use sentence case, preserve SEO/PPC/CRM/B2B acronyms, and retain the complete service and location. A shared formatter omits the brand suffix when needed and, for the longest combinations, the audience phrase. All current combinations meet the 70-character editorial budget; that is not a guaranteed Google display width. H1s retain the full sentence. Supporting introductions, service navigation, backend capability mapping, canonical routes and publication eligibility remain intact. Existing publication dates already reflect this same October 8 revision day.
+
+Distinctiveness is a positioning hypothesis, not evidence of higher CTR or stronger rankings. After deployment and recrawling, compare Search Console impressions, clicks and CTR by page/query group, accounting for changes in position, device and geography; evaluate qualified audit requests separately. Google may choose a different title link. [Google title-link guidance](https://developers.google.com/search/docs/appearance/title-link).
+
 ## Implemented rollout — October 8, 2026
 
 - Familiar search-facing labels, titles, descriptions, H1s and introductory copy now cover all 13 national service families and their existing state/city variants. Market hubs lead with contractor marketing + location. Agentic implementation is explained adjacent to the offer; internal service/BOT identities and canonical URLs remain unchanged.

@@ -51,6 +51,7 @@ describe("geographic buying journey", () => {
     expect(html).toContain('href="/markets/florida/fort-lauderdale"');
     expect(html).toContain('href="/markets/florida"');
     expect(html.match(/<h1[ >]/g)).toHaveLength(1);
+    expect(html.match(/<h1>(.*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "")).toBe("Agentic marketing for contractors in Miami.");
     expect(html).toContain('id="audit"');
     expect(html).toContain("$499");
     expect(html).toContain("$7,500");

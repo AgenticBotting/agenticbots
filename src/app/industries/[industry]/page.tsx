@@ -9,6 +9,7 @@ import { IndustryHero, IndustryPlan, IndustryOperations, IndustryFaq, IndustryLi
 import { MarketTools } from "@/components/marketing/MarketExperience";
 import { ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { INDUSTRIES, getIndustry } from "@/lib/industries";
+import { agenticSearchTitle } from "@/lib/search-positioning";
 import { searchRobots } from "@/lib/search-publication";
 
 type Params = { params: Promise<{ industry: string }> };
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const industry = getIndustry(slug);
   if (!industry) return {};
   const path = `/industries/${industry.slug}`;
-  return { title: { absolute: `${industry.name} Marketing Agency | AgenticBots` }, description: `Marketing for ${industry.audience}: SEO, PPC and connected follow-up through managed AI BOTS. Clear scope and human approval. Start with a $499 audit.`, alternates: { canonical: path }, robots: searchRobots(path) };
+  return { title: { absolute: agenticSearchTitle("marketing", industry.audience) }, description: `Marketing for ${industry.audience}: SEO, PPC and connected follow-up through managed AI BOTS. Clear scope and human approval. Start with a $499 audit.`, alternates: { canonical: path }, robots: searchRobots(path) };
 }
 
 export default async function IndustryPage({ params }: Params) {

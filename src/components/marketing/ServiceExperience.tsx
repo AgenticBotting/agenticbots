@@ -10,7 +10,7 @@ import { getServicePlatforms } from "@/config/service-platforms";
 import { AUDIT_OFFER, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
 import type { Service } from "@/lib/catalog";
 import type { ServiceExperience } from "@/lib/service-experience";
-import { getSearchPositioning } from "@/lib/search-positioning";
+import { agenticServiceLabel, getSearchPositioning } from "@/lib/search-positioning";
 import "./service-experience.css";
 
 export function ServiceAuditLink({ label = "Start with a $499 audit" }: { label?: string }) {
@@ -33,8 +33,8 @@ export function ServiceHero({ svc, location, breadcrumb, editorial }: {
       <Container>
         {breadcrumb && <nav className="sx-breadcrumb" aria-label="Breadcrumb">{breadcrumb}</nav>}
         <div className="sx-hero-intro"><ServiceOrbit slug={svc.slug} /><div className="sx-hero-copy">
-          <p className="sx-kicker"><span className="sx-dot" />Agentic implementation · Managed for you</p>
-          <h1>{editorial ? <>{editorial.heading}<br /><span>{editorial.accent}</span></> : <>{search.label}<br /><span>for {search.audience}{location ? ` in ${location}` : ""}.</span></>}</h1>
+          <p className="sx-kicker"><span className="sx-dot" />BOT implementation · Managed for you</p>
+          <h1>{editorial ? <>{editorial.heading}{" "}<br /><span>{editorial.accent}</span></> : <>{agenticServiceLabel(search.label)}{" "}<br /><span>for {search.audience}{location ? ` in ${location}` : ""}.</span></>}</h1>
           <p className="sx-lead">{editorial?.introduction ?? search.introduction}</p>
           <div className="sx-actions"><ServiceAuditLink /><a href="#service-preview" className="btn btn-outline"><CirclePlay size={16} /> See the workflow</a></div>
           <p className="sx-note">Written findings within {AUDIT_OFFER.turnaround} of payment. Implementation scoped separately.</p>

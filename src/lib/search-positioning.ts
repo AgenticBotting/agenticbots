@@ -99,7 +99,24 @@ export function getSearchPositioning(slug: string): SearchPositioning {
 
 export function serviceSearchTitle(svc: Service, location?: string) {
   const copy = getSearchPositioning(svc.slug);
-  return `${copy.title}${location ? ` in ${location}` : ` for ${copy.audience}`} | AgenticBots`;
+  return agenticSearchTitle(copy.label, copy.audience, location);
+}
+
+export function agenticServiceLabel(service: string) {
+  // Sentence case ordinary words while preserving SEO, PPC, CRM and B2B.
+  return `Agentic ${service.replace(/^[A-Z](?=[a-z])/, letter => letter.toLowerCase())}`;
+}
+
+/** 70 characters is our editorial budget, not a Google display guarantee. */
+export function agenticSearchTitle(service: string, audience: string, location?: string) {
+  const where = location ? ` in ${location}` : "";
+  const offer = agenticServiceLabel(service);
+  const sentence = `${offer} for ${audience}${where}`;
+  const branded = `${sentence} | AgenticBots`;
+  if (branded.length <= 70) return branded;
+  if (sentence.length <= 70) return sentence;
+  // Keep the complete service and place when a long city name needs more room.
+  return `${offer}${where}`;
 }
 
 export function serviceSearchDescription(svc: Service, location?: string) {

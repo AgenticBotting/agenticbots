@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { agenticSearchTitle } from "@/lib/search-positioning";
 import { searchRobots } from "@/lib/search-publication";
 import { IndustryLinks } from "@/components/marketing/IndustryExperience";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { state } = await params;
   const st = getDatasetState(state);
   if (!st) return {};
-  return { title: { absolute: `Contractor Marketing Agency in ${st.name} | AgenticBots` }, description: `SEO, PPC and marketing services for contractors in ${st.name}. Managed AI BOTS connect campaigns and follow-up. Start with a $499 workflow audit.`, alternates: { canonical: `/markets/${state}` }, robots: searchRobots(`/markets/${state}`) };
+  return { title: { absolute: agenticSearchTitle("marketing", "contractors", st.slug === "district-of-columbia" ? "the District of Columbia" : st.name) }, description: `SEO, PPC and marketing services for contractors in ${st.name}. Managed AI BOTS connect campaigns and follow-up. Start with a $499 workflow audit.`, alternates: { canonical: `/markets/${state}` }, robots: searchRobots(`/markets/${state}`) };
 }
 export default async function StateMarketPage({ params }: Params) {
   const { state } = await params;
@@ -38,7 +39,7 @@ export default async function StateMarketPage({ params }: Params) {
   const siblings = ALL_STATES.filter(item => item.slug !== st.slug && regionOf(item.slug) === region).slice(0, 4);
   return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }, { name: st.name, path: `/markets/${st.slug}` }]), faqLd(marketFaqs(place))]} /><Header />
     <main className="service-experience market-experience">
-      <MarketHero eyebrow={`Agentic marketing implementation · ${st.name}`} heading="Marketing for contractors" accent={`in ${place}.`} description={`SEO, paid advertising and customer follow-up for the trades in ${st.name}. We build and manage the BOTS behind the work, using your existing systems and approval process.`} place={st.name} areas={cities.slice(0, 4).map(city => city.city)} areaLabel="Local service areas" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets", href: "/markets" }, { name: region, href: `/markets/region/${regionSlug(region)}` }, { name: st.name }]} directory />
+      <MarketHero eyebrow={`Managed marketing · ${st.name}`} heading="Agentic marketing" accent={`for contractors in ${place}.`} description={`SEO, paid advertising and customer follow-up for the trades in ${st.name}. We build and manage the BOTS behind the work, using your existing systems and approval process.`} place={st.name} areas={cities.slice(0, 4).map(city => city.city)} areaLabel="Local service areas" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets", href: "/markets" }, { name: region, href: `/markets/region/${regionSlug(region)}` }, { name: st.name }]} directory />
       <MarketCoverage heading={`Find your city in ${place}.`} description={`Explore ${cities.length} city ${cities.length === 1 ? "destination" : "destinations"}, grouped by metro. Start locally or discuss a workflow spanning several locations.`} groups={[...groups.values()]} label={`Search ${st.name} cities and metros`} placeholder="City or metro name…"><Link href="#services" className="sx-text-link">View {st.name} services<ArrowRight size={16} /></Link></MarketCoverage>
       <MarketServices place={place} state={serviceState} /><MarketPlanning place={place} text={STATE_SEARCH_BRIEFS[state]} /><IndustryLinks place={place} /><MarketTools /><ServiceDelivery /><MarketFaq place={place} /><ServiceAudit source={`markets-${st.slug}`} focus={`your business in ${place}`} />
       <MarketNearby title={`More of the ${region}.`} links={siblings.map(item => ({ name: item.name, href: `/markets/${item.slug}` }))} parent={{ name: `All ${region} markets`, href: `/markets/region/${regionSlug(region)}` }} />

@@ -11,7 +11,7 @@ import { ALL_CITIES, ALL_STATES } from "@/lib/geo/dataset";
 import { INDUSTRIES, INDUSTRY_CHANNELS } from "@/lib/industries";
 import { LOCAL_SEARCH_BRIEFS } from "@/lib/local-search-briefs";
 import { SEARCH_PUBLICATION, searchRobots } from "@/lib/search-publication";
-import { SEARCH_POSITIONING, serviceSearchTitle, serviceSearchDescription } from "@/lib/search-positioning";
+import { SEARCH_POSITIONING, agenticSearchTitle, serviceSearchTitle, serviceSearchDescription } from "@/lib/search-positioning";
 import { acquisitionContext, acquisitionEventContext } from "@/lib/acquisition-attribution";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/industries", notFound: () => { throw new Error("not found"); } }));
@@ -23,12 +23,25 @@ describe("search acquisition rollout", () => {
     for (const svc of ALL_SERVICES) {
       for (const location of [undefined, ...ALL_STATES.map(s => s.name), ...ALL_CITIES.map(c => `${c.city}, ${c.state_abbr}`)]) {
         const title = serviceSearchTitle(svc, location);
+        expect(title).toMatch(/^Agentic /);
         expect(title.length, title).toBeLessThanOrEqual(70);
+        if (location) expect(title).toContain(` in ${location}`);
         expect(serviceSearchDescription(svc, location).length, title).toBeLessThanOrEqual(170);
         expect(titles.has(title), title).toBe(false);
         titles.add(title);
       }
     }
+    for (const location of [...ALL_STATES.map(s => s.name), ...ALL_CITIES.map(c => `${c.city}, ${c.state_abbr}`)]) {
+      const title = agenticSearchTitle("marketing", "contractors", location);
+      expect(title.length, title).toBeLessThanOrEqual(70);
+      expect(title).toContain(` in ${location}`);
+      expect(titles.has(title), title).toBe(false);
+      titles.add(title);
+    }
+    expect(agenticSearchTitle("marketing", "contractors", "Miami, FL")).toBe("Agentic marketing for contractors in Miami, FL | AgenticBots");
+    expect(agenticSearchTitle("SEO", "HVAC companies")).toBe("Agentic SEO for HVAC companies | AgenticBots");
+    expect(agenticSearchTitle("Content marketing", "contractors", "Miami, FL")).toBe("Agentic content marketing for contractors in Miami, FL | AgenticBots");
+    expect(agenticSearchTitle("Outbound sales support", "commercial contractors", "Rancho Santa Margarita, CA")).toBe("Agentic outbound sales support in Rancho Santa Margarita, CA");
   });
 
   it("preserves the prior 565 indexable destinations and adds only the 19 curated industry pages", async () => {
@@ -56,12 +69,14 @@ describe("search acquisition rollout", () => {
       expect(html).toContain(renderToStaticMarkup(createElement("p", null, industry.qualification)));
       expect(html).toContain('data-demo="true"');
       const metadata = await industryMetadata({ params: Promise.resolve(params) });
+      expect(metadata.title).toEqual({ absolute: agenticSearchTitle("marketing", industry.audience) });
       expect(metadata.description!.length).toBeLessThanOrEqual(170);
       for (const service of INDUSTRY_CHANNELS) {
         const path = `/industries/${industry.slug}/${service}`;
         expect(html).toContain(`href="${path}"`);
         const detail = renderToStaticMarkup(await IndustryServicePage({ params: Promise.resolve({ ...params, service }) }));
         expect(detail.match(/<h1[ >]/g)).toHaveLength(1);
+        expect(detail).toMatch(/<h1>Agentic (?:SEO|PPC management) <br\/><span>for /);
         expect(detail).toContain('id="audit"');
         expect(detail).toContain("$499");
         expect(detail).toContain(renderToStaticMarkup(createElement("p", null, industry[service].decisions[0].body)));
@@ -69,6 +84,7 @@ describe("search acquisition rollout", () => {
         expect(meta.robots).toBeUndefined();
         expect(meta.alternates?.canonical).toBe(path);
         expect(meta.description!.length).toBeLessThanOrEqual(170);
+        expect((meta.title as { absolute: string }).absolute.length).toBeLessThanOrEqual(70);
         expect(titles.has(JSON.stringify(meta.title))).toBe(false);
         titles.add(JSON.stringify(meta.title));
       }
