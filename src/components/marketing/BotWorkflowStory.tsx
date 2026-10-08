@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef } from "react";
+import { useReducer } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -55,70 +55,6 @@ export function BotWorkflowStory() {
     workflowExampleReducer,
     INITIAL_WORKFLOW_EXAMPLE,
   );
-  const chapterRefs = useRef<(HTMLLIElement | null)[]>([]);
-
-  useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 1024px)");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let observer: IntersectionObserver | undefined;
-
-    function observe() {
-      observer?.disconnect();
-      if (!desktop.matches || reduced.matches) return;
-
-      observer = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort(
-              (a, b) =>
-                Math.abs(a.boundingClientRect.top + a.boundingClientRect.height / 2 - window.innerHeight / 2) -
-                Math.abs(b.boundingClientRect.top + b.boundingClientRect.height / 2 - window.innerHeight / 2),
-            )[0];
-
-          if (visible) {
-            dispatch({
-              type: "select",
-              step: Number((visible.target as HTMLElement).dataset.chapter) as WorkflowStep,
-              source: "scroll",
-            });
-          }
-        },
-        { rootMargin: "-44% 0px -44% 0px", threshold: 0 },
-      );
-
-      chapterRefs.current.forEach((element) => {
-        if (element) observer?.observe(element);
-      });
-    }
-
-    function resumeScroll() {
-      dispatch({ type: "resume" });
-    }
-
-    function onScrollKey(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      if (target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "")) return;
-      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"].includes(event.key)) resumeScroll();
-    }
-
-    observe();
-    window.addEventListener("wheel", resumeScroll, { passive: true });
-    window.addEventListener("touchstart", resumeScroll, { passive: true });
-    window.addEventListener("keydown", onScrollKey);
-    desktop.addEventListener("change", observe);
-    reduced.addEventListener("change", observe);
-
-    return () => {
-      observer?.disconnect();
-      window.removeEventListener("wheel", resumeScroll);
-      window.removeEventListener("touchstart", resumeScroll);
-      window.removeEventListener("keydown", onScrollKey);
-      desktop.removeEventListener("change", observe);
-      reduced.removeEventListener("change", observe);
-    };
-  }, []);
-
   function select(index: number) {
     dispatch({ type: "select", step: index as WorkflowStep, source: "manual" });
     track("workflow_step_viewed", { step: CHAPTERS[index].name });
@@ -138,40 +74,26 @@ export function BotWorkflowStory() {
         </div>
 
         <div className="story-layout">
-          <ol className="story-chapters">
+          <ol className="story-chapters" aria-label="Workflow chapters">
             {CHAPTERS.map((chapter, index) => (
               <li
                 key={chapter.name}
-                data-chapter={index}
-                ref={(element) => {
-                  chapterRefs.current[index] = element;
-                }}
                 className={cn("story-chapter", active === index && "is-active")}
               >
-                <span className="story-chapter-number">0{index + 1}</span>
-                <div>
-                  <h3 className="display-lg">{chapter.title}</h3>
-                  <p className="body-base mt-4 max-w-[39ch]">{chapter.copy}</p>
-                </div>
+                <button type="button" aria-pressed={active === index} onClick={() => select(index)}>
+                  <span className="story-chapter-number">0{index + 1}</span>
+                  <span className="story-chapter-copy">
+                    <span className="story-chapter-label">{chapter.name}</span>
+                    <strong>{chapter.title}</strong>
+                    <span>{chapter.copy}</span>
+                  </span>
+                  <ArrowRight className="story-chapter-arrow" size={17} aria-hidden="true" />
+                </button>
               </li>
             ))}
           </ol>
 
           <div className="story-stage">
-            <div className="workflow-controls" role="group" aria-label="Explore the example workflow">
-              {CHAPTERS.map((chapter, index) => (
-                <button
-                  key={chapter.name}
-                  type="button"
-                  aria-pressed={active === index}
-                  onClick={() => select(index)}
-                >
-                  <span>0{index + 1}</span>
-                  {chapter.name}
-                </button>
-              ))}
-            </div>
-
             <div className="workflow-display" aria-live={manual ? "polite" : "off"} aria-atomic="true">
               <div className="workflow-topline">
                 <span>{WORKFLOW_EXAMPLE.title}</span>

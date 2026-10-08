@@ -111,7 +111,7 @@ function ManagedSystem() {
 }
 
 function Governance() {
-  return <section id="infrastructure" className="workforce-governance section-pad on-dark"><Container><div className="governance-layout"><div><p className="eyebrow-dark mb-5">Governance by design</p><h2 className="display-xl max-w-[18ch]">Control is part<br />of the architecture.</h2><p className="body-lg text-ink-300 mt-6 max-w-[44ch]">Each BOT operates within a defined mandate, access model and approval policy. The system expands operational capacity while authorized people retain decision rights.</p><Link href="/how-it-works" className="btn btn-on-dark mt-8">Review the operating model <ArrowRight size={16} /></Link></div><div className="governance-record"><div className="governance-record-head"><Fingerprint size={20} /><span>Governed client environment</span></div><div className="governance-record-core"><Layers3 size={31} /><p>Coordinated BOT system</p><span>Defined roles, controls and workflow ownership</span></div><dl>{[
+  return <section id="infrastructure" className="workforce-governance section-pad on-dark"><Container><div className="governance-layout"><div className="governance-copy"><p className="eyebrow-dark mb-5">Governance by design</p><h2 className="display-xl max-w-[18ch]">Control is part<br />of the architecture.</h2><p className="body-lg text-ink-300 mt-6 max-w-[44ch]">Each BOT operates within a defined mandate, access model and approval policy. The system expands operational capacity while authorized people retain decision rights.</p><div className="governance-principles" aria-label="Operating principles"><span>Scoped access</span><span>Human authority</span><span>Reviewable activity</span></div><Link href="/how-it-works" className="btn btn-on-dark mt-8">Review the operating model <ArrowRight size={16} /></Link></div><div className="governance-record"><div className="governance-record-head"><Fingerprint size={20} /><span>Governed client environment</span><small>CONTROL PLANE</small></div><div className="governance-record-core"><Layers3 size={31} /><p>Coordinated BOT system</p><span>Defined roles, controls and workflow ownership</span></div><dl>{[
     ["Dedicated client environment", "Client access and data are separated by organization."],
     ["Human approval controls", "External changes wait for an authorized person."],
     ["Reviewable BOT ACTIVITY", "Runs, decisions and outcomes have a recorded trail."],
@@ -120,25 +120,94 @@ function Governance() {
 }
 
 function WhoFor() {
-  return <section className="section-pad border-b border-[var(--border)]"><Container><div className="audience-layout"><CoverageSystemVisual /><div><p className="eyebrow mb-5">Built for established contractors</p><h2 className="display-xl max-w-[18ch]">Operational leverage for firms with real complexity.</h2><p className="body-lg mt-6 max-w-[45ch]">Designed for residential and commercial contractors typically operating above $2M in annual revenue, where disconnected systems and inconsistent execution create material operating drag.</p><div className="audience-trades"><div><h3 className="display-md">Residential service organizations</h3><p className="body-sm mt-2">Roofing · HVAC · plumbing · electrical · remodeling</p></div><div><h3 className="display-md">Commercial contracting organizations</h3><p className="body-sm mt-2">General contractors · specialty trades · facilities services</p></div></div><a href="#audit" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Identify the first operating workflow <ArrowRight size={16} /></a></div></div></Container></section>;
+  return <section className="home-audience section-pad border-b border-[var(--border)]"><Container><div className="home-audience-frame"><div className="audience-layout"><CoverageSystemVisual /><div><p className="eyebrow mb-5">Built for established contractors</p><h2 className="display-xl max-w-[18ch]">Operational leverage for firms with real complexity.</h2><p className="body-lg mt-6 max-w-[45ch]">Designed for residential and commercial contractors typically operating above $2M in annual revenue, where disconnected systems and inconsistent execution create material operating drag.</p><div className="audience-fit"><span>BEST FIT</span><strong>Multiple systems · recurring handoffs · accountable managers</strong></div><div className="audience-trades"><div><h3 className="display-md">Residential service organizations</h3><p className="body-sm mt-2">Roofing · HVAC · plumbing · electrical · remodeling</p></div><div><h3 className="display-md">Commercial contracting organizations</h3><p className="body-sm mt-2">General contractors · specialty trades · facilities services</p></div></div><a href="#audit" className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Identify the first operating workflow <ArrowRight size={16} /></a></div></div></div></Container></section>;
 }
 
 function Delivery() {
-  return <section className="section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]"><Container><div className="system-intro"><h2 className="display-xl max-w-[22ch]">Implementation is scoped.<br />Operation is continuous.</h2><p className="body-lg max-w-[45ch]">The setup engagement establishes the operating system. The monthly retainer provides monitoring, maintenance and controlled improvement against the agreed mandate.</p></div><ol className="delivery-rows">{[
-    ["Assess & architect", "Document the current process, operating constraints, integration requirements and acceptance criteria before implementation begins."],
-    ["Configure & validate", "Establish scoped access, decision rules and test coverage against representative workflows and exception cases."],
-    ["Launch & operate", "Move through a monitored release, ongoing performance review and governed expansion as priorities change."],
-  ].map(([title, description], index) => <li key={title}><span>0{index + 1}</span><h3 className="display-lg">{title}</h3><p className="body-base">{description}</p></li>)}</ol></Container></section>;
+  const phases = [
+    ["Assess & architect", "Document the current process, operating constraints, integration requirements and acceptance criteria before implementation begins.", "Current-state map", "Accepted operating mandate"],
+    ["Configure & validate", "Establish scoped access, decision rules and test coverage against representative workflows and exception cases.", "Connected test environment", "Acceptance criteria passed"],
+    ["Launch & operate", "Move through a monitored release, ongoing performance review and governed expansion as priorities change.", "Managed production workflow", "Ongoing review cadence"],
+  ];
+  return <section className="home-delivery section-pad border-b border-[var(--border)]"><Container><div className="home-delivery-shell"><div className="system-intro"><div><p className="eyebrow mb-5">Deployment discipline</p><h2 className="display-xl max-w-[22ch]">Implementation is scoped.<br />Operation is continuous.</h2></div><p className="body-lg max-w-[45ch]">The setup engagement establishes the operating system. The monthly retainer provides monitoring, maintenance and controlled improvement against the agreed mandate.</p></div><div className="delivery-console-head"><span>DEPLOYMENT SEQUENCE</span><span>THREE CONTROLLED PHASES</span></div><ol className="delivery-rows">{phases.map(([title, description, output, gate], index) => <li key={title}><span>0{index + 1}</span><div><h3 className="display-lg">{title}</h3><p className="body-base">{description}</p></div><dl><div><dt>Operating output</dt><dd>{output}</dd></div><div><dt>Control gate</dt><dd>{gate}</dd></div></dl></li>)}</ol></div></Container></section>;
 }
 
 function Founding() {
-  return <section id="founding" className="section-pad-sm border-b border-[var(--border)]"><Container><div className="founding-note"><p className="display-md">Evidence, presented responsibly.</p><p className="body-base max-w-[57ch]">Interface demonstrations explain the operating model. Client outcomes will be published only when they are measured, attributable and approved for release.</p><Link href="/about" className="inline-flex items-center gap-2 text-[14px] font-semibold">Our operating principles <ArrowRight size={16} /></Link></div></Container></section>;
+  return <section id="founding" className="home-evidence section-pad-sm border-b border-[var(--border)]"><Container><div className="founding-note"><div><p className="eyebrow mb-3">Evidence standard</p><p className="display-md">Claims should survive scrutiny.</p></div><p className="body-base max-w-[57ch]">Interface demonstrations explain the operating model. Client outcomes will be published only when they are measured, attributable and approved for release.</p><Link href="/about" className="inline-flex items-center gap-2 text-[14px] font-semibold">Our operating principles <ArrowRight size={16} /></Link></div></Container></section>;
 }
 
 function Audit() {
-  return <section id="audit" className="section-pad"><Container><div className="grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16 items-start"><div><p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} workflow audit</p><h2 className="display-xl max-w-[18ch]">Define the business case for your first BOT.</h2><p className="body-lg mt-5 max-w-[45ch]">We review the customer journey, operating constraints and existing systems to identify a focused workflow with a credible path to implementation.</p><ul className="mt-7 space-y-3">{["Written findings within two business days of payment", "Focused operating review before a sales conversation", "Documented scope before implementation begins"].map((text) => <li key={text} className="flex items-start gap-2.5 text-[14px]"><Check size={16} className="text-[var(--accent-text)] shrink-0 mt-0.5" />{text}</li>)}</ul><p className="body-sm mt-7">The audit is {AUDIT_OFFER.priceLabel}. Managed BOT engagements begin at {formatPlanPrice(entry.setup)} setup + {formatPlanPrice(entry.monthly)}/month.</p></div><AuditForm source="home-final" /></div></Container></section>;
+  return <section id="audit" className="home-audit section-pad"><Container><div className="home-audit-shell"><div className="home-audit-copy"><p className="eyebrow mb-5">{AUDIT_OFFER.priceLabel} workflow audit</p><h2 className="display-xl max-w-[18ch]">Define the business case for your first BOT.</h2><p className="body-lg mt-5 max-w-[45ch]">We review the customer journey, operating constraints and existing systems to identify a focused workflow with a credible path to implementation.</p><ol className="audit-deliverables">{["Written findings within two business days of payment", "Focused operating review before a sales conversation", "Documented scope before implementation begins"].map((text, index) => <li key={text}><span>0{index + 1}</span>{text}</li>)}</ol><p className="body-sm mt-7">The audit is {AUDIT_OFFER.priceLabel}. Managed BOT engagements begin at {formatPlanPrice(entry.setup)} setup + {formatPlanPrice(entry.monthly)}/month.</p></div><AuditForm source="home-final" /></div></Container></section>;
 }
 
 export default function HomePage() {
-  return <><JsonLd data={[faqLd(HOME_FAQ)]} /><Header /><main className="home-overhaul"><Hero /><StackStrip tools={["Client-owned systems", "Workflow policy", "BOT orchestration", "Approval queue", "BOT ACTIVITY", "Management reporting"]} label="Managed operating architecture" /><ManagedSystem /><BotWorkflowStory /><Governance /><WhoFor /><Delivery /><section id="pricing" className="section-pad border-b border-[var(--border)]"><Container><div className="system-intro mb-12"><h2 className="display-xl max-w-[20ch]">A controlled entry point.<br /><span className="em-green">A system designed to scale.</span></h2><p className="body-lg max-w-[45ch]">Select the initial operating mandate. Expand only after the workflow is stable, governed and producing reviewable activity.</p></div><PricingCards /><Link href="/pricing" className="inline-flex items-center gap-2 mt-6 text-[14px] font-semibold">Review commercial terms and scope <ArrowRight size={16} /></Link></Container></section><Founding /><section className="section-pad border-b border-[var(--border)]"><Container><div className="grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-10 lg:gap-16"><h2 className="display-xl max-w-[18ch]">Commercial and<br />operating questions.</h2><FaqAccordion items={HOME_FAQ} /></div></Container></section><Audit /><section className="section-pad-sm border-t border-[var(--border)] bg-[var(--bg-alt)]"><Container><div className="coverage-intro"><div><h2 className="display-md">National delivery. Local market context.</h2><p className="body-sm mt-3">Managed deployments for established contractors across the United States.</p></div><Link href="/markets" className="inline-flex items-center gap-2 text-[14px] font-semibold">Review market coverage <ArrowRight size={16} /></Link></div><ul className="coverage-links">{REGIONS.map((region) => <li key={region}><Link href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link></li>)}</ul></Container></section></main><Footer /></>;
+  return (
+    <>
+      <JsonLd data={[faqLd(HOME_FAQ)]} />
+      <Header />
+      <main className="home-overhaul">
+        <Hero />
+        <StackStrip
+          tools={["Client-owned systems", "Workflow policy", "BOT orchestration", "Approval queue", "BOT ACTIVITY", "Management reporting"]}
+          label="Managed operating architecture"
+        />
+        <ManagedSystem />
+        <BotWorkflowStory />
+        <Governance />
+        <WhoFor />
+        <Delivery />
+
+        <section id="pricing" className="home-pricing section-pad border-b border-[var(--border)]">
+          <Container>
+            <div className="home-pricing-shell">
+              <div className="system-intro mb-12">
+                <div>
+                  <p className="eyebrow mb-5">Commercial model</p>
+                  <h2 className="display-xl max-w-[20ch]">A controlled entry point.<br /><span className="em-green">A system designed to scale.</span></h2>
+                </div>
+                <p className="body-lg max-w-[45ch]">Select the initial operating mandate. Expand only after the workflow is stable, governed and producing reviewable activity.</p>
+              </div>
+              <PricingCards />
+              <div className="home-pricing-foot">
+                <span>Scope, integrations, included usage and support are documented before launch.</span>
+                <Link href="/pricing">Review commercial terms and scope <ArrowRight size={16} /></Link>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <Founding />
+
+        <section className="home-faq section-pad border-b border-[var(--border)]">
+          <Container>
+            <div className="home-faq-layout">
+              <div className="home-faq-heading">
+                <p className="eyebrow mb-5">Decision support</p>
+                <h2 className="display-xl max-w-[18ch]">Commercial and<br />operating questions.</h2>
+                <p className="body-base mt-5 max-w-[38ch]">Direct answers on scope, authority, timing and commercial structure before you commit to implementation.</p>
+              </div>
+              <FaqAccordion items={HOME_FAQ} />
+            </div>
+          </Container>
+        </section>
+
+        <Audit />
+
+        <section className="home-coverage section-pad-sm border-t border-[var(--border)]">
+          <Container>
+            <div className="coverage-intro">
+              <div>
+                <p className="eyebrow mb-3">National operating reach</p>
+                <h2 className="display-md">National delivery. Local market context.</h2>
+                <p className="body-sm mt-3">Managed deployments for established contractors across the United States.</p>
+              </div>
+              <Link href="/markets" className="inline-flex items-center gap-2 text-[14px] font-semibold">Review market coverage <ArrowRight size={16} /></Link>
+            </div>
+            <ul className="coverage-links">{REGIONS.map((region) => <li key={region}><Link href={`/markets/region/${regionSlug(region)}`}>{region}<ArrowRight size={14} /></Link></li>)}</ul>
+          </Container>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
 }
