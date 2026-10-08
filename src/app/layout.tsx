@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter_Tight } from "next/font/google";
+import { Geist, Geist_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ConsoleGreeting } from "@/components/marketing";
 import { MarketingOnly } from "@/components/marketing/MarketingOnly";
@@ -18,11 +18,12 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
   display: "swap",
   weight: "variable",
+  axes: ["wdth"],
 });
 
 
@@ -79,7 +80,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${interTight.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSans.variable}`}>
       <body>
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}

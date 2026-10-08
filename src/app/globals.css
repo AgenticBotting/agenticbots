@@ -1,6 +1,6 @@
 /* Hallmark · macrostructure: product-canvas narrative · theme: studied-DNA (source: user reference images)
  * hero: centered display + wide operating workspace · service: promise + product canvas + deployment rail
- * type: Inter Tight + Geist + Geist Mono · palette: AgenticBots olive / ink / white
+ * type: IBM Plex Sans + Geist + Geist Mono · palette: AgenticBots olive / ink / white
  * critique: P5 H5 E4 S5 R4 V5 · slop: pass · honest: pass · responsive: pass */
 @import "tailwindcss";
 
@@ -13,7 +13,7 @@
    it means something in the system just became active.
 
    Rules that hold everywhere:
-     · Inter Tight carries controlled, high-impact display type; Geist keeps product
+     · IBM Plex Sans carries controlled, high-impact display type; Geist keeps product
        controls, navigation and reading surfaces quiet and precise.
      · Core controls keep the diagonal notch. Product stages may use a
        restrained radius to distinguish presentation from product UI.
@@ -142,11 +142,11 @@
   --radius-xs: 0;
   --notch: 11px;
 
-  /* Inter Tight gives headings a precise corporate grotesque silhouette.
-     Medium-to-bold weights create authority without the poster-like mass
-     of a black display face. Geist remains the enterprise workhorse for
-     body, navigation and controls; Mono carries the technical register. */
-  --font-display: var(--font-inter-tight);
+  /* IBM Plex Sans gives headings an institutional technology character.
+     Medium-to-bold weights create authority without the compressed mass
+     of a display face. Geist remains the enterprise workhorse for body,
+     navigation and controls; Mono carries the technical register. */
+  --font-display: var(--font-ibm-plex-sans);
   --font-body: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -314,31 +314,35 @@
 
   .display-hero {
     font-family: var(--font-display);
-    font-weight: 740;
+    font-weight: 680;
     font-size: clamp(2rem, 3.6vw, 3rem);
-    line-height: .96;
-    letter-spacing: -0.048em;
+    line-height: .98;
+    letter-spacing: -0.038em;
+    font-variation-settings: "wdth" 100;
   }
   .display-xl {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 650;
     font-size: clamp(1.625rem, 2.6vw, 2.125rem);
-    line-height: 1;
-    letter-spacing: -0.04em;
+    line-height: 1.04;
+    letter-spacing: -0.032em;
+    font-variation-settings: "wdth" 100;
   }
   .display-lg {
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 600;
     font-size: clamp(1.1875rem, 1.7vw, 1.4375rem);
-    line-height: 1.08;
-    letter-spacing: -0.032em;
+    line-height: 1.12;
+    letter-spacing: -0.024em;
+    font-variation-settings: "wdth" 100;
   }
   .display-md {
     font-family: var(--font-display);
-    font-weight: 620;
+    font-weight: 580;
     font-size: 1.0625rem;
-    line-height: 1.14;
-    letter-spacing: -0.026em;
+    line-height: 1.18;
+    letter-spacing: -0.018em;
+    font-variation-settings: "wdth" 100;
   }
 
   /* The one green phrase in a headline. Swaps by surface. */
@@ -880,7 +884,7 @@
 .workforce-hero-shell { position: relative; z-index: 1; padding-block: clamp(62px, 7vw, 94px) 0; }
 .hero-copy { min-width: 0; max-width: 920px; margin-inline: auto; text-align: center; }
 .hero-copy > .eyebrow { max-width: calc(100% - 32px); margin-left: clamp(0px, 6vw, 72px); margin-right: auto; text-align: left; }
-.hero-copy h1 { max-width: 16ch; margin-inline: auto; font-family: var(--font-display); font-size: clamp(52px, 7vw, 92px); font-weight: 760; line-height: .9; letter-spacing: -.052em; text-wrap: balance; }
+.hero-copy h1 { max-width: 17ch; margin-inline: auto; font-family: var(--font-display); font-size: clamp(48px, 6.4vw, 82px); font-weight: 680; line-height: .96; letter-spacing: -.042em; font-variation-settings: "wdth" 100; text-wrap: balance; }
 .hero-copy h1 span { color: var(--accent-text); }
 .hero-copy > .body-lg { max-width: 64ch; margin-inline: auto; }
 .hero-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 20px; }
@@ -1197,10 +1201,10 @@
 .service-hero-copy .eyebrow-dim { color: var(--text-muted); }
 .service-hero-copy > .display-lg { color: var(--accent-text) !important; }
 .service-hero-copy > .display-hero {
-  max-width: 18ch;
-  font-size: clamp(3.15rem, 5.6vw, 5.25rem);
-  line-height: .91;
-  letter-spacing: -.052em;
+  max-width: 20ch;
+  font-size: clamp(2.9rem, 5vw, 4.65rem);
+  line-height: .97;
+  letter-spacing: -.041em;
 }
 .service-hero-copy > .display-lg { font-size: clamp(1.35rem, 2vw, 1.8rem); line-height: 1.15; }
 .service-hero-copy > .body-lg { max-width: 62ch; font-size: clamp(1.08rem, 1.35vw, 1.25rem); line-height: 1.62; }
@@ -1339,7 +1343,7 @@
   color: var(--foreground);
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: clamp(17px, 1.5vw, 21px);
-  font-weight: 680;
+  font-weight: 620;
   line-height: 1.05;
   letter-spacing: -.035em;
 }
