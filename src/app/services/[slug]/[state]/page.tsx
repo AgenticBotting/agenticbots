@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getSearchPositioning, serviceSearchTitle, serviceSearchDescription } from "@/lib/search-positioning";
 import { searchRobots } from "@/lib/search-publication";
 import { IndustryLinks } from "@/components/marketing/IndustryExperience";
+import { MarketCoverage } from "@/components/marketing/MarketExperience";
+import { cityMarketGroups } from "@/lib/market-experience";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
@@ -39,8 +41,8 @@ export default async function StateHub({ params }: Params) {
   const positioning = getServicePositioning(svc.slug);
   const search = getSearchPositioning(svc.slug);
   const cities = allCitiesInState(state);
-  const metros = [...new Map(cities.map(c => [c.metro, cities.filter(x => x.metro === c.metro)])).entries()];
   const path = `/services/${svc.serviceSlug}/${st.slug}`;
+  const groups = cityMarketGroups(cities, city => `${path}/${city.city_slug}`);
   const faqs = [
     { q: `How do you deliver ${svc.name.toLowerCase()} across ${st.name}?`, a: `${positioning.deliveryModel}. The service can be delivered remotely across ${st.name}. Your proposal defines the systems, data and local context included in the engagement.` },
     { q: "Do I need different software?", a: "We plan around your existing tools. Scoping checks the access, connection requirements and custom work involved before implementation." },
@@ -53,7 +55,7 @@ export default async function StateHub({ params }: Params) {
       <ServiceBenefits svc={svc} />
       <ServiceBuyerBrief svc={svc} location={st.name} />
       <ServiceScope svc={svc} />
-      <section className="sx-section"><Container><div className="sx-section-heading"><p className="sx-kicker">Local coverage · {cities.length} city destinations</p><h2>{svc.name},<br /><span>across {st.name}.</span></h2><p>Explore your metro and city. Local context informs the plan; your systems and business priorities define the implementation.</p></div><div className="sx-market-links">{metros.map(([metro, list]) => <div key={metro} className="sx-market-group"><h3>{metro} metro</h3><ul>{list.map(city => <li key={city.city_slug}><Link href={`${path}/${city.city_slug}`}>{city.city}</Link></li>)}</ul></div>)}</div></Container></section>
+      <MarketCoverage heading={`${search.label} across ${st.name}.`} description="Choose your city to explore a local implementation, or narrow the directory to your metro area." groups={groups} label="Search cities and metro areas" placeholder="City or metro name…" groupLabel="Metro area" itemLabel="city" proposalFocus={`${search.label} in ${st.name}`} />
       <ServiceConnections svc={svc} /><ServiceDelivery />
       <section className="sx-section"><Container><div className="sx-faq-layout"><div className="sx-section-copy"><p className="sx-kicker">Questions about delivery</p><h2>Built around<br /><span>your business in {st.name}.</span></h2><p>A local service area, a clearly defined scope, and one team managing the work.</p></div><FaqAccordion items={faqs} /></div></Container></section>
       <IndustryLinks service={svc.slug} place={st.name} geo={{ state }} />

@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { ALL_SERVICES, CATALOG } from "@/lib/catalog";
 import { SERVICE_EXPERIENCES, getServiceExperience } from "@/lib/service-experience";
 import { getServicePositioning } from "@/lib/service-positioning";
@@ -48,12 +49,22 @@ describe("service buying journey", () => {
       expect(html).toContain("$7,500");
       expect(html).toContain("$2,500");
       expect(html).toContain("human approval");
-      expect(html).toContain(`href="/services/${svc.serviceSlug}/florida"`);
+      for (const state of ALL_STATES) expect(html).toContain(`href="/services/${svc.serviceSlug}/${state.slug}"`);
       expect(html).toContain('id="service-preview"');
       expect(html).toContain('id="audit"');
       const visibleCopy = html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ").toLowerCase().replace(/[\u2010-\u2015-]/g, " ");
       expect(svc.owns.some(term => visibleCopy.includes(term.toLowerCase().replace(/[\u2010-\u2015-]/g, " "))), svc.slug).toBe(true);
     }
+  });
+
+  it("renders every Mississippi city as a service-specific link with readable metro labels", async () => {
+    const slug = "agentic-ppc-management";
+    const html = renderToStaticMarkup(await StatePage({ params: Promise.resolve({ slug, state: "mississippi" }) }));
+    for (const city of allCitiesInState("mississippi")) expect(html).toContain(`href="/services/${slug}/mississippi/${city.city_slug}"`);
+    expect(html).toContain("Search cities and metro areas");
+    expect(html).toContain("Memphis metro");
+    expect(html).not.toMatch(/Memphis Metro metro/i);
+    expect(html).toContain("More than one service area?");
   });
 
   it("preserves local navigation and indexability for enriched and structural cities", async () => {

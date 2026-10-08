@@ -10,7 +10,7 @@ import { Container } from "@/components/ui";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { ServiceHero, ServiceBuyerBrief, ServiceBenefits, ServiceScope, ServiceConnections, ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
-import { citiesInState } from "@/lib/geo/data";
+import { MarketCoverage } from "@/components/marketing/MarketExperience";
 import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { groupByRegion } from "@/lib/geo/regions";
 import { ALL_SERVICES, ALL_CATEGORIES, getService, serviceHref } from "@/lib/catalog";
@@ -45,6 +45,11 @@ export default async function ServiceHub({ params }: Params) {
   const positioning = getServicePositioning(svc.slug);
   const search = getSearchPositioning(svc.slug);
   const href = `/services/${svc.serviceSlug}`;
+  const coverage = groupByRegion(ALL_STATES).map(({ region, states }) => ({
+    id: region, name: region,
+    items: states.map(st => ({ name: st.name, href: `${href}/${st.slug}`, detail: `${allCitiesInState(st.slug).length} ${allCitiesInState(st.slug).length === 1 ? "city" : "cities"}`, search: st.abbr })),
+    searchItems: states.flatMap(st => allCitiesInState(st.slug).map(city => ({ name: `${city.city}, ${st.abbr}`, href: `${href}/${st.slug}/${city.city_slug}`, detail: st.name, search: city.metro }))),
+  }));
   const faqs = [
     { q: `What is included in ${svc.name.toLowerCase()}?`, a: `${positioning.summary} Your proposal sets out the workflows, integrations, support and acceptance criteria for the engagement.` },
     { q: "Which BOTS deliver this service?", a: `${positioning.deliveryModel}. We configure the service around your existing systems and the work your team needs to move forward.` },
@@ -67,7 +72,7 @@ export default async function ServiceHub({ params }: Params) {
       <IndustryLinks service={svc.slug} />
       <ServiceAudit source={`service-${svc.serviceSlug}-form`} focus={svc.name} />
       {pairs.length > 0 && <section className="sx-section sx-related"><Container><div className="sx-section-copy"><p className="sx-kicker">Build on the first workflow</p><h2>Connect the next<br /><span>part of the business.</span></h2></div><div className="sx-related-grid">{pairs.map(c => <Link key={c.slug} href={serviceHref(c)}><span><strong>{c.name}</strong><p>{getServiceExperience(c.slug).benefits[0].title}</p></span><ArrowRight /></Link>)}</div></Container></section>}
-      <section id="coverage" className="sx-section sx-coverage"><Container><div className="sx-section-heading"><p className="sx-kicker">National delivery. Local context.</p><h2>{svc.name},<br /><span>where you do business.</span></h2><p>Explore local coverage. Your service area informs the plan; your business systems and priorities define the build.</p></div><div className="sx-coverage-grid">{groupByRegion(ALL_STATES).map(({ region, states }) => <div key={region}><h3>{region}</h3><ul>{states.map(st => <li key={st.slug}><Link href={citiesInState(st.slug).length ? `${href}/${st.slug}` : `/markets/${st.slug}`}><span>{st.name}</span><span>{allCitiesInState(st.slug).length}</span></Link></li>)}</ul></div>)}</div><p className="sx-note">Counts show city destinations in each state, not client deployments or results.</p></Container></section>
+      <MarketCoverage heading={`${search.label}, where you do business.`} description="Choose a state or search for your city to explore this service in your market." groups={coverage} label="Search cities and states" placeholder="City, state or metro name…" showFilters proposalFocus={search.label} />
     </main>
     <Footer />
   </>;

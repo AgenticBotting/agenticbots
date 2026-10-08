@@ -9,7 +9,7 @@ import { ALL_SERVICES } from "@/lib/catalog";
 import { ALL_CITIES, ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { getLocalSearchBrief } from "@/lib/local-search-briefs";
 import { getCity } from "@/lib/geo/data";
-import { MARKET_PRIORITIES, filterMarketGroups, type MarketGroup } from "@/lib/market-experience";
+import { MARKET_PRIORITIES, cityMarketGroups, metroLabel, filterMarketGroups, type MarketGroup } from "@/lib/market-experience";
 import { MarketWorkspace } from "@/components/marketing/MarketWorkspace";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/markets", notFound: () => { throw new Error("not found"); } }));
@@ -27,6 +27,20 @@ describe("geographic buying journey", () => {
     expect(filterMarketGroups(groups, "Miami", "west")).toEqual([]);
     expect(filterMarketGroups(groups, "unknown market")).toEqual([]);
     expect(groups[0].items).toHaveLength(1);
+  });
+
+  it("groups every state city once, normalizes metro labels and preserves the selected service in search", () => {
+    const cities = allCitiesInState("mississippi");
+    const local = cityMarketGroups(cities, city => `/services/agentic-ppc-management/mississippi/${city.city_slug}`);
+    expect(local.flatMap(group => group.items)).toHaveLength(cities.length);
+    expect(new Set(local.flatMap(group => group.items.map(item => item.href))).size).toBe(cities.length);
+    expect(metroLabel("Memphis Metro")).toBe("Memphis metro");
+    expect(metroLabel("Gulf Coast")).toBe("Gulf Coast metro");
+    const memphis = filterMarketGroups(local, "Memphis");
+    expect(memphis).toHaveLength(1);
+    expect(memphis[0].items.map(item => item.name)).toEqual(["Horn Lake", "Olive Branch", "Southaven"]);
+    expect(filterMarketGroups(local, "Biloxi", memphis[0].id)).toEqual([]);
+    expect(filterMarketGroups(local, "Biloxi MS")[0].items[0].href).toBe("/services/agentic-ppc-management/mississippi/biloxi");
   });
 
   it("retains crawlable region, state and metro-to-city paths in the initial HTML", async () => {

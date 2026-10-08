@@ -12,7 +12,7 @@ import { ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExp
 import { ALL_STATES, allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
 import { regionOf, regionSlug } from "@/lib/geo/regions";
 import { STATE_SEARCH_BRIEFS } from "@/lib/local-search-briefs";
-import type { MarketGroup } from "@/lib/market-experience";
+import { cityMarketGroups } from "@/lib/market-experience";
 
 type Params = { params: Promise<{ state: string }> };
 export function generateStaticParams() { return ALL_STATES.map(st => ({ state: st.slug })); }
@@ -28,17 +28,13 @@ export default async function StateMarketPage({ params }: Params) {
   if (!st) notFound();
   const cities = allCitiesInState(state);
   const place = st.slug === "district-of-columbia" ? "the District of Columbia" : st.name;
-  const groups = new Map<string, MarketGroup>();
-  for (const city of cities) {
-    if (!groups.has(city.metro_slug)) groups.set(city.metro_slug, { id: city.metro_slug, name: `${city.metro} metro`, items: [] });
-    groups.get(city.metro_slug)!.items.push({ name: city.city, href: `/markets/${st.slug}/${city.city_slug}`, search: `${st.name} ${st.abbr}` });
-  }
+  const groups = cityMarketGroups(cities, city => `/markets/${st.slug}/${city.city_slug}`);
   const region = regionOf(st.slug);
   const siblings = ALL_STATES.filter(item => item.slug !== st.slug && regionOf(item.slug) === region).slice(0, 4);
   return <><JsonLd data={[breadcrumbLd([{ name: "Home", path: "/" }, { name: "Markets", path: "/markets" }, { name: st.name, path: `/markets/${st.slug}` }]), faqLd(marketFaqs(place))]} /><Header market={{ state }} />
     <main className="service-experience market-experience">
       <MarketHero eyebrow={`Managed marketing · ${st.name}`} heading="Agentic marketing" accent={`for contractors in ${place}.`} description={`SEO, paid advertising and customer follow-up for the trades in ${st.name}. We build and manage the BOTS behind the work, using your existing systems and approval process.`} place={st.name} areas={cities.slice(0, 4).map(city => city.city)} areaLabel="Local service areas" breadcrumb={[{ name: "Home", href: "/" }, { name: "Markets", href: "/markets" }, { name: region, href: `/markets/region/${regionSlug(region)}` }, { name: st.name }]} directory />
-      <MarketCoverage heading={`Find your city in ${place}.`} description={`Explore ${cities.length} city ${cities.length === 1 ? "destination" : "destinations"}, grouped by metro. Start locally or discuss a workflow spanning several locations.`} groups={[...groups.values()]} label={`Search ${st.name} cities and metros`} placeholder="City or metro name…"><Link href="#services" className="sx-text-link">View {st.name} services<ArrowRight size={16} /></Link></MarketCoverage>
+      <MarketCoverage heading={`Find your city in ${place}.`} description="Choose a city or metro area to explore local services. Plan one market or an implementation across several locations." groups={groups} groupLabel="Metro area" itemLabel="city" proposalFocus={`Marketing in ${st.name}`} label={`Search ${st.name} cities and metros`} placeholder="City or metro name…"><Link href="#services" className="sx-text-link">View {st.name} services<ArrowRight size={16} /></Link></MarketCoverage>
       <MarketServices place={place} state={state} /><MarketPlanning place={place} text={STATE_SEARCH_BRIEFS[state]} /><IndustryLinks place={place} geo={{ state }} /><MarketTools /><ServiceDelivery /><MarketFaq place={place} /><ServiceAudit source={`markets-${st.slug}`} focus={`your business in ${place}`} />
       <MarketNearby title={`More of the ${region}.`} links={siblings.map(item => ({ name: item.name, href: `/markets/${item.slug}` }))} parent={{ name: `All ${region} markets`, href: `/markets/region/${regionSlug(region)}` }} />
     </main><Footer market={{ state }} /></>;

@@ -41,11 +41,12 @@ export function MarketServices({ place, state, city }: { place?: string; state?:
   </Container></section>;
 }
 
-export function MarketCoverage({ heading, description, groups, label, placeholder, showFilters, children }: {
+export function MarketCoverage({ heading, description, groups, label, placeholder, showFilters, children, groupLabel, itemLabel, proposalFocus }: {
   heading: string; description: string; groups: MarketGroup[]; label: string; placeholder: string;
   showFilters?: boolean; children?: React.ReactNode;
+  groupLabel?: string; itemLabel?: "city" | "destination"; proposalFocus?: string;
 }) {
-  return <section id="coverage" className="sx-section mx-coverage"><Container><div className="mx-directory-heading"><div className="sx-section-copy"><p className="sx-kicker">Find your service area</p><h2>{heading}</h2><p>{description}</p></div>{children}</div><MarketDirectory groups={groups} label={label} placeholder={placeholder} showFilters={showFilters} /><p className="sx-note mx-count-note">Directory counts describe coverage pages, not client locations or results. Services are delivered remotely and scoped to your business.</p></Container></section>;
+  return <section id="coverage" className="sx-section mx-coverage"><Container><div className="mx-directory-heading"><div className="sx-section-copy"><p className="sx-kicker">Find your service area</p><h2>{heading}</h2><p>{description}</p></div>{children}</div><MarketDirectory key={proposalFocus ?? label} groups={groups} label={label} placeholder={placeholder} showFilters={showFilters} groupLabel={groupLabel} itemLabel={itemLabel} proposalFocus={proposalFocus} /><p className="sx-note mx-count-note">Directory counts describe coverage pages, not client locations or results. Services are delivered remotely and scoped to your business.</p></Container></section>;
 }
 
 export function MarketContext({ place, metro, labels, city }: { place: string; metro: string; labels: string[]; city?: City }) {

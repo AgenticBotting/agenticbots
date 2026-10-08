@@ -1,6 +1,22 @@
 /** Public navigation and illustrative planning content. No live client data. */
+import type { DatasetCity } from "./geo/dataset";
+
 export type MarketDestination = { name: string; href: string; detail?: string; search?: string };
 export type MarketGroup = { id: string; name: string; items: MarketDestination[]; searchItems?: MarketDestination[] };
+
+export function metroLabel(name: string): string {
+  return `${name.trim().replace(/(?:\s+metro)+$/i, "")} metro`;
+}
+
+/** One grouping contract for general and service-specific state directories. */
+export function cityMarketGroups(cities: DatasetCity[], href: (city: DatasetCity) => string): MarketGroup[] {
+  const groups = new Map<string, MarketGroup>();
+  for (const city of cities) {
+    if (!groups.has(city.metro_slug)) groups.set(city.metro_slug, { id: city.metro_slug, name: metroLabel(city.metro), items: [] });
+    groups.get(city.metro_slug)!.items.push({ name: city.city, href: href(city), search: `${city.state} ${city.state_abbr}` });
+  }
+  return [...groups.values()];
+}
 
 export const MARKET_PRIORITIES = [
   { id: "demand", label: "Build demand", title: "Be found by the customers you want.", description: "Connect search, advertising, content and prospecting around the services and areas you want to grow.", task: "Local campaign brief", input: "Services, audience and priority locations", output: "A focused campaign brief for review", control: "Your team approves targeting, publishing and account changes.", slugs: ["paid-media", "seo", "reviews", "content", "lead-generation", "outbound"] },
