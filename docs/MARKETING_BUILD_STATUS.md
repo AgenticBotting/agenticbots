@@ -2,6 +2,12 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Local search acquisition plan — 2026-10-08
+
+Completed a source/build and current-guidance audit for conventional agency/service searches, with a proposed geography + service + trade acquisition strategy in `docs/LOCAL_SEARCH_ACQUISITION_PLAN.md`. The plan includes all 13 service query clusters, copy prototypes, a six-trade starting set, publication gates, a 23-existing-page pilot, up to 18 national industry pages and conversion measurement. Current production search volume, rankings, actual Google indexing and paid conversion data were not available to this audit. No public copy, routes or indexing rules changed; this entry records planning only.
+
+Documentation-only validation: typecheck passed, lint passed with zero errors and five existing warnings, and all 187 tests across 27 files passed. No new build was needed because pages, routes and configuration were unchanged; inventory findings were checked against the preceding production build.
+
 ## Geographic market-page redesign — 2026-10-08
 
 The national market directory, five regions, 51 state/DC hubs and 924 city hubs now share the approved white/olive, Geist-based product design. Each has a benefit-led introduction, local planning preview, services grouped by business priority, scoped tool references, delivery/investment details and a compact $499 audit form. National/regional search can find a city directly; state directories filter by city/metro. Search uses existing destinations in memory without adding query-string routes, and all normal state/city crawl paths remain in the initial HTML. Region filtering, empty-state reset and direct service links work on mobile.
