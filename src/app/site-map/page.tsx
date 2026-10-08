@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui";
 import { CATALOG, ALL_SERVICES, serviceHref } from "@/lib/catalog";
+import { INDUSTRIES } from "@/lib/industries";
 import { SORTED_POSTS } from "@/lib/posts";
 import { CITIES, STATES, citiesInState } from "@/lib/geo/data";
 import { getServicePositioning } from "@/lib/service-positioning";
@@ -106,6 +107,7 @@ export default function SiteMapPage() {
               </ul>
             </div>
           </div>
+          <section className="mt-12 border-t border-[var(--border)] pt-8"><h2 className="display-md mb-5"><Link href="/industries">Marketing by industry</Link></h2><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">{INDUSTRIES.map(industry => <div key={industry.slug}><h3 className="font-semibold"><Link href={`/industries/${industry.slug}`}>{industry.name} marketing</Link></h3><ul className="mt-2 space-y-2 text-sm text-[var(--text-secondary)]"><li><Link href={`/industries/${industry.slug}/seo`}>{industry.name} SEO</Link></li><li><Link href={`/industries/${industry.slug}/ppc`}>{industry.name} PPC management</Link></li></ul></div>)}</div></section>
         </Container>
       </main>
       <Footer />

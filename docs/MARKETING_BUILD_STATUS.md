@@ -2,7 +2,17 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
-## Local search acquisition plan — 2026-10-08
+## Local search acquisition implementation — 2026-10-08
+
+Implemented the approved initial rollout: conventional service + contractor + geographic acquisition copy across all existing market/service templates; independent search labels for all 13 services; planning briefs for five states and six cities with separate local SEO/PPC guidance; and a public industry directory with six trade hubs and twelve trade SEO/PPC pages. Trade pages follow the approved white/olive product-canvas design, with relevant buying decisions, fictional task previews, existing capability scope, tool references and the paid audit.
+
+The 565 previously indexable acquisition pages retain eligibility; 19 curated industry pages bring the register to 584. Indexing approval is explicit per canonical URL rather than inherited from enrichment. XML sitemap dates reflect explicit content revisions. The new publication gate checks registry/robots/sitemap alignment, declared intent uniqueness and rendered audit/crawl paths. This is technical validation, not an assertion of ranking or semantic quality across the legacy corpus.
+
+Audit request analytics now uses validated public-page context and session landing-page context. The existing server event records successful request receipt only, excludes free-form identity/goal/source fields, and never labels a request as payment. Delivery is mocked in tests; no real lead, email, CRM write or paid API call was triggered. Search Console, production capture and paid/qualified outcomes remain unverified.
+
+Validation: `npm run typecheck` passed; `npm run lint` passed with zero errors and five existing warnings; all 197 tests across 29 files passed. Final `npm run build -- --webpack` passed: 13,772 static outputs, 13,726 rendered pages plus 102 dynamic routes, all link/metadata/topic gates, and the new publication gate across 13,688 acquisition pages / 584 eligible routes. Existing middleware deprecation and legacy topic-coverage notes remain. Browser review covered the Miami hub, Arizona hub, Miami PPC, industry directory, HVAC hub and HVAC SEO, including 390px and 320px layouts, directory-to-service navigation, task preview switching, audit anchors and required-field validation without submitting a real request. The client attribution helper introduces no network calls; public content stays in server components and the publication register stays out of client imports. No new images or dependencies were added.
+
+## Earlier local search acquisition audit — 2026-10-08
 
 Completed a source/build and current-guidance audit for conventional agency/service searches, with a proposed geography + service + trade acquisition strategy in `docs/LOCAL_SEARCH_ACQUISITION_PLAN.md`. The plan includes all 13 service query clusters, copy prototypes, a six-trade starting set, publication gates, a 23-existing-page pilot, up to 18 national industry pages and conversion measurement. Current production search volume, rankings, actual Google indexing and paid conversion data were not available to this audit. No public copy, routes or indexing rules changed; this entry records planning only.
 

@@ -2,6 +2,7 @@
 
 import { useState, useRef, type FormEvent } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { readLandingPath } from "./AcquisitionAttribution";
 import { track } from "@/lib/analytics";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,8 @@ export function AuditForm({ source = "home-audit", focus, className, compact = f
             form.phone && `Phone: ${form.phone}`,
           ].filter(Boolean).join(" · "),
           source,
+          pagePath: window.location.pathname,
+          landingPath: readLandingPath(),
         }),
       });
       const data = await res.json().catch(() => ({}));

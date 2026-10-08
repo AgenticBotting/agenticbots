@@ -1,6 +1,28 @@
 # Local search acquisition audit and implementation plan
 
-Prepared October 8, 2026. Status: proposed plan; no marketing copy, routes, indexing rules or deployments changed by this audit.
+Prepared October 8, 2026. Status: the initial acquisition rollout below is implemented locally on `platform-v1`, following owner approval. Not pushed or deployed. The original audit and longer-term roadmap remain below as historical context.
+
+## Implemented rollout — October 8, 2026
+
+- Familiar search-facing labels, titles, descriptions, H1s and introductory copy now cover all 13 national service families and their existing state/city variants. Market hubs lead with contractor marketing + location. Agentic implementation is explained adjacent to the offer; internal service/BOT identities and canonical URLs remain unchanged.
+- `src/lib/search-positioning.ts` separates acquisition vocabulary from backend capability records. Scope, BOT configuration and approval controls continue to come from the existing catalog/positioning sources. B2B research is explicitly presented as commercial-contractor prospecting, not sold homeowner enquiries.
+- `src/lib/local-search-briefs.ts` adds distinct planning guidance for Florida, Arizona, Texas, Georgia and North Carolina, plus Miami, Fort Lauderdale, Phoenix, Dallas, Atlanta and Charlotte. The city SEO/PPC sections have separate service-specific decisions and required business inputs. Miami-Dade procurement and Phoenix heat resources are cited only for the limited observations they support; the other recommendations are editorial planning guidance, not asserted market statistics.
+- A curated public catalog in `src/lib/industries.ts` adds six trade hubs and twelve national SEO/PPC intersections, plus `/industries`: **19 new pages**. HVAC, plumbing, electrical, roofing, remodeling and general contractors have distinct project types, buying questions, qualification, follow-up and labeled fictional workflow examples. No private prospecting data is exposed.
+- Contextual links connect markets to trade hubs, SEO/PPC pages to matching trade services, and trade services to their parent/complementary/national services. The footer and HTML sitemap expose the new directory. No new city × industry cartesian expansion or URL migration was introduced.
+- `src/data/search-publication.json` freezes the **565 previously indexable acquisition routes** and explicitly adds these 19 industry routes: **584 eligible routes**. This is site eligibility, not Google indexing or ranking. City enrichment no longer changes robots or XML sitemap membership. Legacy eligibility is labeled `retained-indexability`, not falsely presented as a fresh editorial review.
+- Sitemap segment 1 is generated from that registry, with explicit editorial revision dates. Core content uses a stable revision date; blog entries retain their article dates. No filesystem or deployment timestamps determine lastmod.
+- `scripts/search-publication-gate.mjs` checks unique declared intent ownership, actual rendered pages, robots/registry agreement, sitemap membership/dates, and visible audit/crawl paths across the whole acquisition corpus. Existing note-similarity, metadata, link and topic checks remain. These are technical checks; they do not certify semantic uniqueness, search demand or ranking quality.
+- Audit submissions now carry an allowlisted current-page and first public session landing-page context when allowlisted into the existing server request event. Only known public paths generate service/trade/geography dimensions. Query strings, referrers, identity and free-form fields are excluded from the event. Structural/noindex routes are intentionally not reported as approved acquisition dimensions. The small client helper stores only a path in session storage; publication data stays server-side. The server records `request_received`, not `converted` or a paid outcome, only after successful intake delivery.
+
+### What still requires real acquisition evidence
+
+Production Search Console/analytics verification, qualified-audit reporting, confirmed payment/implementation outcomes, conversion experiments, further local editorial research and selective additional service/trade/city releases remain the next operating phase. No real requests, purchases or provider calls were made to validate the rollout. We cannot claim rank gains or paid conversion lift from local implementation. Expansion is evidence-gated, not automatic.
+
+### Maintaining publication readiness
+
+For a new page, write and review the actual buying content first. Check its intent against existing pages, its service capability against the backend mapping, and any factual/local claims against sources. Then add that exact canonical path, intent and content revision date to the registry. Do not bulk-regenerate approvals from city enrichment. A retained legacy route still needs substantive review before broader expansion is justified. When approved content changes, update its record date deliberately; keep unrelated dates unchanged. `npm run build -- --webpack` runs the publication checks with the existing gates.
+
+Validation results for this implementation are recorded in `docs/MARKETING_BUILD_STATUS.md`.
 
 ## Recommendation
 

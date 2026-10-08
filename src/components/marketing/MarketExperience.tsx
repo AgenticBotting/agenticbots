@@ -12,6 +12,8 @@ import { getServiceExperience } from "@/lib/service-experience";
 import { getServicePlatforms } from "@/config/service-platforms";
 import { AUDIT_OFFER, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
 import { MARKET_PRIORITIES, type MarketDestination, type MarketGroup } from "@/lib/market-experience";
+import { getSearchPositioning } from "@/lib/search-positioning";
+import { getLocalSearchBrief, type LocalSearchBrief } from "@/lib/local-search-briefs";
 import type { City } from "@/lib/geo/schema";
 import "./market-experience.css";
 
@@ -29,10 +31,10 @@ export function MarketHero({ eyebrow, heading, accent, description, place, areas
 
 export function MarketServices({ place, state, city }: { place?: string; state?: string; city?: string }) {
   return <section id="services" className="sx-section mx-services"><Container>
-    <div className="sx-section-heading"><p className="sx-kicker">{place ? `BOT services in ${place}` : "Choose your starting point"}</p><h2>What would make the<br /><span>biggest difference?</span></h2><p>Start with one business priority. Connect the right BOTS and expand as your needs develop.</p></div>
+    <div className="sx-section-heading"><p className="sx-kicker">{place ? `Marketing services in ${place}` : "Choose your starting point"}</p><h2>What would make the<br /><span>biggest difference?</span></h2><p>SEO, paid advertising and customer follow-up, delivered through managed BOTS. Choose the service your business needs; we define the workflow, connections and approval process behind it.</p></div>
     <div className="mx-outcome-list">{MARKET_PRIORITIES.map((priority, i) => <section key={priority.id} id={priority.id} className="mx-outcome"><div className="sx-section-copy"><p className="sx-kicker">0{i + 1} / {priority.label}</p><h3>{priority.title}</h3><p>{priority.description}</p></div><ul>{priority.slugs.map(slug => {
       const svc = ALL_SERVICES.find(item => item.slug === slug)!;
-      return <li key={slug}><Link href={state ? serviceGeoHref(svc, state, city) : serviceHref(svc)}><span><strong>{svc.name}</strong><small>{getServiceExperience(slug).benefits[0].title}</small></span><ArrowRight size={17} /><span className="mx-service-model">{getServicePositioning(slug).deliveryModel}</span></Link></li>;
+      return <li key={slug}><Link href={state ? serviceGeoHref(svc, state, city) : serviceHref(svc)}><span><strong>{getSearchPositioning(slug).label}</strong><small>{getServiceExperience(slug).benefits[0].title}</small></span><ArrowRight size={17} /><span className="mx-service-model">{getServicePositioning(slug).deliveryModel}</span></Link></li>;
     })}</ul></section>)}</div>
   </Container></section>;
 }
@@ -45,7 +47,8 @@ export function MarketCoverage({ heading, description, groups, label, placeholde
 }
 
 export function MarketContext({ place, metro, labels, city }: { place: string; metro: string; labels: string[]; city?: City }) {
-  return <section className="sx-section mx-local-context"><Container><div className="mx-context-layout"><div className="sx-section-copy"><p className="sx-kicker">The local perspective</p><h2>The right system starts<br /><span>with your market.</span></h2><p>{city?.character ?? `Your customers and service area across the ${metro} metro shape the work. We start with the services you sell, the locations you cover and the tools your team uses today.`}</p><div className="mx-local-note"><MapPin size={19} /><div><h3>Planning for {place}</h3><p>{city?.localNote ?? `The audit reviews your own enquiries, sales process and customer history. Together, we define the locations, workflows and review responsibilities included in your implementation.`}</p></div></div></div><aside className="mx-context-sheet"><div><MapPin size={20} /><span>{metro} metro</span></div><h3>{place} and your<br />surrounding service area.</h3><p>Locations considered during planning</p><ul>{labels.slice(0, 5).map(label => <li key={label}><span />{label}</li>)}</ul>{city && <div className="mx-industry-list"><p>Local business context</p><div>{city.industries.slice(0, 4).map(industry => <span key={industry}>{industry}</span>)}</div></div>}<p className="sx-note">Your approved scope defines the exact service area and customer audience.</p></aside></div></Container></section>;
+  const brief = city ? getLocalSearchBrief(city.stateSlug, city.slug) : undefined;
+  return <section className="sx-section mx-local-context"><Container><div className="mx-context-layout"><div className="sx-section-copy"><p className="sx-kicker">The local perspective</p><h2>{brief?.headline ?? <>The right system starts<br /><span>with your market.</span></>}</h2><p>{brief?.planning ?? city?.character ?? `Your customers and service area across the ${metro} metro shape the work. We start with the services you sell, the locations you cover and the tools your team uses today.`}</p><div className="mx-local-note"><MapPin size={19} /><div><h3>Planning for {place}</h3><p>{brief?.review ?? city?.localNote ?? `The audit reviews your own enquiries, sales process and customer history. Together, we define the locations, workflows and review responsibilities included in your implementation.`}</p></div></div>{brief && <LocalSearchSource brief={brief} />}</div><aside className="mx-context-sheet"><div><MapPin size={20} /><span>{metro} metro</span></div><h3>{place} and your<br />surrounding service area.</h3><p>Locations considered during planning</p><ul>{labels.slice(0, 5).map(label => <li key={label}><span />{label}</li>)}</ul>{city && <div className="mx-industry-list"><p>Local business context</p><div>{city.industries.slice(0, 4).map(industry => <span key={industry}>{industry}</span>)}</div></div>}<p className="sx-note">Your approved scope defines the exact service area and customer audience.</p></aside></div></Container></section>;
 }
 
 export function MarketTools() {
@@ -54,6 +57,7 @@ export function MarketTools() {
 
 export function marketFaqs(place: string) {
   return [
+    { q: `Do you provide marketing agency services in ${place}?`, a: "Yes. We scope SEO, paid advertising, content and customer follow-up for contractors and local service businesses. Agentic implementation means managed BOTS prepare and coordinate agreed tasks inside your systems, with human approval for external actions. We deliver remotely, with coverage and responsibilities defined in your proposal." },
     { q: `How do you work with businesses in ${place}?`, a: "We deliver the service remotely, working with your team to understand your customers, tools and operating process. Your proposal defines the locations, workflows, access and responsibilities included." },
     { q: "Where should we start?", a: `The ${AUDIT_OFFER.priceLabel} workflow audit identifies a practical first opportunity and implementation priorities. Written findings arrive within ${AUDIT_OFFER.turnaround} of payment. No payment is taken when you submit the request.` },
     { q: "What does implementation cost?", a: `One defined BOT workflow starts at ${formatPlanPrice(MARKETING_PLANS[0].setup)} setup plus ${formatPlanPrice(MARKETING_PLANS[0].monthly)}/month. Multiple-BOT systems, usage and custom connections are quoted to scope. Ad spend and third-party usage are separate.` },
@@ -68,4 +72,14 @@ export function MarketFaq({ place }: { place: string }) {
 
 export function MarketNearby({ title, links, parent }: { title: string; links: MarketDestination[]; parent: MarketDestination }) {
   return <section className="sx-section mx-nearby"><Container><div className="mx-nearby-heading"><div><p className="sx-kicker">Continue exploring</p><h2>{title}</h2></div><Link href={parent.href} className="sx-text-link">{parent.name}<ArrowRight size={16} /></Link></div><div className="mx-nearby-links">{links.map(link => <Link key={link.href} href={link.href}><MapPin size={15} /><span>{link.name}</span><ArrowRight size={15} /></Link>)}</div></Container></section>;
+}
+
+export function LocalSearchSource({ brief }: { brief: LocalSearchBrief }) {
+  if (!brief.source) return null;
+  return <aside className="sx-local-source"><p>{brief.source.observation}</p><a href={brief.source.url} target="_blank" rel="noreferrer">{brief.source.label}<ArrowRight size={13} /></a><span>Source reviewed {brief.source.checked}</span></aside>;
+}
+
+export function MarketPlanning({ place, text }: { place: string; text?: string }) {
+  if (!text) return null;
+  return <section className="sx-section"><Container><div className="sx-section-copy" data-state-brief={place}><p className="sx-kicker">Marketing across {place}</p><h2>Local coverage.<br /><span>One accountable operating plan.</span></h2><p>{text}</p><p>We connect the agreed SEO, advertising and follow-up work through managed BOTS. Your team approves the scope and customer-facing actions.</p></div></Container></section>;
 }

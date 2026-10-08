@@ -273,3 +273,12 @@
 @media (prefers-reduced-motion: reduce) {
   .service-experience *, .service-experience *::before { animation: none !important; transition: none !important; }
 }
+
+/* Search acquisition briefs use the same typography as the service scope. */
+.sx-benefit-list li { display: flex; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+.sx-benefit-list li > span { font-size: 11px; color: var(--accent-text); }
+.sx-benefit-list li p { font-size: 16px; line-height: 1.75; color: var(--text-secondary); }
+.sx-local-source { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.service-experience .sx-local-source p { font-size: 12px; line-height: 1.7; margin: 0 0 10px; }
+.sx-local-source a { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent-text); text-decoration: underline; text-underline-offset: 4px; }
+.sx-local-source > span { display: block; margin-top: 6px; font-size: 10px; color: var(--text-muted); }

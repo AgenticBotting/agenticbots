@@ -50,7 +50,7 @@ describe("service buying journey", () => {
       expect(html).toContain('id="service-preview"');
       expect(html).toContain('id="audit"');
       const visibleCopy = html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ").toLowerCase().replace(/[\u2010-\u2015-]/g, " ");
-      expect(svc.owns.some(term => visibleCopy.includes(term.toLowerCase().replace(/[\u2010-\u2015-]/g, " ")))).toBe(true);
+      expect(svc.owns.some(term => visibleCopy.includes(term.toLowerCase().replace(/[\u2010-\u2015-]/g, " "))), svc.slug).toBe(true);
     }
   });
 

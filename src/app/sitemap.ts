@@ -1,39 +1,16 @@
-import { statSync } from "node:fs";
-import { join } from "node:path";
 import type { MetadataRoute } from "next";
-import { CATALOG, ALL_SERVICES, serviceHref, serviceGeoHref } from "@/lib/catalog";
+import { CATALOG } from "@/lib/catalog";
 import { ALL_LESSONS } from "@/lib/course";
 import { SORTED_POSTS } from "@/lib/posts";
-import { CITIES, STATES } from "@/lib/geo/data";
-import { REGIONS, regionSlug } from "@/lib/geo/regions";
+import { SEARCH_PUBLICATION } from "@/lib/search-publication";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://agenticbots.dev";
 
-/* Page content moves when either source moves: service copy lives in
-   catalog.ts, the metro data in geo/data.ts. Keying off only the latter
-   meant a catalog edit never bumped lastmod. Read once at module load. */
-function mtimeOf(literalPath: string): number {
-  try {
-    return statSync(literalPath).mtime.getTime();
-  } catch {
-    return 0;
-  }
-}
-
-/* Literal join arguments on purpose: a computed path here makes Turbopack
-   trace the entire project into the server bundle ("Dynamic filesystem
-   access causes tracing of the whole project"), which at 13k pages is a
-   deployment-size problem rather than a warning. */
-const CONTENT_MTIME = (() => {
-  const stamps = [
-    mtimeOf(join(process.cwd(), "src/lib/catalog.ts")),
-    mtimeOf(join(process.cwd(), "src/lib/geo/data.ts")),
-  ].filter(Boolean);
-  return stamps.length ? new Date(Math.max(...stamps)) : new Date();
-})();
+// Editorial revision, deliberately independent of file mtimes and deployment time.
+const CORE_CONTENT_UPDATED = "2026-10-08";
 
 /**
- * Segmented sitemaps (Phase 7): 0 = core site, 1 = local tier-0 pages.
+ * Segmented sitemaps (Phase 7): 0 = core site, 1 = approved acquisition pages.
  * Served at /sitemap/0.xml and /sitemap/1.xml; robots.ts references both,
  * so Search Console coverage stays readable per segment.
  */
@@ -64,39 +41,14 @@ export default async function sitemap(props: { id: number | Promise<{ __metadata
   /* lastmod reflects when the content last changed, not when we last
      deployed — a build-time stamp on every URL teaches crawlers the
      field is meaningless. */
-  const now = CONTENT_MTIME;
+  const now = CORE_CONTENT_UPDATED;
 
   const id = segmentId(await (props as { id: Promise<{ __metadata_id__?: string }> | number }).id);
   if (id === 1) {
-    const hubs: MetadataRoute.Sitemap = ALL_SERVICES.map((s) => ({
-      url: `${BASE}${serviceHref(s)}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8,
+    return Object.entries(SEARCH_PUBLICATION).map(([path, publication]) => ({
+      url: `${BASE}${path}`, lastModified: publication.updated,
+      changeFrequency: "monthly", priority: path.split("/").length <= 3 ? 0.8 : 0.65,
     }));
-    const states: MetadataRoute.Sitemap = ALL_SERVICES.flatMap((s) =>
-      STATES.map((st) => ({
-        url: `${BASE}${serviceGeoHref(s, st.slug)}`, lastModified: now, changeFrequency: "monthly", priority: 0.6,
-      }))
-    );
-    const cities: MetadataRoute.Sitemap = ALL_SERVICES.flatMap((s) =>
-      CITIES.map((c) => ({
-        url: `${BASE}${serviceGeoHref(s, c.stateSlug, c.slug)}`, lastModified: now, changeFrequency: "monthly", priority: 0.65,
-      }))
-    );
-    const marketHubs: MetadataRoute.Sitemap = [
-      { url: `${BASE}/markets`, lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-      ...REGIONS.map((r) => ({
-        url: `${BASE}/markets/region/${regionSlug(r)}`, lastModified: now,
-        changeFrequency: "monthly" as const, priority: 0.7,
-      })),
-      ...STATES.map((st) => ({
-        url: `${BASE}/markets/${st.slug}`, lastModified: now,
-        changeFrequency: "monthly" as const, priority: 0.65,
-      })),
-      ...CITIES.map((c) => ({
-        url: `${BASE}/markets/${c.stateSlug}/${c.slug}`, lastModified: now,
-        changeFrequency: "monthly" as const, priority: 0.7,
-      })),
-    ];
-    return [...hubs, ...states, ...cities, ...marketHubs];
   }
 
   const statics = [

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ConsoleGreeting } from "@/components/marketing";
+import { AcquisitionAttribution } from "@/components/marketing/AcquisitionAttribution";
 import { MarketingOnly } from "@/components/marketing/MarketingOnly";
 import Script from "next/script";
 import { JsonLd, orgLd, webSiteLd } from "@/components/JsonLd";
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}
         <MarketingOnly>
+          <AcquisitionAttribution />
           <BotPlanFlow />
           <ConsoleGreeting />
         </MarketingOnly>

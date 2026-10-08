@@ -7,6 +7,7 @@ import StatePage, { generateMetadata as stateMetadata, generateStaticParams as s
 import CityPage, { generateMetadata as cityMetadata, generateStaticParams as cityParams } from "@/app/markets/[state]/[city]/page";
 import { ALL_SERVICES } from "@/lib/catalog";
 import { ALL_CITIES, ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
+import { getLocalSearchBrief } from "@/lib/local-search-briefs";
 import { getCity } from "@/lib/geo/data";
 import { MARKET_PRIORITIES, filterMarketGroups, type MarketGroup } from "@/lib/market-experience";
 import { MarketWorkspace } from "@/components/marketing/MarketWorkspace";
@@ -44,7 +45,7 @@ describe("geographic buying journey", () => {
   it("preserves enriched local content, every city-service link and nearby navigation", async () => {
     const html = renderToStaticMarkup(await CityPage({ params: Promise.resolve({ state: "florida", city: "miami" }) }));
     const local = getCity("florida", "miami")!;
-    expect(html).toContain(renderToStaticMarkup(createElement("p", null, local.localNote)));
+    expect(html).toContain(renderToStaticMarkup(createElement("p", null, getLocalSearchBrief("florida", "miami")!.review)));
     for (const district of local.districts) expect(html).toContain(district);
     for (const svc of ALL_SERVICES) expect(html).toContain(`href="/services/${svc.serviceSlug}/florida/miami"`);
     expect(html).toContain('href="/markets/florida/fort-lauderdale"');

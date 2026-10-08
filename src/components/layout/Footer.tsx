@@ -6,6 +6,7 @@ import { REGIONS, regionSlug } from "@/lib/geo/regions";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
 
 const COMPANY = [
+  { label: "Industries", href: "/industries" },
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/about" },

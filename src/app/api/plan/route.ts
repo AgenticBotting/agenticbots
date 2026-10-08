@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { deliverPlanRequest } from "@/lib/notify";
+import { acquisitionEventContext } from "@/lib/acquisition-attribution";
 import { trackServer } from "@/lib/analytics";
 
 const WINDOW_MS = 10 * 60 * 1000;
@@ -32,6 +33,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
   const b = body as Record<string, unknown>;
   const name = str(b.name, 120);
   const email = str(b.email, 200);
@@ -56,7 +60,7 @@ export async function POST(request: NextRequest) {
         { status: 502 }
       );
     }
-    await trackServer("plan_form_submitted", { source, focus, converted: true });
+    await trackServer("plan_form_submitted", { ...acquisitionEventContext(b.pagePath, b.landingPath), request_received: true });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[plan] unexpected failure", err);

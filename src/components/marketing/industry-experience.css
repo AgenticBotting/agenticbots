@@ -1,0 +1,52 @@
+.ix-trades { padding: 42px 0; background: var(--bg-alt); border-block: 1px solid var(--border); }
+.ix-trades-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 25px; }
+.service-experience .ix-trades h2 { font-size: clamp(23px, 2.5vw, 32px); max-width: 30ch; }
+.ix-trades ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; }
+.ix-trades li { min-width: 0; }
+.ix-trades li a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; }
+.ix-trades li a:hover { color: var(--accent-text); }
+.ix-trades li svg { flex: none; color: var(--accent-text); }
+.ix-service-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.ix-service-paths article { display: flex; flex-direction: column; padding: 34px; background: var(--background); }
+.ix-service-paths article + article { border-left: 1px solid var(--border); background: var(--bg-alt); }
+.ix-path-top { display: flex; justify-content: space-between; color: var(--accent-text); font-size: 11px; margin-bottom: 35px; }
+.service-experience .ix-service-paths h3 { font-size: 27px; line-height: 1.2; max-width: 25ch; }
+.ix-service-paths p { font-size: 15px; line-height: 1.75; color: var(--text-secondary); margin-top: 17px; margin-bottom: 27px; }
+.ix-service-paths a { margin-top: auto; }
+.ix-projects { display: flex; gap: 30px; align-items: start; justify-content: space-between; padding: 26px 0 0; }
+.ix-projects ul { display: flex; flex-wrap: wrap; gap: 15px 25px; max-width: 650px; }
+.ix-projects li { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-secondary); }
+.ix-projects svg { color: var(--accent-text); }
+.ix-operations { background: var(--bg-alt); border-block: 1px solid var(--border); }
+.ix-operating-rows article { display: flex; gap: 20px; padding: 25px 0; border-bottom: 1px solid var(--border); }
+.ix-operating-rows article:first-child { padding-top: 0; }
+.ix-operating-rows article > span { font-size: 11px; color: var(--accent-text); padding-top: 5px; }
+.service-experience .ix-operating-rows h3 { font-size: 23px; }
+.ix-operating-rows p { margin-top: 12px; font-size: 15px; line-height: 1.8; color: var(--text-secondary); }
+.ix-operating-rows > a { margin-top: 23px; }
+.ix-decision-list { border-top: 1px solid var(--border); }
+.ix-decision-list article { display: grid; grid-template-columns: 40px minmax(0, .85fr) minmax(0, 1fr); gap: 30px; padding: 31px 0; border-bottom: 1px solid var(--border); }
+.ix-decision-list article > span { color: var(--accent-text); font-size: 11px; padding-top: 5px; }
+.service-experience .ix-decision-list h3 { font-size: 25px; line-height: 1.25; }
+.ix-decision-list p { font-size: 16px; line-height: 1.75; color: var(--text-secondary); }
+.ix-fit-note { margin-top: 22px; max-width: 85ch; }
+.ix-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 45px; }
+.ix-directory article { padding: 32px 0; border-top: 1px solid var(--border); }
+.ix-directory article h2 { font-size: 30px; }
+.ix-directory article p { margin: 13px 0 20px; font-size: 15px; color: var(--text-secondary); line-height: 1.75; }
+.ix-directory-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+.ix-directory-links a { font-size: 12px; color: var(--accent-text); }
+@media (max-width: 767px) {
+  .ix-trades-heading, .ix-projects { flex-direction: column; align-items: start; }
+  .ix-trades ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+  .ix-service-paths, .ix-directory { grid-template-columns: minmax(0, 1fr); }
+  .ix-service-paths article { padding: 27px; }
+  .ix-service-paths article + article { border-left: 0; border-top: 1px solid var(--border); }
+  .ix-decision-list article { grid-template-columns: 25px minmax(0, 1fr); gap: 14px; }
+  .ix-decision-list article p { grid-column: 2; }
+  .ix-projects { gap: 15px; }
+}
+@media (max-width: 479px) {
+  .ix-trades ul { grid-template-columns: minmax(0, 1fr); }
+  .ix-service-paths article { padding: 24px 20px; }
+}

@@ -9,6 +9,8 @@ import { getServicePositioning } from "@/lib/service-positioning";
 import { getServicePlatforms } from "@/config/service-platforms";
 import { AUDIT_OFFER, MARKETING_PLANS, formatPlanPrice } from "@/config/marketing-offer";
 import type { Service } from "@/lib/catalog";
+import type { ServiceExperience } from "@/lib/service-experience";
+import { getSearchPositioning } from "@/lib/search-positioning";
 import "./service-experience.css";
 
 export function ServiceAuditLink({ label = "Start with a $499 audit" }: { label?: string }) {
@@ -19,25 +21,37 @@ export function ServiceOrbit({ slug }: { slug?: string }) {
   return <div className="sx-orbit" aria-hidden="true"><i /><i />{getServicePlatforms(slug).slice(0, 4).map((platform, i) => <span key={platform.id} className={`sx-orbit-node sx-orbit-node-${i}`}><PlatformMark id={platform.id} mark={platform.mark} /></span>)}</div>;
 }
 
-export function ServiceHero({ svc, location, breadcrumb }: { svc: Service; location?: string; breadcrumb?: React.ReactNode }) {
+export function ServiceHero({ svc, location, breadcrumb, editorial }: {
+  svc: Service; location?: string; breadcrumb?: React.ReactNode;
+  editorial?: { heading: string; accent: string; introduction: string; examples: ServiceExperience["examples"] };
+}) {
   const copy = getServiceExperience(svc.slug);
+  const search = getSearchPositioning(svc.slug);
   const positioning = getServicePositioning(svc.slug);
   return (
     <section className="sx-hero">
       <Container>
         {breadcrumb && <nav className="sx-breadcrumb" aria-label="Breadcrumb">{breadcrumb}</nav>}
         <div className="sx-hero-intro"><ServiceOrbit slug={svc.slug} /><div className="sx-hero-copy">
-          <p className="sx-kicker"><span className="sx-dot" />{svc.serviceName}{location && ` · ${location}`}</p>
-          <h1>{location ? <>{svc.serviceName}<br /><span>in {location}.</span></> : <>{copy.headline}<br /><span>{copy.accent}</span></>}</h1>
-          <p className="sx-lead">{copy.description}</p>
+          <p className="sx-kicker"><span className="sx-dot" />Agentic implementation · Managed for you</p>
+          <h1>{editorial ? <>{editorial.heading}<br /><span>{editorial.accent}</span></> : <>{search.label}<br /><span>for {search.audience}{location ? ` in ${location}` : ""}.</span></>}</h1>
+          <p className="sx-lead">{editorial?.introduction ?? search.introduction}</p>
           <div className="sx-actions"><ServiceAuditLink /><a href="#service-preview" className="btn btn-outline"><CirclePlay size={16} /> See the workflow</a></div>
           <p className="sx-note">Written findings within {AUDIT_OFFER.turnaround} of payment. Implementation scoped separately.</p>
         </div></div>
-        <div className="sx-preview-frame" id="service-preview"><ServiceWorkspace title={copy.workspace} botName={positioning.deliveryModel} examples={copy.examples} /></div>
+        <div className="sx-preview-frame" id="service-preview"><ServiceWorkspace title={copy.workspace} botName={positioning.deliveryModel} examples={editorial?.examples ?? copy.examples} /></div>
         <div className="sx-hero-foot"><span><Bot size={15} />{positioning.deliveryModel}</span><span><Layers3 size={15} />Built around your existing tools</span><span><Settings2 size={15} />Managed by AgenticBots</span></div>
       </Container>
     </section>
   );
+}
+
+export function ServiceBuyerBrief({ svc, location }: { svc: Service; location?: string }) {
+  const copy = getSearchPositioning(svc.slug);
+  return <section className="sx-section"><Container><div className="sx-scope-layout">
+    <div className="sx-section-copy"><p className="sx-kicker">{copy.label}{location ? ` · ${location}` : " · Your starting point"}</p><h2>{copy.decision}</h2><p>Start with the business decision. We use your accounts, service information and operating priorities to define what the BOT should prepare and what your team needs to review.</p></div>
+    <ol className="sx-benefit-list">{copy.inputs.map((input, i) => <li key={input}><span>0{i + 1}</span><p>{input}</p></li>)}</ol>
+  </div></Container></section>;
 }
 
 export function ServiceBenefits({ svc }: { svc: Service }) {

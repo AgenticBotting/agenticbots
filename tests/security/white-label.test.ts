@@ -15,6 +15,13 @@ import { CLIENT_FORBIDDEN_TERMS } from "@/server/redact";
  */
 const CLIENT_SOURCES = [
   "src/app/page.tsx",
+  "src/app/industries",
+  "src/components/marketing/AcquisitionAttribution.tsx",
+  "src/lib/acquisition-attribution.ts",
+  "src/components/marketing/IndustryExperience.tsx",
+  "src/lib/search-positioning.ts",
+  "src/lib/industries.ts",
+  "src/lib/local-search-briefs.ts",
   "src/app/pricing/page.tsx",
   "src/app/about/page.tsx",
   "src/app/how-it-works/page.tsx",

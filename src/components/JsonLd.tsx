@@ -51,7 +51,7 @@ export function breadcrumbLd(items: { name: string; path: string }[]): Json {
   };
 }
 
-export function serviceLd(opts: { name: string; description: string; path: string; areaServed?: string }): Json {
+export function serviceLd(opts: { name: string; description: string; path: string; areaServed?: string; serviceType?: string }): Json {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -59,7 +59,7 @@ export function serviceLd(opts: { name: string; description: string; path: strin
     description: opts.description,
     url: `${BASE}${opts.path}`,
     provider: { "@id": `${BASE}/#org` },
-    serviceType: "Agentic AI marketing and sales automation",
+    serviceType: opts.serviceType ?? "Managed marketing and sales automation",
     ...(opts.areaServed ? { areaServed: opts.areaServed } : {}),
   };
 }
