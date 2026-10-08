@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BotPlanFlow, ConsoleGreeting } from "@/components/marketing";
 import { MarketingOnly } from "@/components/marketing/MarketingOnly";
@@ -17,15 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
 });
-
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm-plex-sans",
-  subsets: ["latin"],
-  display: "swap",
-  weight: "variable",
-  axes: ["wdth"],
-});
-
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://agenticbots.dev";
 
@@ -80,7 +71,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSans.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <JsonLd data={[orgLd, webSiteLd]} />
         {children}

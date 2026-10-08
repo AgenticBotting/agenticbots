@@ -14,7 +14,7 @@ The homepage and national service pages now use enterprise operating language fo
 
 The services portfolio and all 13 national service pages now use a light, trustworthy editorial hierarchy: a pale numbered hero, UI-only operating views, restrained structural framing, translucent service icons, and a clear section index. Service detail pages add a light operating-transition block that compares the current and managed states without stock imagery or invented proof. Section surfaces alternate intentionally so the long pages scan as distinct chapters. Client-facing service copy uses BOT terminology throughout. The implementation adds no image requests and keeps the existing local SEO route and link structure intact.
 
-Marketing and platform headings use IBM Plex Sans at medium-to-bold variable weights for an institutional technology voice. Hero scale and tracking are restrained so authority comes from composition and clarity rather than visual mass. Geist remains the body and interface face, and Geist Mono remains the technical/data face.
+Marketing and platform typography has returned to the original Geist system: Geist at controlled 600 weights for headings, body and interface text, with Geist Mono for the technical/data register. The product-canvas layouts and service-system visuals remain intact.
 
 The homepage and national service heroes now follow a product-canvas narrative: centered display copy, a wide code-rendered operating workspace, soft olive atmosphere and a restrained capability or deployment rail. Service-specific operating views remain intact across all 13 mandates, but the interface now anchors the hero instead of sitting in a conventional right-hand card. This direction is derived structurally from the owner-provided references and uses the existing AgenticBots palette, content and UI components rather than copying outside assets.
 
@@ -332,7 +332,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 21. Do NOT redesign or break
 
-* The marketing site, its design language (enterprise, minimal, **IBM Plex Sans headings with Geist body/UI**, no "guru" styling), URLs and local SEO pages.
+* The marketing site, its design language (enterprise, minimal, **Geist headings and body/UI**, no "guru" styling), URLs and local SEO pages.
 * Client terminology: **Bot / Bots / Bot Run / Bot Activity**. Never rename to "agent".
 * The `Repository`/`Tx`/Convex envelope storage model and `pf_` prefix.
 * The runtime translator layer and its boundary (no engine specifics outside `src/server/runtime/hermes/**`).
