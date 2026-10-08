@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Menu, X, ArrowRight, ArrowLeft, Mail, ChevronDown, ChevronRight,
+  Menu, X, ArrowRight, ArrowLeft, Mail, Phone, MessageSquare, ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Logo, LogoMask } from "@/components/ui";
 import { ALL_CATEGORIES, serviceHref } from "@/lib/catalog";
@@ -17,10 +17,14 @@ import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/useDialog";
 import { track } from "@/lib/analytics";
 import { AUDIT_OFFER } from "@/config/marketing-offer";
+import { MARKETING_CONTACT } from "@/config/marketing-contact";
+import "./header.css";
 
 const NAV_LINKS = [
+  { label: "Industries we serve", href: "/industries" },
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
 ];
 
 type MenuId = "services" | "areas" | null;
@@ -57,6 +61,20 @@ export function Header() {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  // Close overlays when switching navigation layouts, including browser zoom.
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const onChange = () => {
+      setMobileOpen(false);
+      setOpenMenu(null);
+      setSelectedRegion(null);
+      setSelectedStage(null);
+      setMobileRegion(null);
+    };
+    desktop.addEventListener("change", onChange);
+    return () => desktop.removeEventListener("change", onChange);
+  }, []);
 
   const closeMobile = useCallback(() => {
     setMobileOpen(false);
@@ -107,34 +125,32 @@ export function Header() {
   const regionMobile = mobileRegion ? regions.find((r) => r.region === mobileRegion) ?? null : null;
 
   return (
-    <div className="sticky top-0 z-50">
+    <div className="site-header sticky top-0 z-50">
       {/* ── Utility bar ── */}
-      <div className="hidden lg:block bg-[var(--header-bar)] border-b border-white/[0.06]">
-        <div className="container-bleed">
-          <div className="flex items-center justify-between h-9">
-            <span className="text-[12.5px] font-medium tracking-[-0.01em] text-ink-300">A coordinated BOT workforce</span>
-            <a
-              href="mailto:hello@agenticbots.dev"
-              className="inline-flex items-center gap-2 text-[13px] text-ink-400 hover:text-white transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5" />
-              hello@agenticbots.dev
-            </a>
+      <div className="site-utility">
+        <div className="site-header-shell">
+          <div className="site-utility-row">
+            <span>A coordinated BOT workforce</span>
+            <div className="site-utility-links">
+              <a href={MARKETING_CONTACT.phoneHref} aria-label={`Call ${MARKETING_CONTACT.phone}`}><Phone size={15} aria-hidden="true" />{MARKETING_CONTACT.phone}</a>
+              <a href={MARKETING_CONTACT.emailHref}><Mail size={15} aria-hidden="true" />{MARKETING_CONTACT.email}</a>
+              <Link href="/contact">Contact us<ArrowRight size={14} aria-hidden="true" /></Link>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── Main bar ── */}
       <header className={cn("bg-[var(--header-bg)] transition-shadow duration-300", scrolled && "shadow-mega")}>
-        <div className="container-bleed">
+        <div className="site-header-shell">
           <div
             ref={navRef}
-            className="grid grid-cols-[auto_1fr_auto] items-center h-[76px] lg:h-[84px] gap-2 sm:gap-3 lg:grid-cols-[auto_minmax(16px,1fr)_auto_minmax(16px,1fr)_auto]"
+            className="site-header-row"
           >
             <Link
               href="/"
               aria-label="AgenticBots — home"
-              className="justify-self-start lg:shrink-0 inline-flex items-center"
+              className="site-header-logo inline-flex items-center"
             >
               {/* The lockup is 7.5:1, so it costs ~150px of row even at its
                   smallest. That fits alongside the CTA and the menu button
@@ -142,33 +158,11 @@ export function Header() {
               <LogoMask art="mark" height={24} className="min-[390px]:hidden text-white" />
               <Logo
                 href={null}
-                className="hidden min-[390px]:inline-flex [--logo-h:18px] min-[402px]:[--logo-h:20px] min-[430px]:[--logo-h:22px] sm:[--logo-h:26px] lg:[--logo-h:30px]"
+                className="site-header-wordmark hidden min-[390px]:inline-flex [--logo-h:18px] min-[402px]:[--logo-h:20px] min-[430px]:[--logo-h:22px] sm:[--logo-h:26px]"
               />
             </Link>
 
-            {/* A real element, not just a declared column: CSS grid's
-                default auto-placement fills tracks with however many
-                children actually exist, in order — with only 3 real
-                children (logo, nav, CTA cluster) for 5 declared tracks,
-                the first three tracks would get filled and the two
-                empty-but-declared spacer tracks would end up trailing
-                after the CTA cluster instead of flanking nav, which is
-                exactly what pushed the CTA cluster's right edge 691px
-                off the row's true edge at 1920px on the first attempt. */}
-            <div aria-hidden="true" className="hidden lg:block" />
-
-            {/* Back in normal grid flow — the middle `auto` track, sized
-                to its own content. Its position is now an emergent result
-                of the two equal `minmax(var(--edge-w),1fr)` flanks (see
-                the row's comment), not something calculated directly.
-
-                shrink-0 + whitespace-nowrap stay as guards: nav's track is
-                `auto`, which never compresses on its own, but if this
-                grid is ever swapped for a flex row again, these keep a
-                too-tight fit failing as a real overflow instead of
-                silently wrapping "Service areas" onto two lines the way
-                it did earlier. */}
-            <nav className="hidden lg:flex shrink-0 items-center gap-5 xl:gap-7 whitespace-nowrap">
+            <nav className="site-primary-nav" aria-label="Main navigation">
               <MenuTrigger panelId="services-menu" label="Services" open={openMenu === "services"} onClick={() => toggleMenu("services")} />
               <MenuTrigger panelId="areas-menu" label="Service areas" open={openMenu === "areas"} onClick={() => toggleMenu("areas")} />
               {NAV_LINKS.map((l) => (
@@ -177,6 +171,7 @@ export function Header() {
                   href={l.href}
                   onClick={closeMenu}
                   aria-current={pathname === l.href ? "page" : undefined}
+                  data-active={pathname === l.href || pathname.startsWith(`${l.href}/`)}
                   className={cn(
                     "nav-link transition-colors",
                     pathname === l.href ? "text-white" : "text-ink-200 hover:text-white"
@@ -187,27 +182,24 @@ export function Header() {
               ))}
             </nav>
 
-            {/* The matching second spacer — see the one before logo's
-                closing tag for why this needs to be a real element. */}
-            <div aria-hidden="true" className="hidden lg:block" />
-
-            {/* This is track 5, the row's last — nothing trails it, so it
-                always sits flush against the row's true right edge
-                regardless of its own content width. */}
-            <div className="justify-self-end flex items-center gap-2 sm:gap-3 lg:shrink-0">
+            <div className="site-header-actions">
+              <a href={MARKETING_CONTACT.smsHref} onClick={closeMenu} className="btn site-header-text" aria-label={`Text us at ${MARKETING_CONTACT.phone}`}><MessageSquare size={17} aria-hidden="true" />Text us</a>
               <Link
                 href="/#audit"
                 onClick={() => { closeMenu(); track("cta_clicked", { source: "header", label: "audit" }); }}
-                className="btn btn-primary h-11 px-3 sm:px-5 text-[12.5px] sm:text-[14px]"
+                className="btn btn-primary site-header-audit"
               >
-                <span className="sm:hidden">{AUDIT_OFFER.priceLabel} audit</span>
-                <span className="hidden sm:inline">{AUDIT_OFFER.shortCta}</span>
-                <ArrowRight className="hidden sm:block w-4 h-4" />
+                {AUDIT_OFFER.shortCta}
+                <ArrowRight size={17} aria-hidden="true" />
               </Link>
               <button
+                type="button"
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
-                className="lg:hidden flex items-center justify-center w-11 h-11 border border-[var(--header-line)] text-white"
+                aria-haspopup="dialog"
+                aria-expanded={mobileOpen}
+                aria-controls={mobileOpen ? "site-mobile-menu" : undefined}
+                className="site-menu-toggle"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -402,11 +394,12 @@ export function Header() {
       {/* ── Mobile drawer ── */}
       {mobileOpen && (
         <div
+          id="site-mobile-menu"
           ref={drawerRef}
           role="dialog"
           aria-modal="true"
           aria-label="Site menu"
-          className="lg:hidden fixed inset-0 z-[60] bg-white overflow-y-auto animate-fade-in"
+          className="site-mobile-drawer fixed inset-0 z-[60] bg-white overflow-y-auto animate-fade-in"
         >
           <div className="container-site">
             <div className="flex items-center justify-between h-[76px]">
@@ -496,39 +489,27 @@ export function Header() {
               </MobileGroup>
 
               <ul className="py-5 space-y-2">
-                {[...NAV_LINKS, { label: "About", href: "/about" }, { label: "Blog", href: "/blog" }, { label: "Founding clients", href: "/#founding" }].map((l) => (
+                {[...NAV_LINKS, { label: "About", href: "/about" }, { label: "Founding clients", href: "/#founding" }].map((l) => (
                   <MobileRow key={l.href} href={l.href} onGo={closeMobile} boxed strong>
                     {l.label}
                   </MobileRow>
                 ))}
               </ul>
 
-              <a
-                href="mailto:hello@agenticbots.dev"
-                className="mt-6 flex items-center gap-2 text-[14px] text-[var(--text-secondary)] hover:text-[var(--accent-text)] transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                hello@agenticbots.dev
-              </a>
+              <div className="site-mobile-contact"><a href={MARKETING_CONTACT.phoneHref}><Phone size={18} aria-hidden="true" />Call {MARKETING_CONTACT.phone}</a><a href={MARKETING_CONTACT.emailHref}><Mail size={18} aria-hidden="true" />{MARKETING_CONTACT.email}</a></div>
             </div>
           </div>
           {/* Thumb-zone CTA — pinned to the drawer bottom, always reachable. */}
-          <div className="sticky bottom-0 inset-x-0 bg-white border-t border-[var(--border)] px-5 py-4">
+          <div className="site-drawer-actions sticky bottom-0 inset-x-0 bg-white border-t border-[var(--border)] px-5 py-4">
             <Link
               href="/#audit"
               onClick={closeMobile}
               className="btn btn-primary w-full"
             >
-              {AUDIT_OFFER.cta}
+              {AUDIT_OFFER.shortCta}
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              href="/contact"
-              onClick={closeMobile}
-              className="btn w-full mt-2 border-[var(--color-accent-500)] text-[var(--foreground)] hover:bg-[var(--bg-tint)]"
-            >
-              Contact us
-            </Link>
+            <div className="site-drawer-contact-actions"><a href={MARKETING_CONTACT.smsHref} className="btn btn-outline" aria-label={`Text us at ${MARKETING_CONTACT.phone}`}><MessageSquare size={17} aria-hidden="true" />Text us</a><Link href="/contact" onClick={closeMobile} className="btn btn-outline">Contact us<ArrowRight size={16} aria-hidden="true" /></Link></div>
           </div>
         </div>
       )}
@@ -562,7 +543,7 @@ const MegaPanel = forwardRef<HTMLDivElement, { children: React.ReactNode; id: st
       <div
         ref={ref}
         id={id}
-        className="hidden lg:block absolute left-0 right-0 bg-white border-b border-[var(--border)] shadow-mega animate-fade-up"
+        className="site-mega-panel absolute left-0 right-0 bg-white border-b border-[var(--border)] shadow-mega animate-fade-up"
       >
         <div className="container-site py-8 max-h-[calc(100vh-140px)] overflow-y-auto">{children}</div>
       </div>

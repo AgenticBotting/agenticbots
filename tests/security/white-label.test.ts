@@ -45,6 +45,8 @@ const CLIENT_SOURCES = [
   "src/components/marketing/MarketWorkspace.tsx",
   "src/components/marketing/MarketDirectory.tsx",
   "src/config/marketing-offer.ts",
+  "src/config/marketing-contact.ts",
+  "src/components/layout/Header.tsx",
   "src/lib/marketing/workflow-example.ts",
   "src/lib/service-positioning.ts",
   "src/lib/service-experience.ts",

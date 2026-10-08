@@ -277,16 +277,8 @@
   }
   @media (min-width: 640px) { .container-site { padding-inline: 2rem; } }
 
-  /* Same gutters as container-site, no max-width cap — edge to edge.
-     The header's chrome (utility bar, main bar) uses this instead:
-     container-site's 1200px cap meant that at 1920px the logo and CTA
-     sat 360px in from the true viewport edges on both sides, which reads
-     as "everything bunched toward the center" rather than the
-     logo-hugs-left / CTA-hugs-right rhythm a reference nav bar like
-     Glia's has. Dense dropdown content (the mega-menu panels) stays on
-     container-site on purpose — a grid of link cards stretched across a
-     1920px screen would space out awkwardly; only the slim chrome row
-     wants the full width. */
+  /* Optional edge-to-edge surface. The header has its own responsive
+     shell in components/layout/header.css; menu content uses container-site. */
   .container-bleed {
     width: 100%;
     padding-inline: 1.25rem;

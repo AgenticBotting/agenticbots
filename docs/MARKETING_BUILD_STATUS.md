@@ -2,6 +2,14 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Header legibility and direct contact — 2026-10-08
+
+Replaced the shared header's two large spacer columns with a distributed navigation track inside a balanced 1800px shell. Desktop navigation uses 16px Geist, increasing to 18px on large screens, with higher-contrast labels, visible current-section treatment and 48px targets. The utility bar now shows the owner-supplied 561-717-2777 as a native call link beside email and Contact us. An outlined Text us button sits next to the paid-audit CTA. Links use `tel:+15617172777` and `sms:+15617172777`; the website sends nothing. Shared public details live in `src/config/marketing-contact.ts`.
+
+Added Industries we serve and Blog to primary navigation and retained the existing outcome-first and region-first menus. Below 1280px the header uses the mobile drawer before labels become cramped. Compact mobile keeps Text us prominent; the drawer contains the paid audit, text/contact choices, call number and email. The $499 audit remains in the header from 768px upward. Layout changes close overlays, restore body scrolling and preserve keyboard controls. Header buttons retain the approved 3px radius. No font asset, dependency or page-copy overhaul was introduced.
+
+Validation: typecheck passed; lint passed with zero errors and five existing warnings; 210 tests across 33 files passed, with the header/white-label subset passing again after final accessibility adjustments. The final production build passed with 14,113 static outputs; link integrity, SEO, topic and publication gates passed (14,067 rendered pages plus 103 dynamic routes; 584 index-eligible routes unchanged). All 175 client bundles passed the white-label scan. Browser checks cover 2560px, 1440px, 1280px, 768px, 390px and 320px, including the Services drill-down, Escape/focus return, mobile navigation to Industries and Blog, Contact us navigation, phone/SMS destinations and resize with an open drawer. Call/SMS links were inspected without initiating either action. Nothing deployed or pushed.
+
 ## Service-niche and buyer intelligence — 2026-10-08
 
 The public experience now includes the admin catalog's 341 service niches and 137 buyer types. Added a searchable directory, 341 dedicated niche pages, and interactive buyer-role workflows on the six existing trade hubs and twelve SEO/PPC pages. The flow connects service fit, evidence, GTM and approval without simulating live prospect activity. Only accepted catalog relationships are included: 228 niches have mapped audiences; 113 need buyer-profile scoping. All buyer definitions remain browsable. Shared market/service industry links point to the expanded directory. Design retains Geist, olive/white, controlled radii and finite CSS motion with a reduced-motion fallback.
