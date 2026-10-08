@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
 import { ArrowRight, Bot, Layers3, MapPin, ShieldCheck } from "lucide-react";
@@ -24,7 +25,7 @@ export function MarketHero({ eyebrow, heading, accent, description, place, areas
 }) {
   return <section className="sx-hero mx-hero"><Container>
     <nav className="sx-breadcrumb" aria-label="Breadcrumb">{breadcrumb.map((item, i) => <span key={item.name}>{i > 0 && <span aria-hidden="true">/</span>}{item.href ? <Link href={item.href}>{item.name}</Link> : <span aria-current="page">{item.name}</span>}</span>)}</nav>
-    <div className="sx-hero-intro"><ServiceOrbit /><div className="sx-hero-copy"><p className="sx-kicker"><MapPin size={13} />{eyebrow}</p><h1>{heading}{" "}<br /><span>{accent}</span></h1><p className="sx-lead">{description}</p><div className="sx-actions"><ServiceAuditLink /><a href={directory ? "#coverage" : "#services"} className="btn btn-outline">{directory ? "Find your market" : "Explore local services"}<ArrowRight size={16} /></a></div><p className="sx-note">{PROPOSAL_OFFER.note}</p></div></div>
+    <div className="sx-hero-intro"><ServiceOrbit /><div className="sx-hero-copy"><p className="sx-kicker"><MapPin size={13} />{eyebrow}</p><HeroHeading text={heading} accent={accent} compact={{ text: "Agentic marketing", accent: "for your business.", context: `${directory ? "Service coverage" : "Contractor marketing"} · ${place}` }} /><p className="sx-lead">{description}</p><div className="sx-actions"><ServiceAuditLink /><a href={directory ? "#coverage" : "#services"} className="btn btn-outline">{directory ? "Find your market" : "Explore local services"}<ArrowRight size={16} /></a></div><p className="sx-note">{PROPOSAL_OFFER.note}</p></div></div>
     <div className="sx-preview-frame"><MarketWorkspace place={place} areas={areas} areaLabel={areaLabel} /></div>
     <div className="sx-hero-foot"><span><Layers3 size={15} />Your existing tools</span><span><ShieldCheck size={15} />Your team’s approval</span><span><Bot size={15} />Built and managed for you</span></div>
   </Container></section>;

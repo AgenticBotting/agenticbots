@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
@@ -22,7 +23,7 @@ export default function SiteMapPage() {
       <main>
         <Container className="py-14">
           <p className="eyebrow mb-4">Site map</p>
-          <h1 className="display-hero">Everything, one index.</h1>
+          <HeroHeading text="Everything, one index." />
 
           <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div>

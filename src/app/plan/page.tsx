@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Check, ArrowLeft } from "lucide-react";
@@ -44,7 +45,7 @@ export default function PlanPage() {
           <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
             <div>
               <p className="eyebrow mb-5">{PROPOSAL_OFFER.name}</p>
-              <h1 className="display-hero text-balance">Define the first <span className="em-green">BOT mandate.</span></h1>
+              <HeroHeading text="Define the first" accent="BOT mandate." />
               <p className="body-lg mt-6 max-w-[44ch] text-pretty">
                 Share your goals, current tools, team and investment range in a short guided intake. We review fit, then follow up about scope and the next step.
               </p>

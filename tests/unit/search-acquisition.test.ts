@@ -76,7 +76,7 @@ describe("search acquisition rollout", () => {
         expect(html).toContain(`href="${path}"`);
         const detail = renderToStaticMarkup(await IndustryServicePage({ params: Promise.resolve({ ...params, service }) }));
         expect(detail.match(/<h1[ >]/g)).toHaveLength(1);
-        expect(detail).toMatch(/<h1>Agentic (?:SEO|PPC management) <br\/><span>for /);
+        expect(detail.match(/<h1[^>]*>(.*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "")).toMatch(/^Agentic (?:SEO|PPC management) for /);
         expect(detail).toContain('id="audit"');
         expect(detail).not.toContain("$499");
         expect(detail).toContain("Begin Step-1");

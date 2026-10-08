@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
@@ -27,7 +28,7 @@ export default function ThanksPage() {
             <span className="flex h-11 w-11 items-center justify-center rounded-none bg-[var(--bg-tint)] border border-[var(--border-tint)] text-[var(--accent-text)]">
               <Check className="w-5 h-5" strokeWidth={2.5} />
             </span>
-            <h1 className="display-hero mt-7 text-balance">Your request.<br /><span className="em-green">The next step.</span></h1>
+            <HeroHeading className="mt-7" text="Your request." accent="The next step." />
             <p className="body-lg mt-5">
               After you submit a proposal request, our team reviews the brief and follows up by email. No payment is required to request a proposal.
             </p>

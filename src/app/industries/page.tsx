@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -23,7 +24,7 @@ export default function IndustriesPage() {
   return <><JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Industries", path: "/industries" }])} /><Header />
     <main className="service-experience">
       <section className="sx-hero"><Container><nav className="sx-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><span aria-current="page">Industries</span></nav><div className="sx-hero-intro"><div className="sx-hero-copy">
-        <p className="sx-kicker">Industry intelligence · Managed marketing BOTS</p><h1>Agentic marketing.<br /><span>Built for your business.</span></h1>
+        <p className="sx-kicker">Industry intelligence · Managed marketing BOTS</p><HeroHeading text="Agentic marketing." accent="Built for your business." />
         <p className="sx-lead">Start with the work you do and the people who buy it. Explore service-specific buyer roles and marketing workflows for the trades and local service businesses.</p>
         <div className="sx-actions"><ServiceAuditLink /><a href="#niche-directory" className="btn btn-outline">Find your business<ArrowRight size={16} /></a></div>
       </div></div></Container></section>

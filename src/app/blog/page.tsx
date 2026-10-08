@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui";
 import { BlogOptin, BlogArchive, PostOptin } from "@/components/marketing";
@@ -21,9 +22,7 @@ export default function BlogIndexPage() {
           <Container className="py-10 sm:py-14">
             <div className="mx-auto max-w-[52ch] text-center">
               <p className="eyebrow mb-4">Writing</p>
-              <h1 className="display-hero text-balance">
-                Operating notes for <span className="em-green">serious BOT programs.</span>
-              </h1>
+              <HeroHeading text="Operating notes for" accent="serious BOT programs." />
               <p className="body-base mt-4 text-pretty">
                 Clear analysis of mandates, control models, workflow design and the operating decisions required for production BOTS.
               </p>

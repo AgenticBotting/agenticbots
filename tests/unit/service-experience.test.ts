@@ -44,7 +44,7 @@ describe("service buying journey", () => {
       expect(html.match(/<h1[ >]/g)).toHaveLength(1);
       expect(html).not.toContain("$499");
     expect(html).toContain("Begin Step-1");
-      expect(html).toMatch(/<h1>Agentic .+ <br\/><span>for /);
+      expect(html.match(/<h1[^>]*>(.*?)<\/h1>/)?.[1].replace(/<[^>]+>/g, "")).toMatch(/^Agentic .+ for /);
       expect(html).toContain("$7,500");
       expect(html).toContain("$2,500");
       expect(html).toContain("human approval");

@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import type { Metadata } from "next";
 import { ArrowRight, Check } from "lucide-react";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return <><JsonLd data={[faqLd(PRICING_FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])]} /><Header /><main>
-    <section className="section-pad border-b border-[var(--border)]"><Container><p className="eyebrow mb-5">One BOT → Growth System → Enterprise</p><div className="system-intro"><h1 className="display-hero max-w-[17ch]">Start focused.<br /><span className="em-green">Grow connected.</span></h1><div><p className="body-lg max-w-[43ch]">A one-time setup to build the system around your business. A monthly retainer to operate, maintain and improve it.</p><ProposalLink className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Find your starting point <ArrowRight size={16} /></ProposalLink></div></div></Container></section>
+    <section className="section-pad border-b border-[var(--border)]"><Container><p className="eyebrow mb-5">One BOT → Growth System → Enterprise</p><div className="system-intro"><HeroHeading text="Start focused." accent="Grow connected." /><div><p className="body-lg max-w-[43ch]">A one-time setup to build the system around your business. A monthly retainer to operate, maintain and improve it.</p><ProposalLink className="inline-flex items-center gap-2 text-[14px] font-semibold mt-6">Find your starting point <ArrowRight size={16} /></ProposalLink></div></div></Container></section>
     <section className="section-pad border-b border-[var(--border)]"><Container><h2 className="sr-only">Choose your starting scope</h2><PricingCards /></Container></section>
     <section className="section-pad bg-[var(--bg-alt)] border-b border-[var(--border)]"><Container><div className="system-intro"><h2 className="display-xl max-w-[18ch]">Real work goes<br />into the setup.</h2><p className="body-lg max-w-[43ch]">A useful BOT needs a defined process, the right connections and a tested set of boundaries. These are the deliverables your proposal scopes.</p></div><ol className="delivery-rows">{[
       ["Workflow discovery", "Map the process, define the starting workflow and agree on acceptance criteria."],

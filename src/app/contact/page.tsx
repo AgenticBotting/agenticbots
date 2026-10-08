@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import { Mail, Clock, FileText } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
@@ -26,7 +27,7 @@ export default function ContactPage() {
             <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
               <Reveal>
                 <p className="eyebrow mb-5">Contact</p>
-                <h1 className="display-hero text-balance">Define the <span className="em-green">operating case.</span></h1>
+                <HeroHeading text="Define the" accent="operating case." />
                 <p className="body-lg mt-6 max-w-[44ch] text-pretty">
                   Give us the business priority, current systems and decision horizon. We use that context to evaluate a specific BOT mandate and document the next step.
                 </p>

@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
@@ -11,9 +12,7 @@ export default function NotFound() {
       <main>
         <Container className="py-24 sm:py-32">
           <p className="eyebrow mb-5">Page not found</p>
-          <h1 className="display-hero max-w-[16ch] text-balance">
-            That page <span className="em-green">does not exist.</span>
-          </h1>
+          <HeroHeading text="That page" accent="does not exist." />
           <p className="body-lg mt-6 max-w-[46ch]">
             The link may be old, or we may have moved it. A bot has already logged the
             miss, filed it under <span className="mono text-[0.9em]">routing.debt</span>,

@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -43,7 +44,7 @@ function Hero() {
           <HomeToolOrbit />
           <div className="ch-hero-copy">
             <p className="ch-kicker"><span /> Managed AI for established contractors</p>
-            <h1>More opportunities.<br /><span>Less manual work.</span></h1>
+            <HeroHeading text="More opportunities." accent="Less manual work." />
             <p className="ch-hero-description">Connect your marketing, sales follow-up and customer operations with AI BOTS—built, connected and managed for you.</p>
             <div className="ch-actions"><AuditLink label="Begin Step-1" /><a href="#product-preview" className="btn btn-outline"><CirclePlay size={17} /> See BOTS at work</a></div>
             <p className="ch-hero-note">Six short steps. Mostly quick choices. No payment required.</p>

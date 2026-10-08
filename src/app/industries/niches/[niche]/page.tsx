@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,7 +40,7 @@ export default async function NichePage({ params }: Params) {
     <main className="service-experience">
       <section className="sx-hero nx-hero"><Container>
         <nav className="sx-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/industries">Industries</Link><span>/</span><span aria-current="page">{niche.name}</span></nav>
-        <div className="sx-hero-intro"><div className="sx-hero-copy"><p className="sx-kicker"><span className="sx-dot" />{niche.category} · Managed marketing BOTS</p><h1>Agentic marketing<br /><span>for {nicheAudience(niche.name)}.</span></h1><p className="sx-lead">Connect the services you deliver with the people who buy them. We build your marketing and sales workflow around a defined audience, relevant evidence and the next step your team can act on.</p><div className="sx-actions"><ServiceAuditLink /><a href="#buyer-map" className="btn btn-outline">Explore your buyer strategy<ArrowRight size={16} /></a></div><p className="sx-note">{PROPOSAL_OFFER.note}</p></div></div>
+        <div className="sx-hero-intro"><div className="sx-hero-copy"><p className="sx-kicker"><span className="sx-dot" />{niche.category} · Managed marketing BOTS</p><HeroHeading text="Agentic marketing" accent={`for ${nicheAudience(niche.name)}.`} compact={{ text: "Agentic marketing", accent: "for your business.", context: niche.name }} /><p className="sx-lead">Connect the services you deliver with the people who buy them. We build your marketing and sales workflow around a defined audience, relevant evidence and the next step your team can act on.</p><div className="sx-actions"><ServiceAuditLink /><a href="#buyer-map" className="btn btn-outline">Explore your buyer strategy<ArrowRight size={16} /></a></div><p className="sx-note">{PROPOSAL_OFFER.note}</p></div></div>
         <div className="sx-hero-foot"><span><Target size={15} />Service-specific buyer planning</span><span><GitBranch size={15} />Your existing sales process</span><span><ShieldCheck size={15} />Human approval before action</span></div>
       </Container></section>
       <NicheBuyerSection niche={niche} />

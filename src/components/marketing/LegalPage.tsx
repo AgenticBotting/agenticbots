@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/ui";
 
@@ -13,7 +14,7 @@ export function LegalPage({
         <section className="border-b border-[var(--border)]">
           <Container className="py-14 sm:py-16">
             <p className="eyebrow mb-5">Legal</p>
-            <h1 className="display-hero text-balance">{title}</h1>
+            <HeroHeading text={title} />
             <p className="body-sm mt-5">Last updated {updated}</p>
             <p className="body-lg mt-6 max-w-[62ch] text-pretty">{intro}</p>
           </Container>

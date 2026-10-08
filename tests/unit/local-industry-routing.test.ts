@@ -44,13 +44,13 @@ describe("location-preserving industry journeys", () => {
 
   it("retains city and niche through service choices, buyer specialties and related services", async () => {
     const html = main(renderToStaticMarkup(await LocalCityPage({ params: Promise.resolve({ ...geo, subject: ["hvac"] }) })));
-    expect(html).toContain("for HVAC companies in Buckeye.");
+    expect(html.replace(/<[^>]+>/g, "")).toContain("for HVAC companies in Buckeye.");
     expect(html).toContain(`href="${root}/niches/commercial-hvac"`);
     for (const service of ALL_SERVICES) expect(html).toContain(`href="${root}/hvac/${service.serviceSlug}"`);
     expect(html).not.toContain('href="/industries/');
     expect(html).not.toContain('href="/services/');
     const detail = main(renderToStaticMarkup(await LocalCityPage({ params: Promise.resolve({ ...geo, subject: ["niches", "commercial-hvac", "agentic-seo"] }) })));
-    expect(detail).toContain("commercial HVAC in Buckeye.");
+    expect(detail.replace(/<[^>]+>/g, "")).toContain("commercial HVAC in Buckeye.");
     expect(detail).toContain("Buyer-to-pipeline map");
     expect(detail).toContain('data-demo="true"');
     expect(detail).toContain(`href="${root}/niches/commercial-hvac/agentic-ppc-management"`);
@@ -67,7 +67,7 @@ describe("location-preserving industry journeys", () => {
     expect(html).toContain('href="/markets/alaska/industries/hvac"');
     const local = main(renderToStaticMarkup(await LocalStatePage({ params: Promise.resolve({ state: "alaska", subject: ["hvac"] }) })));
     expect(local).toContain('href="/markets/alaska/anchorage/industries/hvac"');
-    expect(local).toContain("for HVAC companies in Alaska.");
+    expect(local.replace(/<[^>]+>/g, "")).toContain("for HVAC companies in Alaska.");
   });
 
   it("keeps all 341 directory destinations within the location and validates their service combinations", () => {

@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
 import { ArrowRight, Bot, RefreshCw, Search, Target } from "lucide-react";
@@ -20,7 +21,7 @@ export function ServicePortfolio({ pillar }: { pillar?: Pillar }) {
   return <><Header /><main className="service-experience">
     <section className="sx-hero sx-portfolio-intro"><Container><div className="sx-hero-intro"><ServiceOrbit /><div className="sx-hero-copy">
       <p className="sx-kicker"><span className="sx-dot" />{pillar ? `${pillar.name} services` : "Managed BOT services"}</p>
-      <h1>{pillar?.slug === "marketing" ? <>Be easier to find.<br /><span>Be ready for what follows.</span></> : pillar?.slug === "sales" ? <>Keep the opportunity.<br /><span>Move the work forward.</span></> : <>The right BOTS.<br /><span>For the work ahead.</span></>}</h1>
+      <HeroHeading text={pillar?.slug === "marketing" ? "Be easier to find." : pillar?.slug === "sales" ? "Keep the opportunity." : "The right BOTS."} accent={pillar?.slug === "marketing" ? "Be ready for what follows." : pillar?.slug === "sales" ? "Move the work forward." : "For the work ahead."} />
       <p className="sx-lead">Choose the business process you want to improve. We build, connect and manage the BOTS around your tools, your customers and your team.</p>
       <div className="sx-actions"><ServiceAuditLink /><a href={`#${groups[0].id}`} className="btn btn-outline">Explore the services <ArrowRight size={16} /></a></div>
       <p className="sx-note">Start with one priority. Expand when it makes business sense.</p>

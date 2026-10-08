@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import Link from "next/link";
 import { localDirectoryHref, localIndustryHref, type MarketGeo } from "@/lib/local-market-paths";
 import { getSearchPositioning } from "@/lib/search-positioning";
@@ -25,7 +26,7 @@ export function IndustryHero({ industry }: { industry: Industry }) {
     <nav className="sx-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/industries">Industries</Link><span>/</span><span aria-current="page">{industry.name}</span></nav>
     <div className="sx-hero-intro"><ServiceOrbit /><div className="sx-hero-copy">
       <p className="sx-kicker"><span className="sx-dot" />Managed BOTS · Built around your business</p>
-      <h1>Agentic marketing{" "}<br /><span>for {industry.audience}.</span></h1>
+      <HeroHeading text="Agentic marketing" accent={`for ${industry.audience}.`} compact={{ text: "Agentic marketing", accent: "for your business.", context: `For ${industry.audience}` }} />
       <p className="sx-lead">{industry.introduction}</p>
       <div className="sx-actions"><ServiceAuditLink /><a href="#marketing-plan" className="btn btn-outline">Explore the approach<ArrowRight size={16} /></a></div>
       <p className="sx-note">For established {industry.audience}. {PROPOSAL_OFFER.note}</p>

@@ -27,7 +27,7 @@
 .ch-hero { position: relative; background: radial-gradient(ellipse at 50% 69%, var(--ch-soft), transparent 61%), var(--background); }
 .ch-hero-intro { position: relative; padding: 52px 0 38px; isolation: isolate; }
 .ch-hero-copy { position: relative; max-width: 780px; margin-inline: auto; text-align: center; }
-.conversion-home .ch-hero h1 { margin-top: 19px; font-size: clamp(40px, 5.1vw, 67px); line-height: 1.04; letter-spacing: -.055em; }
+.conversion-home .ch-hero h1 { margin-top: 19px; --hero-font-size: clamp(40px, 5.1vw, 67px); line-height: 1.04; letter-spacing: -.055em; }
 .ch-hero h1 span { color: var(--accent-text); }
 .ch-hero-description { max-width: 54ch; margin: 22px auto 0; font-size: 19px; line-height: 1.6; color: var(--text-secondary); }
 .ch-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 27px; }
@@ -306,7 +306,7 @@
   .ch-markets .container-site > div { align-items: start; flex-direction: column; gap: 14px; } .ch-markets nav { gap: 10px 23px; }
 }
 @media (max-width: 389px) {
-  .conversion-home .ch-hero h1 { font-size: 37px; }
+  .conversion-home .ch-hero h1 { --hero-font-size: 37px; }
   .ch-hero .ch-kicker { font-size: 10px; } .ch-actions { flex-direction: column; align-items: stretch; }
   .ch-workspace-tabs button { font-size: 10px; padding-inline: 3px; }
   .ch-flow-card:first-child { display: flex; } .ch-flow-card:first-child .ch-flow-footer { padding-top: 8px; }

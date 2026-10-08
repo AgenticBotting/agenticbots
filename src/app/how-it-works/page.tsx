@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import type { Metadata } from "next";
 import { Header, Footer } from "@/components/layout";
@@ -31,7 +32,7 @@ const FAQ = [
 
 export default function HowItWorksPage() {
   return <><JsonLd data={[faqLd(FAQ), breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/how-it-works" }])]} /><Header /><main>
-    <section className="section-pad border-b border-[var(--border)]"><Container><p className="eyebrow mb-5">The process</p><div className="system-intro"><h1 className="display-hero max-w-[18ch]">A defined process.<br /><span className="em-green">A connected system.</span></h1><div><p className="body-lg max-w-[44ch]">Start with one useful workflow. Agree on what it should do, connect it to your tools and test it before a monitored launch.</p><ProposalLink className="btn btn-primary mt-7">{PROPOSAL_OFFER.cta}</ProposalLink></div></div></Container></section>
+    <section className="section-pad border-b border-[var(--border)]"><Container><p className="eyebrow mb-5">The process</p><div className="system-intro"><HeroHeading text="A defined process." accent="A connected system." /><div><p className="body-lg max-w-[44ch]">Start with one useful workflow. Agree on what it should do, connect it to your tools and test it before a monitored launch.</p><ProposalLink className="btn btn-primary mt-7">{PROPOSAL_OFFER.cta}</ProposalLink></div></div></Container></section>
     <BotWorkflowStory />
     <section className="section-pad border-b border-[var(--border)] bg-[var(--bg-alt)]"><Container><h2 className="display-xl mb-10">From discovery<br />to ongoing operation.</h2><ol className="delivery-rows">{PHASES.map(([title, copy], index) => <li key={title}><span>0{index + 1}</span><h3 className="display-lg">{title}</h3><p className="body-base">{copy}</p></li>)}</ol></Container></section>
     <section className="section-pad workforce-governance on-dark"><Container><div className="system-intro"><h2 className="display-xl max-w-[20ch]">Control is part<br />of the design.</h2><div><p className="body-lg text-ink-200 max-w-[45ch]">Access is defined by organization and role. Work that changes connected systems waits for human approval. BOT ACTIVITY records runs, decisions and outcomes for review.</p><p className="body-sm text-ink-400 mt-5">Architecture and operating approach. Your proposal defines the controls, integrations and support included in your deployment.</p></div></div></Container></section>

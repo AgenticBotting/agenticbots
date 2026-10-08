@@ -1829,3 +1829,27 @@
   .platform-live-dot,
   .platform-node { animation: none; }
 }
+
+/* All public hero H1s: two complete rows at most, fitted to their own column.
+   The server supplies conservative Geist/fallback glyph widths, so this also
+   works before hydration and when scripts or webfonts are unavailable. */
+.hero-heading-frame { container-type: inline-size; min-width: 0; width: 100%; }
+.hero-heading-frame > .hero-heading {
+  font-size: min(var(--hero-font-size, clamp(2rem, 3.6vw, 3rem)), calc(98cqi / var(--hero-line-width)));
+  max-width: none;
+}
+.hero-heading .hero-heading-line { display: block; white-space: nowrap; color: var(--foreground); }
+.hero-heading .hero-heading-accent { color: var(--accent-text); }
+.hero-heading .hero-heading-full { display: block; }
+.hero-heading .hero-heading-compact, .hero-heading-context { display: none; }
+.sx-hero-copy:has(.hero-heading-has-compact) { container-type: inline-size; }
+@container (max-width: 600px) {
+  .hero-heading-frame > .hero-heading-has-compact {
+    margin-top: 0;
+    font-size: min(var(--hero-font-size, clamp(2rem, 3.6vw, 3rem)), calc(98cqi / var(--hero-compact-width)));
+  }
+  .hero-heading .hero-heading-full:has(+ .hero-heading-compact) { display: none; }
+  .hero-heading .hero-heading-compact { display: block; }
+  .hero-heading-frame > .hero-heading-context { display: block; margin: 0 0 14px; font-size: 15px; line-height: 1.5; font-weight: 500; color: var(--accent-text); text-wrap: balance; }
+  .sx-hero-copy:has(.hero-heading-has-compact) > .sx-kicker { display: none; }
+}

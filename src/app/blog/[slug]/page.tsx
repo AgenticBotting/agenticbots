@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -123,7 +124,7 @@ export default async function PostPage({ params }: Params) {
                   · {post.readMinutes} min read
                 </span>
               </div>
-              <h1 className="display-hero text-balance">{post.title}</h1>
+              <HeroHeading text={post.title} />
               <p className="body-base mt-4 text-pretty">{post.excerpt}</p>
 
               {/* Byline + share, then the inline email capture. */}

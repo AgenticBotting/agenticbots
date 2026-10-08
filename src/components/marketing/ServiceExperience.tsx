@@ -1,3 +1,4 @@
+import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
 import { ArrowRight, Bot, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
@@ -35,7 +36,7 @@ export function ServiceHero({ svc, location, breadcrumb, editorial }: {
         {breadcrumb && <nav className="sx-breadcrumb" aria-label="Breadcrumb">{breadcrumb}</nav>}
         <div className="sx-hero-intro"><ServiceOrbit slug={svc.slug} /><div className="sx-hero-copy">
           <p className="sx-kicker"><span className="sx-dot" />BOT implementation · Managed for you</p>
-          <h1>{editorial ? <>{editorial.heading}{" "}<br /><span>{editorial.accent}</span></> : <>{agenticServiceLabel(search.label)}{" "}<br /><span>for {search.audience}{location ? ` in ${location}` : ""}.</span></>}</h1>
+          <HeroHeading text={editorial?.heading ?? agenticServiceLabel(search.label)} accent={editorial?.accent ?? `for ${search.audience}${location ? ` in ${location}` : ""}.`} compact={{ text: editorial?.heading ?? agenticServiceLabel(search.label), context: (editorial?.accent ?? `For ${search.audience}${location ? ` in ${location}` : ""}`).replace(/\.$/, "").replace(/^for /, "For ") }} />
           <p className="sx-lead">{editorial?.introduction ?? search.introduction}</p>
           <div className="sx-actions"><ServiceAuditLink /><a href="#service-preview" className="btn btn-outline"><CirclePlay size={16} /> See the workflow</a></div>
           <p className="sx-note">{PROPOSAL_OFFER.note}</p>
