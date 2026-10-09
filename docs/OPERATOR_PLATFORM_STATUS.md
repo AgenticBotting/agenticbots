@@ -1,5 +1,9 @@
 # Operator platform — 2026-10-09
 
+## Security audit qualification
+
+The later prelaunch review in `SECURITY_LEGAL_AUDIT_2026-10-09.md` identifies unremediated security and legal readiness gaps. The interface work below remains delivered, but its descriptions of append-only records and reviewed execution are not proof of storage immutability or atomic authorization. Local probes confirmed editable audit records, duplicate webhook claims and soft unsubscribe handling. Approval execution ordering, model budgets, MFA, environment/IAM isolation and production monitoring also need the report's release checks. No remediation or deployment was included in the audit; the owner confirms nothing is live today.
+
 ## Delivered locally
 
 The `/ops` workspace now uses the available desktop width, larger Geist type, calmer spacing, low-radius buttons and responsive cards. Marketing styling is unchanged. Mobile navigation collapses so the menu no longer consumes the first screen.

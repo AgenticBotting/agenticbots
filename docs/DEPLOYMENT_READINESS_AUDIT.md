@@ -1,5 +1,7 @@
 # Deployment readiness audit — first AWS staging test
 
+> **Later prelaunch review, 2026-10-09:** See `SECURITY_LEGAL_AUDIT_2026-10-09.md`. The statuses below describe the earlier staging implementation, not current enterprise security/legal clearance. New findings remain open, including environment scoping of lifecycle IAM, approval ordering, storage integrity, abuse controls and production configuration. No cloud deployment was performed by the later audit.
+
 _Audited 2026-10-03 on branch `platform-v1`. Scope: what it takes to run ONE
 fake client ("AgenticBots Test Company") with ONE Bot (SEO Bot) on ONE AWS
 EC2 staging runtime, end to end._

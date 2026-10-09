@@ -1,0 +1,15 @@
+{
+  "fixtureOnly": true,
+  "auditRecordPatchAccepted": true,
+  "concurrentWebhookClaimsAccepted": 2,
+  "duplicateWebhookRecords": 2,
+  "unsubscribeUpgrade": {
+    "reason": "client_suppression",
+    "hard": false,
+    "channels": [
+      "email"
+    ]
+  },
+  "newUnsubscribeCanBeSoft": true,
+  "emptyOperatorScopeCanReadArbitraryTenant": true
+}

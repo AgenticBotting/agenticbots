@@ -4,6 +4,14 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Latest security and legal audit — 2026-10-09
+
+Read `docs/SECURITY_LEGAL_AUDIT_2026-10-09.md` before any launch or integration activation. The owner confirms nothing is live, the email provider is undecided, and the intended market is the US; this supersedes historical deployment descriptions for this audit. The review records 28 security findings and 5 privacy/commercial readiness findings, separating confirmed defects from conditional risks and launch prerequisites. **No fixes or deployments were performed by the audit.**
+
+Highest priorities include public course purchase forgery, unverified-email entitlement matching, analytics on sensitive routes, affected dependencies, approval/execution ordering, atomic webhook claims, model spend controls and unsubscribe enforcement. Local memory-only probes confirmed that audit records can be patched despite the append-only designation, duplicate webhook deliveries can both claim processing, and unsubscribes can remain soft. Do not describe append-only storage or approval execution as fully enforced until these findings are closed.
+
+Validation: typecheck passed; lint has 0 errors / 5 existing warnings; all 250 tests across 38 files passed. The registry audit reported 10 affected packages (2 critical / 8 high), with application exploitability distinguished in the report. Audit evidence is in `docs/security-audit-2026-10-09/`. The privacy notice, commercial terms and operational release evidence require completion before the affected capabilities launch.
+
 ## Latest operator platform update — 2026-10-09
 
 The operator console now has a full-width, responsive data workspace: area charts, BOT and integration cards, inspectable approvals, larger requests, paged audit history, searchable niche/buyer profiles and an interactive Prospect Graph map. Shared operator styles preserve public marketing design. Mobile navigation collapses. Details: `docs/OPERATOR_PLATFORM_STATUS.md`.
