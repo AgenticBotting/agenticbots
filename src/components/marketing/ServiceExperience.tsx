@@ -1,7 +1,7 @@
 import { HeroHeading } from "@/components/ui/HeroHeading";
 import { ProposalLink } from "@/components/marketing/ProposalLink";
 import Link from "next/link";
-import { ArrowRight, Bot, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, Bot, ChartNoAxesCombined, Check, CirclePlay, FileText, Layers3, LockKeyhole, Search, Settings2, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui";
 import { AuditForm } from "./AuditForm";
 import { ServiceOperations } from "./ServiceOperations";
@@ -77,14 +77,28 @@ export function ServiceBenefits({ svc }: { svc: Service }) {
   </Container></section>;
 }
 
+/** Decorative symbols reinforce the capability label without adding UI controls. */
+function ScopeIcon({ label }: { label: string }) {
+  const Icon = /approv|routing|handoff|suppression|eligib/i.test(label) ? ShieldCheck
+    : /monitor|tracking|pacing/i.test(label) ? Activity
+    : /report|measurement|analytics|records|history/i.test(label) ? ChartNoAxesCombined
+    : /research|analysis|review|identification/i.test(label) ? Search
+    : /draft|content|proposal|summar|brief|source/i.test(label) ? FileText
+    : Settings2;
+  return <Icon size={19} strokeWidth={1.6} aria-hidden="true" />;
+}
+
 export function ServiceScope({ svc }: { svc: Service }) {
   const positioning = getServicePositioning(svc.slug);
   return <section id="included" className="sx-section sx-scope"><Container>
     <div className="so-intro"><div className="sx-section-copy"><p className="sx-kicker">Inside your {positioning.deliveryModel}</p><h2>From raw signals.<br /><span>To review-ready work.</span></h2></div><div className="so-intro-description"><p>{positioning.execution}</p><ProposalLink focus={svc.name} className="sx-text-link">Build your workflow <ArrowRight size={16} /></ProposalLink></div></div>
     <ServiceOperations name={svc.name} botName={positioning.deliveryModel} activity={getServiceActivityDemo(svc.slug)} examples={getServiceExperience(svc.slug).examples} />
-    <div className="so-deliverables"><p>Included in your {svc.name.toLowerCase()} service</p><ul>{positioning.scope.map(item => <li key={item}><Check size={15} aria-hidden="true" /><span>{item}</span></li>)}</ul></div>
-    <p className="so-scope-note">Exact integrations, included usage, support and acceptance criteria are agreed in your proposal.</p>
-    <div className="sx-control-note"><ShieldCheck size={21} /><div><strong>Your team keeps control.</strong><p>{positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.</p></div></div>
+    <div className="so-deliverables">
+      <div className="so-deliverables-heading"><h3>What’s included.</h3><p>{svc.name}</p></div>
+      <ul aria-label={`${svc.name} service capabilities`}>{positioning.scope.map(item => <li key={item}><span className="so-capability-icon"><ScopeIcon label={item} /></span><span>{item}</span></li>)}</ul>
+      <div className="so-scope-note"><FileText size={16} aria-hidden="true" /><p>Exact integrations, included usage, support and acceptance criteria are agreed in your proposal.</p></div>
+    </div>
+    <div className="so-assurance"><div className="so-assurance-title"><span><ShieldCheck size={23} strokeWidth={1.6} aria-hidden="true" /></span><div><p>Built-in oversight</p><h3>Your team keeps control.</h3></div></div><div className="so-assurance-copy"><p>{positioning.boundary}</p><p><LockKeyhole size={15} aria-hidden="true" /><span>External messages, publishing, ad changes and CRM writes require human approval.</span></p></div></div>
   </Container></section>;
 }
 

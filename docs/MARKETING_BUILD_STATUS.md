@@ -2,6 +2,12 @@
 
 Status: implemented locally on `platform-v1`; not deployed or pushed.
 
+## Service capability presentation — 2026-10-09
+
+Polished the content beneath the shared service operations chart. Existing service-specific deliverables now appear as six readable icon-led tiles, with a clear “What’s included” heading and service label. A separate oversight panel gives the existing boundary and human-approval copy stronger visual hierarchy. Scope, chart behavior, intake, routes and content claims are unchanged. Server-rendered markup uses existing Lucide icons and Geist; no dependencies or browser logic added. Responsive rules provide three, two and one-column layouts.
+
+Validation: typecheck passed; lint has zero errors and five pre-existing warnings; all 236 tests across 37 files passed. Desktop visual review passed at 1440px. Mobile viewport requests did not change the actual browser width, including in a fresh tab, so mobile visual verification remains unconfirmed. Screenshot: `/tmp/agentic-service-capabilities.png`. This component/CSS-only refinement did not change pages, routes or config; the prior production build remains the latest full-build result. No deployment, push or external submission.
+
 ## Interactive service operations preview — 2026-10-09
 
 Replaced the plain “What’s included” sheet in shared `ServiceScope` with a full-width service operations illustration. All 13 services receive a distinct source-activity metric, twelve-day fictional series and the existing service-specific example tasks. A curved SVG area chart, selected-day checkpoint, source → BOT analysis → human review pipeline and selectable work briefs make the scope inspectable. The original six deliverables, boundary copy and proposal entry remain; national, state, city and industry-service templates inherit the section.

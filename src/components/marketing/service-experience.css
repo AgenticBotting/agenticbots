@@ -104,10 +104,6 @@
 .sx-benefit-list p { font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-top: 10px; }
 .sx-scope, .sx-delivery { background: var(--bg-alt); }
 .sx-scope-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 70px; align-items: center; }
-.sx-control-note { display: flex; align-items: start; gap: 14px; border-top: 1px solid var(--border-strong); margin-top: 38px; padding-top: 24px; }
-.sx-control-note > svg { color: var(--accent-text); flex: none; }
-.sx-control-note strong { font-size: 14px; font-weight: 550; }
-.sx-control-note p { font-size: 12px; line-height: 1.7; color: var(--text-secondary); margin-top: 6px; max-width: 120ch; }
 .sx-connections-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 70px; align-items: center; }
 .sx-tool-map { position: relative; height: 390px; }
 .sx-tool-orbits { position: absolute; inset: 0; overflow: hidden; }
