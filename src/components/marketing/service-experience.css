@@ -104,15 +104,6 @@
 .sx-benefit-list p { font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-top: 10px; }
 .sx-scope, .sx-delivery { background: var(--bg-alt); }
 .sx-scope-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 70px; align-items: center; }
-.sx-scope-sheet { background: var(--background); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--sx-shadow); }
-.sx-scope-sheet > div { display: flex; align-items: center; gap: 10px; padding: 20px 24px; border-bottom: 1px solid var(--border); font-size: 14px; }
-.sx-scope-sheet > div svg { color: var(--accent-text); flex: none; }
-.sx-scope-sheet > div > span { margin-left: auto; font-size: 10px; color: var(--text-muted); }
-.sx-scope-sheet ul { padding: 5px 24px; }
-.sx-scope-sheet li { display: flex; gap: 12px; align-items: center; padding-block: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
-.sx-scope-sheet li:last-child { border: 0; }
-.sx-scope-sheet li svg { color: var(--accent-text); flex: none; }
-.sx-scope-sheet > p { padding: 16px 24px; border-top: 1px solid var(--border); font-size: 11px; line-height: 1.6; color: var(--text-muted); }
 .sx-control-note { display: flex; align-items: start; gap: 14px; border-top: 1px solid var(--border-strong); margin-top: 38px; padding-top: 24px; }
 .sx-control-note > svg { color: var(--accent-text); flex: none; }
 .sx-control-note strong { font-size: 14px; font-weight: 550; }
@@ -248,7 +239,7 @@
   .sx-actions { flex-direction: column; } .sx-hero .sx-kicker { font-size: 10px; }
   .sx-workspace-bar > span:first-child { font-size: 13px; } .sx-detail-top { font-size: 10px; }
   .sx-draft { min-height: 272px; } .sx-work-detail { padding: 17px; }
-  .sx-scope-sheet > div > span { display: none; } .sx-process-input { width: 95%; }
+  .sx-process-input { width: 95%; }
   .sx-process-input, .sx-process-bot, .sx-process-output { padding: 14px; gap: 10px; }
   .sx-art-caption { font-size: 8px; right: 12px; }
   .sx-tool-node strong { font-size: 10px; } .sx-service-list { grid-template-columns: minmax(0, 1fr); }

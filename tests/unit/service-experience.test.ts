@@ -5,6 +5,8 @@ import { ALL_STATES, allCitiesInState } from "@/lib/geo/dataset";
 import { ALL_SERVICES, CATALOG } from "@/lib/catalog";
 import { SERVICE_EXPERIENCES, getServiceExperience } from "@/lib/service-experience";
 import { getServicePositioning } from "@/lib/service-positioning";
+import { ServiceScope } from "@/components/marketing/ServiceExperience";
+import { SERVICE_ACTIVITY_DEMOS } from "@/lib/service-activity-demo";
 import { ServiceWorkspace } from "@/components/marketing/ServiceWorkspace";
 import { ServicePortfolio } from "@/components/marketing/ServicePortfolio";
 import ServicePage from "@/app/services/[slug]/page";
@@ -25,6 +27,26 @@ describe("service buying journey", () => {
       expect(html).toContain("fictional data");
       expect(html).toContain("This preview sends nothing and changes no records.");
       expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
+    }
+  });
+
+  it("shows honest, service-specific activity while preserving all contracted scope items", () => {
+    expect(Object.keys(SERVICE_ACTIVITY_DEMOS).sort()).toEqual(ALL_SERVICES.map(s => s.slug).sort());
+    for (const svc of ALL_SERVICES) {
+      const demo = SERVICE_ACTIVITY_DEMOS[svc.slug];
+      expect(demo.demo).toBe(true);
+      expect(demo.values).toHaveLength(12);
+      expect(demo.values.every(value => Number.isFinite(value) && value >= 0)).toBe(true);
+      const html = renderToStaticMarkup(createElement(ServiceScope, { svc }));
+      expect(html).toContain('data-demo="true"');
+      expect(html).toContain("Illustrative preview · fictional data");
+      expect(html).toContain("No live actions in this preview");
+      expect(html).toContain(demo.metric);
+      expect(html).toContain(String(demo.values.reduce((sum, value) => sum + value, 0)));
+      expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
+      for (const item of getServicePositioning(svc.slug).scope) expect(html).toContain(renderToStaticMarkup(createElement("span", null, item)));
+      expect(html).toContain("require human approval");
+      expect(html).toContain("Build your workflow");
     }
   });
 

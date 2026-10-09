@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowRight, Bot, Check, CirclePlay, FileText, Layers3, LockKeyhole, Settings2, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui";
 import { AuditForm } from "./AuditForm";
+import { ServiceOperations } from "./ServiceOperations";
+import { getServiceActivityDemo } from "@/lib/service-activity-demo";
 import { ServiceWorkspace } from "./ServiceWorkspace";
 import { PlatformMark } from "./ServicePlatformConstellation";
 import { getServiceExperience } from "@/lib/service-experience";
@@ -78,9 +80,10 @@ export function ServiceBenefits({ svc }: { svc: Service }) {
 export function ServiceScope({ svc }: { svc: Service }) {
   const positioning = getServicePositioning(svc.slug);
   return <section id="included" className="sx-section sx-scope"><Container>
-    <div className="sx-scope-layout"><div className="sx-section-copy"><p className="sx-kicker">What’s included</p><h2>Clear responsibilities.<br /><span>Practical deliverables.</span></h2><p>{positioning.execution}</p><ProposalLink className="sx-text-link">Define your scope <ArrowRight size={16} /></ProposalLink></div>
-      <div className="sx-scope-sheet"><div><FileText size={17} /><strong>{svc.name}</strong><span>Service scope</span></div><ul>{positioning.scope.map(item => <li key={item}><Check size={16} /><span>{item}</span></li>)}</ul><p>Exact integrations, included usage, support and acceptance criteria are agreed in your proposal.</p></div>
-    </div>
+    <div className="so-intro"><div className="sx-section-copy"><p className="sx-kicker">Inside your {positioning.deliveryModel}</p><h2>From raw signals.<br /><span>To review-ready work.</span></h2></div><div className="so-intro-description"><p>{positioning.execution}</p><ProposalLink focus={svc.name} className="sx-text-link">Build your workflow <ArrowRight size={16} /></ProposalLink></div></div>
+    <ServiceOperations name={svc.name} botName={positioning.deliveryModel} activity={getServiceActivityDemo(svc.slug)} examples={getServiceExperience(svc.slug).examples} />
+    <div className="so-deliverables"><p>Included in your {svc.name.toLowerCase()} service</p><ul>{positioning.scope.map(item => <li key={item}><Check size={15} aria-hidden="true" /><span>{item}</span></li>)}</ul></div>
+    <p className="so-scope-note">Exact integrations, included usage, support and acceptance criteria are agreed in your proposal.</p>
     <div className="sx-control-note"><ShieldCheck size={21} /><div><strong>Your team keeps control.</strong><p>{positioning.boundary} External messages, publishing, ad changes and CRM writes require human approval.</p></div></div>
   </Container></section>;
 }
