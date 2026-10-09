@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { AlertTriangle, Bell, Bot as BotIcon, CircleDollarSign, ClipboardList, Inbox, Receipt, Users } from "lucide-react";
+import { AlertTriangle, Bot as BotIcon, CircleDollarSign, Users } from "lucide-react";
 import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { opsDashboard } from "@/server/services/queries";
 import { PageHead, Panel, When, Empty, Banner } from "@/components/platform/ui";
 import { Status } from "@/components/platform/status";
 import { Avatar, Kpi, KpiRow, Lights, SegBar, TimelineList, toneFor, type Tone } from "@/components/platform/viz";
-import { StackedColumns } from "@/components/platform/charts";
+import { OperationsChart } from "@/components/platform/operations-chart";
 import { money, titleCase } from "@/lib/platform/format";
 
 export const metadata = { title: "Dashboard" };
@@ -19,6 +19,8 @@ export default async function OpsDashboard() {
   const runTotals = d.runsDaily.map((x) => x.completed + x.failed + x.other);
   const runs14 = runTotals.reduce((a, b) => a + b, 0);
   const failed14 = d.runsDaily.reduce((s, x) => s + x.failed, 0);
+  const completed14 = d.runsDaily.reduce((s, x) => s + x.completed, 0);
+  const finished14 = completed14 + failed14;
   const health = {
     healthy: d.fleet.filter((f) => f.health === "healthy").length,
     degraded: d.fleet.filter((f) => f.health === "degraded").length,
@@ -51,7 +53,7 @@ export default async function OpsDashboard() {
     <>
       <PageHead
         title="Control center"
-        description={queue.length === 0 ? "Nothing is waiting on you. Bots are running." : `${queue.length} item${queue.length === 1 ? "" : "s"} need${queue.length === 1 ? "s" : ""} a look across ${new Set(queue.map((q) => q.orgId)).size} client${new Set(queue.map((q) => q.orgId)).size === 1 ? "" : "s"}.`}
+        description={queue.length === 0 ? "No open decisions. Review activity and the freshness of your runtime checks below." : `${queue.length} item${queue.length === 1 ? "" : "s"} need${queue.length === 1 ? "s" : ""} a look across ${new Set(queue.map((q) => q.orgId)).size} client${new Set(queue.map((q) => q.orgId)).size === 1 ? "" : "s"}.`}
       />
 
       {d.eligibleForReactivation.map((o) => (
@@ -64,24 +66,22 @@ export default async function OpsDashboard() {
         <Kpi icon={Users} value={d.activeClients} label="Active clients" href="/ops/clients" hint={`${d.suspended.length} suspended, ${d.pastDue.length} past due`} />
         <Kpi icon={CircleDollarSign} value={money(d.mrrCents)} label="Monthly recurring revenue" href="/ops/billing" hint="Active agreements" />
         <Kpi icon={BotIcon} value={d.activeRuns.length} label="Bots working now" href="/ops/runs?status=active" spark={runTotals} hint={`${runs14} runs in the last 14 days`} />
-        <Kpi icon={AlertTriangle} value={failed14} label="Failed runs, 14 days" href="/ops/runs?status=failed" tone={failed14 ? "watch" : undefined} hint={runs14 ? `${Math.round(((runs14 - failed14) / runs14) * 100)}% succeeded` : "No runs yet"} meter={runs14 ? { pct: ((runs14 - failed14) / runs14) * 100 } : undefined} />
-        <Kpi icon={Bell} value={d.incidents.length} label="Open incidents" href="/ops/monitoring" tone={d.incidents.some((i) => i.severity === "critical" || i.severity === "high") ? "bad" : d.incidents.length ? "watch" : undefined} hint={d.incidents.length ? `Worst: ${d.incidents[0].severity}` : "All clear"} />
-        <Kpi icon={ClipboardList} value={d.pendingApprovals} label="Pending approvals" href="/ops/approvals" tone={d.pendingApprovals ? "watch" : undefined} hint="Waiting on clients or you" />
-        <Kpi icon={Inbox} value={d.newRequests} label="New requests" href="/ops/requests" tone={d.newRequests ? "watch" : undefined} hint="Not yet routed" />
-        <Kpi icon={Receipt} value={money(d.outstandingCents)} label="Outstanding receivables" href="/ops/billing" tone={d.pastDueCents ? "bad" : undefined} hint={d.pastDueCents ? `${money(d.pastDueCents)} past due` : "Nothing past due"} meter={d.outstandingCents ? { pct: (d.pastDueCents / d.outstandingCents) * 100, tone: "bad" } : undefined} />
+        <Kpi icon={AlertTriangle} value={failed14} label="Failed runs, 14 days" href="/ops/runs?status=failed" tone={failed14 ? "watch" : undefined} hint={finished14 ? `${Math.round((completed14 / finished14) * 100)}% of finished runs succeeded` : "No runs yet"} meter={finished14 ? { pct: (completed14 / finished14) * 100 } : undefined} />
       </KpiRow>
+      <nav className="oc-strip" aria-label="Operator priorities">
+        <Link href="/ops/monitoring"><b>{d.incidents.length}</b><span>Open incidents</span></Link>
+        <Link href="/ops/approvals"><b>{d.pendingApprovals}</b><span>Awaiting approval</span></Link>
+        <Link href="/ops/requests"><b>{d.newRequests}</b><span>New requests</span></Link>
+        <Link href="/ops/billing"><b>{money(d.outstandingCents)}</b><span>Receivables</span></Link>
+      </nav>
 
       <div className="pf-grid pf-grid-main">
-        <Panel title="Bot runs, last 14 days" sub="Completed, failed and still in progress" action={<Link href="/ops/runs" className="pf-small font-semibold text-[var(--accent-text)]">All runs</Link>}>
-          <StackedColumns
-            label="Bot runs per day"
-            dates={d.runsDaily.map((x) => x.date)}
-            series={[
-              { key: "completed", label: "Completed", tone: "good", values: d.runsDaily.map((x) => x.completed) },
-              { key: "failed", label: "Failed", tone: "bad", values: d.runsDaily.map((x) => x.failed) },
-              { key: "other", label: "In progress or waiting", tone: "live", values: d.runsDaily.map((x) => x.other) },
-            ]}
-          />
+        <Panel title="Bot runs, last 14 days" sub="Recorded activity · daily totals in UTC" action={<Link href="/ops/runs" className="pf-small font-semibold text-[var(--accent-text)]">All runs</Link>}>
+          <OperationsChart dates={d.runsDaily.map(x => x.date)} series={[
+            { label: "Completed", values: d.runsDaily.map(x => x.completed) },
+            { label: "Failed / interrupted", values: d.runsDaily.map(x => x.failed) },
+            { label: "Other states", values: d.runsDaily.map(x => x.other) },
+          ]} />
         </Panel>
 
         <Panel title="Fleet health" sub={`${d.fleet.length} client runtime${d.fleet.length === 1 ? "" : "s"}`} action={<Link href="/ops/infrastructure" className="pf-small font-semibold text-[var(--accent-text)]">Infrastructure</Link>}>
@@ -91,16 +91,17 @@ export default async function OpsDashboard() {
               { label: "Healthy", value: health.healthy, tone: "good" },
               { label: "Degraded", value: health.degraded, tone: "watch" },
               { label: "Offline", value: health.offline, tone: "bad" },
-              { label: "Stopped", value: health.stopped, tone: "quiet" },
+              { label: "Unverified / stopped", value: health.stopped, tone: "quiet" },
             ]}
           />
+          <p className="oc-note mt-4">Checks older than 10 minutes are unverified. These are observations, not an uptime SLA.</p>
           <ul className="pf-fleet">
             {d.fleet.map((f) => (
               <li key={f.orgId}>
                 <Avatar name={f.orgName} size="sm" />
                 <Link href={`/ops/clients/${f.orgId}?tab=infrastructure`} className="n">{f.orgName}</Link>
                 <Lights items={[
-                  { label: "Engine", tone: f.ready ? "good" : f.health === "stopped" ? "quiet" : "bad", title: f.ready ? "ready" : f.health },
+                  { label: "Engine", tone: f.ready ? "good" : f.health === "stopped" || f.health === "unknown" ? "quiet" : "bad", title: f.ready ? "ready" : f.health },
                   { label: "Tunnel", tone: toneFor(f.tunnel === "connected" ? "connected" : f.tunnel === "down" ? "down" : undefined), title: f.tunnel },
                 ]} />
                 <span className="disk" title="Data volume used">{f.diskUsedPct ?? "—"}{f.diskUsedPct !== undefined ? "%" : ""}</span>

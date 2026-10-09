@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { runtimeObservation } from "@/lib/platform/health";
 import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { lookups } from "@/server/services/lookups";
@@ -16,6 +18,8 @@ export default async function MonitoringPage({ searchParams }: { searchParams: P
   const r = await repo();
   const L = await lookups(r, actor);
   const allInc = (await r.list("incidents")).filter((i) => L.visible(i.orgId));
+  const runtimes = (await r.list("runtimes")).filter(rt=>L.visible(rt.orgId));
+  const overdue = runtimes.filter(rt=>!runtimeObservation(rt).fresh);
   let incidents = allInc;
   const openInc = allInc.filter((i) => i.status === "open" || i.status === "investigating");
   const SEV = { critical: 0, high: 1, medium: 2, low: 3 } as const;
@@ -34,6 +38,11 @@ export default async function MonitoringPage({ searchParams }: { searchParams: P
   return (
     <>
       <PageHead title="Monitoring" description="Incidents dedupe by problem and target. Clients only ever see a plain sentence such as “Google Ads connection needs attention.”" />
+      <div className="oc-steps">
+        <div><span className="n">01 · Service impact</span><strong>{new Set(openInc.map(i=>i.orgId)).size} clients</strong><p>With unresolved incidents.</p></div>
+        <div><span className="n">02 · Priority</span><strong>{openInc.filter(i=>i.severity==="critical" || i.severity==="high").length} urgent</strong><p>Critical and high severity issues.</p></div>
+        <Link href="/ops/infrastructure"><span className="n">03 · Visibility</span><strong>{overdue.length} checks overdue →</strong><p>Refresh these runtimes before treating health as current.</p></Link>
+      </div>
       <Panel className="mb-4">
         <SegBar
           label="Open incidents by severity"
@@ -46,7 +55,7 @@ export default async function MonitoringPage({ searchParams }: { searchParams: P
         />
       </Panel>
       <FilterLinks current={status} items={["open", "resolved", "ignored", "all"].map((s) => ({ key: s, label: s.charAt(0).toUpperCase() + s.slice(1), href: `/ops/monitoring?status=${s}`, count: s === "open" ? openInc.length : s === "all" ? allInc.length : allInc.filter((i) => i.status === s).length }))} />
-      {incidents.length === 0 ? <Panel><Empty title={status === "open" ? "No open incidents" : "No incidents"}>{status === "open" ? "Every runtime, integration and account looks healthy." : null}</Empty></Panel> : (
+      {incidents.length === 0 ? <Panel><Empty title={status === "open" ? "No open incidents" : "No incidents"}>{status === "open" ? "No unresolved incidents are recorded. Check infrastructure for observation freshness." : null}</Empty></Panel> : (
         <div className="pf-incidents">
           {[...incidents].sort((a, b) => SEV[a.severity] - SEV[b.severity] || b.lastSeenAt.localeCompare(a.lastSeenAt)).map((i) => {
             const tone = i.severity === "critical" || i.severity === "high" ? "bad" : i.severity === "medium" ? "watch" : "quiet";

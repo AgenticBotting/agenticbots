@@ -33,7 +33,8 @@ export async function runSyncCycle(r: Repository, opts: { healthEveryMs?: number
   }
   for (const rt of await r.list("runtimes")) {
     if (rt.deploymentState === "not_provisioned") continue;
-    const last = rt.lastHeartbeatAt ? Date.parse(rt.lastHeartbeatAt) : 0;
+    const checkedAt = rt.lastCheckedAt ?? rt.lastHeartbeatAt;
+    const last = checkedAt ? Date.parse(checkedAt) : 0;
     if (Date.now() - last < healthEvery) continue;
     try {
       await refreshRuntimeHealth(r, rt.id);

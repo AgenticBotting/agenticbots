@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/utils";
 
@@ -138,6 +138,7 @@ export function ConfirmAction({
   confirmText?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   const [state, formAction] = useActionState(action, {});
   const [typed, setTyped] = useState("");
   const [open, setOpen] = useState(false);
@@ -157,13 +158,13 @@ export function ConfirmAction({
           {state.message}
         </span>
       )}
-      <dialog ref={ref} className="pf-dialog" aria-labelledby={`dlg-${label}`} onClose={() => setOpen(false)}>
+      <dialog ref={ref} className="pf-dialog" aria-labelledby={titleId} onClose={() => setOpen(false)}>
         <form action={formAction}>
           {Object.entries(hidden).map(([k, v]) => (
             <input key={k} type="hidden" name={k} value={v} />
           ))}
           <header className="pf-panel-head">
-            <h2 id={`dlg-${label}`}>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
           </header>
           <div className="pf-panel-body">
             <div className="text-[13.5px] leading-relaxed">{body}</div>

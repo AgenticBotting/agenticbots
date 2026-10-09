@@ -8,7 +8,8 @@ import { runtimeFor } from "@/server/runtime";
 import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { notFound } from "@/server/errors";
 import { clearIncident, raiseIncident } from "./incidents";
-import { SYSTEM, type ActorRef } from "./common";
+import { isDemo } from "@/server/env";
+import { SYSTEM, audit, type ActorRef } from "./common";
 
 const DISK_WARN_PCT = 85;
 
@@ -23,7 +24,8 @@ export async function refreshRuntimeHealth(r: Repository, runtimeId: string, by:
   const correlationId = newCorrelationId();
   const aws = awsControl();
   const rt = runtimeFor(runtime);
-  const patch: Partial<Runtime> = { lastHeartbeatAt: nowIso() };
+  const started = Date.now();
+  const patch: Partial<Runtime> = { lastCheckedAt: nowIso() };
 
   if (runtime.instanceId) {
     try {
@@ -37,7 +39,8 @@ export async function refreshRuntimeHealth(r: Repository, runtimeId: string, by:
 
   try {
     const health = await rt.getDetailedHealth();
-    patch.health = health.status;
+    patch.lastHeartbeatAt = nowIso();
+    patch.health = health.status === "healthy" && !health.ready ? "degraded" : health.status;
     patch.ready = health.ready;
     patch.tunnel = "connected";
     if (health.ready) {
@@ -56,6 +59,11 @@ export async function refreshRuntimeHealth(r: Repository, runtimeId: string, by:
 
   const tx = new Tx(r);
   const next = tx.patch("runtimes", runtime, patch);
+  tx.insert("runtime_health_samples", {
+    orgId: runtime.orgId, runtimeId: runtime.id, checkedAt: patch.lastCheckedAt!,
+    health: next.health, ready: next.ready, latencyMs: Date.now() - started, demo: isDemo(),
+  });
+  audit(tx, by, { action: "runtime.health_checked", orgId: runtime.orgId, targetType: "runtime", targetId: runtime.id, correlationId, detail: `Health: ${next.health}; ready: ${next.ready}` });
   await tx.commit();
 
   // Incidents: raise on bad state (never for an intentionally suspended runtime), clear on recovery.

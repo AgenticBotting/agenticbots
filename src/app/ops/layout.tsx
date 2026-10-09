@@ -1,6 +1,8 @@
+import { approvalDisplayStatus } from "@/lib/platform/approval-status";
 import type { Metadata } from "next";
 import { Search } from "lucide-react";
 import "../platform.css";
+import "./console.css";
 import { Logo } from "@/components/ui/Logo";
 import { OpsNav } from "@/components/platform/OpsNav";
 import { requireOperatorPage } from "@/server/auth/guard";
@@ -22,7 +24,7 @@ export default async function OpsLayout({ children }: { children: React.ReactNod
   const [approvals, requests, incidents] = await Promise.all([r.list("approvals"), r.list("requests"), r.list("incidents")]);
   const scoped = <T extends { orgId: string }>(rows: T[]) => rows.filter((x) => can(actor, "ops.view", x.orgId));
   const counts = {
-    approvals: scoped(approvals).filter((a) => a.status === "pending").length,
+    approvals: scoped(approvals).filter((a) => approvalDisplayStatus(a) === "pending").length,
     requests: scoped(requests).filter((q) => q.status === "submitted").length,
     incidents: scoped(incidents).filter((i) => i.status === "open").length,
   };

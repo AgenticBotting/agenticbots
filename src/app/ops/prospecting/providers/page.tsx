@@ -12,9 +12,9 @@ export const metadata = { title: "Providers & cost" };
 
 export default async function ProvidersPage() {
   const { ctx, L } = await pageCtx();
-  const [cost, budgets, handoffs] = await Promise.all([costSummary(ctx.store, ctx.now), ctx.store.list("pg_budgets"), ctx.store.list("pg_handoffs")]);
+  const [cost, budgets, handoffs] = await Promise.all([costSummary(ctx), ctx.store.list("pg_budgets"), ctx.store.list("pg_handoffs")]);
   const catalog = providerCatalog();
-  const visibleBudgets = budgets.filter((b) => !b.orgId || L.visible(b.orgId));
+  const visibleBudgets = budgets.filter((b) => b.orgId ? L.visible(b.orgId) : ctx.p.kind === "user" && ctx.p.actor.platformRole === "superadmin");
   const visibleHandoffs = handoffs.filter((h) => L.visible(h.orgId)).slice(0, 20);
   return (
     <>

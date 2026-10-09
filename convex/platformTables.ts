@@ -14,7 +14,7 @@ export const PLATFORM_TABLES = [
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",
   "client_onboardings", "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
-  "processed_webhooks",
+  "processed_webhooks", "runtime_health_samples", "operating_drafts",
   // Prospect Graph
   "pg_import_runs", "pg_niches", "pg_buyer_types", "pg_relationships", "pg_companies", "pg_company_sources",
   "pg_fact_claims", "pg_company_merge_reviews", "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
@@ -24,7 +24,7 @@ export const PLATFORM_TABLES = [
 
 export const APPEND_ONLY = new Set<string>([
   "payments", "billing_events", "audit_logs", "invoices", "service_agreements", "deployment_events",
-  "pg_import_runs", "pg_cost_events", "pg_outcomes",
+  "pg_import_runs", "pg_cost_events", "pg_outcomes", "runtime_health_samples",
 ]);
 
 export type PlatformTable = (typeof PLATFORM_TABLES)[number];

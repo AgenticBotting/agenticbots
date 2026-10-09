@@ -4,7 +4,7 @@ import { audit } from "@/server/services/common";
 import { correlationId } from "@/server/ids";
 import { invalid } from "@/server/errors";
 import type { GraphTx, ProspectGraphStore } from "./store";
-import { assertAllowed, principalRef, type Ctx } from "./access";
+import { allowed, assertAllowed, principalRef, type Ctx } from "./access";
 import { stableId } from "./ontology/normalize";
 
 /**
@@ -316,9 +316,13 @@ export interface CostSummary {
   freeCalls: number;
 }
 
-export async function costSummary(store: ProspectGraphStore, now: Date, orgId?: string): Promise<CostSummary> {
-  const m = monthOf(now);
-  const events = (await store.list("pg_cost_events")).filter((e) => e.createdAt.slice(0, 7) === m && (!orgId || e.orgId === orgId));
+export async function costSummary(ctx: Ctx, orgId?: string): Promise<CostSummary> {
+  assertAllowed(ctx.p, "read_shared");
+  const m = monthOf(ctx.now);
+  const events = (await ctx.store.list("pg_cost_events")).filter(e =>
+    e.createdAt.slice(0, 7) === m && (!orgId || e.orgId === orgId) &&
+    (e.orgId ? allowed(ctx.p, "read_private", e.orgId) : ctx.p.kind === "user" && ctx.p.actor.platformRole === "superadmin")
+  );
   const byP = new Map<string, { usd: number; calls: number; failed: number }>();
   const byO = new Map<string, number>();
   for (const e of events) {

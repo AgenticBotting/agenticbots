@@ -3,7 +3,7 @@ import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { billingOverview } from "@/server/billing/overview";
 import { PageHead, Panel, Table, FilterLinks, Empty } from "@/components/platform/ui";
-import { Avatar, Kpi, KpiRow, SegBar } from "@/components/platform/viz";
+import { Avatar, Kpi, KpiRow, SegBar, Card } from "@/components/platform/viz";
 import { CircleDollarSign, Landmark, Receipt, TrendingUp } from "lucide-react";
 import { Status } from "@/components/platform/status";
 import { money, titleCase, usd } from "@/lib/platform/format";
@@ -33,7 +33,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
         <Kpi icon={CircleDollarSign} value={money(m.mrrCents)} label="Monthly recurring revenue" hint={`${money(m.activeContractValueCents)} active contract value per year`} />
         <Kpi icon={Receipt} value={money(m.outstandingCents)} label="Outstanding receivables" tone={pastDueCents ? "bad" : undefined} meter={m.outstandingCents ? { pct: (pastDueCents / m.outstandingCents) * 100, tone: "bad" } : undefined} hint={pastDueCents ? `${money(pastDueCents)} of it past due` : "Nothing past due"} />
         <Kpi icon={Landmark} value={money(m.paymentsThisMonthCents)} label="Received this month" hint={`${money(m.implementationFeesOutstandingCents)} implementation fees outstanding`} />
-        <Kpi icon={TrendingUp} value={money(m.estimatedGrossMarginCents)} label="Est. gross margin (mo)" meter={m.mrrCents ? { pct: (m.estimatedGrossMarginCents / m.mrrCents) * 100 } : undefined} hint={`${usd(m.estimatedOperatingCostUsd, 0)} est. operating cost`} />
+        <Kpi icon={TrendingUp} value={money(m.estimatedGrossMarginCents)} label="Est. contribution (mo)" meter={m.mrrCents ? { pct: (m.estimatedGrossMarginCents / m.mrrCents) * 100 } : undefined} hint={`${usd(m.estimatedOperatingCostUsd, 0)} est. operating cost`} />
       </KpiRow>
       <Panel className="mb-4" title="Accounts by payment status">
         <SegBar
@@ -48,6 +48,8 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
         />
         {m.eligibleForSuspension > 0 && <p className="pf-small mt-3 text-[#8A5208] font-semibold">{m.eligibleForSuspension} account{m.eligibleForSuspension === 1 ? " is" : "s are"} eligible for suspension. Nothing is suspended automatically.</p>}
       </Panel>
+      <p className="oc-note mb-6">Contribution deducts estimated model and runtime costs from recurring contract value. It excludes other overhead and is separate from payments received.</p>
+      <div className="pf-cards mb-6">{shown.map(x=><Card key={x.org.id} tone={x.paymentStatus==="past_due" ? "watch" : undefined}><div className="head"><Avatar name={x.org.name}/><Link className="title" href={`/ops/clients/${x.org.id}?tab=billing`}>{x.org.name}</Link><Status value={x.paymentStatus}/></div><div className="figs"><div><div className="k">Contract / month</div><div className="v">{x.agreement ? money(x.agreement.monthlyValueCents) : "—"}</div></div><div><div className="k">Outstanding</div><div className="v">{money(x.outstandingCents)}</div></div><div><div className="k">Last payment</div><div className="v">{x.lastPayment ? money(x.lastPayment.amountCents) : "—"}</div></div></div><div className="foot"><span>Next billing {x.nextBillingDate ?? "not scheduled"}</span><Link className="underline" href={`/ops/clients/${x.org.id}?tab=billing`}>Review account →</Link></div></Card>)}</div>
       <FilterLinks current={f} items={[["all", "All"], ["paid", "Paid"], ["due", "Due"], ["past_due", "Past due"], ["partially_paid", "Partially paid"], ["suspended", "Suspended"], ["upcoming", "Upcoming"]].map(([k, l]) => ({ key: k, label: l, href: `/ops/billing?f=${k}`, count: rows.filter(FILTER[k]).length }))} />
       <Panel flush>
         <Table head={["Client", "Monthly value", "Payment", "Outstanding", "Last invoice", "Last payment", "Next billing", "Suspension", ""]} empty={<Empty title="No clients match" />}>

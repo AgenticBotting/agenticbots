@@ -1,3 +1,10 @@
+import { ApprovalReviews } from "@/components/platform/approval-reviews";
+import { PlaybookEditor } from "@/components/platform/playbook-editor";
+import { ActionButton } from "@/components/platform/actions";
+import { loadDraft } from "@/server/services/playbooks";
+import { supportEvidence } from "@/server/services/support-planning";
+import { compilePlaybook } from "@/lib/platform/playbooks";
+import { prepareSupportAction } from "../../playbook-actions";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireOperatorPage } from "@/server/auth/guard";
@@ -7,7 +14,7 @@ import { lookups } from "@/server/services/lookups";
 import { PageHead, Panel, KV, When } from "@/components/platform/ui";
 import { Status } from "@/components/platform/status";
 import { ActionForm, SubmitButton } from "@/components/platform/actions";
-import { RunsTable, ApprovalsTable } from "@/components/platform/lists";
+import { RunsTable } from "@/components/platform/lists";
 import { NoteBox } from "@/components/platform/NoteBox";
 import { REQUEST_STATUS_LABEL } from "@/server/views/client";
 import * as A from "../../actions";
@@ -28,12 +35,19 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
   const linkedRuns = runs.filter((x) => x.requestId === id || req.linkedRunIds.includes(x.id));
   const linkedApprovals = approvals.filter((a) => a.requestId === id || req.linkedApprovalIds.includes(a.id));
   const submitter = L.users.get(req.submittedBy);
+  const {draft} = await loadDraft(r,actor,"support",id);
+  const evidence = await supportEvidence(r,actor,id);
   const activeBots = bots.filter((b) => b.status !== "disabled");
 
   return (
     <>
       <PageHead title={req.title} crumbs={[{ href: "/ops/requests", label: "Requests" }, { href: `/ops/clients/${req.orgId}`, label: org?.name ?? "Client" }]}
         description={<span className="inline-flex gap-4 items-center"><Status value={req.status} label={REQUEST_STATUS_LABEL[req.status]} /> <span>Priority: {req.priority}</span></span>} />
+      <Panel title="Support workbench" sub="Prepare a diagnosis → review the plan → authorize execution" className="mb-6">
+        <p className="oc-note mb-4">Build a diagnostic brief from this client’s platform records. This preparation uses recorded evidence and an editable SOP template; it does not call a model or execute changes.</p>
+        <details className="mb-4"><summary className="oc-note cursor-pointer">Inspect available evidence</summary><ul className="list-disc pl-5 mt-3 grid gap-2 oc-note">{evidence.facts.map((f,i)=><li key={i}>{f}</li>)}</ul></details>
+        {draft ? <PlaybookEditor key={`${req.version}-${draft.version}`} kind="support" targetId={id} title={draft.title} sourceVersion={req.version} draft={draft}/> : <ActionButton action={prepareSupportAction} hidden={{requestId:id,version:"0"}} label="Prepare diagnostic plan" variant="primary"/>}
+      </Panel>
       <div className="pf-grid pf-grid-main">
         <div className="pf-grid">
           <Panel title="What the client asked">
@@ -43,12 +57,12 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
           <Panel title="Start a Bot Run for this request" sub="The client sees progress as activity — never which Bot or person did the work.">
             <ActionForm action={A.requestRunAction} hidden={{ requestId: id, idempotencyKey: randomUUID() }}>
               <label className="pf-label">Bot<select name="botId" className="field">{activeBots.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
-              <label className="pf-label">Task <span className="hint">Leave empty to send the request as written.</span><textarea name="task" className="field" rows={3} /></label>
+              <label className="pf-label">Task <span className="hint">Leave empty to send the request as written.</span><textarea name="task" className="field" rows={5} defaultValue={draft ? compilePlaybook(draft.title,draft.steps) : ""} maxLength={4000} /></label>
               <div><SubmitButton disabled={org?.status === "suspended"}>Start Bot Run</SubmitButton></div>
             </ActionForm>
           </Panel>
           <Panel title="Linked runs" flush><RunsTable runs={linkedRuns} names={{ orgs: L.orgs, bots: L.bots }} showClient={false} /></Panel>
-          <Panel title="Linked approvals" flush><ApprovalsTable approvals={linkedApprovals} names={{ orgs: L.orgs, bots: L.bots }} showClient={false} /></Panel>
+          <Panel title="Linked approvals"><ApprovalReviews approvals={linkedApprovals} names={{ orgs: L.orgs, bots: L.bots }} showClient={false} allowActions /></Panel>
           <Panel title="Conversation with the client">
             <div className="grid gap-3 mb-4">
               {req.messages.length === 0 && <p className="pf-muted pf-small">No messages yet.</p>}

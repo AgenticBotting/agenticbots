@@ -1,3 +1,6 @@
+import { ApprovalReviews } from "@/components/platform/approval-reviews";
+import { approvalDisplayStatus } from "@/lib/platform/approval-status";
+import { runtimeObservation } from "@/lib/platform/health";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireOperatorPage } from "@/server/auth/guard";
@@ -10,7 +13,7 @@ import { clientBillingStatus, deriveInvoiceStatus, outstandingCents, suspensionE
 import { PageHead, Panel, KV, Stats, Stat, Tabs, Banner, BotName, When, Empty, Table } from "@/components/platform/ui";
 import { Status } from "@/components/platform/status";
 import { ActionButton, ActionForm, ConfirmAction, SubmitButton } from "@/components/platform/actions";
-import { AuditTable, AutomationsTable, BotsTable, IncidentsTable, IntegrationsTable, InvoicesTable, RequestsTable, RunsTable, ApprovalsTable } from "@/components/platform/lists";
+import { AuditTable, AutomationsTable, BotsTable, IncidentsTable, IntegrationsTable, InvoicesTable, RequestsTable, RunsTable } from "@/components/platform/lists";
 import { money, usd, compact, dateTime } from "@/lib/platform/format";
 import { NoteBox } from "@/components/platform/NoteBox";
 import { AutomationForm } from "@/components/platform/forms";
@@ -60,7 +63,7 @@ export default async function ClientDetail({ params, searchParams }: { params: P
   const deployedTypes = new Set(bots.map((b) => b.typeKey));
   const tabHref = (t: Tab) => `/ops/clients/${id}${t === "overview" ? "" : `?tab=${t}`}`;
   const counts: Partial<Record<Tab, number>> = {
-    bots: bots.length, approvals: approvals.filter((a) => a.status === "pending").length,
+    bots: bots.length, approvals: approvals.filter((a) => approvalDisplayStatus(a) === "pending").length,
     requests: requests.filter((q) => !["completed", "declined"].includes(q.status)).length, monitoring: openIncidents.length,
   };
 
@@ -152,12 +155,12 @@ export default async function ClientDetail({ params, searchParams }: { params: P
               <Panel title="Runtime health">
                 {runtime ? (
                   <KV rows={[
-                    ["Runtime", <Status key="h" value={runtime.health} />],
-                    ["Ready", runtime.ready ? "Yes — capabilities verified" : "No"],
+                    ["Runtime", <Status key="h" value={runtimeObservation(runtime).health} />],
+                    ["Ready", runtimeObservation(runtime).ready ? "Yes — recent check" : runtimeObservation(runtime).fresh ? "No" : "Unverified — check overdue"],
                     ["Server", <span key="s">{runtime.ec2State ?? "unknown"} <span className="pf-muted pf-small">{runtime.instanceType}</span></span>],
-                    ["Private connectivity", <Status key="t" value={runtime.tunnel} />],
+                    ["Private connectivity", <Status key="t" value={runtimeObservation(runtime).fresh ? runtime.tunnel : "unknown"} />],
                     ["Last heartbeat", <When key="w" iso={runtime.lastHeartbeatAt} />],
-                    ["Automations", jobs.some((j) => j.status === "failed") ? <Status key="f" value="failed" label={`${jobs.filter((j) => j.status === "failed").length} failing`} /> : `${jobs.length} healthy`],
+                    ["Automations", jobs.some((j) => j.status === "failed") ? <Status key="f" value="failed" label={`${jobs.filter((j) => j.status === "failed").length} failing`} /> : `${jobs.length} configured`],
                     ["Integrations", integrations.some((i) => i.status === "needs_attention") ? <Status key="i" value="needs_attention" /> : `${integrations.filter((i) => i.status === "connected").length} connected`],
                   ]} />
                 ) : <Empty title="No runtime record" />}
@@ -208,7 +211,7 @@ export default async function ClientDetail({ params, searchParams }: { params: P
 
       {tab === "approvals" && (
         <div className="pf-grid">
-          <Panel flush><ApprovalsTable approvals={approvals} names={names} showClient={false} actions={(a) => a.status === "pending" ? <ApprovalButtons id={a.id} /> : null} /></Panel>
+          <ApprovalReviews approvals={approvals} names={names} showClient={false} allowActions />
           <Panel title="Send prepared work for approval" sub="E.g. drafted emails, a content piece, an ad change. Approving starts the execution run.">
             <ActionForm action={A.createApprovalAction} hidden={{ orgId: org.id }} resetOnSuccess className="max-w-2xl">
               <div className="pf-form-row">
@@ -253,10 +256,10 @@ export default async function ClientDetail({ params, searchParams }: { params: P
               ["Region", runtime.region],
               ["EC2 instance", <span key="i" className="pf-mono">{runtime.instanceId ?? "not provisioned"}</span>],
               ["EC2 state", runtime.ec2State ?? "unknown"],
-              ["Health", <Status key="h" value={runtime.health} />],
+              ["Health", <Status key="h" value={runtimeObservation(runtime).health} />],
               ["Deployment", <Status key="dp" value={runtime.deploymentState} />],
               ["Disk used", runtime.diskUsedPct !== undefined ? `${runtime.diskUsedPct}%` : "—"],
-              ["Private connectivity", <Status key="t" value={runtime.tunnel} />],
+              ["Private connectivity", <Status key="t" value={runtimeObservation(runtime).fresh ? runtime.tunnel : "unknown"} />],
               ["Backups", <span key="b">{runtime.backup.status} · last <When iso={runtime.backup.lastSnapshotAt} /> · {runtime.backup.retentionDays}d retention</span>],
               ["Last restart", <When key="r" iso={runtime.lastRestartAt} />],
               ["Capabilities", runtime.capabilities ? Object.entries(runtime.capabilities).filter(([, v]) => v).map(([k]) => k).join(", ") : "—"],
@@ -404,15 +407,6 @@ function AutomationControls({ id, status }: { id: string; status: string }) {
       <ActionButton action={A.automationAction} hidden={{ jobId: id, op: "run" }} label="Run now" variant="ghost" />
       <ActionButton action={A.automationAction} hidden={{ jobId: id, op: status === "paused" ? "resume" : "pause" }} label={status === "paused" ? "Resume" : "Pause"} variant="ghost" />
       <ConfirmAction action={A.automationAction} hidden={{ jobId: id, op: "delete" }} label="Delete" title="Delete this automation?" body="The schedule is removed from the runtime. Past runs stay in the history." confirmLabel="Delete automation" />
-    </div>
-  );
-}
-
-function ApprovalButtons({ id }: { id: string }) {
-  return (
-    <div className="flex gap-1.5">
-      <ActionButton action={A.resolveApprovalAction} hidden={{ approvalId: id, decision: "approve" }} label="Approve" variant="primary" />
-      <ActionButton action={A.resolveApprovalAction} hidden={{ approvalId: id, decision: "deny" }} label="Deny" variant="ghost" />
     </div>
   );
 }

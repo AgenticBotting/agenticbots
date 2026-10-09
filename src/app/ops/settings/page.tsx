@@ -20,9 +20,10 @@ export default async function SettingsPage() {
   const superadmin = can(actor, "ops.users.manage");
   return (
     <>
-      <PageHead title="Settings" />
+      <PageHead title="Platform settings" description="Manage model routes, operating defaults and your team. Client-specific settings live in each client workspace." />
+      <nav className="oc-steps" aria-label="Settings sections"><a href="#environment"><span className="n">01 · Operations</span><strong>Environment</strong><p>Runtime, storage and billing defaults.</p></a><a href="#models"><span className="n">02 · Intelligence</span><strong>Model providers</strong><p>Model catalog and cost estimates.</p></a><a href="#team"><span className="n">03 · Access</span><strong>Your team</strong><p>Staff accounts and invitations.</p></a></nav>
       <div className="pf-grid pf-grid-2">
-        <Panel title="Environment">
+        <Panel title="Environment" id="environment">
           <KV rows={[
             ["Mode", <Status key="m" value={platformMode() === "production" ? "active" : "pending"} label={platformMode()} />],
             ["Database", isDemo() ? "Built-in demo store (resets on reset)" : "Convex"],
@@ -40,7 +41,7 @@ export default async function SettingsPage() {
             </div>
           )}
         </Panel>
-        <Panel title="Model providers" sub="Rates are USD per million tokens and drive every cost estimate. Check them against your provider's price list.">
+        <Panel id="models" title="Model providers" sub="Rates are USD per million tokens and drive every cost estimate. Check them against your provider's price list.">
           <Table head={["Provider", "Models"]}>
             {providers.map((p) => <tr key={p.id}><td>{p.displayName}<div className="pf-mono pf-muted">{p.provider}</div></td><td className="pf-small">{p.models.map((m) => <div key={m.id}><span className="pf-mono">{m.id}</span> — ${m.inputPerM} in / ${m.outputPerM} out</div>)}</td></tr>)}
           </Table>
@@ -63,7 +64,7 @@ export default async function SettingsPage() {
             </ActionForm>
           )}
         </Panel>
-        <Panel title="AgenticBots team" flush>
+        <Panel id="team" title="AgenticBots team" flush>
           <Table head={["Name", "Email", "Role", "Status", "Last sign-in", ""]}>
             {staff.map((u) => (
               <tr key={u.id}>

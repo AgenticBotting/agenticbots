@@ -1,3 +1,4 @@
+import { ApprovalReviews } from "@/components/platform/approval-reviews";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireOperatorPage } from "@/server/auth/guard";
@@ -28,7 +29,6 @@ export default async function RunDetail({ params }: { params: Promise<{ id: stri
     run.requestId ? r.get("requests", run.requestId) : null,
   ]);
   const runtime = bot ? await r.get("runtimes", bot.runtimeId) : null;
-  const pending = approvals.filter((a) => a.status === "pending");
 
   return (
     <>
@@ -50,17 +50,7 @@ export default async function RunDetail({ params }: { params: Promise<{ id: stri
           </>
         }
       />
-      {pending.map((a) => (
-        <Banner key={a.id} tone="watch" action={
-          <div className="flex gap-2">
-            <ActionButton action={A.resolveApprovalAction} hidden={{ approvalId: a.id, decision: "approve" }} label="Approve" variant="primary" />
-            <ActionButton action={A.resolveApprovalAction} hidden={{ approvalId: a.id, decision: "deny" }} label="Deny" />
-          </div>
-        }>
-          <strong>Waiting for approval ({a.audience === "client" ? "client decides" : "AgenticBots decides"}):</strong> {a.title}
-          {a.preview && <div className="pf-small mt-1 whitespace-pre-wrap">{a.preview}</div>}
-        </Banner>
-      ))}
+      {approvals.length > 0 && <div className="mb-6"><ApprovalReviews approvals={approvals} names={{}} showClient={false} allowActions /></div>}
       {run.failureReason && <Banner tone="bad"><strong>Failure:</strong> {run.failureReason} <span className="pf-mono">{run.correlationId}</span></Banner>}
 
       <div className="pf-grid pf-grid-main">

@@ -161,6 +161,8 @@ export interface Runtime extends Tenanted {
   endpointRef?: string;
   diskUsedPct?: number;
   lastHeartbeatAt?: ISODate;
+  /** Last attempted health check; heartbeat advances only on a response. */
+  lastCheckedAt?: ISODate;
   tunnel: "connected" | "down" | "unknown";
   backup: { lastSnapshotAt?: ISODate; status: "ok" | "failed" | "none" | "unknown"; retentionDays: number };
   lastRestartAt?: ISODate;
@@ -169,6 +171,26 @@ export interface Runtime extends Tenanted {
   capabilities?: Record<string, boolean>;
   lastError?: { code: string; message: string; at: ISODate; correlationId: string };
   estimatedMonthlyCostUsd: number;
+}
+
+/** A point-in-time observation, not a claim about availability between checks. */
+export interface RuntimeHealthSample extends Tenanted {
+  runtimeId: ID;
+  checkedAt: ISODate;
+  health: RuntimeHealth;
+  ready: boolean;
+  latencyMs: number;
+  demo: boolean;
+}
+
+export interface OperatingDraft extends Tenanted {
+  kind: "automation" | "skill" | "support";
+  targetId: string;
+  title: string;
+  steps: { id: string; kind: "context" | "analyze" | "prepare"; title: string; instruction: string }[];
+  updatedBy: ID;
+  sourceVersion: number;
+  formatVersion: 1;
 }
 
 export interface DeploymentEvent extends Tenanted {
@@ -744,6 +766,8 @@ export interface Tables extends ProspectingTables {
   bots: Bot;
   skill_assignments: SkillAssignment;
   runtimes: Runtime;
+  runtime_health_samples: RuntimeHealthSample;
+  operating_drafts: OperatingDraft;
   deployment_events: DeploymentEvent;
   runs: Run;
   run_events: RunEvent;
@@ -774,7 +798,7 @@ export const TABLE_NAMES: readonly TableName[] = [
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",
   "client_onboardings", "usage_rollups", "provider_configurations", "service_agreements", "invoices",
   "payments", "billing_events", "incidents", "operator_notes", "audit_logs",
-  "processed_webhooks",
+  "processed_webhooks", "runtime_health_samples", "operating_drafts",
   // Prospect Graph (see src/lib/prospecting/types.ts)
   "pg_import_runs", "pg_niches", "pg_buyer_types", "pg_relationships", "pg_companies", "pg_company_sources",
   "pg_fact_claims", "pg_company_merge_reviews", "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
@@ -785,5 +809,5 @@ export const TABLE_NAMES: readonly TableName[] = [
 /** Tables whose rows are never hard-deleted (financial + audit history). */
 export const APPEND_ONLY_TABLES: readonly TableName[] = [
   "payments", "billing_events", "audit_logs", "invoices", "service_agreements", "deployment_events",
-  "pg_import_runs", "pg_cost_events", "pg_outcomes",
+  "pg_import_runs", "pg_cost_events", "pg_outcomes", "runtime_health_samples",
 ];

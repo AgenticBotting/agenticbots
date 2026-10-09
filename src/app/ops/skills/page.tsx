@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { lookups } from "@/server/services/lookups";
@@ -26,7 +27,7 @@ export default async function SkillsPage() {
             <Card key={s.key}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="title">{s.name}</div>
+                  <Link href={`/ops/skills/${s.key}`} className="title hover:underline">{s.name}</Link>
                   <div className="pf-mono pf-muted mt-0.5">runtime/skills/{s.key}</div>
                 </div>
                 <span className="pf-chip-model">v{s.version}</span>
@@ -54,6 +55,7 @@ export default async function SkillsPage() {
                   {on.length > 4 && <li className="pf-muted">and {on.length - 4} more</li>}
                 </ul>
               )}
+              <Link href={`/ops/skills/${s.key}`} className="btn btn-outline">Map & edit strategy →</Link>
             </Card>
           );
         })}

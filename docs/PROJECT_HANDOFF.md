@@ -4,6 +4,16 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Latest operator platform update — 2026-10-09
+
+The operator console now has a full-width, responsive data workspace: area charts, BOT and integration cards, inspectable approvals, larger requests, paged audit history, searchable niche/buyer profiles and an interactive Prospect Graph map. Shared operator styles preserve public marketing design. Mobile navigation collapses. Details: `docs/OPERATOR_PLATFORM_STATUS.md`.
+
+Persistent tenant-scoped SOP drafts support drag/keyboard reordering, templates and explicit application to paused automations. Skill workspaces apply reviewed client strategy to the selected BOT's general instructions for future manual runs, leaving base skills and scheduled prompts unchanged. Request workbenches prepare evidence and a diagnostic plan without paid inference or execution. Owner choice: diagnose/prepare; human approves execution. The canvas is sequential, not a branching execution engine.
+
+Health checks now persist append-only samples, distinguish attempted checks from successful heartbeats and render stale observations as unverified. Pending approval counts account for expiry. Prospecting cost summaries enforce the operator's client scope. New tables `operating_drafts` and `runtime_health_samples` require a later authorized Convex deployment. No cloud deployment or paid calls have occurred.
+
+Standard isolated runtime plus optional enterprise HA is the accepted direction. Measured 99.9% uptime, automatic failover, live support diagnosis and durable cross-system deployment/reconciliation are **not yet proven or enabled**. Follow `docs/ENTERPRISE_RELIABILITY_PLAN.md` and the existing first-staging runbook before enterprise commitments.
+
 ## Latest marketing update — 2026-10-09
 
 The text below the shared service chart now uses six icon-led capability tiles and a separate oversight panel. Existing deliverables, approval boundaries and charts remain intact. Desktop visual review, typecheck and all 236 tests passed; lint has zero errors. Mobile visual verification remains unconfirmed because viewport overrides did not take effect this turn. Details: `docs/MARKETING_BUILD_STATUS.md`.
@@ -176,7 +186,7 @@ Seed result: 341 niches (102 A / 133 B / 106 C), 137 buyer types, ~11,357 rule-p
 
 Storage is a generic document envelope: Convex table `pf_<name>` with `pid`, `orgId?`, `doc`, `version`, indexes `by_pid`, `by_org`. Rows share `Base` (`id`, `createdAt`, `updatedAt`, `version`). All writes go through `Tx` with optimistic `version` checks. Append-only tables (never deleted): `payments`, `billing_events`, `audit_logs`, `invoices`, `service_agreements`, `deployment_events`, `pg_import_runs`, `pg_cost_events`, `pg_outcomes`.
 
-**Platform tables** (`TABLE_NAMES`, mirrored in `convex/platformTables.ts` — keep identical): `users`, `memberships`, `sessions`, `organizations`, `client_onboardings`, `bots`, `skill_assignments`, `runtimes`, `deployment_events`, `runs`, `run_events`, `conversations`, `activity_events`, `approvals`, `requests`, `automation_jobs`, `integrations`, `usage_rollups`, `provider_configurations`, `service_agreements`, `invoices`, `payments`, `billing_events`, `incidents`, `operator_notes`, `audit_logs`, `processed_webhooks`.
+**Platform tables** (`TABLE_NAMES`, mirrored in `convex/platformTables.ts` — keep identical): `users`, `memberships`, `sessions`, `organizations`, `client_onboardings`, `bots`, `skill_assignments`, `runtimes`, `runtime_health_samples`, `operating_drafts`, `deployment_events`, `runs`, `run_events`, `conversations`, `activity_events`, `approvals`, `requests`, `automation_jobs`, `integrations`, `usage_rollups`, `provider_configurations`, `service_agreements`, `invoices`, `payments`, `billing_events`, `incidents`, `operator_notes`, `audit_logs`, `processed_webhooks`.
 
 **Prospect Graph tables:**
 * Shared (never an `orgId`): `pg_import_runs`, `pg_niches`, `pg_buyer_types`, `pg_relationships`, `pg_companies`, `pg_company_sources`, `pg_fact_claims`, `pg_company_merge_reviews`, `pg_people`, `pg_company_people`, `pg_contact_points`, `pg_domain_intel`, `pg_signals`.

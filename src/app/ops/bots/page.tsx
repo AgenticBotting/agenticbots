@@ -1,9 +1,10 @@
+import Link from "next/link";
+import { Status } from "@/components/platform/status";
 import { requireOperatorPage } from "@/server/auth/guard";
 import { repo } from "@/server/db";
 import { lookups } from "@/server/services/lookups";
-import { PageHead, Panel } from "@/components/platform/ui";
-import { SegBar } from "@/components/platform/viz";
-import { BotsTable } from "@/components/platform/lists";
+import { PageHead, Panel, BotName, When, Empty } from "@/components/platform/ui";
+import { SegBar, Card } from "@/components/platform/viz";
 import { BOT_CATALOG } from "@/config/bot-catalog";
 
 export const metadata = { title: "Bots" };
@@ -20,6 +21,7 @@ export default async function BotsPage({ searchParams }: { searchParams: Promise
   if (sp.client) bots = bots.filter((b) => b.orgId === sp.client);
   if (sp.type) bots = bots.filter((b) => b.typeKey === sp.type);
   if (sp.status === "attention") bots = bots.filter((b) => b.status === "degraded" || b.status === "offline" || !!b.errorState);
+  else if (sp.status === "active") bots = bots.filter(b => b.status === "active" || b.status === "idle");
   else if (sp.status) bots = bots.filter((b) => b.status === sp.status);
   return (
     <>
@@ -42,7 +44,16 @@ export default async function BotsPage({ searchParams }: { searchParams: Promise
         <select name="status" defaultValue={sp.status ?? ""} className="field" aria-label="Status"><option value="">Any status</option><option value="active">Active</option><option value="working">Working</option><option value="idle">Idle</option><option value="disabled">Disabled</option><option value="offline">Offline</option><option value="degraded">Degraded</option><option value="attention">Needs attention</option><option value="provisioning">Provisioning</option></select>
         <button type="submit" className="btn btn-outline">Apply</button>
       </form>
-      <Panel flush><BotsTable bots={bots} names={{ orgs: L.orgs, bots: L.bots }} runs={new Map(runs.map((x) => [x.id, x]))} groupByClient={!sp.client} /></Panel>
+      <div className="pf-cards">
+        {bots.length === 0 && <Empty title="No BOTS match these filters" />}
+        {bots.map(bot => { const run=runs.find(x=>x.id===bot.currentRunId && x.orgId===bot.orgId); return <Card key={bot.id} tone={bot.errorState ? "watch" : undefined}>
+          <div className="flex items-center justify-between gap-3"><BotName typeKey={bot.typeKey} name={bot.name} href={`/ops/bots/${bot.id}`} /><Status value={bot.status}/></div>
+          <Link href={`/ops/clients/${bot.orgId}`} className="oc-note hover:underline">{L.orgs.get(bot.orgId)}</Link>
+          <div className="oc-bot-meta"><div><small>Model route</small><span className="pf-chip-model">{bot.model}</span></div><div><small>Connected tools assigned</small><strong>{bot.integrationIds.length}</strong></div></div>
+          <div><div className="pf-small pf-muted mb-2">Current work</div>{run ? <Link className="row-link" href={`/ops/runs/${run.id}`}>{run.task}</Link> : <p className="oc-note">No active run recorded</p>}</div>
+          <div className="flex justify-between items-center gap-3 border-t border-[var(--border)] pt-4"><span className="oc-note">Last activity <When iso={bot.lastActivityAt}/></span><Link className="btn btn-outline" href={`/ops/bots/${bot.id}`}>Open BOT →</Link></div>
+        </Card>; })}
+      </div>
     </>
   );
 }

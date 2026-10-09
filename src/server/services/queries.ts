@@ -1,9 +1,11 @@
+import { approvalDisplayStatus } from "@/lib/platform/approval-status";
 import "server-only";
 import type { Bot, Incident, Integration, Organization, Run, Runtime, ServiceAgreement } from "@/lib/platform/types";
 import type { Repository } from "@/server/db/repository";
 import { can, type Actor } from "@/server/auth/policy";
 import { clientBillingStatus, deriveInvoiceStatus, outstandingCents, todayStr, type ClientBillingStatus } from "@/server/billing/domain";
 import { monthKey } from "./common";
+import { runtimeObservation } from "@/lib/platform/health";
 import { isActive } from "./runs";
 
 /** Run outcomes per day, oldest first, for the last `days` days. */
@@ -23,7 +25,9 @@ export function runsByDay(runs: Run[], days = 14, now = Date.now()): RunDay[] {
     other: 0,
   }));
   for (const r of runs) {
-    const i = days - 1 - Math.floor((now - Date.parse(r.createdAt)) / DAY);
+    const stamp = Date.parse(r.createdAt);
+    if (!Number.isFinite(stamp) || stamp > now) continue;
+    const i = out.findIndex(day => day.date === r.createdAt.slice(0, 10));
     if (i < 0 || i >= days) continue;
     if (r.status === "completed") out[i].completed++;
     else if (r.status === "failed" || r.status === "interrupted") out[i].failed++;
@@ -63,6 +67,7 @@ export async function clientRows(r: Repository, actor: Actor): Promise<ClientRow
     .map((org) => {
       const orgBots = bots.filter((b) => b.orgId === org.id);
       const rt = runtimes.find((x) => x.orgId === org.id);
+      const observation = rt ? runtimeObservation(rt) : undefined;
       const roll = rollups.filter((u) => u.orgId === org.id && u.period === month);
       const inc = incidents.filter((i) => i.orgId === org.id && (i.status === "open" || i.status === "investigating"));
       const worst = inc.sort((a, b) => SEV_RANK[b.severity] - SEV_RANK[a.severity])[0]?.severity;
@@ -70,10 +75,10 @@ export async function clientRows(r: Repository, actor: Actor): Promise<ClientRow
         org,
         agreement: agreements.find((a) => a.orgId === org.id && a.status !== "terminated" && a.status !== "completed"),
         paymentStatus: clientBillingStatus(invoices.filter((i) => i.orgId === org.id)),
-        runtime: rt,
+        runtime: rt && observation ? { ...rt, health: observation.health, ready: observation.ready, tunnel: observation.fresh ? rt.tunnel : "unknown" } : undefined,
         bots: orgBots,
         enabledBots: orgBots.filter((b) => b.status !== "disabled").length,
-        openApprovals: approvals.filter((a) => a.orgId === org.id && a.status === "pending").length,
+        openApprovals: approvals.filter((a) => a.orgId === org.id && approvalDisplayStatus(a) === "pending").length,
         openRequests: requests.filter((q) => q.orgId === org.id && !["completed", "declined"].includes(q.status)).length,
         integrationWarnings: integrations.filter((i) => i.orgId === org.id && (i.status === "needs_attention" || i.status === "disconnected")).length,
         runsThisMonth: roll.reduce((s, u) => s + u.runs, 0),
@@ -116,7 +121,7 @@ export interface OpsDashboard {
 export async function opsDashboard(r: Repository, actor: Actor): Promise<OpsDashboard> {
   const month = monthKey();
   const [orgs, incidents, runs, approvals, requests, integrations, jobs, deployments, rollups, runtimes, invoices, payments, audits, bots] = await Promise.all([
-    r.list("organizations"), r.list("incidents"), r.list("runs", { limit: 400 }), r.list("approvals"), r.list("requests"),
+    r.list("organizations"), r.list("incidents"), r.list("runs"), r.list("approvals"), r.list("requests"),
     r.list("integrations"), r.list("automation_jobs"), r.list("deployment_events", { limit: 50 }), r.list("usage_rollups"),
     r.list("runtimes"), r.list("invoices"), r.list("payments", { limit: 50 }), r.list("audit_logs", { limit: 60 }), r.list("bots"),
   ]);
@@ -136,7 +141,7 @@ export async function opsDashboard(r: Repository, actor: Actor): Promise<OpsDash
     const inv = invoices.filter((i) => i.orgId === o.id).map((i) => ({ ...i, status: deriveInvoiceStatus(i, today) }));
     if (inv.some((i) => i.status === "past_due")) add(o.id, "Invoice past due");
   }
-  for (const a of v(approvals).filter((a) => a.status === "pending" && a.audience === "operator")) add(a.orgId, "Approval waiting on AgenticBots");
+  for (const a of v(approvals).filter((a) => approvalDisplayStatus(a) === "pending" && a.audience === "operator")) add(a.orgId, "Approval waiting on AgenticBots");
 
   const vRuntimes = v(runtimes);
   const openInvoices = v(invoices).map((i) => ({ ...i, status: deriveInvoiceStatus(i, today) }));
@@ -145,15 +150,18 @@ export async function opsDashboard(r: Repository, actor: Actor): Promise<OpsDash
     runsDaily: runsByDay(v(runs)),
     fleet: vRuntimes
       .filter((rt) => rt.deploymentState !== "not_provisioned")
-      .map((rt) => ({ orgId: rt.orgId, orgName: orgNames.get(rt.orgId) ?? "", health: rt.health, ready: rt.ready, tunnel: rt.tunnel, diskUsedPct: rt.diskUsedPct, deploymentState: rt.deploymentState })),
+      .map((rt) => {
+        const observation = runtimeObservation(rt);
+        return { orgId: rt.orgId, orgName: orgNames.get(rt.orgId) ?? "", health: observation.health, ready: observation.ready, tunnel: observation.fresh ? rt.tunnel : "unknown", diskUsedPct: rt.diskUsedPct, deploymentState: rt.deploymentState };
+      }),
     mrrCents: v(agreementsAll).filter((a) => a.status === "active" || a.status === "past_due").reduce((s, a) => s + a.monthlyValueCents, 0),
     pastDueCents: openInvoices.filter((i) => i.status === "past_due").reduce((s, i) => s + Math.max(0, i.balanceDueCents), 0),
     activeClients: vOrgs.filter((o) => o.status === "active" || o.status === "past_due").length,
     clientsNeedingAttention: [...attention.entries()].map(([id, reasons]) => ({ org: vOrgs.find((o) => o.id === id)!, reasons })).filter((x) => x.org),
-    incidents: openInc.sort((a, b) => SEV_RANK[b.severity] - SEV_RANK[a.severity]).slice(0, 8),
+    incidents: openInc.sort((a, b) => SEV_RANK[b.severity] - SEV_RANK[a.severity]),
     failedRuns: v(runs).filter((x) => x.status === "failed" || x.status === "interrupted").slice(0, 6),
     activeRuns: v(runs).filter((x) => isActive(x.status)),
-    pendingApprovals: v(approvals).filter((a) => a.status === "pending").length,
+    pendingApprovals: v(approvals).filter((a) => approvalDisplayStatus(a) === "pending").length,
     newRequests: v(requests).filter((q) => q.status === "submitted").length,
     disconnectedIntegrations: v(integrations).filter((i) => i.status === "needs_attention" || i.status === "disconnected"),
     pastDue: vOrgs.filter((o) => invoices.some((i) => i.orgId === o.id && deriveInvoiceStatus(i, today) === "past_due")),

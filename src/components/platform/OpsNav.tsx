@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useId, useState } from "react";
 import {
   Activity, Bell, Bot, CalendarClock, ClipboardList, CreditCard, Gauge, Inbox, LayoutDashboard,
-  Plug, ScrollText, Server, Settings, Sparkles, Target, UserPlus, Users,
+  Plug, ScrollText, Server, Settings, Sparkles, Target, UserPlus, Users, Menu, X,
 } from "lucide-react";
 
 const GROUPS: { label: string; items: { href: string; label: string; icon: React.ElementType; countKey?: string }[] }[] = [
@@ -39,9 +40,16 @@ const GROUPS: { label: string; items: { href: string; label: string; icon: React
 
 export function OpsNav({ counts }: { counts: Record<string, number> }) {
   const path = usePathname();
+  const [open, setOpen] = useState(false);
+  const navId = useId();
   const isCurrent = (href: string) => (href === "/ops" ? path === "/ops" : path === href || path.startsWith(`${href}/`));
+  const current = GROUPS.flatMap(g => g.items).find(i => isCurrent(i.href));
   return (
-    <nav aria-label="Operator console">
+    <div className="oc-navigation" data-open={open}>
+    <button type="button" className="oc-menu-toggle" aria-expanded={open} aria-controls={navId} onClick={() => setOpen(!open)}>
+      <span>{current?.label ?? "Operator console"}</span><span className="flex gap-2 items-center">{open ? "Close menu" : "Menu"}{open ? <X size={18}/> : <Menu size={18}/>}</span>
+    </button>
+    <nav id={navId} aria-label="Operator console">
       {GROUPS.map((g) => (
         <div key={g.label} style={{ display: "contents" }}>
           <div className="pf-rail-group">{g.label}</div>
@@ -49,7 +57,7 @@ export function OpsNav({ counts }: { counts: Record<string, number> }) {
             const Icon = i.icon;
             const n = i.countKey ? counts[i.countKey] ?? 0 : 0;
             return (
-              <Link key={i.href} href={i.href} className="pf-nav" aria-current={isCurrent(i.href) ? "page" : undefined}>
+              <Link key={i.href} href={i.href} className="pf-nav" aria-current={isCurrent(i.href) ? "page" : undefined} onClick={() => setOpen(false)}>
                 <Icon aria-hidden="true" />
                 {i.label}
                 {n > 0 && <span className="count" aria-label={`${n} open`}>{n}</span>}
@@ -59,5 +67,6 @@ export function OpsNav({ counts }: { counts: Record<string, number> }) {
         </div>
       ))}
     </nav>
+    </div>
   );
 }

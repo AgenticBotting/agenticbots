@@ -1,3 +1,4 @@
+import { ProspectMap } from "@/components/platform/prospect-map";
 import Link from "next/link";
 import { Building2, CircleDollarSign, Layers, ListChecks, Map, Target } from "lucide-react";
 import { PageHead, Panel, Table, Empty, When, Banner } from "@/components/platform/ui";
@@ -19,10 +20,16 @@ export default async function ProspectingOverview() {
     ontologyOverview(ctx.r, ctx.p),
     listMarkets(ctx),
     listJobs(ctx),
-    costSummary(ctx.store, ctx.now),
+    costSummary(ctx),
     ctx.store.list("pg_prospects"),
     ctx.store.list("pg_companies"),
   ]);
+  const [niches, buyers, relationships] = await Promise.all([ctx.store.list("pg_niches"),ctx.store.list("pg_buyer_types"),ctx.store.list("pg_relationships")]);
+  const mappedNiches = [...niches].sort((a,b)=>b.attractiveness.total-a.attractiveness.total).slice(0,5).map(n=>({
+    id:n.id, name:n.name, buyers:relationships.filter(rel=>rel.nicheId===n.id && (rel.status==="approved" || rel.status==="auto_approved")).sort((a,b)=>a.priority-b.priority).slice(0,3).flatMap(rel=>{
+      const buyer=buyers.find(b=>b.id===rel.buyerTypeId);return buyer ? [{name:buyer.name,roles:rel.relevantDecisionMakerTitles.slice(0,3),status:rel.status,motion:rel.buyingMotion}] : [];
+    }),
+  }));
   const visible = prospects.filter((p) => L.visible(p.orgId));
   const qualified = visible.filter((p) => p.status === "qualified").length;
   const noDomain = companies.filter((c) => !c.domain).length;
@@ -44,6 +51,13 @@ export default async function ProspectingOverview() {
         <Kpi icon={Target} value={qualified} label="Qualified" hint={`of ${visible.length} prospects`} />
         <Kpi icon={CircleDollarSign} value={usd(cost.monthUsd)} label="Spend (month)" hint={`${cost.paidCalls} paid · ${cost.freeCalls} free calls`} href="/ops/prospecting/providers" />
       </KpiRow>
+      <section aria-label="How prospect intelligence flows" className="oc-steps">
+        <Link href="/ops/prospecting/niches"><span className="n">01 · Market knowledge</span><strong>{o.niches} service niches</strong><p>Define the work your clients sell.</p></Link>
+        <Link href="/ops/prospecting/buyers"><span className="n">02 · Buyer mapping</span><strong>{o.buyers} buyer types</strong><p>{o.relationships.toLocaleString()} recorded relationships. Review status matters.</p></Link>
+        <Link href="/ops/prospecting/icps"><span className="n">03 · Client fit</span><strong>Ideal customer profiles</strong><p>Combine niche, territory, evidence and qualification rules.</p></Link>
+        <Link href="/ops/prospecting/markets"><span className="n">04 · Qualified work</span><strong>{qualified} qualified prospects</strong><p>{visible.length} private prospects across {markets.length} client markets.</p></Link>
+      </section>
+      <Panel title="See the relationships behind the strategy" sub="Explore five highly ranked niches. These are ontology mappings, not verified buying intent." className="mb-6"><ProspectMap niches={mappedNiches}/></Panel>
       <div className="pf-grid pf-grid-2">
         <Panel title="Markets" sub="Qualified prospects per market" flush={markets.length === 0}>
           {markets.length === 0 ? (
@@ -69,7 +83,7 @@ export default async function ProspectingOverview() {
           </Table>
         </Panel>
       </div>
-      <Panel title="Recent jobs" flush>
+      <Panel title="Recent jobs" flush className="mt-6">
         <Table head={["Job", "Client", "Status", "Progress", "Paid calls", "Spend", "Started"]} empty={<Empty title="No jobs yet" />}>
           {jobs.slice(0, 12).map((j) => (
             <tr key={j.id}>

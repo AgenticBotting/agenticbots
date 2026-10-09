@@ -97,7 +97,7 @@ export function AutomationsTable({ jobs, names, showClient = true, actions }: { 
         const bot = names.bots?.get(j.botId);
         return (
           <tr key={j.id}>
-            <td><strong className="text-[var(--foreground)]">{j.name}</strong><div className="pf-small pf-muted pf-trunc">{j.prompt}</div>{j.lastError && <div className="pf-small text-[var(--color-danger)]">{j.lastError}</div>}</td>
+            <td><Link className="row-link font-semibold" href={`/ops/automations/${j.id}`}>{j.name}</Link><div className="pf-small pf-muted pf-trunc">{j.prompt}</div>{j.lastError && <div className="pf-small text-[var(--color-danger)]">{j.lastError}</div>}</td>
             <td>{bot ? <BotName typeKey={bot.typeKey} name={bot.name} href={`/ops/bots/${bot.id}`} /> : "—"}</td>
             {showClient && <td>{names.orgs?.get(j.orgId)}</td>}
             <td>{j.scheduleLabel}<div className="pf-mono pf-muted">{j.schedule}</div></td>

@@ -36,11 +36,12 @@ export default async function UsagePage({ searchParams }: { searchParams: Promis
         <Kpi icon={Cpu} value={usd(totalModel)} label="Model cost (est.)" hint="From operator-entered rates" />
         <Kpi icon={Server} value={usd(totalInfra, 0)} label="Infrastructure (est.)" hint={`${byClient.filter((x) => x.infra > 0).length} runtimes`} />
         <Kpi icon={CircleDollarSign} value={money(Math.round(totalRevenue * 100))} label="Contract revenue" hint="Monthly recurring" />
-        <Kpi icon={TrendingUp} value={usd(totalRevenue - totalModel - totalInfra, 0)} label="Est. gross margin" meter={totalRevenue ? { pct: ((totalRevenue - totalModel - totalInfra) / totalRevenue) * 100 } : undefined} hint={totalRevenue ? `${Math.round(((totalRevenue - totalModel - totalInfra) / totalRevenue) * 100)}% of revenue` : "No active agreements"} />
+        <Kpi icon={TrendingUp} value={usd(totalRevenue - totalModel - totalInfra, 0)} label="Est. contribution" meter={totalRevenue ? { pct: ((totalRevenue - totalModel - totalInfra) / totalRevenue) * 100 } : undefined} hint={totalRevenue ? `${Math.round(((totalRevenue - totalModel - totalInfra) / totalRevenue) * 100)}% of revenue` : "No active agreements"} />
       </KpiRow>
+      <p className="oc-note mb-6">Estimates exclude labor, data vendors, taxes and other overhead. Contract values and infrastructure are current snapshots; changing the month selects usage only. Contribution is not accounting profit or cash received.</p>
       <div className="pf-grid">
         <div className="pf-grid pf-grid-2">
-          <Panel title="Margin by client" sub="Revenue minus model and infrastructure cost">
+          <Panel title="Contribution by client" sub="Current contract value less selected model usage and current infrastructure estimate">
             <BarRows
               rows={byClient
                 .map((x) => ({ x, m: x.revenue !== undefined ? x.revenue - x.model - x.infra : -(x.model + x.infra) }))

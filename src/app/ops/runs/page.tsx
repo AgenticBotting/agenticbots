@@ -6,7 +6,7 @@ import { RunsTable } from "@/components/platform/lists";
 import { isActive } from "@/server/services/runs";
 import { runsByDay } from "@/server/services/queries";
 import { Kpi, KpiRow } from "@/components/platform/viz";
-import { StackedColumns } from "@/components/platform/charts";
+import { OperationsChart } from "@/components/platform/operations-chart";
 import { compact, isoDaysAgo, usd } from "@/lib/platform/format";
 import { Activity, CheckCircle2, Clock, DollarSign } from "lucide-react";
 
@@ -41,22 +41,17 @@ export default async function RunsPage({ searchParams }: { searchParams: Promise
       <PageHead title="Runs" description="Every Bot Run. Open one for its timeline, usage and runtime identifiers." />
       <KpiRow cols={4}>
         <Kpi icon={Activity} value={week.length} label="Runs, last 7 days" spark={days.slice(-7).map((x) => x.completed + x.failed + x.other)} hint={`${allRuns.filter((x) => isActive(x.status)).length} running now`} />
-        <Kpi icon={CheckCircle2} value={week.length ? `${Math.round((done / Math.max(1, done + bad)) * 100)}%` : "—"} label="Success rate, 7 days" tone={bad ? "watch" : undefined} meter={done + bad ? { pct: (done / (done + bad)) * 100, tone: bad / (done + bad) > 0.2 ? "bad" : undefined } : undefined} hint={`${done} completed, ${bad} failed`} />
+        <Kpi icon={CheckCircle2} value={done + bad ? `${Math.round((done / (done + bad)) * 100)}%` : "—"} label="Success rate, 7 days" tone={bad ? "watch" : undefined} meter={done + bad ? { pct: (done / (done + bad)) * 100, tone: bad / (done + bad) > 0.2 ? "bad" : undefined } : undefined} hint={`${done} completed, ${bad} failed`} />
         <Kpi icon={Clock} value={medianMin === null ? "—" : `${medianMin} min`} label="Typical run time" hint="Median of finished runs, 7 days" />
         <Kpi icon={DollarSign} value={usd(cost, 2)} label="Est. model cost, 7 days" hint={`${compact(tokens)} tokens`} />
       </KpiRow>
 
       <Panel title="Runs per day" sub="Last 14 days" className="mb-4">
-        <StackedColumns
-          label="Runs per day"
-          height={150}
-          dates={days.map((x) => x.date)}
-          series={[
-            { key: "completed", label: "Completed", tone: "good", values: days.map((x) => x.completed) },
-            { key: "failed", label: "Failed", tone: "bad", values: days.map((x) => x.failed) },
-            { key: "other", label: "In progress or waiting", tone: "live", values: days.map((x) => x.other) },
-          ]}
-        />
+        <OperationsChart dates={days.map(x=>x.date)} series={[
+          {label:"Completed",values:days.map(x=>x.completed)},
+          {label:"Failed / interrupted",values:days.map(x=>x.failed)},
+          {label:"Other states",values:days.map(x=>x.other)},
+        ]}/>
       </Panel>
 
       <FilterLinks current={sp.status ?? ""} items={[

@@ -13,6 +13,7 @@ const lanOrigins = Object.values(networkInterfaces())
   );
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: { "/ops/skills/*": ["./runtime/skills/**/SKILL.md"] },
   allowedDevOrigins: [...lanOrigins, "*.local"],
   async redirects() {
     return REDIRECTS;

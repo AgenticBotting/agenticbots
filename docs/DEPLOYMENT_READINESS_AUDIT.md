@@ -376,3 +376,9 @@ finished.
   `ALLOW_CLOUD_CHANGES=1`), `bundle:build` (bundle contains
   `root-config.yaml`).
 - Production build and white-label bundle scan.
+
+## Operator foundation update — 2026-10-09
+
+The console redesign now persists versioned operating drafts and append-only runtime health samples. Check attempts and successful heartbeats are separate, and stale observations no longer appear healthy. This improves monitoring evidence but does not change the single-runtime availability topology or prove live deployment. New `operating_drafts` and `runtime_health_samples` tables must be deployed with the application after authorization.
+
+Owner-approved direction: standard isolation plus optional HA, with support diagnoses and change plans requiring human execution approval. See `OPERATOR_PLATFORM_STATUS.md` for implemented behavior and `ENTERPRISE_RELIABILITY_PLAN.md` for the staging, durable-work, monitoring, restore and HA release gates. Existing live-staging blockers above remain.

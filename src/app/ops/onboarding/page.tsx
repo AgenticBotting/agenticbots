@@ -98,6 +98,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         Onboarding compilation creates records and review checklists only. It does not connect OAuth, call paid vendors, send email, write a CRM or provision AWS.
       </Banner>
 
+      <div className="oc-steps"><div><span className="n">01 · Business context</span><strong>Tell us the work</strong><p>Client, services, buyers and territory.</p></div><div><span className="n">02 · Draft configuration</span><strong>Build the plan</strong><p>Map BOTS, ideal buyers and required integrations.</p></div><div><span className="n">03 · Readiness</span><strong>Resolve blockers</strong><p>Review missing access and decisions before deployment.</p></div></div>
       <div className="pf-grid pf-grid-main">
         <Panel title="Compile from one sentence" sub="Use an existing client, then paste the business summary you would say on a sales call.">
           {manageable.length === 0 ? (
