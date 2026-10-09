@@ -1,17 +1,8 @@
 import "server-only";
 import { assertLive } from "@/server/env";
 
-/**
- * Outbound notification for bot-plan requests.
- *
- * Two independent sinks, both optional and both fail-soft: MailerLite
- * captures the lead into the list, Resend emails the request to the
- * inbox. Missing credentials are logged and skipped so local dev and
- * preview deploys keep working without a .env file.
- */
-
-const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
-const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID;
+/** Enquiry delivery to our inbox only. Submitting an enquiry never enrolls
+ * someone in a marketing list. Campaign delivery is not implemented. */
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "hello@agenticbots.dev";
@@ -32,38 +23,6 @@ type SinkResult = { ok: boolean; skipped?: boolean; error?: string };
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
-}
-
-async function toMailerLite(req: PlanRequest): Promise<SinkResult> {
-  if (!MAILERLITE_API_KEY) return { ok: true, skipped: true };
-
-  try {
-    const res = await fetch("https://connect.mailerlite.com/api/subscribers", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${MAILERLITE_API_KEY}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        email: req.email,
-        fields: {
-          name: req.name,
-          company: req.company || "",
-          website: req.website || "",
-          focus: req.focus || "",
-        },
-        ...(MAILERLITE_GROUP_ID ? { groups: [MAILERLITE_GROUP_ID] } : {}),
-      }),
-    });
-
-    if (!res.ok) {
-      return { ok: false, error: `MailerLite ${res.status}` };
-    }
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "unknown" };
-  }
 }
 
 async function toInbox(req: PlanRequest): Promise<SinkResult> {
@@ -94,6 +53,7 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
@@ -114,37 +74,10 @@ async function toInbox(req: PlanRequest): Promise<SinkResult> {
   }
 }
 
-/**
- * Fan out to both sinks. Succeeds if nothing hard-failed — a skipped
- * sink (no credentials) counts as success so the form still works.
- *
- * The exception is production with BOTH sinks unconfigured: there is
- * nowhere for the lead to land, so this must fail rather than let the
- * visitor read a success message for a request that reached no one.
- */
+/** Success means the enquiry actually reached the configured inbox. */
 export async function deliverPlanRequest(req: PlanRequest): Promise<{ ok: boolean }> {
   assertLive("deliver website enquiry");
-  if (req.kind === "proposal") {
-    // The complete qualification brief must reach the inbox. A subscriber-only
-    // sink drops these answers and would imply marketing consent not given here.
-    if (!RESEND_API_KEY) return { ok: false };
-    const result = await toInbox(req);
-    return { ok: result.ok && !result.skipped };
-  }
-  const [list, inbox] = await Promise.all([toMailerLite(req), toInbox(req)]);
-
-  for (const [label, r] of [["mailerlite", list], ["resend", inbox]] as const) {
-    if (r.skipped) console.warn(`[plan] ${label} not configured, skipped`);
-    else if (!r.ok) console.error(`[plan] ${label} failed: ${r.error}`);
-  }
-
-  if (list.skipped && inbox.skipped) {
-    if (process.env.NODE_ENV === "production") {
-      console.error("[plan] no delivery sink configured — lead would be lost, failing the request");
-      return { ok: false };
-    }
-    console.warn("[plan] no delivery sink configured (dev/preview) — lead logged only");
-  }
-
-  return { ok: list.ok && inbox.ok };
+  if (!RESEND_API_KEY) return { ok: false };
+  const result = await toInbox(req);
+  return { ok: result.ok && !result.skipped };
 }

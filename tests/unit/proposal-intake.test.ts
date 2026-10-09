@@ -3,12 +3,12 @@ import { NextRequest } from "next/server";
 import { POST } from "@/app/api/plan/route";
 import { deliverPlanRequest } from "@/lib/notify";
 import { trackServer } from "@/lib/analytics";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { sharedRateLimit } from "@/server/security/rate-limit";
 import { emptyProposal, proposalAnswersSchema, proposalBrief, proposalFit, proposalRequestSchema, proposalStepReady, toggleProposalTool, type ProposalAnswers } from "@/lib/proposal-intake";
 
 vi.mock("@/lib/notify", () => ({ deliverPlanRequest: vi.fn(async () => ({ ok: true })) }));
 vi.mock("@/lib/analytics", () => ({ trackServer: vi.fn(async () => {}) }));
-vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: vi.fn(() => ({ allowed: true })) }));
+vi.mock("@/server/security/rate-limit", () => ({ sharedRateLimit: vi.fn(() => ({ allowed: true })) }));
 
 const answers: ProposalAnswers = {
   goals: ["More qualified leads", "Better sales follow-up"], customerType: "Businesses & property owners",
@@ -19,7 +19,7 @@ const answers: ProposalAnswers = {
 const lead = { kind: "proposal", name: "Fictional Test", email: "test@example.invalid", company: "Fictional QA", website: "example.invalid", phone: "", qualification: answers, consent: true, source: "header", pagePath: "/industries/niches/commercial-roofing", landingPath: "/markets/florida/miami" };
 const request = (body: unknown) => new NextRequest("http://localhost/api/plan", { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } });
 
-beforeEach(() => { vi.clearAllMocks(); vi.mocked(deliverPlanRequest).mockResolvedValue({ ok: true }); vi.mocked(checkRateLimit).mockReturnValue({ allowed: true, remaining: 4 }); });
+beforeEach(() => { vi.clearAllMocks(); vi.mocked(deliverPlanRequest).mockResolvedValue({ ok: true }); vi.mocked(sharedRateLimit).mockResolvedValue({ allowed: true, remaining: 4 }); });
 
 describe("proposal qualification", () => {
   it("requires the choices before advancing and retains the full review brief", () => {
@@ -71,7 +71,7 @@ describe("proposal qualification", () => {
     expect(await failed.text()).not.toContain("private");
     expect(trackServer).not.toHaveBeenCalled();
     vi.clearAllMocks();
-    vi.mocked(checkRateLimit).mockReturnValue({ allowed: false, remaining: 0 });
+    vi.mocked(sharedRateLimit).mockResolvedValue({ allowed: false, remaining: 0 });
     expect((await POST(request(lead))).status).toBe(429);
     expect(deliverPlanRequest).not.toHaveBeenCalled();
   });

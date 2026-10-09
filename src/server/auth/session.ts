@@ -5,6 +5,9 @@ import { repo } from "@/server/db";
 import { Tx } from "@/server/db/repository";
 import { nowIso, randomToken, sha256Hex } from "@/server/ids";
 import type { Session, User } from "@/lib/platform/types";
+import { isDemo } from "@/server/env";
+import { audit, SYSTEM } from "@/server/services/common";
+import { correlationId } from "@/server/ids";
 import type { Actor } from "./policy";
 
 /**
@@ -28,7 +31,7 @@ function cookieOptions(expires: Date) {
 export async function createSession(user: User): Promise<void> {
   const r = await repo();
   const secret = randomToken(32);
-  const expires = new Date(Date.now() + SESSION_TTL_MS);
+  const expires = new Date(Date.now() + (user.platformRole && !isDemo() ? 60 * 60_000 : SESSION_TTL_MS));
   const h = await headers();
   const tx = new Tx(r);
   const session = tx.insert("sessions", {
@@ -38,6 +41,7 @@ export async function createSession(user: User): Promise<void> {
     userAgent: (h.get("user-agent") ?? "").slice(0, 200),
   });
   tx.patch("users", user, { lastLoginAt: nowIso() });
+  audit(tx, SYSTEM, { action: "auth.session.create", targetType: "user", targetId: user.id, correlationId: correlationId() });
   await tx.commit();
   (await cookies()).set(SESSION_COOKIE, `${session.id}.${secret}`, cookieOptions(expires));
 }
@@ -50,6 +54,7 @@ export async function destroySession(): Promise<void> {
   if (found) {
     const tx = new Tx(await repo());
     tx.patch("sessions", found.session, { revokedAt: nowIso() });
+    audit(tx, SYSTEM, { action: "auth.session.logout", targetType: "user", targetId: found.user.id, correlationId: correlationId() });
     await tx.commit();
   }
 }
@@ -62,7 +67,7 @@ async function lookup(raw: string): Promise<{ session: Session; user: User } | n
   if (!/^[0-9a-f-]{36}$/.test(id)) return null;
   const r = await repo();
   const session = await r.get("sessions", id);
-  if (!session || session.revokedAt || Date.parse(session.expiresAt) < Date.now()) return null;
+  if (!session || session.revokedAt || !Number.isFinite(Date.parse(session.expiresAt)) || Date.parse(session.expiresAt) <= Date.now()) return null;
   const a = Buffer.from(sha256Hex(secret), "hex");
   const b = Buffer.from(session.tokenHash, "hex");
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
@@ -77,8 +82,10 @@ export async function currentActor(): Promise<Actor | null> {
   if (!raw) return null;
   const found = await lookup(raw);
   if (!found) return null;
+  const mfaAt = Date.parse(found.session.mfaVerifiedAt ?? "");
+  if (found.user.platformRole && !isDemo() && (!Number.isFinite(mfaAt) || mfaAt > Date.now())) return null;
   const memberships = await (await repo()).list("memberships", { where: { userId: found.user.id } });
-  return actorFrom(found.user, memberships);
+  return { ...actorFrom(found.user, memberships), authenticatedAt: isDemo() ? undefined : found.session.mfaVerifiedAt ?? found.session.createdAt };
 }
 
 export function actorFrom(user: User, memberships: { orgId: string; role: "client_admin" | "client_member" }[]): Actor {
@@ -90,8 +97,15 @@ export function actorFrom(user: User, memberships: { orgId: string; role: "clien
       status: user.status,
       platformRole: user.platformRole,
       operatorOrgIds: user.operatorOrgIds,
+      operatorAllOrgs: user.operatorAllOrgs,
     },
     platformRole: user.platformRole,
     memberships: memberships.map((m) => ({ orgId: m.orgId, role: m.role })),
   };
+}
+
+/** Restricted authentication ceremony context. Never use this as app authorization. */
+export async function authenticationSession() {
+  const raw = (await cookies()).get(SESSION_COOKIE)?.value;
+  return raw ? lookup(raw) : null;
 }

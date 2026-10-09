@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { networkInterfaces } from "node:os";
+import { commonSecurityHeaders } from "./src/lib/security-headers";
 // Plain ESM, shared verbatim with scripts/topic-gate.mjs.
 import { REDIRECTS } from "./src/lib/redirects.mjs";
 
@@ -13,6 +14,15 @@ const lanOrigins = Object.values(networkInterfaces())
   );
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  // The development badge covers the mobile portal's bottom navigation.
+  // Compile and runtime errors remain visible in the development overlay.
+  devIndicators: false,
+  async headers() {
+    return [{ source: "/:path*", headers: [...commonSecurityHeaders,
+      ...(process.env.NODE_ENV === "production" ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }] : []),
+    ] }];
+  },
   outputFileTracingIncludes: { "/ops/skills/*": ["./runtime/skills/**/SKILL.md"] },
   allowedDevOrigins: [...lanOrigins, "*.local"],
   async redirects() {
@@ -29,7 +39,7 @@ const nextConfig: NextConfig = {
       ...(opsHost
         ? [
             { source: "/", has: [{ type: "host" as const, value: opsHost }], destination: "/ops" },
-            { source: "/:path((?!ops|api|login|_next|portal).*)", has: [{ type: "host" as const, value: opsHost }], destination: "/ops/:path" },
+            { source: "/:path((?!ops|api|login|_next|portal|privacy|terms|security).*)", has: [{ type: "host" as const, value: opsHost }], destination: "/ops/:path" },
           ]
         : []),
       ...(appHost

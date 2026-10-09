@@ -14,6 +14,7 @@ import {
   type Row,
 } from "./repository";
 import { conflict } from "@/server/errors";
+import { validatePatch, validateRecord } from "../../../convex/platformIntegrity";
 
 type Store = Record<TableName, Map<string, Row>>;
 
@@ -96,7 +97,10 @@ export class MemoryRepository implements Repository {
         if (row.version !== op.expectedVersion) {
           throw conflict("This record was changed by someone else. Reload and try again.");
         }
-        staged.set(key(op.table, op.id), applyPatch(row, op.patch));
+        validatePatch(op.table, op.patch, row);
+        const next = applyPatch(row, op.patch);
+        validateRecord(op.table, op.id, next);
+        staged.set(key(op.table, op.id), next);
       } else {
         staged.set(key(op.table, op.id), null);
       }

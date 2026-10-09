@@ -1,15 +1,16 @@
 import "server-only";
+import { requireExecutionRelease } from "@/server/security/release-gates";
 import type { Bot, Organization, Run, RunStatus, Runtime, ResultMetric } from "@/lib/platform/types";
 import { TERMINAL_RUN_STATUSES } from "@/lib/platform/types";
 import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
-import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
+import { correlationId as newCorrelationId, nowIso, sha256Hex } from "@/server/ids";
 import { botRuntime, TERMINAL_EVENT_TYPES, type BotEventType, type BotRunEvent, type RuntimeApproval } from "@/server/runtime";
 import { isRuntimeNotFound, sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { translateEvent } from "@/server/runtime/translate";
 import { clientSafe, redactSecrets } from "@/server/redact";
-import { conflict, invalid, notFound } from "@/server/errors";
+import { AppError, conflict, invalid, notFound } from "@/server/errors";
 import { assertExecutable, assertPermission, audit, getScoped, SYSTEM, type ActorRef } from "./common";
 import { estimateCost, recordRunUsage, ZERO_USAGE } from "./usage";
 import { raiseIncident } from "./incidents";
@@ -24,7 +25,7 @@ async function loadContext(r: Repository, botId: string) {
   const bot = await r.get("bots", botId);
   if (!bot) throw notFound("Bot");
   const [org, runtime] = await Promise.all([r.get("organizations", bot.orgId), r.get("runtimes", bot.runtimeId)]);
-  if (!org || !runtime) throw notFound("Bot");
+  if (!org || !runtime || runtime.orgId !== bot.orgId) throw notFound("Bot");
   return { bot, org, runtime };
 }
 
@@ -56,12 +57,22 @@ export async function startRun(r: Repository, actor: Actor | ActorRef, input: St
   if (bot.status === "provisioning") throw conflict(`${bot.name} is still being deployed.`);
 
   const existing = (await r.list("runs", { orgId: org.id, where: { idempotencyKey: input.idempotencyKey } }))[0];
-  if (existing) return existing;
+  if (existing) {
+    if (existing.botId !== bot.id || existing.task !== task) throw conflict("Idempotency key belongs to different work.");
+    return existing;
+  }
 
+  requireExecutionRelease();
+  for (const [table, id] of [["requests", input.requestId], ["automation_jobs", input.automationId], ["conversations", input.conversationId]] as const) {
+    if (!id) continue;
+    const related = await r.get(table, id);
+    if (!related || related.orgId !== org.id || ("botId" in related && related.botId !== bot.id)) throw notFound("Related work");
+  }
   const correlationId = newCorrelationId();
   const startedBy = "user" in actor ? actor.user.id : actor.id;
   let tx = new Tx(r);
   let run = tx.insert("runs", {
+    id: sha256Hex(JSON.stringify([org.id, input.idempotencyKey])),
     orgId: org.id,
     botId: bot.id,
     task,
@@ -80,7 +91,15 @@ export async function startRun(r: Repository, actor: Actor | ActorRef, input: St
     model: bot.model,
   });
   audit(tx, actor, { action: "run.start", orgId: org.id, targetType: "run", targetId: run.id, correlationId, detail: `${bot.name}: ${task.slice(0, 120)}` });
-  await tx.commit();
+  try { await tx.commit(); }
+  catch (e) {
+    const prior = await r.get("runs", run.id);
+    if (e instanceof AppError && e.code === "conflict" && prior) {
+      if (prior.botId !== bot.id || prior.task !== task) throw conflict("Idempotency key belongs to different work.");
+      return prior;
+    }
+    throw e;
+  }
 
   try {
     const rt = botRuntime(runtime, bot);

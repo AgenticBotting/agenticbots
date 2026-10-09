@@ -15,6 +15,7 @@ export function LoginForm({ next, demoAccounts, demoPassword }: { next: string; 
       <label className="pf-label">Password<input ref={pw} name="password" type="password" autoComplete="current-password" className="field" required /></label>
       {state.error && <div className="pf-msg err" role="alert">{state.error}</div>}
       <SubmitButton className="btn-lg w-full" pendingLabel="Signing in…">Sign in</SubmitButton>
+      <p className="pf-small"><a href="/privacy" className="underline">Privacy policy</a> · <a href="/terms" className="underline">Terms</a></p>
       {demoAccounts && (
         <div className="pf-msg info">
           <div className="font-semibold mb-1">Demo mode — fictional data</div>

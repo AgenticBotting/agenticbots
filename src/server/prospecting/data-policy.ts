@@ -29,8 +29,7 @@ export const TENANT_PRIVATE_POLICY: UsagePolicy = {
 export function policyForProvider(p: Pick<AnyProvider, "key" | "paid" | "demo" | "policy">): UsagePolicy {
   if (p.policy) return p.policy;
   if (p.demo || p.key === "native") return PUBLIC_FACT_POLICY;
-  if (p.paid) throw invalid(`Provider ${p.key} has no data usage policy; paid data storage is blocked.`);
-  return PUBLIC_FACT_POLICY;
+  throw invalid(`Provider ${p.key} has no data usage policy; data storage is blocked, including free sources.`);
 }
 
 export function assertReusable(policy: UsagePolicy, orgId?: string): void {

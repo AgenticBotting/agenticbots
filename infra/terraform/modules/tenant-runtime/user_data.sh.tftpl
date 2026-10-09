@@ -10,7 +10,7 @@ SECRET_PREFIX="${secret_prefix}"
 DATA_DIR=/opt/agenticbots/data
 BUNDLE_DIR=/opt/agenticbots/runtime
 
-dnf install -y docker jq amazon-cloudwatch-agent xfsprogs python3-pyyaml rsync openssl
+dnf install -y docker jq amazon-cloudwatch-agent xfsprogs python3-pyyaml rsync openssl iptables-nft
 mkdir -p /usr/local/lib/docker/cli-plugins
 if [ ! -x /usr/local/lib/docker/cli-plugins/docker-compose ]; then
   curl -fsSL "https://github.com/docker/compose/releases/download/v2.39.4/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose
@@ -36,6 +36,22 @@ aws s3 cp "s3://${artifact_bucket}/runtime/${bundle_version}/bundle.tar.gz" /tmp
 tar -xzf /tmp/bundle.tar.gz -C "$BUNDLE_DIR"
 mkdir -p /opt/agenticbots/bin
 install -m 0755 "$BUNDLE_DIR/lifecycle.sh" /opt/agenticbots/bin/lifecycle.sh
+install -m 0755 "$BUNDLE_DIR/network-guard.sh" /opt/agenticbots/bin/network-guard.sh
+cat > /etc/systemd/system/agenticbots-network-guard.service <<'UNIT'
+[Unit]
+Description=AgenticBots container network isolation
+After=docker.service
+Requires=docker.service
+PartOf=docker.service
+[Service]
+Type=oneshot
+ExecStart=/opt/agenticbots/bin/network-guard.sh
+RemainAfterExit=yes
+[Install]
+WantedBy=docker.service
+UNIT
+systemctl daemon-reload
+systemctl enable --now agenticbots-network-guard.service
 
 cat > /opt/agenticbots/runtime.env <<ENV
 TENANT_ID=$TENANT_ID

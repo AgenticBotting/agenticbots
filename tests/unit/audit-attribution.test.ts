@@ -3,16 +3,16 @@ import { NextRequest } from "next/server";
 import { POST } from "@/app/api/plan/route";
 import { deliverPlanRequest } from "@/lib/notify";
 import { trackServer } from "@/lib/analytics";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { sharedRateLimit } from "@/server/security/rate-limit";
 
 vi.mock("@/lib/notify", () => ({ deliverPlanRequest: vi.fn(async () => ({ ok: true })) }));
 vi.mock("@/lib/analytics", () => ({ trackServer: vi.fn(async () => {}) }));
-vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: vi.fn(() => ({ allowed: true })) }));
+vi.mock("@/server/security/rate-limit", () => ({ sharedRateLimit: vi.fn(() => ({ allowed: true })) }));
 
 const request = (body: unknown) => new NextRequest("http://localhost/api/plan", { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } });
 const lead = { name: "Fictional Test", email: "test@example.invalid", focus: "private free text", source: "private-source-text", goal: "private goal", pagePath: "/industries/roofing/seo", landingPath: "/markets/florida/miami" };
 
-beforeEach(() => { vi.clearAllMocks(); vi.mocked(deliverPlanRequest).mockResolvedValue({ ok: true }); vi.mocked(checkRateLimit).mockReturnValue({ allowed: true, remaining: 4 }); });
+beforeEach(() => { vi.clearAllMocks(); vi.mocked(deliverPlanRequest).mockResolvedValue({ ok: true }); vi.mocked(sharedRateLimit).mockResolvedValue({ allowed: true, remaining: 4 }); });
 
 describe("audit request attribution", () => {
   it("records one request event after mocked delivery with only allowed route dimensions", async () => {
@@ -33,7 +33,7 @@ describe("audit request attribution", () => {
     expect(trackServer).not.toHaveBeenCalled();
   });
   it("retains the intake rate limit", async () => {
-    vi.mocked(checkRateLimit).mockReturnValue({ allowed: false, remaining: 0 });
+    vi.mocked(sharedRateLimit).mockResolvedValue({ allowed: false, remaining: 0 });
     expect((await POST(request(lead))).status).toBe(429);
     expect(deliverPlanRequest).not.toHaveBeenCalled();
   });

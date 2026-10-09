@@ -1,8 +1,9 @@
 import "server-only";
+import { sharedRateLimit } from "@/server/security/rate-limit";
 import type { OutboundHandoff, OutboundPayload } from "@/lib/prospecting/types";
 import { assertExecutable, audit } from "@/server/services/common";
-import { correlationId } from "@/server/ids";
-import { notFound } from "@/server/errors";
+import { correlationId, sha256Hex } from "@/server/ids";
+import { AppError, notFound } from "@/server/errors";
 import { getPrivate, principalRef, type Ctx } from "./access";
 import { checkSuppression } from "./compliance";
 import { OUTBOUND_OK } from "./email";
@@ -62,10 +63,11 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
   const set = opts.providers ?? defaultProviders();
 
   // Idempotent: an accepted handoff for this prospect is returned as is.
-  const prior = (await ctx.store.list("pg_handoffs", { orgId: p.orgId, where: { prospectId: p.id } })).find((h) => h.status === "accepted" || h.status === "queued");
+  const prior = (await ctx.store.list("pg_handoffs", { orgId: p.orgId, where: { prospectId: p.id } })).find((h) => h.provider !== "crm_queue" && (h.status === "accepted" || h.status === "queued"));
   if (prior && prior.provider !== "crm_queue") return { handoff: prior, sent: false, violations: [] };
 
   const violations: string[] = [];
+  if (!isPerson) violations.push("A person must approve outbound handoffs.");
   if (p.status !== "qualified") violations.push(`Prospect is "${p.status}", not qualified.`);
   const contact = p.primaryContactPointId ? await ctx.store.get("pg_contact_points", p.primaryContactPointId) : null;
   const company = await ctx.store.get("pg_companies", p.companyId);
@@ -91,6 +93,7 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
 
   const demoContact = !!(contact?.provenance.demo || person?.demo || company?.demo);
   const provider = pickProvider(set, demoContact);
+  if (provider && !provider.demo) violations.push("Live outbound is not released. A reviewed provider, sender address, unsubscribe flow and exact-message approval are required.");
   if (!provider && violations.length === 0) violations.push("No outbound system is connected.");
 
   const market = await ctx.store.get("pg_markets", p.marketId);
@@ -115,7 +118,27 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
     return { handoff, sent: false, violations };
   }
 
-  const idem = `${p.id}:${contact.id}:${payload.sequenceKey}`;
+  const idem = `${p.orgId}:${p.id}:${contact.id}:${payload.sequenceKey}`;
+  const handoffId = sha256Hex(idem);
+  const existing = await ctx.store.get("pg_handoffs", handoffId);
+  if (existing) return { handoff: existing, sent: false, violations: existing.policyViolations };
+  // Count reservations, including uncertain outcomes, never just completed sends.
+  const limit = await sharedRateLimit(ctx.r, `outbound:${p.orgId}:${today}`, cap, 86_400_000);
+  if (!limit.allowed) throw new Error("Daily outbound allowance has been reserved.");
+  const reservation = tx.insert("pg_handoffs", {
+    id: handoffId, orgId: p.orgId, prospectId: p.id, contactPointId: contact.id,
+    provider: provider.key, status: "queued", payload, policyViolations: [], requestedBy: who.name,
+    demo: demoContact, createdAt: ctx.now.toISOString(),
+  });
+  audit(tx.audit, who, { action: "prospecting.outbound.reserved", orgId: p.orgId, targetType: "prospect", targetId: p.id, correlationId: cid });
+  try { await tx.commit(); }
+  catch (e) {
+    if (e instanceof AppError && e.code === "conflict") {
+      const claimed = await ctx.store.get("pg_handoffs", handoffId);
+      if (claimed) return { handoff: claimed, sent: false, violations: [] };
+    }
+    throw e;
+  }
   let status: OutboundHandoff["status"] = "failed";
   let externalRef: string | undefined;
   const reasons: string[] = [];
@@ -127,11 +150,7 @@ export async function sendToOutbound(ctx: Ctx, prospectId: string, opts: Outboun
   } catch (e) {
     reasons.push(e instanceof ProviderError ? `Outbound system: ${e.kind.replace("_", " ")}.` : "Outbound system error.");
   }
-  const handoff = tx.insert("pg_handoffs", {
-    orgId: p.orgId, prospectId: p.id, contactPointId: contact.id, provider: provider.key, status, payload, externalRef,
-    policyViolations: reasons, requestedBy: who.name, demo: demoContact,
-    createdAt: ctx.now.toISOString(),
-  });
+  const handoff = tx.patch("pg_handoffs", reservation, { status, externalRef, policyViolations: reasons });
   if (status === "accepted") tx.patch("pg_prospects", p, { status: "sent_to_outbound", nextAction: "In outbound sequence" });
   audit(tx.audit, who, { action: "prospecting.outbound.handoff", orgId: p.orgId, targetType: "prospect", targetId: p.id, result: status === "accepted" ? "success" : "failure", correlationId: cid, detail: status });
   await tx.commit();

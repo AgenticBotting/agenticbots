@@ -38,7 +38,7 @@ export async function suspendClient(
 ): Promise<LifecycleOutcome> {
   const org = await getOrgFor(r, orgId, actor, "ops.clients.suspend");
   if (!SUSPENSION_REASONS.includes(reason)) throw invalid("Choose a suspension reason.");
-  if (org.status === "suspended") return { ok: true, message: `${org.name} is already suspended.`, correlationId: newCorrelationId() };
+
   const correlationId = newCorrelationId();
 
   // 1. Gate first, so no new work can start while we stop things.
@@ -71,9 +71,11 @@ export async function suspendClient(
     try {
       const cmd = await awsControl().runLifecycle(runtime.id, runtime.instanceId ?? "demo", "stop-runtime");
       tx = new Tx(r);
-      tx.patch("runtimes", runtime, { deploymentState: "suspended", health: "stopped", ready: false });
+      const stopped = cmd.status === "success";
+      if (!stopped) problems.push("Stop has not been confirmed. Review the lifecycle command before resuming work.");
+      tx.patch("runtimes", runtime, { deploymentState: stopped ? "suspended" : "failed", health: stopped ? "stopped" : "unknown", ready: false });
       tx.insert("deployment_events", {
-        orgId, runtimeId: runtime.id, kind: "suspend", status: cmd.status === "failed" ? "failed" : "succeeded",
+        orgId, runtimeId: runtime.id, kind: "suspend", status: cmd.status === "success" ? "succeeded" : "failed",
         detail: `stop-runtime ${cmd.commandId}`, actorId: actor.user.id, correlationId,
       });
       await tx.commit();
@@ -156,11 +158,12 @@ export async function restartRuntime(r: Repository, actor: Actor, runtimeId: str
   const correlationId = newCorrelationId();
   const cmd = await awsControl().runLifecycle(runtime.id, runtime.instanceId ?? "demo", "restart-runtime");
   const tx = new Tx(r);
-  tx.patch("runtimes", runtime, { lastRestartAt: nowIso(), restartCount24h: runtime.restartCount24h + 1 });
-  tx.insert("deployment_events", { orgId: org.id, runtimeId, kind: "restart", status: "succeeded", detail: `restart-runtime ${cmd.commandId}`, actorId: actor.user.id, correlationId });
+  tx.patch("runtimes", runtime, { ...(cmd.status === "success" ? { lastRestartAt: nowIso(), restartCount24h: runtime.restartCount24h + 1 } : {}), ready: false, health: "unknown" });
+  const pending = cmd.status === "pending" || cmd.status === "in_progress";
+  tx.insert("deployment_events", { orgId: org.id, runtimeId, kind: "restart", status: cmd.status === "success" ? "succeeded" : pending ? "started" : "failed", detail: `restart-runtime ${cmd.commandId}`, actorId: actor.user.id, correlationId });
   audit(tx, actor, { action: "runtime.restart", orgId: org.id, targetType: "runtime", targetId: runtimeId, correlationId });
   await tx.commit();
-  return { ok: true, message: "Restart requested. Health will update shortly.", correlationId };
+  return { ok: pending || cmd.status === "success", message: pending || cmd.status === "success" ? "Restart requested. Health must be checked before resuming work." : "Restart did not complete. Review the lifecycle command.", correlationId };
 }
 
 export async function updateClientProfile(

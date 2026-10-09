@@ -4,7 +4,15 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
-## Latest security and legal audit — 2026-10-09
+## Non-course security remediation — 2026-10-09
+
+After the audit below, the owner asked for non-course fixes and confirmed that nothing is live. Read **[SECURITY_REMEDIATION_STATUS.md](SECURITY_REMEDIATION_STATUS.md)** for each finding's current status and **[PRIVACY_AND_SECURITY_OPERATIONS.md](runbooks/PRIVACY_AND_SECURITY_OPERATIONS.md)** for manual handling. Source changes include staff passkeys, immutable audit records, shared rate limits and replay claims, hard opt-outs, tenant/env credential checks, security headers, privacy/cancellation requests, the revised notices, IAM/runtime hardening and CI scans. Production dependency audit is clear; one dev-only lint advisory is under a narrow expiring exception. Live BOT execution and real outbound remain blocked until spend and exact-action approvals are verified. No cloud changes or real messages were made. The course purchase/auth flow remains deferred and must not launch.
+
+Final local gates passed: typecheck, lint (0 errors), 269 tests, 6 desktop/mobile browser tests, white-label and source scans, dependency gate, and the production build with SEO/link checks. The build needed network access for build-time dependencies. No staging deployment or real-device passkey exercise was performed.
+
+The original audit below is a historical baseline, not the current status. Do not describe the platform as fully compliant, independently penetration-tested or 99.9% available. Run staging and legal release checks first.
+
+## Latest security and legal audit — 2026-10-09 (baseline)
 
 Read `docs/SECURITY_LEGAL_AUDIT_2026-10-09.md` before any launch or integration activation. The owner confirms nothing is live, the email provider is undecided, and the intended market is the US; this supersedes historical deployment descriptions for this audit. The review records 28 security findings and 5 privacy/commercial readiness findings, separating confirmed defects from conditional risks and launch prerequisites. **No fixes or deployments were performed by the audit.**
 
@@ -92,7 +100,7 @@ Nothing has been deployed to AWS. The marketing site deploys to Vercel from `mai
 
 ## 2. Repository architecture
 
-One Next.js 16.3.4 app (React 19, Tailwind 4, TypeScript, Convex 1.46, zod 4, Vitest 5, Playwright). **Next 16 differs from training data — read `node_modules/next/dist/docs/` before writing Next code** (e.g. `params`/`searchParams` are Promises; `middleware.ts` is deprecated in favor of `proxy` but still in use here).
+One Next.js 16.4.0 app (React 19, Tailwind 4, TypeScript, Convex 1.46, zod 4, Vitest 5, Playwright). **Next 16 differs from training data — read `node_modules/next/dist/docs/` before writing Next code** (e.g. `params`/`searchParams` are Promises; the app uses `src/proxy.ts` in place of deprecated `middleware.ts`).
 
 | Path | What |
 |---|---|

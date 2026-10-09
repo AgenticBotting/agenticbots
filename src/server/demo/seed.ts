@@ -41,7 +41,7 @@ export async function seedDemo(r: Repository): Promise<void> {
 
   /* ── People ── */
   const admin = tx.insert("users", { email: "admin@agenticbots.demo", name: "Demo Admin", status: "active", platformRole: "superadmin", passwordHash: pw, createdAt: ago(120) });
-  const operator = tx.insert("users", { email: "operator@agenticbots.demo", name: "Jordan Ellis", status: "active", platformRole: "operator", passwordHash: pw, createdAt: ago(90) });
+  const operator = tx.insert("users", { email: "operator@agenticbots.demo", name: "Jordan Ellis", status: "active", platformRole: "operator", operatorAllOrgs: true, passwordHash: pw, createdAt: ago(90) });
   const owner = tx.insert("users", { email: "owner@acmeroofing.demo", name: "Dana Whitfield", status: "active", passwordHash: pw, createdAt: ago(60) });
   const staff = tx.insert("users", { email: "staff@acmeroofing.demo", name: "Marcus Lee", status: "active", passwordHash: pw, createdAt: ago(55) });
 

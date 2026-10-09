@@ -40,6 +40,7 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
       </header>
       <main id="main" className="pf-portal-main">{children}</main>
+      <footer className="pf-portal-main"><a href="/privacy" className="underline">Privacy policy</a> · <a href="/terms" className="underline">Terms</a> · <a href="/portal/account" className="underline">Account, privacy & cancellation</a></footer>
       <PortalMobileTabs approvals={approvals} />
     </div>
   );

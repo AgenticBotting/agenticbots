@@ -47,7 +47,7 @@ export function assertPermission(actor: Actor, permission: Permission, orgId?: s
 /** The execution gate. Suspended or canceled organizations cannot start
  *  any work — checked before every run, automation and approval resume. */
 export function assertExecutable(org: Organization): void {
-  if (org.status === "suspended" || org.status === "canceled") throw suspendedError();
+  if (org.status === "suspended" || org.status === "canceled" || org.holds.security || org.holds.manual || org.holds.billing) throw suspendedError();
 }
 
 export function audit(

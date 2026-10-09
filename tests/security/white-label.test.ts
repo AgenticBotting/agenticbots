@@ -79,6 +79,7 @@ const CLIENT_SOURCES = [
   "src/app/api/reports",
   "src/app/login",
   "src/server/views/client.ts",
+  "src/server/services/privacy.ts",
   "src/server/prospecting/views.ts",
   "src/config/bot-catalog.ts",
   "src/config/integrations.ts",

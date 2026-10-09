@@ -93,6 +93,11 @@ data "aws_iam_policy_document" "permissions" {
       variable = "aws:ResourceTag/agenticbots:managed"
       values   = ["true"]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/agenticbots:env"
+      values   = [var.environment]
+    }
   }
   statement {
     sid       = "ReadCommandResults"
@@ -117,6 +122,11 @@ data "aws_iam_policy_document" "permissions" {
       test     = "StringEquals"
       variable = "aws:ResourceTag/agenticbots:managed"
       values   = ["true"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/agenticbots:env"
+      values   = [var.environment]
     }
   }
   statement {

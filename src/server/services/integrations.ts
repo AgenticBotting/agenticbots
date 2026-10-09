@@ -6,14 +6,14 @@ import { getIntegrationDef } from "@/config/integrations";
 import type { Repository } from "@/server/db/repository";
 import { Tx } from "@/server/db/repository";
 import type { Actor } from "@/server/auth/policy";
-import { correlationId as newCorrelationId, nowIso } from "@/server/ids";
+import { correlationId as newCorrelationId, newId, nowIso, sha256Hex } from "@/server/ids";
 import { botRuntime } from "@/server/runtime";
 import { sanitizeRuntimeError } from "@/server/runtime/runtime-errors";
 import { awsControl } from "@/server/aws/control";
-import { conflict, invalid, notFound } from "@/server/errors";
-import { isDemo } from "@/server/env";
+import { AppError, conflict, invalid, notFound } from "@/server/errors";
+import { isDemo, platformMode } from "@/server/env";
 import { redactSecrets } from "@/server/redact";
-import { audit, getOrgFor, getScoped } from "./common";
+import { audit, getOrgFor, getScoped, SYSTEM } from "./common";
 import { clearIncident, raiseIncident } from "./incidents";
 
 export async function createIntegration(
@@ -21,21 +21,25 @@ export async function createIntegration(
   actor: Actor,
   input: { orgId: string; provider: IntegrationKey; displayName?: string; secretRef?: string; metadata?: Record<string, string> },
 ): Promise<Integration> {
-  await getOrgFor(r, input.orgId, actor, "ops.integrations.manage");
+  const org = await getOrgFor(r, input.orgId, actor, "ops.integrations.manage");
+  const prefix = `agenticbots/${org.environment === "production" ? "prod" : org.environment}/tenants/${org.tenantId}/integrations/`;
   const def = getIntegrationDef(input.provider);
   if (!def) throw invalid("Unknown integration type.");
-  if (input.secretRef && !/^agenticbots\/(prod|staging|demo)\/tenants\/[a-z0-9-]+\/integrations\/[a-z0-9_-]+$/.test(input.secretRef)) {
+  if (input.secretRef && (!input.secretRef.startsWith(prefix) || !/^agenticbots\/(prod|staging|demo)\/tenants\/[a-z0-9-]+\/integrations\/[a-z0-9_-]+$/.test(input.secretRef))) {
     throw invalid("Secret reference must be a path under agenticbots/<env>/tenants/<tenant>/integrations/<name>.");
   }
   const tx = new Tx(r);
+  const integrationId = newId();
   // A new integration is never "connected" until a check or an operator proves it.
   const row = tx.insert("integrations", {
+    id: integrationId,
     orgId: input.orgId,
     provider: input.provider,
     displayName: input.displayName?.trim() || def.displayName,
     status: input.secretRef ? "needs_attention" : "not_configured",
     capabilities: [],
     secretRef: input.secretRef,
+    webhookSecretRef: input.provider === "webhook" ? `${prefix}${integrationId}/webhook` : undefined,
     botIds: [],
     metadata: input.metadata ?? {},
   });
@@ -66,7 +70,7 @@ export async function checkIntegration(r: Repository, actor: Actor, integrationI
     const botId = integ.botIds[0];
     const bot = botId ? await r.get("bots", botId) : null;
     const runtime = bot ? await r.get("runtimes", bot.runtimeId) : null;
-    if (!bot || !runtime) {
+    if (!bot || !runtime || bot.orgId !== integ.orgId || runtime.orgId !== integ.orgId) {
       lastError = "Assign this integration to a Bot before checking it.";
       status = "needs_attention";
     } else {
@@ -112,6 +116,7 @@ export async function setIntegrationStatusManually(
   evidence: string,
 ): Promise<Integration> {
   const integ = await getScoped(r, "integrations", integrationId, actor, "ops.integrations.manage");
+  if (!isDemo() && status === "disconnected") throw conflict("A status change does not revoke credentials. Complete the provider revocation runbook first.");
   if (!["connected", "needs_attention", "disconnected", "not_configured"].includes(status)) throw invalid("Invalid status.");
   if (status === "connected" && evidence.trim().length < 10) {
     throw invalid("Describe how you verified the connection (e.g. 'Test contact created in HubSpot and deleted').");
@@ -144,38 +149,46 @@ export function verifyWebhookSignature(secret: string, timestamp: string, body: 
   return expected.length === got.length && timingSafeEqual(expected, got);
 }
 
-export async function webhookSecretFor(integ: Integration): Promise<string | null> {
+export async function webhookSecretFor(integ: Integration, r: Repository): Promise<string | null> {
   if (isDemo()) {
     // Deterministic demo secret so the demo webhook can be exercised locally.
     return createHmac("sha256", "agenticbots-demo-webhooks").update(integ.id).digest("hex");
   }
   if (!integ.webhookSecretRef) return null;
+  const org = await r.get("organizations", integ.orgId);
+  const environment = platformMode() === "production" ? "prod" : "staging";
+  if (!org || org.environment !== platformMode() || !/^[a-z0-9-]+$/.test(org.tenantId)) return null;
+  const expected = `agenticbots/${environment}/tenants/${org.tenantId}/integrations/${integ.id}/webhook`;
+  if (integ.webhookSecretRef !== expected) return null;
   const v = await awsControl().getSecretJson<{ secret: string }>(integ.webhookSecretRef);
   return v.secret ?? null;
 }
 
 /** Record a delivery id so a replayed webhook is processed at most once. */
 export async function claimWebhookDelivery(r: Repository, source: string, externalId: string, orgId?: string): Promise<boolean> {
-  const seen = await r.list("processed_webhooks", { where: { source, externalId } });
-  if (seen.length > 0) return false;
+  const id = sha256Hex(JSON.stringify([source, externalId]));
+  if (await r.get("processed_webhooks", id)) return false;
   const tx = new Tx(r);
-  tx.insert("processed_webhooks", { source, externalId, orgId });
+  tx.insert("processed_webhooks", { id, source, externalId, orgId, status: "processing" });
+  audit(tx, SYSTEM, { action: "webhook.claim", orgId, targetType: "webhook", targetId: id, correlationId: newCorrelationId() });
   try {
     await tx.commit();
     return true;
-  } catch {
-    return false;
+  } catch (e) {
+    if (e instanceof AppError && e.code === "conflict" && await r.get("processed_webhooks", id)) return false;
+    throw e;
   }
 }
 
 export async function disconnectIntegration(r: Repository, actor: Actor, integrationId: string): Promise<Integration> {
   const integ = await getScoped(r, "integrations", integrationId, actor, "ops.integrations.manage");
+  if (!isDemo()) throw conflict("Live disconnection requires verified provider-token revocation and runtime credential removal. Keep this client on a security hold until both are confirmed.");
   if (integ.status === "disconnected") throw conflict("Already disconnected.");
   const tx = new Tx(r);
   const next = tx.patch("integrations", integ, { status: "disconnected", botIds: [] });
   for (const botId of integ.botIds) {
     const bot = await r.get("bots", botId);
-    if (bot) tx.patch("bots", bot, { integrationIds: bot.integrationIds.filter((i) => i !== integ.id) });
+    if (bot && bot.orgId === integ.orgId) tx.patch("bots", bot, { integrationIds: bot.integrationIds.filter((i) => i !== integ.id) });
   }
   audit(tx, actor, { action: "integration.disconnect", orgId: integ.orgId, targetType: "integration", targetId: integ.id, correlationId: newCorrelationId() });
   await tx.commit();

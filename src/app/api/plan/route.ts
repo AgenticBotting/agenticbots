@@ -1,25 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { sharedRateLimit } from "@/server/security/rate-limit";
+import { repo } from "@/server/db";
+import { requestIp } from "@/lib/request-security";
 import { deliverPlanRequest } from "@/lib/notify";
 import { acquisitionEventContext } from "@/lib/acquisition-attribution";
 import { trackServer } from "@/lib/analytics";
+import { redactSecrets } from "@/server/redact";
+import { body as readBody } from "@/server/api";
 import { proposalBrief, proposalRequestSchema } from "@/lib/proposal-intake";
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function clientKey(req: NextRequest): string {
-  const fwd = req.headers.get("x-forwarded-for");
-  return (fwd?.split(",")[0] || req.headers.get("x-real-ip") || "anonymous").trim();
-}
 
 function str(v: unknown, max = 2000): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
 export async function POST(request: NextRequest) {
-  const { allowed } = checkRateLimit(`plan:${clientKey(request)}`, MAX_PER_WINDOW, WINDOW_MS);
+  let allowed = false;
+  try { ({ allowed } = await sharedRateLimit(await repo(), `plan:${requestIp(request.headers)}`, MAX_PER_WINDOW, WINDOW_MS)); }
+  catch { return NextResponse.json({ error: "Enquiries are temporarily unavailable. Please contact us directly." }, { status: 503 }); }
   if (!allowed) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a few minutes." },
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
 
   let body: unknown;
   try {
-    body = await request.json();
+    body = await readBody(request);
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
     await trackServer("plan_form_submitted", { ...acquisitionEventContext(b.pagePath, b.landingPath), request_received: true });
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[plan] unexpected failure", err);
+    console.error("[plan] unexpected failure", redactSecrets(err instanceof Error ? err.message : "Unknown error"));
     return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
   }
 }

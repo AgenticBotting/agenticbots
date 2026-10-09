@@ -6,7 +6,7 @@ import type { Actor } from "@/server/auth/policy";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { correlationId as newCorrelationId, nowIso, randomToken, sha256Hex } from "@/server/ids";
 import { conflict, invalid, notFound } from "@/server/errors";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { sharedRateLimit } from "@/server/security/rate-limit";
 import { platformMode } from "@/server/env";
 import { assertPermission, audit, SYSTEM } from "./common";
 import { defaultRuntimeProvider } from "@/server/runtime";
@@ -92,8 +92,11 @@ export interface InviteResult {
 export async function inviteUser(
   r: Repository,
   actor: Actor,
-  input: { email: string; name: string; platformRole?: PlatformRole; orgId?: string; clientRole?: ClientRole },
+  input: { email: string; name: string; platformRole?: PlatformRole; operatorAllOrgs?: boolean; operatorOrgIds?: string[]; orgId?: string; clientRole?: ClientRole },
 ): Promise<InviteResult> {
+  if (input.platformRole && !["superadmin", "operator"].includes(input.platformRole)) throw invalid("Invalid staff role.");
+  if (input.clientRole && !["client_admin", "client_member"].includes(input.clientRole)) throw invalid("Invalid client role.");
+  if (input.orgId && !await r.get("organizations", input.orgId)) throw notFound("Client");
   if (input.platformRole) assertPermission(actor, "ops.users.manage");
   else {
     if (!input.orgId || !input.clientRole) throw invalid("Choose the client and role.");
@@ -102,6 +105,7 @@ export async function inviteUser(
   const email = normEmail(input.email);
   if (!EMAIL.test(email)) throw invalid("Enter a valid email address.");
   if (!input.name.trim()) throw invalid("Enter the person's name.");
+  const scope = input.platformRole === "operator" ? await operatorScope(r, input.operatorAllOrgs === true, input.operatorOrgIds ?? []) : {};
   const token = randomToken(32);
   const users = await r.list("users", { where: { email } });
   const tx = new Tx(r);
@@ -109,7 +113,7 @@ export async function inviteUser(
   if (user) {
     if (input.platformRole && user.platformRole) throw conflict("That person already has staff access.");
     user = tx.patch("users", user, {
-      ...(input.platformRole ? { platformRole: input.platformRole } : {}),
+      ...(input.platformRole ? { platformRole: input.platformRole, ...scope } : {}),
       inviteTokenHash: user.status === "invited" ? sha256Hex(token) : user.inviteTokenHash,
       inviteExpiresAt: user.status === "invited" ? new Date(Date.now() + 7 * 86_400_000).toISOString() : user.inviteExpiresAt,
     });
@@ -119,6 +123,7 @@ export async function inviteUser(
       name: input.name.trim(),
       status: "invited",
       platformRole: input.platformRole,
+      ...scope,
       inviteTokenHash: sha256Hex(token),
       inviteExpiresAt: new Date(Date.now() + 7 * 86_400_000).toISOString(),
     });
@@ -133,6 +138,7 @@ export async function inviteUser(
 }
 
 export async function acceptInvite(r: Repository, userId: string, token: string, password: string): Promise<User> {
+  if (password.length < 12 || password.length > 1024) throw invalid("Use a password between 12 and 1024 characters.");
   const user = await r.get("users", userId);
   if (!user || !user.inviteTokenHash || !user.inviteExpiresAt) throw notFound("Invitation");
   if (Date.parse(user.inviteExpiresAt) < Date.now()) throw conflict("This invitation has expired. Ask AgenticBots for a new one.");
@@ -140,6 +146,7 @@ export async function acceptInvite(r: Repository, userId: string, token: string,
   const tx = new Tx(r);
   const next = tx.patch("users", user, {
     passwordHash: await hashPassword(password),
+    termsAcceptedAt: nowIso(), termsVersion: "2026-10-09", privacyVersion: "2026-10-09",
     status: "active",
     inviteTokenHash: undefined,
     inviteExpiresAt: undefined,
@@ -151,13 +158,18 @@ export async function acceptInvite(r: Repository, userId: string, token: string,
 
 /** Email + password check, rate limited per email and per IP. */
 export async function authenticate(r: Repository, email: string, password: string, ip: string): Promise<User | null> {
+  if (email.length > 254 || password.length > 1024) throw invalid("Invalid credentials.");
   const e = normEmail(email);
-  const byIp = checkRateLimit(`login-ip:${ip}`, 20, 15 * 60_000);
-  const byEmail = checkRateLimit(`login-email:${e}`, 8, 15 * 60_000);
+  const byIp = await sharedRateLimit(r, `login-ip:${ip}`, 20, 15 * 60_000);
+  const byEmail = await sharedRateLimit(r, `login-email:${e}`, 8, 15 * 60_000);
   if (!byIp.allowed || !byEmail.allowed) throw conflict("Too many sign-in attempts. Wait a few minutes and try again.");
   const user = (await r.list("users", { where: { email: e } }))[0];
   const ok = await verifyPassword(password, user?.passwordHash);
-  if (!ok || !user || user.status !== "active") return null;
+  const accepted = !!(ok && user && user.status === "active");
+  const tx = new Tx(r);
+  audit(tx, SYSTEM, { action: accepted ? "auth.password.accepted" : "auth.password.denied", targetType: "user", targetId: user?.id ?? sha256Hex(e), correlationId: newCorrelationId(), result: accepted ? "success" : "denied" });
+  await tx.commit();
+  if (!accepted) return null;
   return user;
 }
 
@@ -172,5 +184,25 @@ export async function setUserStatus(r: Repository, actor: Actor, userId: string,
     for (const s of await r.list("sessions", { where: { userId } })) if (!s.revokedAt) tx.patch("sessions", s, { revokedAt: nowIso() });
   }
   audit(tx, actor, { action: `user.${status}`, targetType: "user", targetId: userId, correlationId: newCorrelationId() });
+  await tx.commit();
+}
+
+async function operatorScope(r: Repository, all: boolean, ids: string[]) {
+  if (!Array.isArray(ids) || ids.length > 1000 || ids.some(id => typeof id !== "string")) throw invalid("Choose valid clients.");
+  const scope = [...new Set(ids)];
+  if (all && scope.length) throw invalid("Choose all clients or selected clients, not both.");
+  for (const id of scope) if (!await r.get("organizations", id)) throw notFound("Client");
+  return { operatorAllOrgs: all, operatorOrgIds: all ? undefined : scope };
+}
+
+export async function setOperatorScope(r: Repository, actor: Actor, userId: string, all: boolean, ids: string[]) {
+  assertPermission(actor, "ops.users.manage");
+  const user = await r.get("users", userId);
+  if (!user || user.platformRole !== "operator") throw notFound("Operator");
+  const scope = await operatorScope(r, all, ids);
+  const tx = new Tx(r);
+  tx.patch("users", user, scope);
+  for (const session of await r.list("sessions", { where: { userId } })) if (!session.revokedAt) tx.patch("sessions", session, { revokedAt: nowIso() });
+  audit(tx, actor, { action: "user.scope.change", targetType: "user", targetId: userId, correlationId: newCorrelationId(), detail: all ? "Explicit all-client access" : `${ids.length} selected clients; sessions revoked` });
   await tx.commit();
 }

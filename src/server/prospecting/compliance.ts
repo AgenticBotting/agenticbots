@@ -1,8 +1,8 @@
 import "server-only";
 import type { Suppression, SuppressionReason } from "@/lib/prospecting/types";
 import { audit } from "@/server/services/common";
-import { correlationId, nowIso } from "@/server/ids";
-import { forbidden, invalid, notFound } from "@/server/errors";
+import { correlationId, nowIso, sha256Hex } from "@/server/ids";
+import { AppError, forbidden, invalid, notFound } from "@/server/errors";
 import type { ProspectGraphStore } from "./store";
 import { assertAllowed, principalRef, type Ctx } from "./access";
 import { normalizeDomain } from "./identity";
@@ -41,7 +41,8 @@ export async function checkSuppression(store: ProspectGraphStore, orgId: string,
   const all = await store.list("pg_suppressions");
   const hits: SuppressionHit[] = [];
   for (const s of all) {
-    if (s.liftedAt) continue;
+    const permanent = ["unsubscribed", "bounced", "do_not_contact"].includes(s.reason);
+    if (s.liftedAt && !permanent) continue;
     if (s.orgId && s.orgId !== orgId) continue;
     if (!s.channels.includes("all") && !s.channels.includes(channel)) continue;
     const match =
@@ -49,7 +50,7 @@ export async function checkSuppression(store: ProspectGraphStore, orgId: string,
       (s.kind === "domain" && !!domain && (domain === s.value || domain.endsWith(`.${s.value}`))) ||
       (s.kind === "company" && !!t.companyId && s.value === t.companyId) ||
       (s.kind === "person" && !!t.personId && s.value === t.personId);
-    if (match) hits.push({ suppressionId: s.id, reason: s.reason, hard: s.hard, scope: s.orgId ? "client" : "global", kind: s.kind });
+    if (match) hits.push({ suppressionId: s.id, reason: s.reason, hard: s.hard || permanent, scope: s.orgId ? "client" : "global", kind: s.kind });
   }
   return hits;
 }
@@ -86,25 +87,29 @@ export async function addSuppression(ctx: Ctx, input: SuppressionInput): Promise
   if (input.orgId) assertAllowed(ctx.p, "suppress", input.orgId);
   else assertAllowed(ctx.p, "global_suppression");
   const value = normalizeValue(input.kind, input.value);
-  const existing = (await ctx.store.list("pg_suppressions")).find((s) => !s.liftedAt && s.orgId === input.orgId && s.kind === input.kind && s.value === value);
-  if (existing) return existing;
   const who = principalRef(ctx.p);
-  const tx = ctx.store.tx();
-  const row = tx.insert("pg_suppressions", {
-    orgId: input.orgId,
-    kind: input.kind,
-    value,
-    reason: input.reason,
-    channels: input.channels?.length ? input.channels : ["all"],
-    source: input.source ?? (ctx.p.kind === "bot" ? "bot" : "operator"),
-    note: input.note?.slice(0, 500),
-    createdBy: who.name,
-    // Suppressions are hard unless a person explicitly makes one soft. A Bot cannot.
-    hard: ctx.p.kind === "bot" ? true : input.hard ?? true,
-  });
-  audit(tx.audit, who, { action: "prospecting.suppression.add", orgId: input.orgId, targetType: "suppression", targetId: row.id, correlationId: correlationId(), detail: `${input.kind} (${input.reason})` });
-  await tx.commit();
-  return row;
+  const permanent = (reason: SuppressionReason) => ["unsubscribed", "bounced", "do_not_contact"].includes(reason);
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const existing = (await ctx.store.list("pg_suppressions")).find(s => s.orgId === input.orgId && s.kind === input.kind && s.value === value);
+    const tx = ctx.store.tx();
+    const hard = permanent(input.reason) || ctx.p.kind === "bot" || (input.hard ?? true);
+    const channels = input.channels?.length ? input.channels : ["all" as const];
+    const merged = [...new Set([...(existing?.channels ?? []), ...channels])];
+    const reason = existing && permanent(existing.reason) ? existing.reason : input.reason;
+    const row = existing ? tx.patch("pg_suppressions", existing, {
+      hard: existing.hard || hard, reason, channels: merged, liftedAt: undefined, liftedBy: undefined,
+    }) : tx.insert("pg_suppressions", {
+      // The same recipient cannot acquire competing active records in a race.
+      id: sha256Hex(JSON.stringify([input.orgId ?? "global", input.kind, value])),
+      orgId: input.orgId, kind: input.kind, value, reason,
+      channels, hard, source: input.source ?? (ctx.p.kind === "bot" ? "bot" : "operator"),
+      note: input.note?.slice(0, 500), createdBy: who.name,
+    });
+    audit(tx.audit, who, { action: existing ? "prospecting.suppression.strengthen" : "prospecting.suppression.add", orgId: input.orgId, targetType: "suppression", targetId: row.id, correlationId: correlationId(), detail: `${input.kind} (${input.reason})` });
+    try { await tx.commit(); return row; }
+    catch (e) { if (!(e instanceof AppError) || e.code !== "conflict" || attempt === 5) throw e; }
+  }
+  throw invalid("Suppression update needs a retry.");
 }
 
 export async function liftSuppression(ctx: Ctx, id: string, note?: string): Promise<Suppression> {
@@ -113,7 +118,7 @@ export async function liftSuppression(ctx: Ctx, id: string, note?: string): Prom
   if (s.orgId) assertAllowed(ctx.p, "lift_suppression", s.orgId);
   else assertAllowed(ctx.p, "global_suppression");
   // Unsubscribes and bounces are facts about the recipient; they are permanent.
-  if (s.reason === "unsubscribed" || s.reason === "bounced") throw invalid("Unsubscribes and bounces cannot be lifted.");
+  if (["unsubscribed", "bounced", "do_not_contact"].includes(s.reason)) throw invalid("Unsubscribes and bounces cannot be lifted.");
   const who = principalRef(ctx.p);
   const tx = ctx.store.tx();
   const row = tx.patch("pg_suppressions", s, { liftedAt: nowIso(), liftedBy: who.name });

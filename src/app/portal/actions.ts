@@ -46,7 +46,7 @@ export const decideAction: A = async (_p, f) =>
     if (!a || a.orgId !== org.id) throw notFound("Approval");
     const decision = str(f, "decision") === "approve" ? "approve" : "deny";
     await resolveApproval(r, actor, a.id, decision, opt(f, "note"));
-    return decision === "approve" ? "Approved. The Bot will carry it out." : "Declined. Nothing will be sent or changed.";
+    return decision === "approve" ? "Your approval was recorded. Review the request for its execution status." : "Declined. Nothing will be sent or changed.";
   }, "/portal");
 
 export async function portalLogout() {

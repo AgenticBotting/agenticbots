@@ -42,6 +42,7 @@ export default async function OpsLayout({ children }: { children: React.ReactNod
         </div>
         <OpsNav counts={counts} />
         <div className="pf-rail-foot">
+          <a href="/login/security" className="underline">Verify access / backup key</a><br/><a href="/privacy" className="underline">Privacy</a> · <a href="/terms" className="underline">Terms</a>
           <div className="who">{actor.user.name}</div>
           <div className="role">{actor.platformRole === "superadmin" ? "Superadmin" : "Operator"}</div>
           <form action={logoutAction} className="mt-2">

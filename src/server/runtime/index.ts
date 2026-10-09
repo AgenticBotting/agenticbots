@@ -1,4 +1,5 @@
 import "server-only";
+import { requireExecutionRelease } from "@/server/security/release-gates";
 import type { Bot, Runtime } from "@/lib/platform/types";
 import type { Repository } from "@/server/db/repository";
 import type { RuntimeAdapter } from "./RuntimeAdapter";
@@ -63,28 +64,28 @@ export class BotRuntime {
   async listBotToolsets() { return this.adapter.listBotToolsets(await this.c()); }
 
   /* Bot Runs */
-  async startBotRun(input: StartBotRunInput) { return this.adapter.startBotRun(await this.c(), input); }
+  async startBotRun(input: StartBotRunInput) { requireExecutionRelease(); return this.adapter.startBotRun(await this.c(), input); }
   async getBotRun(runtimeRunId: string) { return this.adapter.getBotRun(await this.c(), runtimeRunId); }
   async stopBotRun(runtimeRunId: string) { return this.adapter.stopBotRun(await this.c(), runtimeRunId); }
   async listBotRunEvents(runtimeRunId: string) { return this.adapter.listBotRunEvents(await this.c(), runtimeRunId); }
   async *streamBotRunEvents(runtimeRunId: string, signal?: AbortSignal): AsyncIterable<BotRunEvent> {
     yield* this.adapter.streamBotRunEvents(await this.c(), runtimeRunId, signal);
   }
-  async approveBotRun(runtimeRunId: string, approvalId?: string) { return this.adapter.approveBotRun(await this.c(), runtimeRunId, approvalId); }
+  async approveBotRun(runtimeRunId: string, approvalId?: string) { requireExecutionRelease(); return this.adapter.approveBotRun(await this.c(), runtimeRunId, approvalId); }
   async denyBotRun(runtimeRunId: string, approvalId?: string) { return this.adapter.denyBotRun(await this.c(), runtimeRunId, approvalId); }
 
   /* Conversations */
   async listConversations() { return this.adapter.listConversations(await this.c()); }
-  async createConversation(title: string) { return this.adapter.createConversation(await this.c(), title); }
+  async createConversation(title: string) { requireExecutionRelease(); return this.adapter.createConversation(await this.c(), title); }
   async getConversation(runtimeConversationId: string) { return this.adapter.getConversation(await this.c(), runtimeConversationId); }
 
   /* Automations */
   async listAutomations() { return this.adapter.listAutomations(await this.c()); }
-  async createAutomation(config: AutomationConfig) { return this.adapter.createAutomation(await this.c(), config); }
-  async updateAutomation(runtimeAutomationId: string, config: Partial<AutomationConfig>) { return this.adapter.updateAutomation(await this.c(), runtimeAutomationId, config); }
+  async createAutomation(config: AutomationConfig) { requireExecutionRelease(); return this.adapter.createAutomation(await this.c(), config); }
+  async updateAutomation(runtimeAutomationId: string, config: Partial<AutomationConfig>) { requireExecutionRelease(); return this.adapter.updateAutomation(await this.c(), runtimeAutomationId, config); }
   async pauseAutomation(runtimeAutomationId: string) { return this.adapter.pauseAutomation(await this.c(), runtimeAutomationId); }
-  async resumeAutomation(runtimeAutomationId: string) { return this.adapter.resumeAutomation(await this.c(), runtimeAutomationId); }
-  async runAutomationNow(runtimeAutomationId: string) { return this.adapter.runAutomationNow(await this.c(), runtimeAutomationId); }
+  async resumeAutomation(runtimeAutomationId: string) { requireExecutionRelease(); return this.adapter.resumeAutomation(await this.c(), runtimeAutomationId); }
+  async runAutomationNow(runtimeAutomationId: string) { requireExecutionRelease(); return this.adapter.runAutomationNow(await this.c(), runtimeAutomationId); }
   async deleteAutomation(runtimeAutomationId: string) { return this.adapter.deleteAutomation(await this.c(), runtimeAutomationId); }
 }
 
@@ -103,7 +104,7 @@ export async function botRuntimeById(r: Repository, botId: string): Promise<BotR
   const bot = await r.get("bots", botId);
   if (!bot) throw new BotNotFoundError("Unknown Bot");
   const runtime = await r.get("runtimes", bot.runtimeId);
-  if (!runtime) throw new RuntimeUnavailableError("Bot has no runtime");
+  if (!runtime || runtime.orgId !== bot.orgId) throw new RuntimeUnavailableError("Bot has no runtime");
   return new BotRuntime(runtime, bot);
 }
 

@@ -1,4 +1,6 @@
+// Isolated loopback emulator only: exercise the adapter behind the unreleased live gate.
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { vi } from "vitest";
 import { MemoryRepository } from "@/server/db/memory";
 import { setRepoForTesting } from "@/server/db";
 import { Tx } from "@/server/db/repository";
@@ -126,3 +128,5 @@ describe("staging chain: AgenticBots → Hermes adapter → runtime → result �
     process.env.RUNTIME_DEV_TARGETS = JSON.stringify({ [runtime.id]: { baseUrl: fake.url, keys: fake.keys } });
   });
 });
+
+vi.mock("@/server/security/release-gates", () => ({ requireExecutionRelease: () => {} }));

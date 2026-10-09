@@ -32,8 +32,31 @@ export async function handle(fn: () => Promise<Response>): Promise<Response> {
 
 export async function body<T = Record<string, unknown>>(req: Request): Promise<T> {
   try {
-    return (await req.json()) as T;
-  } catch {
+    if (req.headers.get("content-type")?.split(";")[0].trim() !== "application/json") throw new Error("JSON required");
+    const value = JSON.parse(await boundedText(req));
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Object required");
+    return value as T;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError("validation", "Request body must be JSON.", 400);
   }
+}
+
+/** Bound bytes while reading, including chunked requests without Content-Length. */
+export async function boundedText(req: Request, maxBytes = 64_000): Promise<string> {
+  if (Number(req.headers.get("content-length")) > maxBytes) throw new AppError("validation", "Request is too large.", 413);
+  const reader = req.body?.getReader();
+  if (!reader) return "";
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) { await reader.cancel(); throw new AppError("validation", "Request is too large.", 413); }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  return Buffer.concat(chunks).toString("utf8");
 }

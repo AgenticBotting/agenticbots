@@ -3,7 +3,7 @@ import { login, logout, confirmDialog } from "./helpers";
 
 test("operator runs the business from the console", async ({ page }) => {
   await login(page, "operator@agenticbots.demo");
-  await expect(page.getByRole("heading", { name: "What needs attention" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Control center" })).toBeVisible();
 
   // Open client → Bots → a Bot
   await page.getByRole("link", { name: "Clients", exact: true }).click();
@@ -21,8 +21,11 @@ test("operator runs the business from the console", async ({ page }) => {
 
   // Approvals
   await page.getByRole("link", { name: /^Approvals/ }).click();
+  const approvalTitle = await page.locator("details.oc-review").first().locator("summary h2").innerText();
+  await page.locator("details.oc-review").first().locator("summary").click();
   await page.getByRole("button", { name: "Approve for client" }).first().click();
-  await expect(page.getByText("Approved.").first()).toBeVisible();
+  await page.locator("dialog[open]").locator('button[type="submit"]').click();
+  await expect(page.getByRole("heading", { name: approvalTitle })).toHaveCount(0);
 
   // Request: assign + view incident
   await page.getByRole("link", { name: /^Requests/ }).click();
@@ -46,7 +49,8 @@ test("operator runs the business from the console", async ({ page }) => {
   await page.getByLabel("Payment method").selectOption("ach");
   await page.getByLabel(/Reference/).fill("ACH-E2E-001");
   await page.getByRole("button", { name: "Record payment" }).click();
-  await expect(page.getByText(/recorded\. Balance \$0/)).toBeVisible();
+  await expect(page.getByRole("row", { name: /Balance due \$0\.00/ })).toBeVisible();
+  await expect(page.getByRole("row", { name: /ACH-E2E-001/ })).toBeVisible();
 
   // Past due, then manual suspension, verify blocked, reactivate, healthy
   await page.goto("/ops/clients");
@@ -70,6 +74,6 @@ test("operator runs the business from the console", async ({ page }) => {
 test("Bayside invoice can be marked past due", async ({ page }) => {
   await login(page, "operator@agenticbots.demo");
   await page.goto("/ops/billing?f=past_due");
-  await expect(page.getByRole("link", { name: "Bayside Plumbing Co." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Bayside Plumbing Co." }).first()).toBeVisible();
   await expect(page.getByText(/eligible/).first()).toBeVisible();
 });

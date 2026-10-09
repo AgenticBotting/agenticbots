@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Runtime } from "@/lib/platform/types";
 
 /** Secrets Manager → connection resolution, as used on staging/production. */
@@ -24,11 +24,14 @@ vi.mock("@/server/aws/control", () => ({
 const { resolveRuntimeConnection } = await import("@/server/runtime/runtime-factory");
 const runtime = { id: "rt1", provider: "hermes", endpointRef: "agenticbots/staging/tenants/t1/runtime" } as unknown as Runtime;
 
-afterEach(() => {
-  process.env.DEMO_MODE = "true";
-});
+beforeEach(() => { vi.stubEnv("PLATFORM_ENV", "staging"); vi.stubEnv("DEMO_MODE", "false"); });
+afterEach(() => { vi.unstubAllEnvs(); });
 
 describe("runtime connection from Secrets Manager", () => {
+  it("rejects a staging secret in production", async () => {
+    vi.stubEnv("PLATFORM_ENV", "production");
+    await expect(resolveRuntimeConnection(runtime)).rejects.toThrow(/namespace/);
+  });
   it("runtime-level calls (health, capabilities) use the runtime's default key", async () => {
     process.env.DEMO_MODE = "false";
     const c = await resolveRuntimeConnection(runtime);

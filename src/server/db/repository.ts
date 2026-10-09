@@ -3,6 +3,7 @@ import type { Base, TableName, Tables } from "@/lib/platform/types";
 import { APPEND_ONLY_TABLES } from "@/lib/platform/types";
 import { newId, nowIso } from "@/server/ids";
 import { conflict } from "@/server/errors";
+import { validatePatch, validateRecord } from "../../../convex/platformIntegrity";
 
 /**
  * The storage boundary. Two implementations:
@@ -36,6 +37,10 @@ export interface Repository {
 }
 
 export function assertOpAllowed(op: Op): void {
+  try {
+    if (op.type === "insert") validateRecord(op.table, op.doc.id, op.doc);
+    if (op.type === "patch") validatePatch(op.table, op.patch);
+  } catch (e) { throw conflict(e instanceof Error ? e.message : "Invalid storage operation."); }
   if (op.type === "delete" && APPEND_ONLY_TABLES.includes(op.table)) {
     throw conflict(`Records in ${op.table} are never deleted. Record a correction instead.`);
   }
@@ -106,7 +111,13 @@ export class Tx {
     // An explicit `undefined` means "clear this field"; it travels as null
     // (JSON drops undefined) and both stores delete the key on null.
     const patch: Record<string, unknown> = { updatedAt: nowIso() };
-    for (const [k, v] of Object.entries(changes)) patch[k] = v === undefined ? null : v;
+    for (const [k, v] of Object.entries(changes)) {
+      if (["id", "orgId", "createdAt", "version"].includes(k)) {
+        if ((current as unknown as Record<string, unknown>)[k] === v) continue;
+        throw conflict("Record identity and ownership cannot be changed.");
+      }
+      patch[k] = v === undefined ? null : v;
+    }
     this.ops.push({ type: "patch", table, id: current.id, expectedVersion: current.version, patch: clean(patch) });
     return applyPatch(current as unknown as Row, patch) as unknown as Tables[K] & { version: number };
   }

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { PLATFORM_TABLES, APPEND_ONLY, physical } from "./platformTables";
+import { validatePatch, validateRecord } from "./platformIntegrity";
 
 /**
  * Server-to-server document API for the AgenticBots platform.
@@ -122,8 +123,10 @@ export const commit = mutation({
         .unique()) as Row | null;
 
       if (op.type === "insert") {
-        if (existing) throw new Error(`Duplicate id in ${op.table}`);
+        if (existing) throw new Error(`CONFLICT: Duplicate id in ${op.table}`);
         const doc = op.doc as Record<string, unknown>;
+        validateRecord(op.table, op.id, doc);
+        if (doc.version !== 1) throw new Error("New records must start at version 1.");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await ctx.db.insert(t as any, {
           pid: op.id,
@@ -137,12 +140,14 @@ export const commit = mutation({
         if (existing.version !== op.expectedVersion) {
           throw new Error("CONFLICT: This record was changed by someone else. Reload and try again.");
         }
+        validatePatch(op.table, op.patch ?? {}, existing.doc);
         const next: Record<string, unknown> = { ...existing.doc };
         for (const [k, val] of Object.entries((op.patch ?? {}) as Record<string, unknown>)) {
           if (val === null) delete next[k];
           else next[k] = val;
         }
         next.version = existing.version + 1;
+        validateRecord(op.table, op.id, next);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await ctx.db.patch(existing._id as any, { doc: next, version: existing.version + 1 } as any);
       } else {

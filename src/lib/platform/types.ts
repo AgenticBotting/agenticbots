@@ -43,8 +43,13 @@ export interface User extends Base {
   status: "active" | "invited" | "disabled";
   /** Set for AgenticBots staff only. */
   platformRole?: PlatformRole;
-  /** Operators may be limited to specific organizations. Empty / absent = all. */
+  /** An explicit list limits an operator; an empty list grants no tenant access. */
   operatorOrgIds?: ID[];
+  /** All tenants only when explicitly granted and no restricted list is set. */
+  operatorAllOrgs?: boolean;
+  termsAcceptedAt?: ISODate;
+  termsVersion?: string;
+  privacyVersion?: string;
   lastLoginAt?: ISODate;
   /** One-time set-password token (sha256 hex) and expiry. */
   inviteTokenHash?: string;
@@ -63,6 +68,7 @@ export interface Session extends Base {
   expiresAt: ISODate;
   revokedAt?: ISODate;
   userAgent?: string;
+  mfaVerifiedAt?: ISODate;
 }
 
 /* ─────────────────────────── Organizations ────────────────────────── */
@@ -321,7 +327,7 @@ export interface Approval extends Tenanted {
   runId?: ID;
   requestId?: ID;
   /** runtime = the run is parked waiting on this decision.
-   *  deliverable = the Bot finished drafting; approving starts the execution run. */
+   *  deliverable = review acceptance only; execution requires a separate exact runtime approval. */
   kind: "runtime" | "deliverable";
   category: ApprovalCategory;
   title: string;
@@ -340,6 +346,9 @@ export interface Approval extends Tenanted {
   resolutionNote?: string;
   /** Runtime approval request id. Operator-only. */
   runtimeApprovalId?: string;
+  /** Decision is committed before dispatch; uncertain dispatch is never retried blindly. */
+  executionState?: "not_applicable" | "dispatching" | "acknowledged" | "unknown";
+  executionError?: string;
 }
 
 /* ───────────────────────────── Requests ───────────────────────────── */
@@ -751,6 +760,8 @@ export interface AuditLog extends Base {
 }
 
 export interface ProcessedWebhook extends Base {
+  status?: "processing" | "completed" | "failed";
+  runId?: ID;
   source: string;
   externalId: string;
   orgId?: ID;
@@ -758,7 +769,52 @@ export interface ProcessedWebhook extends Base {
 
 /* ─────────────────────────── Table registry ───────────────────────── */
 
+export interface Passkey extends Base {
+  userId: ID;
+  credentialId: string;
+  /** Public verification key only; private keys never leave the authenticator. */
+  publicKey: string;
+  counter: number;
+  transports: string[];
+}
+export interface AuthChallenge extends Base {
+  userId: ID;
+  sessionId: ID;
+  purpose: "register" | "authenticate";
+  challenge: string;
+  expiresAt: ISODate;
+  usedAt?: ISODate;
+}
+export interface SecurityCounter extends Base {
+  count: number;
+  expiresAt: ISODate;
+}
+export interface OperationLease extends Base {
+  cursor?: string;
+  holder: string;
+  expiresAt: ISODate;
+  completedAt?: ISODate;
+}
+
+export interface PrivacyCase extends Base {
+  orgId?: ID;
+  subjectUserId?: ID;
+  contactEmail: string;
+  kind: "access" | "correct" | "delete" | "opt_out" | "cancel";
+  details: string;
+  status: "received" | "verified" | "completed" | "declined";
+  dueAt: ISODate;
+  verifiedAt?: ISODate;
+  resolvedAt?: ISODate;
+  resolution?: string;
+}
+
 export interface Tables extends ProspectingTables {
+  privacy_cases: PrivacyCase;
+  passkeys: Passkey;
+  auth_challenges: AuthChallenge;
+  security_counters: SecurityCounter;
+  operation_leases: OperationLease;
   users: User;
   memberships: Membership;
   sessions: Session;
@@ -793,6 +849,7 @@ export interface Tables extends ProspectingTables {
 export type TableName = keyof Tables;
 
 export const TABLE_NAMES: readonly TableName[] = [
+  "privacy_cases", "security_counters", "operation_leases", "passkeys", "auth_challenges",
   "users", "memberships", "sessions", "organizations", "bots", "skill_assignments",
   "runtimes", "deployment_events", "runs", "run_events", "conversations",
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",

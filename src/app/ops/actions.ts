@@ -434,6 +434,8 @@ export const inviteUserAction: A = async (_p, f) =>
       name: str(f, "name"),
       platformRole: (opt(f, "platformRole") as "operator" | "superadmin" | undefined) ?? undefined,
       orgId: opt(f, "orgId"),
+      operatorAllOrgs: f.get("operatorAllOrgs") === "yes",
+      operatorOrgIds: f.getAll("operatorOrgIds").map(String),
       clientRole: (opt(f, "clientRole") as "client_admin" | "client_member" | undefined) ?? undefined,
     });
     return { ok: true, message: `Invitation created for ${res.user.email}. Send them this one-time link (valid 7 days):`, link: res.setPasswordPath };
@@ -486,3 +488,8 @@ export async function logoutAction() {
   await destroySession();
   redirect("/login");
 }
+
+export const setOperatorScopeAction: A = async (_p, f) => act(async () => {
+  await accounts.setOperatorScope(await repo(), await requireActor(), str(f, "userId"), f.get("operatorAllOrgs") === "yes", f.getAll("operatorOrgIds").map(String));
+  return "Client access updated and existing sessions revoked.";
+});

@@ -11,8 +11,10 @@ import type { ClientRole, ID, Membership, PlatformRole, User } from "@/lib/platf
  *   client_member  their organization's portal, read + submit requests
  */
 export interface Actor {
-  user: Pick<User, "id" | "email" | "name" | "status" | "platformRole" | "operatorOrgIds">;
+  user: Pick<User, "id" | "email" | "name" | "status" | "platformRole" | "operatorOrgIds" | "operatorAllOrgs">;
   platformRole?: PlatformRole;
+  /** Present only on authenticated HTTP actors; CLI principals use their separate trust boundary. */
+  authenticatedAt?: string;
   memberships: Pick<Membership, "orgId" | "role">[];
 }
 
@@ -86,7 +88,7 @@ export function isStaff(actor: Actor | null): boolean {
 export function operatorCoversOrg(actor: Actor, orgId: ID): boolean {
   if (actor.platformRole === "superadmin") return true;
   const scope = actor.user.operatorOrgIds;
-  return !scope || scope.length === 0 || scope.includes(orgId);
+  return scope ? scope.includes(orgId) : actor.user.operatorAllOrgs === true;
 }
 
 /**
@@ -98,6 +100,7 @@ export function can(actor: Actor | null, permission: Permission, orgId?: ID): bo
 
   if (permission.startsWith("ops.")) {
     if (!actor.platformRole) return false;
+    if (actor.authenticatedAt && !["ops.view", "ops.audit.read", "ops.billing.read", "ops.prospecting.view"].includes(permission) && (!Number.isFinite(Date.parse(actor.authenticatedAt)) || Date.now() - Date.parse(actor.authenticatedAt) > 15 * 60_000)) return false;
     if (SUPERADMIN_ONLY.has(permission)) return actor.platformRole === "superadmin";
     if (!OPERATOR.has(permission)) return false;
     return orgId === undefined ? true : operatorCoversOrg(actor, orgId);

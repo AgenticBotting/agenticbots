@@ -160,6 +160,7 @@ function buildBundle(version = process.env.RUNTIME_BUNDLE_VERSION ?? "1.0.0"): s
   mkdirSync(join(out, "skills"), { recursive: true });
   cpSync(join(ROOT, "infra/runtime/docker-compose.yml"), join(out, "docker-compose.yml"));
   cpSync(join(ROOT, "infra/runtime/lifecycle.sh"), join(out, "lifecycle.sh"));
+  cpSync(join(ROOT, "infra/runtime/network-guard.sh"), join(out, "network-guard.sh"));
   cpSync(join(ROOT, "infra/runtime/config"), join(out, "config"), { recursive: true });
   for (const s of SKILLS) cpSync(join(ROOT, "runtime/skills", s.key), join(out, "skills", s.key), { recursive: true });
   // Per-profile skill lists: least capability — only each Bot's default skills.

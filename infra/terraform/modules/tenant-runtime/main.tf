@@ -237,7 +237,7 @@ resource "aws_instance" "runtime" {
 
   metadata_options {
     http_tokens                 = "required" # IMDSv2 only
-    http_put_response_hop_limit = 2          # containers may need it
+    http_put_response_hop_limit = 1          # instance credentials are host-only
     http_endpoint               = "enabled"
   }
 
@@ -269,6 +269,10 @@ resource "aws_instance" "runtime" {
     # The AMI updates constantly; replacing a runtime is a deliberate act
     # (see docs/runbooks/RESTORE_CLIENT_RUNTIME.md), not a plan side effect.
     ignore_changes = [ami, user_data]
+    precondition {
+      condition     = var.environment != "prod" || can(regex("^arn:aws:sns:", var.alarm_topic_arn))
+      error_message = "Production runtimes require an alarm notification topic with a tested subscription."
+    }
   }
 }
 

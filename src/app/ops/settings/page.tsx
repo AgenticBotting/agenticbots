@@ -18,9 +18,12 @@ export default async function SettingsPage() {
   const [users, providers] = await Promise.all([r.list("users", { order: "asc" }), r.list("provider_configurations")]);
   const staff = users.filter((u) => u.platformRole);
   const superadmin = can(actor, "ops.users.manage");
+  const organizations = superadmin ? await r.list("organizations") : [];
+  const scopeChoices = <><label className="pf-label"><span><input type="checkbox" name="operatorAllOrgs" value="yes" /> Explicitly allow all clients</span></label><label className="pf-label">Or choose clients<select className="field" name="operatorOrgIds" multiple size={Math.min(5, Math.max(2, organizations.length))}>{organizations.map(org => <option key={org.id} value={org.id}>{org.name}</option>)}</select><span className="pf-muted">No selection grants no client access. All clients and a selection cannot be combined.</span></label></>;
   return (
     <>
       <PageHead title="Platform settings" description="Manage model routes, operating defaults and your team. Client-specific settings live in each client workspace." />
+      {can(actor, "ops.settings.manage") && <p className="mb-5"><a href="/ops/privacy" className="underline">Open privacy & cancellation request desk</a></p>}
       <nav className="oc-steps" aria-label="Settings sections"><a href="#environment"><span className="n">01 · Operations</span><strong>Environment</strong><p>Runtime, storage and billing defaults.</p></a><a href="#models"><span className="n">02 · Intelligence</span><strong>Model providers</strong><p>Model catalog and cost estimates.</p></a><a href="#team"><span className="n">03 · Access</span><strong>Your team</strong><p>Staff accounts and invitations.</p></a></nav>
       <div className="pf-grid pf-grid-2">
         <Panel title="Environment" id="environment">
@@ -83,11 +86,18 @@ export default async function SettingsPage() {
                 <label className="pf-label">Email<input name="email" type="email" className="field" required /></label>
               </div>
               <label className="pf-label">Role<select name="platformRole" className="field"><option value="operator">Operator — daily operations</option><option value="superadmin">Superadmin — everything, including users and destroy</option></select></label>
+              {scopeChoices}
               <div><SubmitButton variant="outline">Create invitation</SubmitButton></div>
             </ActionForm>
           </Panel>
         )}
       </div>
+      {superadmin && <Panel title="Operator client access" sub="Scope changes revoke active sessions. Explicit client selections take priority over an all-client grant.">
+        {staff.filter(u => u.platformRole === "operator").map(u => <ActionForm key={u.id} action={A.setOperatorScopeAction} hidden={{ userId: u.id }} className="mt-5">
+          <h3>{u.name}</h3><p className="pf-small">Current access: {u.operatorOrgIds ? `${u.operatorOrgIds.length} selected clients` : u.operatorAllOrgs ? "All clients" : "No clients"}</p>
+          {scopeChoices}<SubmitButton variant="outline">Replace client access</SubmitButton>
+        </ActionForm>)}
+      </Panel>}
     </>
   );
 }

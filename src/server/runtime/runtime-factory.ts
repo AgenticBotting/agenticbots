@@ -5,7 +5,7 @@ import type { RuntimeConnection, RuntimeProvider } from "./runtime-types";
 import { DemoRuntimeAdapter } from "./demo/DemoRuntimeAdapter";
 import { HermesRuntimeAdapter } from "./hermes/HermesRuntimeAdapter";
 import { awsControl } from "@/server/aws/control";
-import { isDemo } from "@/server/env";
+import { isDemo, platformMode } from "@/server/env";
 import { RuntimeAuthenticationError, RuntimeUnavailableError } from "./runtime-errors";
 
 /**
@@ -63,7 +63,7 @@ interface EndpointSecret {
  *  RUNTIME_DEV_TARGETS='{"<runtimeId>":{"baseUrl":"http://127.0.0.1:<port>","keys":{"seo":"..."}}}' */
 function devTargets(): Record<string, { baseUrl: string; keys: Record<string, string> }> | null {
   const raw = process.env.RUNTIME_DEV_TARGETS;
-  if (!raw || process.env.PLATFORM_ENV === "production") return null;
+  if (!raw || platformMode() === "production") return null;
   try {
     return JSON.parse(raw);
   } catch {
@@ -90,15 +90,24 @@ export async function resolveRuntimeConnection(
     const profile = bot?.runtimeProfile ?? "default";
     const apiKey = dev.keys[profile] ?? dev.keys.default;
     if (!apiKey) throw new RuntimeAuthenticationError(`No dev key for Bot ${profile}`);
-    return { ...base, endpoint: dev.baseUrl, credentials: { apiKey } };
+    const url = new URL(dev.baseUrl);
+    if (!["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) || url.protocol !== "http:" || url.username || url.password) throw new RuntimeAuthenticationError("Development runtime targets must be loopback HTTP endpoints.");
+    return { ...base, endpoint: url.origin, credentials: { apiKey } };
   }
   if (!runtime.endpointRef) throw new RuntimeUnavailableError("Runtime endpoint is not registered");
+  const expectedEnvironment = platformMode() === "production" ? "prod" : "staging";
+  const match = runtime.endpointRef.match(/^agenticbots\/(prod|staging)\/tenants\/([a-z0-9-]+)\/runtime$/);
+  if (!match || match[1] !== expectedEnvironment) throw new RuntimeAuthenticationError("Invalid runtime credential namespace");
+  const profilePrefix = runtime.endpointRef.replace(/\/runtime$/, "/profiles/");
+  if (bot && (!/^[a-z0-9_-]{1,80}$/.test(bot.runtimeProfile) || (bot.credentialRef && bot.credentialRef !== `${profilePrefix}${bot.runtimeProfile}`))) throw new RuntimeAuthenticationError("Invalid Bot credential namespace");
   const aws = awsControl();
   const ep = await aws.getSecretJson<EndpointSecret>(runtime.endpointRef);
   // Bot calls use that Bot's own key; runtime-level calls use the default key.
   const keyRef = bot?.credentialRef ?? (bot ? `${runtime.endpointRef.replace(/\/runtime$/, "")}/profiles/${bot.runtimeProfile}` : undefined);
   const apiKey = keyRef ? (await aws.getSecretJson<{ apiKey: string }>(keyRef)).apiKey : ep.defaultProfileKey;
-  if (!ep.baseUrl || !apiKey) throw new RuntimeAuthenticationError("Runtime credentials incomplete");
+  if (!ep.baseUrl || !apiKey || !ep.accessClientId || !ep.accessClientSecret) throw new RuntimeAuthenticationError("Runtime credentials incomplete");
+  const endpoint = new URL(ep.baseUrl);
+  if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password || endpoint.pathname !== "/" || endpoint.search || endpoint.hash) throw new RuntimeAuthenticationError("Runtime endpoint must be a private HTTPS origin");
   return {
     ...base,
     endpoint: ep.baseUrl,

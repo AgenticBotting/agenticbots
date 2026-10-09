@@ -9,6 +9,7 @@
  * deployment.
  */
 export const PLATFORM_TABLES = [
+  "privacy_cases", "security_counters", "operation_leases", "passkeys", "auth_challenges",
   "users", "memberships", "sessions", "organizations", "bots", "skill_assignments",
   "runtimes", "deployment_events", "runs", "run_events", "conversations",
   "activity_events", "approvals", "requests", "automation_jobs", "integrations",

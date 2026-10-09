@@ -14,6 +14,7 @@ export type PlatformMode = "demo" | "staging" | "production";
 
 export function platformMode(): PlatformMode {
   if (isTrue(process.env.DEMO_MODE)) return "demo";
+  if (process.env.PLATFORM_ENV && !["staging", "production"].includes(process.env.PLATFORM_ENV)) throw new Error("Invalid PLATFORM_ENV. Use staging or production; demo requires DEMO_MODE=true.");
   return process.env.PLATFORM_ENV === "staging" ? "staging" : "production";
 }
 
@@ -58,6 +59,6 @@ export function intEnv(name: string, fallback: number): number {
 /** Which backing store the platform uses. */
 export function storeKind(): "memory" | "convex" {
   if (isDemo()) return "memory";
-  if (process.env.PLATFORM_STORE === "memory") return "memory";
+  if (process.env.PLATFORM_STORE === "memory") throw new Error("In-memory storage is permitted only in demo mode.");
   return "convex";
 }
