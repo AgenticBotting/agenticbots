@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { agenticSearchTitle } from "@/lib/search-positioning";
-import { searchRobots } from "@/lib/search-publication";
+import { SEARCH_PUBLICATION, searchRobots } from "@/lib/search-publication";
 import { IndustryLinks } from "@/components/marketing/IndustryExperience";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
@@ -11,7 +11,12 @@ import { getCity, nearbyCities } from "@/lib/geo/data";
 import { ALL_CITIES, getDatasetCity, getDatasetState, isEnriched } from "@/lib/geo/dataset";
 
 type Params = { params: Promise<{ state: string; city: string }> };
-export function generateStaticParams() { return ALL_CITIES.map(city => ({ state: city.state_slug, city: city.city_slug })); }
+export function generateStaticParams() {
+  return Object.keys(SEARCH_PUBLICATION).flatMap((path) => {
+    const match = path.match(/^\/markets\/([^/]+)\/([^/]+)$/);
+    return match && match[1] !== "region" ? [{ state: match[1], city: match[2] }] : [];
+  });
+}
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { state, city } = await params;
   const rec = getDatasetCity(state, city);

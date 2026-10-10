@@ -4,6 +4,12 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Latest preview deployment update — 2026-10-10
+
+`platform-v1` was pushed through `2d60efe` and the connected Vercel project started a preview. That preview compiled successfully but failed after 18 minutes because Vercel's Next adapter had already relocated `.next/server/app/sitemap/*.body` before the npm `postbuild` artifact gate ran. The release did not reach Ready and no production alias changed.
+
+The deployment fix now prerenders only editorially approved service/state, service/city and market/city acquisition routes; every other validated destination remains a dynamic on-demand route. The production build fell from 14,124 to 1,056 generated pages and completed locally in about 30 seconds. Local artifact gates still inspect the real `.next` output; Vercel defers those artifact checks to GitHub CI, and CI now runs for pushes on every branch. Validation: typecheck, lint (zero errors/five existing warnings), 270 tests and the full build passed; link, SEO, topic and search-publication gates covered 1,009 prerendered routes and all 584 approved indexable routes. Commit and the replacement Vercel preview are the next steps.
+
 ## Non-course security remediation — 2026-10-09
 
 After the audit below, the owner asked for non-course fixes and confirmed that nothing is live. Read **[SECURITY_REMEDIATION_STATUS.md](SECURITY_REMEDIATION_STATUS.md)** for each finding's current status and **[PRIVACY_AND_SECURITY_OPERATIONS.md](runbooks/PRIVACY_AND_SECURITY_OPERATIONS.md)** for manual handling. Source changes include staff passkeys, immutable audit records, shared rate limits and replay claims, hard opt-outs, tenant/env credential checks, security headers, privacy/cancellation requests, the revised notices, IAM/runtime hardening and CI scans. Production dependency audit is clear; one dev-only lint advisory is under a narrow expiring exception. Live BOT execution and real outbound remain blocked until spend and exact-action approvals are verified. No cloud changes or real messages were made. The course purchase/auth flow remains deferred and must not launch.

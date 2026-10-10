@@ -1,5 +1,13 @@
 # Deployment readiness audit — first AWS staging test
 
+> **Vercel preview note, 2026-10-10:** The first `platform-v1` preview compiled
+> but failed in npm `postbuild` after Vercel relocated Next's prerendered
+> artifacts. Artifact gates now run locally and in GitHub CI for every branch
+> push, while Vercel skips the duplicate post-relocation inspection. Only the
+> 584 explicitly approved acquisition routes are candidates for geography
+> prerendering; other valid local routes render on demand. The local production
+> build now generates 1,056 pages instead of 14,124 and passed every gate.
+
 > **Later prelaunch review, 2026-10-09:** See `SECURITY_LEGAL_AUDIT_2026-10-09.md`. The statuses below describe the earlier staging implementation, not current enterprise security/legal clearance. New findings remain open, including environment scoping of lifecycle IAM, approval ordering, storage integrity, abuse controls and production configuration. No cloud deployment was performed by the later audit.
 
 _Audited 2026-10-03 on branch `platform-v1`. Scope: what it takes to run ONE

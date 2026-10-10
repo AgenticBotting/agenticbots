@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import IndustryIndex from "@/app/industries/page";
 import IndustryPage, { generateMetadata as industryMetadata, generateStaticParams as industryParams } from "@/app/industries/[industry]/page";
 import IndustryServicePage, { generateMetadata as channelMetadata, generateStaticParams as channelParams } from "@/app/industries/[industry]/[service]/page";
-import CityServicePage from "@/app/services/[slug]/[state]/[city]/page";
+import CityServicePage, { generateStaticParams as cityServiceParams } from "@/app/services/[slug]/[state]/[city]/page";
+import { generateStaticParams as stateServiceParams } from "@/app/services/[slug]/[state]/page";
 import sitemap from "@/app/sitemap";
 import { ALL_SERVICES } from "@/lib/catalog";
 import { ALL_CITIES, ALL_STATES } from "@/lib/geo/dataset";
@@ -55,6 +56,21 @@ describe("search acquisition rollout", () => {
     const urls = await sitemap({ id: 1 });
     expect(urls.map(url => new URL(url.url).pathname).sort()).toEqual(entries.map(([path]) => path).sort());
     for (const entry of urls) expect(entry.lastModified).toBe(SEARCH_PUBLICATION[new URL(entry.url).pathname].updated);
+  });
+
+  it("prerenders approved service geography while leaving the wider matrix on demand", () => {
+    const paths = Object.keys(SEARCH_PUBLICATION);
+    const expectedCities = paths.flatMap(path => {
+      const match = path.match(/^\/services\/([^/]+)\/([^/]+)\/([^/]+)$/);
+      return match ? [{ slug: match[1], state: match[2], city: match[3] }] : [];
+    });
+    const expectedStates = paths.flatMap(path => {
+      const match = path.match(/^\/services\/([^/]+)\/([^/]+)$/);
+      return match ? [{ slug: match[1], state: match[2] }] : [];
+    });
+    expect(cityServiceParams()).toEqual(expectedCities);
+    expect(stateServiceParams()).toEqual(expectedStates);
+    expect(cityServiceParams().length).toBeLessThan(ALL_SERVICES.length * ALL_CITIES.length);
   });
 
   it("renders all trade journeys with unique buying guidance, real scope and proposal paths", async () => {

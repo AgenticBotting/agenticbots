@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getSearchPositioning, serviceSearchTitle, serviceSearchDescription } from "@/lib/search-positioning";
-import { searchRobots } from "@/lib/search-publication";
+import { SEARCH_PUBLICATION, searchRobots } from "@/lib/search-publication";
 import { IndustryLinks } from "@/components/marketing/IndustryExperience";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,12 +22,14 @@ import { getServiceExperience } from "@/lib/service-experience";
 type Params = { params: Promise<{ slug: string; state: string; city: string }> };
 
 export function generateStaticParams() {
-  /* Every service × every city in the national dataset — the internal
-     links from city hubs land on a real service+city variation for all
-     924 markets, not just the enriched set. */
-  return ALL_SERVICES.flatMap((s) =>
-    ALL_CITIES.map((c) => ({ slug: s.serviceSlug, state: c.state_slug, city: c.city_slug }))
-  );
+  /* Prerender only editorially approved acquisition pages. Every other
+     validated service/city destination remains available on demand, so
+     internal city links still resolve without making each deployment
+     rebuild the full service x city matrix. */
+  return Object.keys(SEARCH_PUBLICATION).flatMap((path) => {
+    const match = path.match(/^\/services\/([^/]+)\/([^/]+)\/([^/]+)$/);
+    return match ? [{ slug: match[1], state: match[2], city: match[3] }] : [];
+  });
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

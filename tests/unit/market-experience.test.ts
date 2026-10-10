@@ -11,6 +11,7 @@ import { getLocalSearchBrief } from "@/lib/local-search-briefs";
 import { getCity } from "@/lib/geo/data";
 import { MARKET_PRIORITIES, cityMarketGroups, metroLabel, filterMarketGroups, type MarketGroup } from "@/lib/market-experience";
 import { MarketWorkspace } from "@/components/marketing/MarketWorkspace";
+import { SEARCH_PUBLICATION } from "@/lib/search-publication";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/markets", notFound: () => { throw new Error("not found"); } }));
 const groups: MarketGroup[] = [
@@ -53,7 +54,14 @@ describe("geographic buying journey", () => {
     for (const city of allCitiesInState("florida")) expect(florida).toContain(`href="/markets/florida/${city.city_slug}"`);
     for (const svc of ALL_SERVICES) expect(florida).toContain(`href="/services/${svc.serviceSlug}/florida"`);
     expect(stateParams()).toHaveLength(ALL_STATES.length);
-    expect(cityParams()).toHaveLength(ALL_CITIES.length);
+    const publishedCities = Object.keys(SEARCH_PUBLICATION)
+      .filter(path => /^\/markets\/(?!region\/)[^/]+\/[^/]+$/.test(path))
+      .map(path => {
+        const [, , state, city] = path.split("/");
+        return { state, city };
+      });
+    expect(cityParams()).toEqual(publishedCities);
+    expect(cityParams().length).toBeLessThan(ALL_CITIES.length);
   });
 
   it("preserves enriched local content, every city-service link and nearby navigation", async () => {

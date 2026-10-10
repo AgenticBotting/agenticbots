@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "prebuild": "node scripts/pseo-gate.mjs",
-    "postbuild": "node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs && node scripts/search-publication-gate.mjs",
+    "postbuild": "node scripts/postbuild-gates.mjs",
     "gates": "npm run prebuild && node scripts/link-integrity.mjs && node scripts/seo-checks.mjs && node scripts/topic-gate.mjs && node scripts/search-publication-gate.mjs",
     "ops": "tsx --conditions=react-server --tsconfig tsconfig.json ops/cli.ts",
     "ops:staging": "node scripts/with-env.mjs .env.staging -- tsx --conditions=react-server --tsconfig tsconfig.json ops/cli.ts",

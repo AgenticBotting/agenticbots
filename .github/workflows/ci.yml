@@ -3,7 +3,7 @@
 #   npm run test:e2e · terraform validate · docker compose config
 name: ci
 on:
-  push: { branches: [main] }
+  push: {}
   pull_request:
 
 permissions:

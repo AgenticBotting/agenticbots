@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getSearchPositioning, serviceSearchTitle, serviceSearchDescription } from "@/lib/search-positioning";
-import { searchRobots } from "@/lib/search-publication";
+import { SEARCH_PUBLICATION, searchRobots } from "@/lib/search-publication";
 import { IndustryLinks } from "@/components/marketing/IndustryExperience";
 import { MarketCoverage } from "@/components/marketing/MarketExperience";
 import { cityMarketGroups } from "@/lib/market-experience";
@@ -11,14 +11,17 @@ import { Container } from "@/components/ui";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { ServiceHero, ServiceBuyerBrief, ServiceBenefits, ServiceScope, ServiceConnections, ServiceDelivery, ServiceAudit } from "@/components/marketing/ServiceExperience";
 import { JsonLd, serviceLd, breadcrumbLd, faqLd } from "@/components/JsonLd";
-import { ALL_SERVICES, getService } from "@/lib/catalog";
-import { ALL_STATES, allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
+import { getService } from "@/lib/catalog";
+import { allCitiesInState, getDatasetState } from "@/lib/geo/dataset";
 import { getServicePositioning } from "@/lib/service-positioning";
 
 type Params = { params: Promise<{ slug: string; state: string }> };
 
 export function generateStaticParams() {
-  return ALL_SERVICES.flatMap((s) => ALL_STATES.map((st) => ({ slug: s.serviceSlug, state: st.slug })));
+  return Object.keys(SEARCH_PUBLICATION).flatMap((path) => {
+    const match = path.match(/^\/services\/([^/]+)\/([^/]+)$/);
+    return match ? [{ slug: match[1], state: match[2] }] : [];
+  });
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
