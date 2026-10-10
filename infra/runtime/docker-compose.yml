@@ -20,7 +20,6 @@ services:
     # The pinned upstream s6 bootstrap requires root, then drops service
     # processes to UID 10000. Do not force --user and break that bootstrap.
     # A fully read-only/custom non-root image remains a staging release gate.
-    pids_limit: 256
     restart: unless-stopped
     command: ["gateway", "run"]
     env_file:
@@ -49,6 +48,7 @@ services:
         limits:
           cpus: "1.75"
           memory: 3200M
+          pids: 256
     cap_drop: [ALL]
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID, KILL]
     security_opt:

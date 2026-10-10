@@ -31,7 +31,8 @@ flowchart LR
   subgraph AWS["AWS — one EC2 per client"]
     SSM[Systems Manager<br/>lifecycle document]
     SM[Secrets Manager<br/>agenticbots/prod/tenants/*]
-    EC2[EC2 + encrypted EBS]
+    NAT[Outbound NAT gateway]
+    EC2[Private-subnet EC2 + encrypted EBS]
     CW[CloudWatch]
   end
   CF[Cloudflare Tunnel + Access]
@@ -43,6 +44,7 @@ flowchart LR
   SVC --> DB
   SVC --> RA
   RA -- HTTPS + service token + Bot key --> CF --> EC2
+  EC2 --> NAT
   SVC --> AWSC --> SSM --> EC2
   AWSC --> SM
   AWSC --> CW
@@ -106,6 +108,9 @@ flowchart TB
 
 - One EC2, one engine deployment, one KMS key and one IAM role per client.
   Unrelated clients never share an engine.
+- Runtime instances have no public IPs and no inbound security-group rules.
+  They reach AWS APIs, model providers and the outbound tunnel through a NAT
+  gateway; Systems Manager handles administration.
 - In the database every tenant record carries `orgId` (indexed). The service
   layer loads a record, then proves `can(actor, …, record.orgId)`; a record
   from another tenant is reported as **not found** (URL-id probing reveals

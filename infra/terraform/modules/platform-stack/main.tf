@@ -96,6 +96,48 @@ module "backups" {
   tags           = local.tags
 }
 
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "control_plane_key" {
+  statement {
+    sid       = "AccountAdministersKeyViaIam"
+    actions   = ["kms:*"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid       = "AllowEncryptedAlarmDelivery"
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey*"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com", "sns.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_kms_key" "control_plane" {
+  description             = "AgenticBots ${var.environment} runtime artifacts and alarm messages"
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  policy                  = data.aws_iam_policy_document.control_plane_key.json
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "control_plane" {
+  name          = "alias/agenticbots-${var.environment}-control-plane"
+  target_key_id = aws_kms_key.control_plane.key_id
+}
+
 resource "aws_s3_bucket" "artifacts" {
   bucket = var.artifact_bucket
   tags   = local.tags
@@ -112,7 +154,11 @@ resource "aws_s3_bucket_public_access_block" "artifacts" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "artifacts" {
   bucket = aws_s3_bucket.artifacts.id
   rule {
-    apply_server_side_encryption_by_default { sse_algorithm = "aws:kms" }
+    bucket_key_enabled = true
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.control_plane.arn
+      sse_algorithm     = "aws:kms"
+    }
   }
 }
 
@@ -122,8 +168,9 @@ resource "aws_s3_bucket_versioning" "artifacts" {
 }
 
 resource "aws_sns_topic" "alarms" {
-  name = "agenticbots-${var.environment}-alarms"
-  tags = local.tags
+  name              = "agenticbots-${var.environment}-alarms"
+  kms_master_key_id = aws_kms_key.control_plane.arn
+  tags              = local.tags
 }
 
 resource "aws_sns_topic_subscription" "email" {
@@ -147,6 +194,7 @@ module "tenant" {
   default_model          = var.default_model
   runtime_bundle_version = each.value.bundle_version
   artifact_bucket        = aws_s3_bucket.artifacts.bucket
+  artifact_kms_key_arn   = aws_kms_key.control_plane.arn
   vpc_id                 = module.network.vpc_id
   subnet_id              = module.network.subnet_ids[0]
   alarm_topic_arn        = aws_sns_topic.alarms.arn

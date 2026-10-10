@@ -65,6 +65,10 @@ variable "artifact_bucket" {
   description = "S3 bucket holding the runtime bundle (compose file, lifecycle script, skills)."
   type        = string
 }
+variable "artifact_kms_key_arn" {
+  description = "Customer-managed KMS key that encrypts the runtime bundle bucket."
+  type        = string
+}
 variable "alarm_topic_arn" {
   type    = string
   default = ""

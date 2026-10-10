@@ -368,11 +368,11 @@ overrides `.env.local` (where demo mode lives).
 | A model provider key (OpenRouter recommended) with a little credit | The Bot needs a model | You |
 | A separate Convex project "agenticbots-staging" | Keeps staging data out of production | You |
 
-Estimated staging cost while it runs: about $1.25–1.50/day. The t3.medium
-is about $1/day; the public IPv4 address, 20 GB volume, KMS key, secrets,
-detailed monitoring and snapshots make up the rest. Model usage is billed by
-the provider (a test run costs cents). Stop or destroy the test runtime when
-finished.
+Staging incurs AWS compute, encrypted storage, backups, KMS, Secrets Manager,
+detailed monitoring and NAT gateway charges, plus model-provider usage and the
+runtime domain. Prices change; review the current estimates and create budget
+alerts immediately before the first authorized apply. Stop or destroy staging
+resources when the test is complete.
 
 ## Verification performed for this change
 
@@ -392,3 +392,19 @@ finished.
 The console redesign now persists versioned operating drafts and append-only runtime health samples. Check attempts and successful heartbeats are separate, and stale observations no longer appear healthy. This improves monitoring evidence but does not change the single-runtime availability topology or prove live deployment. New `operating_drafts` and `runtime_health_samples` tables must be deployed with the application after authorization.
 
 Owner-approved direction: standard isolation plus optional HA, with support diagnoses and change plans requiring human execution approval. See `OPERATOR_PLATFORM_STATUS.md` for implemented behavior and `ENTERPRISE_RELIABILITY_PLAN.md` for the staging, durable-work, monitoring, restore and HA release gates. Existing live-staging blockers above remain.
+
+## Vercel preview and infrastructure validation update — 2026-10-10
+
+The `platform-v1` branch is pushed and its replacement Vercel preview is Ready.
+The original 18-minute failure was caused by prerendering more than 12,000
+noindex combinations and then inspecting a sitemap artifact after Vercel's
+adapter moved it. Approved acquisition pages are now prerendered, long-tail
+pages render on demand, and the preview completes in about two minutes.
+
+The first branch CI run exposed infrastructure-definition issues before any
+AWS apply: public runtime subnet addressing, provider-managed encryption on the
+artifact bucket, an unencrypted alarm topic, and conflicting Compose PID-limit
+fields. Terraform now defines private runtime subnets behind outbound NAT, a
+rotating customer-managed key for artifacts and alarms, and one Compose PID
+limit. Terraform 1.9.8 validates the production root module with AWS provider
+6.68.0. No AWS resources were created or changed.

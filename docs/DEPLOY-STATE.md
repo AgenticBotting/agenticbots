@@ -1,78 +1,75 @@
 # Where things stand — deployment
 
-_Last updated: Sept 8 2026_
+_Last updated: October 10, 2026_
 
-## Live
+## Current verified deployment
 
-**Production URL:** https://agenticbots-lc3b68qbk-lot-sealers-projects.vercel.app
-Status: Ready · 4,923 pages · ~8 min build on Vercel.
+**Branch:** `platform-v1`
 
-**Every URL currently 302s to Vercel SSO.** That is Deployment Protection,
-on by default for new projects. Turn it off to make the site public:
-Vercel → agenticbots → Settings → Deployment Protection → Vercel
-Authentication → Disabled.
+**Vercel project:** `agenticbots`
 
-## Where it lives, and why
+**Vercel scope:** `agentic-bots-projects`
 
-| | |
-|---|---|
-| GitHub | `AgenticBotting/agenticbots` (private), pushed via SSH deploy key |
-| Vercel project | `agenticbots` |
-| Vercel scope | `lot-sealers-projects` |
-| Vercel login | `info-38951386` |
+**Verified preview:**
+`https://agenticbots-j7bblgl6i-agentic-bots-projects.vercel.app`
 
-The Vercel scope looks wrong but is deliberate. Vercel allows one account
-per phone number, and creating a team needs a card — so a separate account
-or team was not available. A **project** gives the separation that actually
-matters: its own domain, env vars, deployments and settings, sharing only
-the billing account. Revisit if a paid plan ever happens.
+The preview reached **Ready** in about two minutes. It is protected by Vercel
+Authentication, so automated public requests receive the expected sign-in
+redirect. Authenticated checks with `vercel curl` passed for:
 
-Three accounts live on this machine and collided repeatedly during setup:
-- GitHub CLI credential → the *other* account; cannot see this private repo.
-  Solved with an SSH deploy key (`~/.ssh/id_ed25519_agenticbots`) plus the
-  `github-agenticbots` host alias in `~/.ssh/config`.
-- Vercel `login` kept authorising Lot Sealers because the browser session
-  was reused by the device flow.
-- Commits were authored `LotSealers <info@lotsealers.com>` from the global
-  git identity; rewritten to `AgenticBotting <170340097+AgenticBotting@
-  users.noreply.github.com>` before the first push. Repo-local git identity
-  is set so future commits stay correct.
+- `/` — 200, prerendered;
+- `/services/agentic-seo/florida/miami` — 200, prerendered;
+- `/services/agentic-seo/alaska/anchorage` — 200, rendered on demand;
+- `/sitemap/1.xml` — 200 XML;
+- `/ops` — 307 to `/login?next=/ops`, with private/no-store controls.
 
-## Next steps, in order
+The first preview for commit `2d60efe` took about 18 minutes and failed after
+generating 14,124 pages because the Vercel adapter moved a generated sitemap
+artifact before the npm postbuild gate read it. Commit `40c06ee` corrected the
+build strategy:
 
-1. **Disable Deployment Protection** — otherwise nobody can see the site.
-2. **Environment variables** (Vercel → Settings → Environment Variables).
-   `/api/plan` returns 502 in production when no delivery sink is
-   configured, on purpose, so a visitor is never told a lead was received
-   when it was not. At least one of:
-   - `RESEND_API_KEY` + `FROM_EMAIL` + `CONTACT_EMAIL`
-   - `MAILERLITE_API_KEY` + `MAILERLITE_GROUP_ID`
-   Plus `NEXT_PUBLIC_SITE_URL=https://agenticbots.dev`.
-   Optional analytics: `NEXT_PUBLIC_UMAMI_URL`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`,
-   `UMAMI_URL`, `UMAMI_WEBSITE_ID`. See `.env.example`.
-3. **Attach the domain** — Vercel → Settings → Domains → `agenticbots.dev`.
-4. **Connect GitHub for auto-deploy** — must be done in the dashboard
-   (Settings → Git → Connect → `AgenticBotting/agenticbots`). The CLI cannot:
-   our remote is the SSH alias `git@github-agenticbots:…`, which Vercel
-   cannot parse. Until then, deploy with `vercel deploy --yes` from this
-   directory. Alternatively point `origin` at the canonical URL first.
+- only approved search-acquisition routes are prerendered;
+- valid long-tail routes still render on demand;
+- the local/CI build remains the authoritative exact-artifact gate;
+- GitHub CI now runs on every branch push.
 
-## Cleanup still outstanding
+The same production build now completes locally in roughly 30 seconds and
+generates 1,056 routes instead of 14,124. The replacement Vercel preview took
+about two minutes.
 
-- `~/Documents/GitHub/agenticbots` — GitHub Desktop's clone of the
-  throwaway README-only history. Stale second working copy; delete it.
-  The real repo is `~/Desktop/AgenticBots`.
-- `~/.ssh/id_ed25519_agenticbots` and its `~/.ssh/config` block are in use
-  for pushes — keep them.
+## Release gate
 
-## Still open from the audit
+Production promotion waits for the current GitHub CI run to pass. CI runs the
+application build, unit tests, browser tests, Terraform formatting and
+validation, container-compose validation, shell syntax checks, and the Trivy
+secret/infrastructure scan. The preview is the reviewable release candidate;
+do not promote a failing commit.
 
-- **Service taxonomy** — `cities-dataset.json` and
-  `SERVICE-CONTENT-BLUEPRINT.md` define two different 8-service lists.
-  Mass generation of the 7,392 city×service pages stays blocked until one
-  is chosen. See `docs/SEO-ARCHITECTURE.md`.
-- **Assets** — photography, explainer video, guide PDF. See
-  `docs/ASSET-BRIEF.md`. The guide's download button promises a file that
-  nothing currently delivers.
-- **Real numbers** — ProofBar, pricing and category stats are labelled
-  illustrative until verified figures exist.
+No AWS resources have been applied. Terraform now describes private runtime
+subnets, outbound NAT, customer-managed encryption for runtime artifacts and
+alarm messages, and isolated client runtimes. Applying it requires a separate
+owner-authorized staging operation because it creates paid infrastructure.
+
+## Production configuration still required
+
+The public marketing pages can run without the private operator platform, but
+real lead delivery and the platform require environment-specific credentials.
+Configure these in Vercel rather than committing them:
+
+- `NEXT_PUBLIC_SITE_URL` for the production domain;
+- one approved lead-delivery provider configuration;
+- production database/auth secrets for `/ops` and `/portal`;
+- Vercel OIDC and the production AWS role only after the AWS staging release
+  gates pass.
+
+Analytics remains disabled unless consent-gated configuration is deliberately
+added. Model-provider, email, CRM and advertising credentials are not required
+for the marketing-site release and must not be added until their live flows
+have been approved and tested.
+
+## Source control
+
+The private GitHub repository is `AgenticBotting/agenticbots`. This working
+copy is the authoritative checkout at `~/Desktop/AgenticBots`, and its SSH
+remote uses the local `github-agenticbots` host alias. Never commit `.env`
+files, generated demo state or cloud credentials.

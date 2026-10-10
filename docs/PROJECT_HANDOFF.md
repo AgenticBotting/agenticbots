@@ -412,3 +412,23 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 * The Prospect Graph shared/private split, `ProspectGraphStore` boundary, EnrichmentRouter as the only provider caller, fail-closed budgets, the outbound policy gate, and Bot restrictions.
 * Existing AWS/Terraform staging work and the provisioning CLI safety switch.
 * Demo mode's guarantee of zero external side effects.
+
+## 22. Deployment update — 2026-10-10
+
+`platform-v1` is pushed to GitHub. Vercel preview deployment
+`agenticbots-j7bblgl6i-agentic-bots-projects.vercel.app` is Ready and its
+homepage, an approved service-city page, an on-demand long-tail page, sitemap
+and private `/ops` redirect were verified with authenticated requests.
+
+Commit `40c06ee` reduced the production build from 14,124 generated routes and
+an 18-minute failed preview to 1,056 generated routes and an approximately
+two-minute successful preview. Only approved acquisition routes are
+prerendered; other valid routes remain available on demand.
+
+The first full branch CI run passed the application build and browser tests,
+then found four infrastructure issues. The follow-up hardening keeps runtime
+instances in private subnets behind outbound NAT, encrypts artifacts and SNS
+alarm messages with a rotating customer-managed KMS key, gives runtime roles
+decrypt access only to that artifact key, and defines the container PID limit
+once. Terraform validates locally. No Terraform apply or AWS change has been
+performed. Production promotion remains gated on the follow-up CI run.

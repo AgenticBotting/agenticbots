@@ -170,6 +170,11 @@ data "aws_iam_policy_document" "tenant" {
     actions   = ["s3:GetObject"]
     resources = ["arn:aws:s3:::${var.artifact_bucket}/runtime/*"]
   }
+  statement {
+    sid       = "RuntimeBundleKey"
+    actions   = ["kms:Decrypt", "kms:DescribeKey"]
+    resources = [var.artifact_kms_key_arn]
+  }
 }
 
 resource "aws_iam_role_policy" "tenant" {

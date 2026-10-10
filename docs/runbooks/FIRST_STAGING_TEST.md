@@ -15,8 +15,10 @@ creates something in the cloud refuses to run unless you put
 `ALLOW_CLOUD_CHANGES=1` in front of it.
 
 **Time:** about 2 hours the first time. Most of it is creating accounts.
-**Cost:** about $10 for the domain (one time), $5 of model credit, and about
-$1.25–1.50 per day while the staging server exists.
+**Cost:** AWS compute, encrypted storage, backups, the outbound NAT gateway,
+model usage and the runtime domain all incur provider charges. Check the
+current AWS and model-provider estimates before applying Terraform, set budget
+alerts first, and destroy staging resources when the test is complete.
 
 Background on what is and isn't ready: `docs/DEPLOYMENT_READINESS_AUDIT.md`.
 
