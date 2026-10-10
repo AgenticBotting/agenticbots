@@ -1,0 +1,20 @@
+# Local dependency and build output. Vercel installs and builds from source.
+node_modules
+.next
+out
+build
+coverage
+test-results
+playwright-report
+
+# Local platform and infrastructure state must never enter a deployment upload.
+.platform-data
+infra/terraform/**/.terraform
+infra/terraform/**/*.tfstate*
+
+# Local-only configuration and operating-system files.
+.env*
+!.env.example
+!.env.staging.example
+.DS_Store
+*.pem

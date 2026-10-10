@@ -35,7 +35,8 @@ build strategy:
 
 The same production build now completes locally in roughly 30 seconds and
 generates 1,056 routes instead of 14,124. The replacement Vercel preview took
-about two minutes.
+about two minutes. `.vercelignore` excludes local Next.js, dependency,
+Terraform-provider and test caches so CLI releases upload source only.
 
 ## Release gate
 
