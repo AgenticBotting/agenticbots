@@ -1,5 +1,15 @@
 # Deployment readiness audit — first AWS staging test
 
+> **Hermes launch-gate update, 2026-10-11:** A full review of the official
+> Hermes documentation and the pinned/current source found that the existing
+> image is reproducibly pinned but predates upstream authentication hardening,
+> and the API server exposes a broader default tool surface than the current
+> config disables. Read
+> [`research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md`](research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md)
+> and [`LAUNCH_IMPLEMENTATION_PLAN.md`](LAUNCH_IMPLEMENTATION_PLAN.md). Do not
+> run the first AWS apply until the version upgrade, per-profile tool allowlist,
+> model route, egress policy and local contract gates are complete.
+
 > **Vercel preview note, 2026-10-10:** The first `platform-v1` preview compiled
 > but failed in npm `postbuild` after Vercel relocated Next's prerendered
 > artifacts. Artifact gates now run locally and in GitHub CI for every branch
@@ -61,12 +71,17 @@ found; "Now" shows the state after the fixes in this change.
 | 22 | Runtime version tracking | PARTIAL | PARTIAL |
 | 23 | EBS persistent storage | COMPLETE | COMPLETE |
 | 24 | Backups | PARTIAL (manual snapshot IAM wrong) | COMPLETE |
-| 25 | Hermes version pinning | PLACEHOLDER (no digest) | COMPLETE |
+| 25 | Hermes version pinning | PLACEHOLDER (no digest) | PARTIAL (reproducible old pin; security-reviewed upgrade required) |
 | 26 | Rollback/update support | PARTIAL (runbook step would not take effect) | NOT IMPLEMENTED (as tooling; runbook corrected) |
 | 27 | Convex production configuration | PARTIAL | PARTIAL |
 | 28 | Vercel production configuration | PARTIAL (cron breaks Hobby deploys) | PARTIAL |
 | 29 | Environment variables | PARTIAL | COMPLETE |
 | 30 | Staging/demo separation | PARTIAL | COMPLETE |
+| 31 | API-server tool allowlist | NOT IMPLEMENTED | NOT IMPLEMENTED (launch blocker) |
+| 32 | Runtime egress allowlist | NOT IMPLEMENTED | NOT IMPLEMENTED (required before browser/web/MCP tools) |
+| 33 | Native Kanban integration | NOT IMPLEMENTED | DEFERRED (not in stable `/v1` API; not launch-critical) |
+| 34 | Finite run/model budgets | PARTIAL | PARTIAL (platform controls exist; exact Hermes version contract required) |
+| 35 | Daily safe-update pipeline | NOT IMPLEMENTED | NOT IMPLEMENTED (daily detection, qualification, canary and rollout rings required before fleet scale) |
 
 ## Blockers found and fixed for the staging test
 

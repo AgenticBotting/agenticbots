@@ -66,4 +66,18 @@ describe("runtime boundary", () => {
     const suite = readFileSync(join(ROOT, "tests/contract/runtime-adapter.contract.ts"), "utf8");
     expect(suite).not.toMatch(/hermes/i);
   });
+
+  it("headless runtime configs disable direct Bot Mode messaging", () => {
+    const configs = [
+      "infra/runtime/config/root-config.yaml",
+      "infra/runtime/config/profile-config.yaml",
+    ];
+
+    for (const path of configs) {
+      const config = readFileSync(join(ROOT, path), "utf8");
+      expect(config).toMatch(/^\s*bot_mode_protocol:\s*false\s*$/m);
+      expect(config).not.toMatch(/^\s*bot_peers:\s*$/m);
+      expect(config).not.toMatch(/hermes-bots/);
+    }
+  });
 });

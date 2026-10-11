@@ -4,6 +4,10 @@
 # (DEFAULT_MODEL_PROVIDER / DEFAULT_MODEL).
 
 agent:
+  # AgenticBots owns BOT coordination, audit and approval. Hermes Bot Mode can
+  # dynamically inject message_agent into a canonical "Bot Chat" when Desktop
+  # metadata exists, so disable that protocol explicitly for launch.
+  bot_mode_protocol: false
   # Least capability: no shell and no code execution unless an operator
   # deliberately enables them for a specific Bot (and then only with a
   # cloud sandbox terminal backend — see SECURITY in HERMES_INTEGRATION.md).

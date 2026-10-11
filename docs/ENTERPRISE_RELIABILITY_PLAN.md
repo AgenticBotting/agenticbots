@@ -2,6 +2,14 @@
 
 Decision record, 2026-10-09. Owner choices: standard isolated runtime, optional enterprise high availability; support diagnoses and prepares changes, the owner approves execution.
 
+**2026-10-11 implementation update:** The full Hermes documentation and
+version audit is in
+[`research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md`](research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md).
+The ordered launch gates are in
+[`LAUNCH_IMPLEMENTATION_PLAN.md`](LAUNCH_IMPLEMENTATION_PLAN.md). The current
+Hermes pin must be upgraded and its API tool surface explicitly allowlisted
+before the first staging runtime.
+
 ## Architecture direction
 
 Keep the platform independent of both the agent harness and model provider. Hermes remains behind `BotRuntime` and `RuntimeAdapter`; views and workflows use neutral platform records. The current engine is pinned and tested with an in-process contract fixture. Updating upstream requires contract validation against that exact deployed version. Model routing stays configurable per BOT, with tenant-specific credentials, permissions and budgets.
@@ -24,6 +32,35 @@ flowchart LR
 ```
 
 The diagram describes the existing logical boundary plus intended enforcement. It does not attest that every live integration has passed staging. Provider adapters still marked as stubs remain unavailable.
+
+## Quiet operating model for the first release
+
+The first release should optimize continuously without creating a daily chat
+burden. Each BOT receives bounded scheduled work; AgenticBots records the BOT
+RUN and result; external changes stop for exact-action approval. The owner gets
+one daily operating summary plus immediate alerts only for a client-impacting
+failure, security event or required approval.
+
+Vercel serves the web and short control requests. Convex, accessed only through
+the `Repository`, stores durable desired state, approvals and audit records.
+The isolated AWS runtime performs long-running BOT work. Terraform and the
+lifecycle script reproduce that runtime. AWS MCP may assist an operator with
+read-only diagnosis, but it is not the execution plane or source of truth.
+
+Native Hermes Kanban and a Chief-of-Staff BOT are later phases. Kanban is not
+part of the stable runtime `/v1` API and its worker model needs a dedicated
+least-privilege bridge, per-board client isolation and explicit concurrency
+caps. A future Chief-of-Staff BOT may summarize tenant-safe Convex records; it
+will not execute changes. Telegram, meetings, goals and heartbeats do not block
+the initial pilot.
+
+Hermes release discovery should run daily. A release reaches clients only after
+immutable-digest resolution, disposable contract tests, sanitized state
+migration, a fictional staging canary and rolling client rings. Each client is
+drained, its scheduler paused and its state backed up before Docker recreates
+the container with the same volume, secrets and hostname. The rollout stops on
+any regression. This keeps the fleet current without installing an untested
+daily release everywhere at once.
 
 ## Two deployment tiers
 

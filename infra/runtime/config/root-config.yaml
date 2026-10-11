@@ -11,6 +11,9 @@ gateway:
     max_concurrent_runs: 4
 
 agent:
+  # Bot Mode is a Desktop orchestration plugin. Keep its prompt protocol and
+  # dynamically injected message_agent tool off on the headless host profile.
+  bot_mode_protocol: false
   disabled_toolsets:
     - terminal
     - code_execution

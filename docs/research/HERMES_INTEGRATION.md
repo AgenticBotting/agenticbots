@@ -3,6 +3,15 @@
 > Internal engineering document. The runtime is an implementation detail;
 > clients never see its name. AgenticBots is the product.
 
+> **Launch gate, 2026-10-11:** The pin below is reproducible but is no longer
+> the approved production target. Upstream `v0.21.6` includes authentication
+> and request-hardening fixes released after this pin. The complete review is
+> in [HERMES_DOCUMENTATION_AUDIT_2026-10-11.md](HERMES_DOCUMENTATION_AUDIT_2026-10-11.md),
+> and the execution sequence is in
+> [../LAUNCH_IMPLEMENTATION_PLAN.md](../LAUNCH_IMPLEMENTATION_PLAN.md). Select,
+> digest-pin and contract-test a reviewed version at least as new as `v0.21.6`
+> before the first AWS staging runtime.
+
 Researched from the upstream source on **2026-10-03** (clone of
 `github.com/NousResearch/hermes-agent`), not from memory.
 
@@ -10,7 +19,7 @@ Researched from the upstream source on **2026-10-03** (clone of
 |---|---|
 | Upstream | `NousResearch/hermes-agent` |
 | License | MIT (Copyright © 2025 Nous Research) — see `THIRD_PARTY_NOTICES.md` |
-| Pinned tag | **`v2026.9.24`** |
+| Current repository pin | **`v2026.9.24`** — historical integration baseline; upgrade required before staging |
 | Pinned commit | `f97608f178d1ffeca59860195ab7da295f7c8e5f` |
 | Image | `nousresearch/hermes-agent:v2026.9.24@sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7` |
 | Image digest | `sha256:fca358f12efd65bfaaca05884166f15c0e2788375ca30d77061ac1ebc96452b7` — multi-arch index digest of the `v2026.9.24` tag, read from Docker Hub on 2026-10-03 (amd64 manifest `sha256:2fd023ef…ea283`). Re-check before production with `docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24`. Terraform and `lifecycle.sh` both refuse an image that is not pinned by digest. |
@@ -93,6 +102,27 @@ so SQLite WAL is safe (upstream warns about virtiofs/9p).
   framed as data in every AgenticBots skill and in webhook-triggered tasks.
 - The engine dashboard (port 9119) stores keys and is **not run**.
 
+Disabling those two toolsets is not a complete production allowlist. The
+pinned API-server defaults also expose file, browser, credential, skill,
+delegation, memory, web and cron capabilities. Before staging, the root and
+every BOT profile require an explicit `platform_toolsets.api_server` allowlist,
+MCP disabled unless a reviewed connection needs it, and a contract assertion
+against `/v1/toolsets`. Runtime BOTs must not mutate the versioned skills
+AgenticBots deploys. Browser/web/MCP tools also require an egress allowlist;
+the current Docker bridge permits outbound traffic.
+
+Kanban, goals, heartbeats, messaging, webhooks, dashboard plugins and
+agent-created schedules remain disabled for launch. Native Kanban exists but
+its REST surface is supplied by the dashboard plugin rather than the stable
+runtime `/v1` API, and its workers are full operating-system processes. Do not
+expose the dashboard to obtain it.
+
+Hermes Bot Mode confirms that a Bot is a profile and its routines are cron
+jobs, matching this adapter. Its Desktop plugin and direct BOT messaging are
+not part of the launch runtime. `agent.bot_mode_protocol: false` prevents a
+future `Bot Chat` plus Desktop metadata from dynamically injecting
+`message_agent`; do not configure Bot Mode peers or group rooms.
+
 ## Business approvals vs. runtime approvals
 
 The engine's approval gate covers dangerous commands and untrusted MCP
@@ -119,6 +149,10 @@ click can never send twice). Both kinds share one approvals table.
 
 ## Upgrade assumptions
 
-Never deploy `latest`; never auto-upgrade every client. Follow
+Never deploy `latest` or update the full client fleet simultaneously without
+qualification. Follow
 `docs/runbooks/UPGRADE_HERMES.md`: staging first, `npm run
-test:hermes-contract`, then client-by-client.
+test:hermes-contract`, then client-by-client. Production unattended runtimes
+use server-side API or Bedrock credentials; consumer OAuth is not their
+availability dependency. Provider fallback is enabled only after the fallback
+passes the same tool, schema, privacy, approval and budget tests.

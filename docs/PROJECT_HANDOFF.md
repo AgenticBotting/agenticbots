@@ -4,6 +4,44 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Hermes and launch plan update — 2026-10-11
+
+The official Hermes documentation index (257 pages), full documentation
+corpus, pinned `v2026.9.24` source and current `v0.21.6` source/release notes
+were reviewed. The canonical findings are in
+[`research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md`](research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md),
+and the phased execution plan is
+[`LAUNCH_IMPLEMENTATION_PLAN.md`](LAUNCH_IMPLEMENTATION_PLAN.md).
+
+Hermes remains a suitable runtime behind `BotRuntime`, with conditions. The
+repository pin is deterministic but predates upstream dashboard authentication
+and request-hardening fixes. Upgrade to a reviewed digest at least as new as
+`v0.21.6` before staging. The current runtime configs disable terminal and code
+execution but do not explicitly restrict the API server's wider file, browser,
+credential, skill, delegation, memory, web and cron surface. Exact per-profile
+tool allowlists, effective-toolset contract tests, finite work/model budgets
+and an egress policy are launch blockers.
+
+Native Hermes Kanban exists, but its REST routes belong to the dashboard
+plugin rather than the stable `/v1` runtime API. Do not expose the dashboard
+to obtain it. Kanban, Chief-of-Staff messaging, goals, heartbeats, broad MCP,
+browser/terminal access and automatic HA are later phases. The first operating
+model is scheduled bounded BOT work, one quiet daily summary, exception alerts
+and human approval for every external action.
+
+The Bot Mode page was checked separately against both reviewed source trees.
+It confirms BOTS are profiles and routines are cron jobs. Its protocol defaults
+on and can dynamically inject `message_agent` after Desktop metadata and a
+canonical `Bot Chat` exist, so root and BOT configs now set
+`agent.bot_mode_protocol: false`; a security test locks that launch policy.
+
+**Next implementation order:** version/digest upgrade → tool allowlists and
+contract tests → finite budgets and egress policy → `upgrade-engine` lifecycle
+action and local rollback → daily release watcher and candidate qualification
+→ redacted Terraform plan/cost/IAM package → owner approval for one fake AWS
+staging tenant. No AWS/Convex runtime was deployed, no paid inference was used
+and no secrets were changed in this audit.
+
 ## Latest preview deployment update — 2026-10-10
 
 `platform-v1` was pushed through `2d60efe` and the connected Vercel project started a preview. That preview compiled successfully but failed after 18 minutes because Vercel's Next adapter had already relocated `.next/server/app/sitemap/*.body` before the npm `postbuild` artifact gate ran. The release did not reach Ready and no production alias changed.

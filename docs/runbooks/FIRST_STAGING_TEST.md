@@ -22,6 +22,41 @@ alerts first, and destroy staging resources when the test is complete.
 
 Background on what is and isn't ready: `docs/DEPLOYMENT_READINESS_AUDIT.md`.
 
+## Mandatory preflight — complete before Step 1
+
+The steps below predate the 2026-10-11 full Hermes audit. Do not create cloud
+resources until all boxes are checked and evidence is linked from the staging
+record:
+
+- [ ] A reviewed Hermes release at least as new as `v0.21.6` is pinned by tag,
+  commit and immutable image digest. `v2026.9.24` is not the staging target.
+- [ ] `npm run test:hermes-contract` passes against a local disposable runtime
+  using that exact image.
+- [ ] The default profile and SEO BOT have explicit API-server tool allowlists;
+  `/v1/toolsets` contains no unapproved capability.
+- [ ] Dashboard and dashboard plugins are off. Kanban, goals, heartbeats,
+  messaging, webhooks and agent-created schedules are off.
+- [ ] `agent.bot_mode_protocol` is false in the root and SEO BOT profiles;
+  there are no Bot Mode metadata markers, canonical Bot Chats, groups or peers.
+- [ ] Terminal, host code execution, skill mutation, credential-vault mutation
+  and unreviewed MCP are unavailable.
+- [ ] Concurrency, turns, duration, retries, tokens and model spend have finite
+  fail-closed limits at the runtime or platform boundary.
+- [ ] The first model uses a server-side API or Bedrock credential. Consumer
+  OAuth is not the unattended production dependency. Any fallback is disabled
+  until separately evaluated.
+- [ ] The SEO BOT's required outbound destinations are documented. Browser,
+  web and MCP tools stay off if egress enforcement is incomplete.
+- [ ] `upgrade-engine` and rollback are tested locally, or the staging plan
+  includes a reviewed manual recovery with a pre-upgrade backup.
+- [ ] AWS cost ceiling, budget alert, alert recipient, destroy procedure and
+  Terraform plan have been reviewed by the owner.
+- [ ] `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` pass.
+
+See `docs/research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md` and
+`docs/LAUNCH_IMPLEMENTATION_PLAN.md`. Completing this checklist still does not
+authorize deployment; the owner must approve the exact cloud plan.
+
 ---
 
 ## Words you will see
@@ -134,7 +169,8 @@ Write down both names it prints. Then:
    - `vercel_team_slug`: leave `lot-sealers-projects`. That is the slug in
      your Vercel dashboard URL, `vercel.com/<slug>/agenticbots`. Change it
      if yours differs.
-   - Leave `default_engine_image` as is. It is already pinned.
+   - Set `default_engine_image` to the newly reviewed tag and immutable digest.
+     Do not use the historical `v2026.9.24` value or `latest`.
    - `default_model`: leave it, or paste another model id from
      https://openrouter.ai/models.
    - Save.
@@ -194,9 +230,17 @@ domain just for runtimes. This keeps the website safe.
 
 ## Step 6 — A model key (≈5 min)
 
-1. Sign in at https://openrouter.ai → **Credits** → add $5.
-2. **Keys → Create Key** → name it `agenticbots-staging`. Copy it, and keep
-   it for Step 10. Never put it in a file.
+Choose the one provider approved in the staging readiness package. OpenRouter
+is one possible provider, not a requirement. Use a server-side API key with a
+strict provider budget and no real client data. Do not use a personal consumer
+OAuth login for this unattended test.
+
+If OpenRouter is the approved provider:
+
+1. Sign in at https://openrouter.ai → **Credits** and add only the approved
+   staging amount.
+2. **Keys → Create Key** → name it `agenticbots-staging`. Apply a provider-side
+   limit if offered. Copy it, and keep it for Step 10. Never put it in a file.
 
 ## Step 7 — Your staging settings file (≈5 min)
 
