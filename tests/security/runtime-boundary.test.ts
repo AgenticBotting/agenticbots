@@ -80,4 +80,23 @@ describe("runtime boundary", () => {
       expect(config).not.toMatch(/hermes-bots/);
     }
   });
+
+  it("headless runtime configs fail closed on tools and bound unattended work", () => {
+    const configs = [
+      "infra/runtime/config/root-config.yaml",
+      "infra/runtime/config/profile-config.yaml",
+    ];
+
+    for (const path of configs) {
+      const config = readFileSync(join(ROOT, path), "utf8");
+      expect(config).toMatch(/^platform_toolsets:\s*\n\s+api_server:\s*\[\]\s*\n\s+cron:\s*\[\]\s*$/m);
+      expect(config).toMatch(/^\s*max_turns:\s*25\s*$/m);
+      expect(config).toMatch(/^\s*budget_warning_ratio:\s*0\.8\s*$/m);
+      expect(config).toMatch(/^\s*run_budget_seconds:\s*600\s*$/m);
+      expect(config).toMatch(/^\s*api_max_retries:\s*1\s*$/m);
+      expect(config).toMatch(/^\s*auto_recovery_cycles:\s*0\s*$/m);
+      expect(config).toMatch(/^\s*allow_agent_scheduling:\s*false\s*$/m);
+      expect(config).not.toMatch(/^\s*(?:api_server|cron):\s*(?:all|\[\s*all\s*\]|\[\s*['"]?\*['"]?\s*\])\s*$/m);
+    }
+  });
 });

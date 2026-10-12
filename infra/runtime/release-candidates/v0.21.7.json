@@ -1,0 +1,23 @@
+{
+  "repository": "NousResearch/hermes-agent",
+  "tag": "v0.21.7",
+  "releaseUrl": "https://github.com/NousResearch/hermes-agent/releases/tag/v0.21.7",
+  "publishedAt": "2026-10-12T05:53:41Z",
+  "tagObjectSha": "00f69310e29c24dfd7c6bb258b0a2337d3455d79",
+  "sourceCommit": "71d34bad1045610252eda02ee79549436896e784",
+  "manifestDigest": "sha256:444b42594e7f467425872fc35e077a227d377f0fe0726bc818706d62175fad8b",
+  "image": "nousresearch/hermes-agent:stable@sha256:444b42594e7f467425872fc35e077a227d377f0fe0726bc818706d62175fad8b",
+  "tagSignatureVerified": false,
+  "tagSignatureReason": "unsigned",
+  "qualification": {
+    "sourceReviewed": true,
+    "toolAllowlistReviewed": true,
+    "apiContractPassed": false,
+    "containerSmokePassed": false,
+    "migrationRestorePassed": false,
+    "sbomScanPassed": false,
+    "stagingCanaryPassed": false
+  },
+  "promotionAllowed": false,
+  "notes": "Candidate metadata only. Docker is unavailable on the review host; do not promote until every required gate passes in an isolated runtime."
+}

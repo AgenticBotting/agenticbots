@@ -4,6 +4,23 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Phase 1 runtime hardening started — 2026-10-12
+
+The first local-only controls are implemented. Root and every BOT profile now
+fail closed with explicit empty API-server and cron tool allowlists; Bot Mode,
+terminal, code execution and BOT-created schedules stay disabled. Hermes turns
+are capped at 25 iterations and 600 seconds, provider attempts are bounded and
+the post-exhaustion recovery ladder is off. A security test locks these values.
+
+The official `v0.21.7` release is recorded as a **candidate**, not the active
+pin. A read-only watcher resolves the official annotated tag to commit
+`71d34bad1045610252eda02ee79549436896e784` and manifest digest
+`sha256:444b4259…fad8b`. GitHub reports the tag as unsigned. Docker is not
+installed on the review host, so container, SBOM, contract, migration and
+staging gates remain closed and `promotionAllowed` is false. See
+[`research/HERMES_V0_21_7_QUALIFICATION.md`](research/HERMES_V0_21_7_QUALIFICATION.md).
+No cloud resources, secrets, paid inference or deployed runtime changed.
+
 ## Hermes and launch plan update — 2026-10-11
 
 The official Hermes documentation index (257 pages), full documentation
@@ -187,7 +204,7 @@ UI (pages, API routes) → services → BotRuntime facade (src/server/runtime/in
 
 * **Bot types** live in `src/config/bot-catalog.ts` (`seo`, `ads`, `reviews`, `content`, `prospecting`, `outbound`, `reactivation`, `crm`, `analytics`, `proposal`). **Bot instances** are rows in `bots` (`orgId`, `typeKey`, `runtimeProfile`, `credentialRef`, model, capabilities, integrations).
 * One runtime (one EC2, one engine deployment) **per client**. Each Bot = one engine **profile** with its own key, skills and memory.
-* The engine is **Hermes Agent v2026.9.24**, pinned by digest `sha256:fca358f1…52b7`. Its name, URLs, ports, headers and wire types exist **only** under `src/server/runtime/hermes/**` (plus `runtime-types.ts` provider union and the `redact.ts` deny-list). Enforced by ESLint `no-restricted-imports` and `tests/security/runtime-boundary.test.ts`.
+* The active infrastructure examples still carry the historical **Hermes Agent v2026.9.24** digest solely as a reproducible baseline; it is not approved for staging. `v0.21.7` is the selected candidate and remains blocked pending disposable-container and staging qualification. Engine names, URLs, ports, headers and wire types exist **only** under `src/server/runtime/hermes/**` (plus `runtime-types.ts` provider union and the `redact.ts` deny-list). Enforced by ESLint `no-restricted-imports` and `tests/security/runtime-boundary.test.ts`.
 * Neutral vocabulary: run status `queued · running · waiting_for_approval · completed · failed · cancelled · interrupted`; events `bot.run.*`, `bot.action.*`, `bot.approval.*`; `translate.ts` turns them into client text.
 * Approvals: anything that sends, publishes, changes ads, writes CRM or deletes stops for human approval.
 * Results are only numbers a Bot reported on a `METRICS {...}` line — never estimates.

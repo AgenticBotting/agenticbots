@@ -1,6 +1,6 @@
 # AgenticBots launch implementation plan
 
-_Updated 2026-10-11 from the Hermes documentation audit, security/legal
+_Updated 2026-10-12 from the Hermes documentation audit, security/legal
 remediation status, deployment audit and reliability plan. This plan creates
 reviewable local evidence before any cloud changes or paid model usage._
 
@@ -74,6 +74,21 @@ This phase requires a separate owner authorization to deploy or promote.
 
 **Purpose:** turn the Hermes assumptions into enforceable configuration and
 tests before AWS exists.
+
+Progress on 2026-10-12:
+
+- **Done locally:** explicit zero-tool API/cron allowlists, Bot Mode and
+  self-scheduling disabled, 25-turn/600-second caps, bounded provider attempts,
+  recovery cycling disabled and regression tests.
+- **Done locally:** a read-only official-release watcher plus a durable
+  `v0.21.7` candidate record containing tag, commit and manifest digest.
+- **Blocked by missing Docker/staging:** real-image contract tests, SBOM scan,
+  state migration/restore, network containment and canary soak. Candidate
+  promotion stays false; neither the old pin nor the candidate is staging
+  approved.
+- **Still to implement:** model token/spend reservation, reviewed per-BOT tool
+  overlays and egress lists, the drain/backup/upgrade lifecycle action and
+  automated disposable-candidate qualification.
 
 Implementation:
 

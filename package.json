@@ -24,6 +24,7 @@
     "test:white-label": "vitest run tests/security/white-label.test.ts && node scripts/white-label-scan.mjs",
     "test:e2e": "playwright test",
     "test:hermes-contract": "vitest run --config vitest.contract.config.mts",
+    "hermes:check-release": "node scripts/hermes-release-candidate.mjs --verify-record",
     "security:deps": "node scripts/security-dependency-audit.mjs"
   },
   "dependencies": {

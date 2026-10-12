@@ -10,13 +10,32 @@ gateway:
   api_server:
     max_concurrent_runs: 4
 
+# Fail closed on both unattended surfaces. An explicit empty list means zero
+# model-callable tools in Hermes; omitting the key would inherit the engine's
+# defaults. AgenticBots enables reviewed tools later with a per-BOT overlay.
+platform_toolsets:
+  api_server: []
+  cron: []
+
 agent:
   # Bot Mode is a Desktop orchestration plugin. Keep its prompt protocol and
   # dynamically injected message_agent tool off on the headless host profile.
   bot_mode_protocol: false
+  # Bound every model turn and provider failure path. These are containment
+  # limits, not the platform's still-required prepaid cost reservation.
+  max_turns: 25
+  budget_warning_ratio: 0.8
+  run_budget_seconds: 600
+  api_max_retries: 1
+  auto_recovery_cycles: 0
   disabled_toolsets:
     - terminal
     - code_execution
+
+cron:
+  # Schedules are created by AgenticBots. A BOT may not create more schedules
+  # for itself and grow an unreviewed execution loop.
+  allow_agent_scheduling: false
 
 approvals:
   mode: manual

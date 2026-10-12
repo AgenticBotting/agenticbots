@@ -3,17 +3,34 @@
 # The model block is added by lifecycle.sh from runtime.env
 # (DEFAULT_MODEL_PROVIDER / DEFAULT_MODEL).
 
+# Launch baseline: API and scheduled work receive no model-callable tools.
+# This explicit empty allowlist is intentionally different from an omitted
+# key, which would inherit Hermes defaults. Reviewed per-BOT overlays may only
+# narrow or deliberately replace this list after staging qualification.
+platform_toolsets:
+  api_server: []
+  cron: []
+
 agent:
   # AgenticBots owns BOT coordination, audit and approval. Hermes Bot Mode can
   # dynamically inject message_agent into a canonical "Bot Chat" when Desktop
   # metadata exists, so disable that protocol explicitly for launch.
   bot_mode_protocol: false
+  max_turns: 25
+  budget_warning_ratio: 0.8
+  run_budget_seconds: 600
+  # One provider attempt, then fail/fallback; no post-exhaustion sleep ladder.
+  api_max_retries: 1
+  auto_recovery_cycles: 0
   # Least capability: no shell and no code execution unless an operator
   # deliberately enables them for a specific Bot (and then only with a
   # cloud sandbox terminal backend — see SECURITY in HERMES_INTEGRATION.md).
   disabled_toolsets:
     - terminal
     - code_execution
+
+cron:
+  allow_agent_scheduling: false
 
 approvals:
   mode: manual
