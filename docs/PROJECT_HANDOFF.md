@@ -4,13 +4,46 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## AWS foundation hardening prepared — 2026-10-15
+
+Local Terraform now has three ordered layers: `foundation-bootstrap` creates a
+KMS-encrypted, versioned, TLS-only state bucket with native locking and deletion
+guards; `foundation` creates a single-Region CloudTrail, private encrypted audit
+storage, root/IAM alarms and a $5 daily Cost Anomaly Detection subscription;
+the existing environment stacks create runtime infrastructure only after those
+controls. A review-only organization policy restricts Regional work to
+`us-east-2`, with a narrow `us-east-1` exception for global WAF/CloudFront logs.
+The management-account recovery/MFA and irreversible advanced-feature sequence
+is in `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md`.
+
+Staging now uses direct outbound routing and creates no NAT gateway or Elastic
+IP when empty. Running staging EC2 instances may receive a public IPv4 address,
+but their security group still has no inbound rules; SSM and the outbound
+Cloudflare tunnel remain the access paths. Production still uses private
+subnets behind NAT, and the tenant module rejects production public IPs.
+
+Fresh backend-disabled plans passed: state bootstrap **9 add**, audit foundation
+**21 add**, and empty-tenant staging **23 add**, each with 0 change / 0 destroy.
+The staging plan contains no NAT gateway, Elastic IP, EC2 instance or tenant.
+AWS Labs IAM Policy Autopilot reviewed all three plan JSON files locally;
+generated deployment policies are broad baselines and must not be attached as
+written. Terraform validation and six infrastructure boundary tests passed.
+No apply, deployment, advanced-feature activation or cloud mutation occurred.
+
+The live follow-up inventory remains empty for EC2, NAT, Elastic IP, S3,
+CloudTrail and cost anomaly monitors. The existing **AgenticBots Staging**
+Budget is healthy at $40/month with $0 actual spend. The next action is an
+owner-reviewed and explicitly approved state-bootstrap apply; advanced features
+remain off.
+
 ## Read-only AWS inventory and Terraform review — 2026-10-15
 
 The selected Region is empty apart from AWS-managed defaults and estimated
 October spend is `$0.00`: no EC2/EBS/EIP/NAT, S3, Secrets Manager, customer KMS,
 alarms/log groups, SNS, CloudTrail, DLM policies or custom SSM documents exist.
-There is no AWS Budget. Required global-service checks also found no CloudWatch
-log groups or CloudFront WAF web ACLs in `us-east-1`.
+Required global-service checks also found no CloudWatch log groups or
+CloudFront WAF web ACLs in `us-east-1`. The later budget and hardening update
+above supersedes this inventory snapshot's original control state.
 
 A disposable, backend-disabled staging plan was generated with Terraform
 `1.16.6` and AWS provider `6.68.0`: **27 add, 0 change, 0 destroy**, with an

@@ -64,11 +64,33 @@ thresholds. Together with the project's $50 hard limit and its earlier
 50%/75%/90% controls, staging now has both early notification and automatic
 containment while advanced features remain off.
 
+### Local hardening follow-up
+
+The blocking AWS controls are now implemented and validated locally. Nothing
+has been applied to the live project:
+
+- `foundation-bootstrap`: **9 to add, 0 to change, 0 to destroy** — a
+  versioned, private, KMS-encrypted Terraform state bucket with TLS-only
+  access, native S3 locking and deletion guards;
+- `foundation`: **21 to add, 0 to change, 0 to destroy** — a single-Region
+  CloudTrail with log validation, protected audit storage, encrypted
+  CloudWatch Logs, root/IAM-change alarms and AWS Cost Anomaly Detection;
+- empty staging platform: **23 to add, 0 to change, 0 to destroy** — direct
+  outbound staging networking with **zero NAT gateways, zero Elastic IPs and
+  zero EC2 instances** until a tenant is explicitly added; and
+- the review-only Region policy denies Regional work outside `us-east-2` and
+  permits only the documented `us-east-1` exception for global WAF,
+  CloudFront and their logs. It is not attached to any AWS organization.
+
+Fresh read-only inventory after planning still found zero EC2 instances, NAT
+gateways, Elastic IPs, S3 buckets, CloudTrail trails, anomaly monitors and
+anomaly subscriptions. The live budget remained healthy at $0 actual spend.
+
 Source:
 
 - https://docs.aws.amazon.com/accounts/latest/reference/activate-advanced-features.html
 
-## Reproducible local plan
+## Original reproducible local plan
 
 Review tooling:
 
@@ -86,7 +108,9 @@ Result:
 Plan: 27 to add, 0 to change, 0 to destroy.
 ```
 
-The 27 planned resources are the shared foundation only: one VPC, three
+The following 27-resource result records the plan reviewed before the local
+hardening follow-up above. It is now superseded and must not be applied. It
+contained one VPC, three
 subnets, route tables and associations, one internet gateway, one NAT gateway,
 one Elastic IP, a locked default security group, one encrypted/versioned/private
 artifact bucket, one control-plane KMS key and alias, one encrypted SNS topic,
@@ -151,21 +175,22 @@ features are activated. Preserve the $40 budget, add anomaly detection and
 verify the replacement cost-control design before activation and before any
 shared foundation is applied.
 
-### P0 — No CloudTrail audit trail exists or is planned
+### P0 prepared locally — CloudTrail is not yet applied
 
-The live project has no trail, and the 27-resource plan does not add one. Before
-any deployment role or runtime exists, add a single-Region management-event
-trail with log-file validation, a private versioned S3 destination, encryption,
-retention and an alarm path for unexpected IAM changes. CloudTrail is the
-evidence needed to reconstruct who changed infrastructure.
+The live project still has no trail. The separate `foundation` root now plans a
+single-Region management-event trail with log-file validation, a private
+versioned encrypted S3 destination, 400-day encrypted CloudWatch retention and
+alarms for root and IAM API activity. Its resources have deletion guards and
+must be applied before any deployment role or runtime exists.
 
-### P0 — Remote Terraform state has not been bootstrapped
+### P0 prepared locally — Remote Terraform state is not yet bootstrapped
 
-The configured S3 backend points to a placeholder bucket, and the project has no
-S3 buckets. Bootstrap the state bucket in `us-east-2` with versioning, block
-public access, encryption, TLS-only access and native S3 state locking before a
-normal plan. Review the bootstrap separately because state can contain sensitive
-values.
+The project still has no S3 buckets. The new `foundation-bootstrap` root plans a
+state bucket in `us-east-2` with versioning, all public access blocked,
+customer-managed KMS encryption, TLS-only access, native S3 state locking and
+deletion guards. Bootstrap it first, migrate the bootstrap state into the same
+protected backend, and then initialize every other Terraform root. Review the
+bootstrap separately because state can contain sensitive values.
 
 ### P0 — The planned runtime image is not approved
 
@@ -193,17 +218,19 @@ before extraction.
 
 ## Important follow-ups
 
-### P1 — Base foundation costs money before a client exists
+### P1 reduced — Staging no longer incurs an idle NAT charge
 
-AWS's Ohio price is `$0.045/hour` plus `$0.045/GB` for the planned NAT gateway;
-the attached public IPv4 address is `$0.005/hour`; and the one customer-managed
-KMS key is `$1/month`. At 730 hours, the empty shared foundation is therefore
-about **$37.50/month before credits**, plus S3, requests, logs and data transfer.
+The staging root now uses direct outbound networking. Its empty plan creates no
+NAT gateway, Elastic IP or EC2 instance, avoiding the earlier fixed NAT charge.
+When a staging runtime is deliberately added, its public IPv4 address is used
+only for outbound traffic; the runtime security group still has no inbound
+rules. Production remains on private subnets behind managed NAT.
 
-For the first controlled staging test, one managed NAT gateway is simpler and
-safer than operating a NAT instance. Time-box the test and destroy the shared
-foundation when it is not being used. Before production, add an S3 gateway
-endpoint so S3 traffic avoids NAT processing charges.
+The state, audit and platform KMS keys, CloudTrail/CloudWatch ingestion and
+retention, S3 storage/requests, public IPv4 while a runtime is active and data
+transfer still cost money. Keep staging tenant-free until the runtime test is
+approved, set short log retention for application logs, and revisit VPC
+endpoints only after measured traffic justifies their hourly cost.
 
 Sources:
 
@@ -259,10 +286,12 @@ policy after the exact log/metric API calls are confirmed.
 
 ## Next gate
 
-The next gate is a reviewable **advanced-feature activation readiness plan**:
-replacement budgets and anomaly alerts, a Region-restriction SCP, management
-account recovery/MFA, CloudTrail, and hardened state bootstrap. Activation is
-irreversible and removes the $50 hard spend limit, so it requires a separate
-owner decision after those controls are concrete. Then repeat the inventory and
-OIDC check, generate a fresh redacted plan/cost/IAM review, and ask for explicit
-approval for the exact apply. Do not create a tenant in that apply.
+The advanced-feature readiness controls are now concrete and reviewable, but
+they are not live. The next gate is to choose globally unique state and audit
+bucket names, generate one final redacted bootstrap plan and obtain explicit
+owner approval for that exact **state-bootstrap-only** apply. After the state
+and audit foundation are live and tested, the owner can separately decide
+whether to activate advanced features. Activation remains irreversible and
+removes the $50 hard spend limit. Repeat the inventory and OIDC check after any
+activation, then generate a fresh platform plan. Do not create a tenant in any
+foundation apply.

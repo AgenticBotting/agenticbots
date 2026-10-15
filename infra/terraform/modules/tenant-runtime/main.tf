@@ -233,12 +233,13 @@ resource "aws_security_group" "runtime" {
 
 # ───────────── Compute ─────────────
 resource "aws_instance" "runtime" {
-  ami                    = data.aws_ssm_parameter.al2023.value
-  instance_type          = var.instance_type
-  subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.runtime.id]
-  iam_instance_profile   = aws_iam_instance_profile.instance.name
-  monitoring             = true
+  ami                         = data.aws_ssm_parameter.al2023.value
+  instance_type               = var.instance_type
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = var.associate_public_ip_address
+  vpc_security_group_ids      = [aws_security_group.runtime.id]
+  iam_instance_profile        = aws_iam_instance_profile.instance.name
+  monitoring                  = true
 
   metadata_options {
     http_tokens                 = "required" # IMDSv2 only
@@ -277,6 +278,10 @@ resource "aws_instance" "runtime" {
     precondition {
       condition     = var.environment != "prod" || can(regex("^arn:aws:sns:", var.alarm_topic_arn))
       error_message = "Production runtimes require an alarm notification topic with a tested subscription."
+    }
+    precondition {
+      condition     = var.environment != "prod" || !var.associate_public_ip_address
+      error_message = "Production runtimes must not have public IPv4 addresses; use NAT egress."
     }
   }
 }

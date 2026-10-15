@@ -1,0 +1,4 @@
+audit_bucket_name            = "REPLACE-agenticbots-audit-unique-suffix"
+alert_email                  = "nick@agenticbots.dev"
+anomaly_threshold_usd        = 5
+cloudtrail_retention_days    = 400

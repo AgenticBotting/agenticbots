@@ -1,6 +1,6 @@
 # Where things stand — deployment
 
-_Last updated: October 10, 2026_
+_Last updated: October 15, 2026_
 
 ## Current verified deployment
 
@@ -47,16 +47,20 @@ secret/infrastructure scan. The preview is the reviewable release candidate;
 do not promote a failing commit.
 
 No AWS resources have been applied. Terraform now describes private runtime
-subnets, outbound NAT, customer-managed encryption for runtime artifacts and
-alarm messages, and isolated client runtimes. Applying it requires a separate
-owner-authorized staging operation because it creates paid infrastructure.
-The 2026-10-15 read-only review produced a valid empty-tenant plan of 27 adds,
-but it is **not apply-ready**: the paid project still blocks OIDC-provider
-operations. Advanced-feature activation would remove that restriction, but it
-is irreversible and removes the active $50 hard spend limit. A healthy $40
-monthly AWS Budget now provides email alerts; anomaly detection, Region
-guardrails, hardened remote state and a CloudTrail audit path must exist first.
-See
+subnets, low-cost outbound-only staging, private production NAT, customer
+encryption and isolated client runtimes. Separate local roots now prepare a
+hardened Terraform state bucket and the CloudTrail/audit/anomaly foundation.
+Fresh no-apply plans are 9 adds for state, 21 for audit controls and 23 for the
+empty staging environment, all with 0 change / 0 destroy. The staging plan has
+no NAT, Elastic IP, EC2 instance or tenant.
+
+Applying anything still requires a separate owner-authorized operation. The
+paid project blocks the staging OIDC provider until advanced features are
+active. Activation is irreversible and removes the active $50 hard spend
+limit. The healthy $40 AWS Budget remains live at $0 actual spend, while the
+anomaly monitor, Region guardrail, hardened state and CloudTrail controls are
+only prepared locally. Follow
+`docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` and
 `docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
 
 ## Production configuration still required

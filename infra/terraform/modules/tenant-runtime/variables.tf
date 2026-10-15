@@ -28,6 +28,11 @@ variable "root_volume_gb" {
 }
 variable "subnet_id" { type = string }
 variable "vpc_id" { type = string }
+variable "associate_public_ip_address" {
+  description = "Low-cost staging only. Production runtimes must remain private behind NAT."
+  type        = bool
+  default     = false
+}
 variable "bot_profiles" {
   description = "Runtime profiles (Bots) to provision, e.g. [\"ads\",\"seo\"]. Only purchased Bots."
   type        = list(string)

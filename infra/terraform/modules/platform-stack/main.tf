@@ -19,6 +19,15 @@ variable "vpc_cidr" {
   type    = string
   default = "10.42.0.0/16"
 }
+variable "network_egress_mode" {
+  description = "direct is allowed only for low-cost staging; production uses nat."
+  type        = string
+  default     = "nat"
+  validation {
+    condition     = contains(["direct", "nat"], var.network_egress_mode)
+    error_message = "network_egress_mode must be direct or nat."
+  }
+}
 variable "vercel_team_slug" { type = string }
 variable "vercel_project_name" { type = string }
 variable "vercel_environments" {
@@ -65,10 +74,11 @@ locals {
 }
 
 module "network" {
-  source = "../network"
-  name   = "agenticbots-${var.environment}"
-  cidr   = var.vpc_cidr
-  tags   = local.tags
+  source      = "../network"
+  name        = "agenticbots-${var.environment}"
+  cidr        = var.vpc_cidr
+  egress_mode = var.network_egress_mode
+  tags        = local.tags
 }
 
 module "lifecycle_document" {
@@ -184,21 +194,22 @@ module "tenant" {
   source   = "../tenant-runtime"
   for_each = var.tenants
 
-  tenant_id              = each.key
-  environment            = var.environment
-  instance_type          = each.value.instance_type
-  data_volume_gb         = each.value.data_volume_gb
-  bot_profiles           = each.value.bot_profiles
-  engine_image           = coalesce(each.value.engine_image, var.default_engine_image)
-  default_model_provider = var.default_model_provider
-  default_model          = var.default_model
-  runtime_bundle_version = each.value.bundle_version
-  artifact_bucket        = aws_s3_bucket.artifacts.bucket
-  artifact_kms_key_arn   = aws_kms_key.control_plane.arn
-  vpc_id                 = module.network.vpc_id
-  subnet_id              = module.network.subnet_ids[0]
-  alarm_topic_arn        = aws_sns_topic.alarms.arn
-  tags                   = local.tags
+  tenant_id                   = each.key
+  environment                 = var.environment
+  instance_type               = each.value.instance_type
+  data_volume_gb              = each.value.data_volume_gb
+  bot_profiles                = each.value.bot_profiles
+  engine_image                = coalesce(each.value.engine_image, var.default_engine_image)
+  default_model_provider      = var.default_model_provider
+  default_model               = var.default_model
+  runtime_bundle_version      = each.value.bundle_version
+  artifact_bucket             = aws_s3_bucket.artifacts.bucket
+  artifact_kms_key_arn        = aws_kms_key.control_plane.arn
+  vpc_id                      = module.network.vpc_id
+  subnet_id                   = module.network.subnet_ids[0]
+  associate_public_ip_address = module.network.associate_public_ip_address
+  alarm_topic_arn             = aws_sns_topic.alarms.arn
+  tags                        = local.tags
 }
 
 output "control_plane_role_arn" { value = module.control_plane.role_arn }

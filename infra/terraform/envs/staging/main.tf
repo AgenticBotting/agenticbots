@@ -54,6 +54,7 @@ module "stack" {
 
   environment                       = "staging"
   vpc_cidr                          = "10.52.0.0/16"
+  network_egress_mode               = "direct"
   vercel_team_slug                  = var.vercel_team_slug
   vercel_project_name               = var.vercel_project_name
   vercel_environments               = ["preview", "development"]

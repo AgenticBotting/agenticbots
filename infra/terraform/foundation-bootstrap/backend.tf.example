@@ -1,0 +1,12 @@
+# Copy to backend.tf only AFTER the first apply creates this bucket, replace
+# both placeholders, then run: terraform init -migrate-state
+terraform {
+  backend "s3" {
+    bucket       = "REPLACE-agenticbots-tfstate-unique-suffix"
+    key          = "foundation-bootstrap/terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    kms_key_id   = "REPLACE-state-kms-key-arn"
+    use_lockfile = true
+  }
+}

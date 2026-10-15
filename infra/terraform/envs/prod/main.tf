@@ -54,6 +54,7 @@ module "stack" {
 
   environment                       = "prod"
   vpc_cidr                          = "10.42.0.0/16"
+  network_egress_mode               = "nat"
   vercel_team_slug                  = var.vercel_team_slug
   vercel_project_name               = var.vercel_project_name
   vercel_environments               = ["production"]

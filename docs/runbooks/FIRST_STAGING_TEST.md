@@ -124,33 +124,28 @@ npm install
 
 **Check:** `terraform version` prints a version.
 
-## Step 3 — A storage bucket for Terraform's records (≈3 min)
+## Step 3 — Protected Terraform state and audit foundation
 
-Terraform remembers what it created in a file kept in S3. Create that
-bucket once. Paste this whole block:
+Do not create the state bucket with one-off S3 commands. The reviewed
+`infra/terraform/foundation-bootstrap` configuration now creates it with a
+dedicated rotating KMS key, versioning, native state locking, public-access
+blocks, TLS-only access and deletion protection. Follow
+`docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` through the foundation
+verification step. Each apply in that runbook needs a separate owner approval.
 
-```bash
-export AWS_PROFILE=agenticbots-staging
-SUFFIX=$(openssl rand -hex 4)
-aws s3api create-bucket --bucket agenticbots-tfstate-$SUFFIX --region us-east-2 --create-bucket-configuration LocationConstraint=us-east-2
-aws s3api put-bucket-versioning --bucket agenticbots-tfstate-$SUFFIX --versioning-configuration Status=Enabled
-aws s3api put-public-access-block --bucket agenticbots-tfstate-$SUFFIX --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-echo "STATE BUCKET:     agenticbots-tfstate-$SUFFIX"
-echo "ARTIFACT BUCKET:  agenticbots-staging-artifacts-$SUFFIX"
-```
+When the protected backend and audit foundation are verified:
 
-Write down both names it prints. Then:
-
-1. Open `infra/terraform/envs/staging/backend.tf`, for example with
-   `open -e infra/terraform/envs/staging/backend.tf`. Replace
-   `REPLACE-agenticbots-tfstate` with the **state bucket** name and save.
-2. Create the settings file:
+1. Put the output state bucket and KMS key ARN into
+   `infra/terraform/envs/staging/backend.tf`.
+2. Choose a separate globally unique artifact bucket name, such as
+   `agenticbots-staging-artifacts-<random suffix>`; Terraform creates it.
+3. Create the settings file:
    ```bash
    cp infra/terraform/envs/staging/terraform.tfvars.example infra/terraform/envs/staging/terraform.tfvars
    open -e infra/terraform/envs/staging/terraform.tfvars
    ```
-   - `artifact_bucket` = the **artifact bucket** name. Terraform creates
-     it; do not create it yourself.
+   - `artifact_bucket` = the chosen **artifact bucket** name. Terraform
+     creates it; do not create it yourself.
    - `vercel_team_slug`: leave `lot-sealers-projects`. That is the slug in
      your Vercel dashboard URL, `vercel.com/<slug>/agenticbots`. Change it
      if yours differs.
@@ -257,10 +252,13 @@ Step 9 fixes. For each ✖ it tells you what to do.
 
 ## Step 8 — Create the shared staging infrastructure (≈5 min)
 
-This creates the following shared foundation, with no EC2 server yet. The NAT
-gateway, its public IPv4 address and the control-plane KMS key cost about
-**$37.50/month before credits**, plus storage, requests and data processing.
-- a private network with no inbound access;
+This creates the following shared runtime foundation, with no EC2 server yet.
+Staging no longer creates an idle NAT gateway. A running staging runtime uses a
+public IPv4 address only for outbound traffic and still exposes no inbound
+security-group rules. Review the current estimate before applying; KMS, S3,
+logs, backups, a running EC2 instance, its public IPv4 address, EBS, data
+transfer and model use can still cost money.
+- an isolated staging network with no inbound access;
 - the one allowed remote command;
 - the login role Vercel will use later;
 - daily backups;
