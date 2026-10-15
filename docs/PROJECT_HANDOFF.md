@@ -15,11 +15,11 @@ that profile. Temporary login credentials last 12 hours and can be renewed
 for up to 90 days without repeating browser authentication.
 
 This setup created no AWS resources and does not relax the repository's cloud
-change gates. The toolkit control endpoint uses `us-east-1`, but the project's
-actual selected Region still must be confirmed in AWS Settings before any
-regional resource is planned or created. The AWS starter rules are appended to
-the root `AGENTS.md`; the AgenticBots project rules take precedence where they
-conflict.
+change gates. The owner confirmed the project's selected Region is US East
+(Ohio), `us-east-2`, and the local profile now uses it. The toolkit control
+endpoint remains in its required `us-east-1` Region. The AWS starter rules are
+appended to the root `AGENTS.md`, with help level `HIGH`; the AgenticBots
+project rules take precedence where they conflict.
 
 ## Phase 1 runtime hardening started — 2026-10-12
 
