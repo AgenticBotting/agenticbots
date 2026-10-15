@@ -1,5 +1,5 @@
 # Copy to terraform.tfvars (git-ignored) and fill in.
-region              = "us-east-1"
+region              = "us-east-2"
 # Vercel → Settings → General → "Team URL" / slug. For a personal (Hobby)
 # account this is the scope shown in the dashboard URL, e.g. lot-sealers-projects.
 vercel_team_slug    = "lot-sealers-projects"

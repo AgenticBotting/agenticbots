@@ -84,7 +84,7 @@ export async function seedDemo(r: Repository): Promise<void> {
   /* ── Runtimes ── */
   const mkRuntime = (org: Organization, suspended = false): Runtime =>
     tx.insert("runtimes", {
-      orgId: org.id, provider: "demo", region: "us-east-1", instanceId: `i-0demo${org.slug.replace(/[^a-z]/g, "").slice(0, 8)}`, instanceType: "t3.medium",
+      orgId: org.id, provider: "demo", region: "us-east-2", instanceId: `i-0demo${org.slug.replace(/[^a-z]/g, "").slice(0, 8)}`, instanceType: "t3.medium",
       ec2State: "running", health: suspended ? "stopped" : "healthy", ready: !suspended, runtimeVersion: "1.0.0", engineVersion: "v2026.9.24",
       engineDigest: "sha256:pinned-at-deploy", endpointRef: `agenticbots/demo/tenants/${org.tenantId}/runtime`, diskUsedPct: suspended ? 41 : 29,
       lastHeartbeatAt: ago(0, 0.05), tunnel: suspended ? "down" : "connected", backup: { lastSnapshotAt: ago(0, 6), status: "ok", retentionDays: 30 },
@@ -430,7 +430,7 @@ export async function seedDemo(r: Repository): Promise<void> {
 
   /* ── Deployment history, notes, audit ── */
   for (const [org, rt, kind, detail, days] of [
-    [acme, acmeRt, "provision", "Runtime provisioned (t3.medium, us-east-1, 100 GB encrypted)", 60],
+    [acme, acmeRt, "provision", "Runtime provisioned (t3.medium, us-east-2, 100 GB encrypted)", 60],
     [acme, acmeRt, "deploy_bot", "Ads, SEO, Reviews, Prospecting, Outbound, CRM, Analytics deployed", 58],
     [acme, acmeRt, "deploy_bot", "Reactivation Bot deployed", 30],
     [acme, acmeRt, "restart", "Restart after engine config change", 9],

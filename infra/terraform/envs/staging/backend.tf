@@ -4,7 +4,7 @@ terraform {
   backend "s3" {
     bucket       = "REPLACE-agenticbots-tfstate"
     key          = "staging/terraform.tfstate"
-    region       = "us-east-1"
+    region       = "us-east-2"
     encrypt      = true
     use_lockfile = true
   }

@@ -5,10 +5,10 @@ For the **first staging test**, follow docs/runbooks/FIRST_STAGING_TEST.md inste
 
 | # | What | Where to get it | Where it goes | How to check |
 |---|---|---|---|---|
-| 1 | **AWS admin access** (not root) | AWS → IAM Identity Center user with AdministratorAccess, MFA on | `aws configure sso` on your Mac | `aws sts get-caller-identity` shows your user |
+| 1 | **AWS project access** | Social login protected by MFA; selected Region `us-east-2` in AWS Settings | `aws login --profile agenticbots-staging` | `aws sts get-caller-identity --profile agenticbots-staging` succeeds |
 | 2 | ~~Engine image digest~~ — **done**: pinned in `terraform.tfvars.example` (read from Docker Hub 2026-10-03). Optional re-check: `docker buildx imagetools inspect nousresearch/hermes-agent:v2026.9.24` | — | `terraform.tfvars` → `default_engine_image` | `terraform plan` accepts it |
 | 3 | **Terraform state bucket + settings** | Part 2.4–2.5 of BEGINNER_SETUP | `backend.tf`, `terraform.tfvars` | `terraform init` succeeds |
-| 4 | **Vercel env vars + OIDC** | Vercel project `agenticbots` → Settings | Environment Variables; Security → OIDC (Team) | `/ops` loads in production; sync cron returns 200 |
+| 4 | **Advanced AWS features + Vercel env vars/OIDC** | Activate advanced AWS features before Terraform creates the OIDC provider; Vercel project `agenticbots` → Settings | Environment Variables; Security → OIDC (Team) | Terraform can create/read the provider; `/ops` loads in production |
 | 5 | **Convex platform secret** | `openssl rand -hex 32` | `npx convex env set PLATFORM_SERVER_SECRET … --prod` **and** Vercel | Convex shows `pf_*` tables after first sign-in |
 | 6 | **Cloudflare API token, account id, zone id** | Cloudflare → My Profile → API Tokens (scopes in BEGINNER_SETUP Part 5) | Your shell when running `tenant:provision` | Provision prints the runtime hostname; `tenant:status` → tunnel connected |
 | 7 | **Model provider key(s)** | e.g. Anthropic Console → API Keys | Secrets Manager `agenticbots/prod/tenants/<tenant>/providers` | A Bot Run completes with tokens recorded |

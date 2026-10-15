@@ -49,31 +49,29 @@ or an ad account. **Settings → Reset demo data** starts over.
 ## Part 2 — AWS from the beginning
 
 ### 2.1 Sign in safely
-1. Sign in at https://console.aws.amazon.com with the **root** email once.
-2. **Turn on MFA for root:** top-right account menu → *Security credentials* →
-   *Assign MFA device* → authenticator app.
-3. **Stop using root.** Go to **IAM Identity Center** → *Enable* → *Users* →
-   *Add user* (yourself) → *Permission sets* → create `AdministratorAccess` →
-   *AWS accounts* → assign your user + that permission set. Use the Identity
-   Center sign-in URL from now on, with MFA.
+1. Sign in through the social login connected to the AgenticBots AWS project.
+2. Protect that identity-provider account with MFA.
+3. In **AWS Settings → View all projects → Overview → Additional Info**, confirm
+   the selected Region is **US East (Ohio), `us-east-2`**. Team members are
+   invited from AWS Settings; do not create IAM users or access keys.
 
 ### 2.2 Install the tools on your Mac
 ```bash
 brew install awscli terraform jq
-aws configure sso          # session name: agenticbots, region: us-east-1
-aws sso login --profile <the profile name it printed>
-export AWS_PROFILE=<that profile>
+aws login --profile agenticbots-staging
+aws configure set region us-east-2 --profile agenticbots-staging
+export AWS_PROFILE=agenticbots-staging
 aws sts get-caller-identity   # ✔ shows your account and your user — not root
 ```
 
 ### 2.3 Pick a region
-Use **us-east-1** (N. Virginia) unless you have a reason not to. Everything
-below assumes it; change `region` in `terraform.tfvars` if you pick another.
+The AgenticBots AWS project is restricted to its selected Region,
+**us-east-2** (Ohio). Regional resources must stay there.
 
 ### 2.4 Terraform state (one time)
 Terraform remembers what it created in a state file. Keep it in S3:
 ```bash
-aws s3api create-bucket --bucket agenticbots-tfstate-<something-unique> --region us-east-1
+aws s3api create-bucket --bucket agenticbots-tfstate-<something-unique> --region us-east-2 --create-bucket-configuration LocationConstraint=us-east-2
 aws s3api put-bucket-versioning --bucket agenticbots-tfstate-<…> --versioning-configuration Status=Enabled
 aws s3api put-public-access-block --bucket agenticbots-tfstate-<…> --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 ```

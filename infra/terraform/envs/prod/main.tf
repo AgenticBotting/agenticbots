@@ -1,7 +1,11 @@
 # AgenticBots prod environment. All resources come from modules/platform-stack.
 variable "region" {
   type    = string
-  default = "us-east-1"
+  default = "us-east-2"
+  validation {
+    condition     = var.region == "us-east-2"
+    error_message = "This AWS project is restricted to its selected Region, us-east-2 (Ohio)."
+  }
 }
 variable "vercel_team_slug" { type = string }
 variable "vercel_project_name" {

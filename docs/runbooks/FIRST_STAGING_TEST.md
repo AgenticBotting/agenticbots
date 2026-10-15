@@ -51,6 +51,8 @@ record:
   includes a reviewed manual recovery with a pre-upgrade backup.
 - [ ] AWS cost ceiling, budget alert, alert recipient, destroy procedure and
   Terraform plan have been reviewed by the owner.
+- [ ] Advanced AWS features are active. The managed project policy otherwise
+  blocks the IAM OIDC provider required for Vercel's short-lived AWS login.
 - [ ] `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` pass.
 
 See `docs/research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md` and
@@ -65,7 +67,7 @@ authorize deployment; the owner must approve the exact cloud plan.
 |---|---|
 | **Terminal** | The Mac app (Applications → Utilities → Terminal) where you paste commands. Paste one block, press Return, and wait until it finishes before the next. |
 | **AWS** | Amazon's cloud, where the staging server runs. |
-| **Region** | Which Amazon data center. We use `us-east-1` (N. Virginia) everywhere. |
+| **Region** | Which Amazon data center. This project uses its selected Region, `us-east-2` (Ohio). |
 | **Profile** (AWS) | A saved login on your Mac. Ours is called `agenticbots-staging`. |
 | **Terraform** | A tool that creates cloud resources from the files in `infra/terraform`. |
 | **Cloudflare** | Gives the server a private, encrypted address so only AgenticBots can reach it. |
@@ -81,52 +83,31 @@ cd ~/Desktop/AgenticBots
 
 ---
 
-## Step 1 — AWS account and a safe login (≈30 min)
+## Step 1 — AWS project and a safe login (≈10 min)
 
-1. If you do not have an AWS account: go to https://aws.amazon.com and click
-   **Create an AWS Account**. This "root" login is only for billing and
-   emergencies.
-2. Protect the root login: AWS console → top-right account menu →
-   **Security credentials** → **Assign MFA device** → follow the steps with
-   an authenticator app.
-3. Create the everyday login (IAM Identity Center):
-   1. In the console search bar type **IAM Identity Center** and open it.
-      Make sure the region (top right) says **N. Virginia (us-east-1)**.
-      Click **Enable**.
-   2. **Users → Add user**: your email, first and last name. You will get an
-      invitation email. Open it, set a password and set up MFA.
-   3. **Permission sets → Create permission set → Predefined → AdministratorAccess**
-      → Next → Create.
-   4. **AWS accounts** → tick your account → **Assign users or groups** →
-      choose your user → choose **AdministratorAccess** → Submit.
-   5. On the IAM Identity Center **Dashboard**, copy the **AWS access portal
-      URL** (looks like `https://d-xxxxxxxxxx.awsapps.com/start`).
-4. Install the AWS command-line tool. If `brew` is not installed, first
+1. Sign in through the social login connected to the AgenticBots AWS project.
+   Protect that identity-provider account with MFA.
+2. In **AWS Settings → View all projects → Overview → Additional Info**, confirm
+   the selected Region is **US East (Ohio), `us-east-2`**. Invite any future
+   team member from AWS Settings; do not create IAM users or access keys.
+3. Install the AWS command-line tool. If `brew` is not installed, first
    install Homebrew from https://brew.sh.
    ```bash
    brew install awscli
    ```
-5. Connect it to your login:
+4. Connect it to your login and save the selected Region:
    ```bash
-   aws configure sso
+   aws login --profile agenticbots-staging
+   aws configure set region us-east-2 --profile agenticbots-staging
    ```
-   Answer the questions:
-   - SSO session name: `agenticbots`
-   - SSO start URL: paste the access portal URL
-   - SSO region: `us-east-1`
-   - SSO registration scopes: press Return
-   - A browser opens. Approve it.
-   - Pick your account, then `AdministratorAccess`.
-   - Default client Region: `us-east-1`
-   - CLI default output format: `json`
-   - Profile name: `agenticbots-staging`
-6. **Check:**
+   A browser opens. Sign in and approve CLI access.
+5. **Check:**
    ```bash
    aws sts get-caller-identity --profile agenticbots-staging
    ```
    You should see your 12-digit account number. The login lasts about 8
    hours. When a command later says the token expired, run
-   `aws sso login --profile agenticbots-staging`.
+   `aws login --profile agenticbots-staging`.
 
 ## Step 2 — Tools and code (≈5 min)
 
@@ -147,7 +128,7 @@ bucket once. Paste this whole block:
 ```bash
 export AWS_PROFILE=agenticbots-staging
 SUFFIX=$(openssl rand -hex 4)
-aws s3api create-bucket --bucket agenticbots-tfstate-$SUFFIX --region us-east-1
+aws s3api create-bucket --bucket agenticbots-tfstate-$SUFFIX --region us-east-2 --create-bucket-configuration LocationConstraint=us-east-2
 aws s3api put-bucket-versioning --bucket agenticbots-tfstate-$SUFFIX --versioning-configuration Status=Enabled
 aws s3api put-public-access-block --bucket agenticbots-tfstate-$SUFFIX --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 echo "STATE BUCKET:     agenticbots-tfstate-$SUFFIX"
@@ -272,7 +253,9 @@ Step 9 fixes. For each ✖ it tells you what to do.
 
 ## Step 8 — Create the shared staging infrastructure (≈5 min)
 
-This creates the following, still with no server and no cost to speak of:
+This creates the following shared foundation, with no EC2 server yet. The NAT
+gateway, its public IPv4 address and the control-plane KMS key cost about
+**$37.50/month before credits**, plus storage, requests and data processing.
 - a private network with no inbound access;
 - the one allowed remote command;
 - the login role Vercel will use later;
@@ -381,7 +364,7 @@ That is the whole chain. 🎉
 
 | Symptom | What to do |
 |---|---|
-| `Token has expired` / `SSO session` errors | `aws sso login --profile agenticbots-staging`, then repeat the command |
+| `Token has expired` / login session errors | `aws login --profile agenticbots-staging`, then repeat the command |
 | `staging:check` says the database is unreachable | Check `CONVEX_URL` in `.env.staging`, and that you ran Step 5 (deploy + `env set`) |
 | Cloudflare `failed: … Authentication` | The API token is missing a permission from Step 4 |
 | Provision waits and then says "did not become healthy" | Look at the server (below), then run the same `tenant:provision` command again; it is safe to re-run |
@@ -411,7 +394,7 @@ Copy the output into a chat with Claude.
    - `DEMO_MODE=false`, `PLATFORM_ENV=staging`;
    - `CONVEX_URL`, `NEXT_PUBLIC_CONVEX_URL` and `PLATFORM_SERVER_SECRET`
      (staging values);
-   - `AWS_REGION=us-east-1`;
+   - `AWS_REGION=us-east-2`;
    - `AWS_ROLE_ARN` and `AWS_LIFECYCLE_DOCUMENT` (from Step 8);
    - `RUNTIME_PROVIDER=hermes`;
    - `CRON_SECRET` (any random value).

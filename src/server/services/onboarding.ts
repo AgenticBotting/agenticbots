@@ -391,7 +391,7 @@ function operatorActions(classification: OnboardingClassification, budget: Onboa
 
 function deploymentPlan(row: ClientOnboarding, botStack: OnboardingBotRecommendation[], reqs: OnboardingIntegrationRequirement[], skillRows: OnboardingSkillPlan[], providersConfigured: boolean): OnboardingDeploymentPlan {
   return {
-    runtime: { kind: "client_runtime", region: "us-east-1", status: providersConfigured ? "draft" : "blocked" },
+    runtime: { kind: "client_runtime", region: "us-east-2", status: providersConfigured ? "draft" : "blocked" },
     bots: botStack.filter((b) => b.status !== "not_recommended").map((b) => {
       const type = botTypeOrThrow(b.botType);
       return { botType: b.botType, runtimeProfile: type.runtimeProfile, status: b.status === "recommended" ? "planned" : "optional", skillKeys: skillRows.filter((s) => s.botType === b.botType && s.status === "planned").map((s) => s.skillKey), integrationKeys: type.allowedIntegrations.filter((k) => reqs.some((r) => r.provider === k)) };

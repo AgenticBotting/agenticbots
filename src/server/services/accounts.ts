@@ -65,7 +65,7 @@ export async function createClientOrg(
   tx.insert("runtimes", {
     orgId: org.id,
     provider: mode === "demo" ? "demo" : defaultRuntimeProvider(),
-    region: input.region ?? process.env.AWS_REGION ?? "us-east-1",
+    region: input.region ?? process.env.AWS_REGION ?? "us-east-2",
     instanceType,
     health: mode === "demo" ? "healthy" : "unknown",
     ready: mode === "demo",

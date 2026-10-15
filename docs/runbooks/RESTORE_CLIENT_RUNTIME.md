@@ -7,7 +7,7 @@ kept even after a client cancels.
 ## Before you start
 - Suspend the client in the console (blocks new work).
 - Note the client's **tenant id** and **instance id** (client → Infrastructure).
-- AWS console, region `us-east-1` (or yours), signed in as your admin user (not root).
+- AWS console, selected Region `us-east-2` (Ohio), signed in through the project login.
 
 ## 1. Pick the snapshot
 EC2 → **Snapshots** → filter tag `agenticbots:tenant = <tenant id>` → choose

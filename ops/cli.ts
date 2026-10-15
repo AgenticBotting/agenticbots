@@ -221,7 +221,7 @@ async function cloudflareTunnel(tenantId: string): Promise<{ tunnelToken: string
 
 async function secretsClient() {
   const sm = await import("@aws-sdk/client-secrets-manager");
-  return { sm, c: new sm.SecretsManagerClient({ region: process.env.AWS_REGION ?? "us-east-1" }) };
+  return { sm, c: new sm.SecretsManagerClient({ region: process.env.AWS_REGION ?? "us-east-2" }) };
 }
 
 async function putSecret(id: string, value: unknown) {
@@ -462,7 +462,7 @@ async function stagingCheck() {
   if (db) check("Staging database reachable", true);
   check("AWS_REGION", !!env("AWS_REGION"));
   const sts = spawnSync("aws", ["sts", "get-caller-identity", "--output", "text", "--query", "Account"], { encoding: "utf8" });
-  check(`AWS credentials work${sts.status === 0 ? ` (account ${sts.stdout.trim()})` : ""}`, sts.status === 0, "Install the AWS CLI, then `aws sso login --profile agenticbots-staging` (see the runbook).");
+  check(`AWS credentials work${sts.status === 0 ? ` (account ${sts.stdout.trim()})` : ""}`, sts.status === 0, "Install the AWS CLI, then `aws login --profile agenticbots-staging` (see the runbook).");
   check("terraform or tofu installed", hasTerraform(), "brew install terraform");
   const tfvars = join(tfDir(), "terraform.tfvars");
   const tfv = existsSync(tfvars) ? readFileSync(tfvars, "utf8") : "";

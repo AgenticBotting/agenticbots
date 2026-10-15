@@ -4,6 +4,24 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Read-only AWS inventory and Terraform review — 2026-10-15
+
+The selected Region is empty apart from AWS-managed defaults and estimated
+October spend is `$0.00`: no EC2/EBS/EIP/NAT, S3, Secrets Manager, customer KMS,
+alarms/log groups, SNS, CloudTrail, DLM policies or custom SSM documents exist.
+There is no AWS Budget. Required global-service checks also found no CloudWatch
+log groups or CloudFront WAF web ACLs in `us-east-1`.
+
+A disposable, backend-disabled staging plan was generated with Terraform
+`1.16.6` and AWS provider `6.68.0`: **27 add, 0 change, 0 destroy**, with an
+empty tenant map. Nothing was applied. The live managed project policy denies
+IAM OIDC-provider actions, so the included Vercel OIDC provider is a launch
+blocker until advanced AWS features are active. Region defaults were corrected
+to `us-east-2`, Vercel secret access was narrowed to runtime/profile/webhook
+paths, and the setup docs now match the new AWS login flow. Full evidence,
+costs and remaining blockers are in
+`docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
+
 ## Local AWS Agent Toolkit setup — 2026-10-15
 
 The official AWS Agent Toolkit is installed locally for Codex, Claude Code and
@@ -444,7 +462,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 18. Current blockers
 
-1. **Owner accounts for staging**: AWS IAM Identity Center login, a Cloudflare-hosted runtime domain, a model provider key, the Convex staging project, Vercel env/OIDC (see `docs/WHAT_I_NEED_FROM_YOU.md`).
+1. **Owner accounts for staging**: AWS project login with advanced features, a Cloudflare-hosted runtime domain, a model provider key, the Convex staging project, Vercel env/OIDC (see `docs/WHAT_I_NEED_FROM_YOU.md`).
 2. **Convex functions not redeployed** with the new `platform.page` query (owner runs `npx convex deploy`).
 3. **No real prospecting data source**: every vendor adapter is a stub; implementing one requires reading current vendor docs and the owner's explicit approval for paid usage plus a budget.
 4. `platform-v1` not pushed or merged.

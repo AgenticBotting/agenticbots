@@ -105,9 +105,13 @@ data "aws_iam_policy_document" "permissions" {
     resources = ["*"]
   }
   statement {
-    sid       = "ReadTenantSecrets"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*"]
+    sid     = "ReadTenantSecrets"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [
+      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*/runtime-*",
+      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*/profiles/*",
+      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:agenticbots/${var.environment}/tenants/*/integrations/*/webhook-*",
+    ]
   }
   statement {
     sid       = "DecryptTenantSecrets"

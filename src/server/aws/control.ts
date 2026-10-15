@@ -91,7 +91,7 @@ async function credentials() {
 
 class RealAwsControl implements AwsControl {
   readonly kind = "aws" as const;
-  private region = process.env.AWS_REGION ?? "us-east-1";
+  private region = process.env.AWS_REGION ?? "us-east-2";
   private secretCache = new Map<string, { at: number; value: unknown }>();
 
   private async ec2() {
