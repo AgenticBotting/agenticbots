@@ -4,6 +4,23 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Local AWS Agent Toolkit setup — 2026-10-15
+
+The official AWS Agent Toolkit is installed locally for Codex, Claude Code and
+Cursor. AWS CLI `2.38.1`, `uv 0.13.1` and the 24 default AWS skills were
+installed from the official AWS and Astral sources. The local AWS profile is
+`agenticbots-staging`; browser login and a read-only STS identity check
+succeeded. Every generated `aws-mcp` configuration is explicitly bound to
+that profile. Temporary login credentials last 12 hours and can be renewed
+for up to 90 days without repeating browser authentication.
+
+This setup created no AWS resources and does not relax the repository's cloud
+change gates. The toolkit control endpoint uses `us-east-1`, but the project's
+actual selected Region still must be confirmed in AWS Settings before any
+regional resource is planned or created. The AWS starter rules are appended to
+the root `AGENTS.md`; the AgenticBots project rules take precedence where they
+conflict.
+
 ## Phase 1 runtime hardening started — 2026-10-12
 
 The first local-only controls are implemented. Root and every BOT profile now
