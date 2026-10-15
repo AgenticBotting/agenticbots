@@ -31,6 +31,12 @@ spend limit, so do not direct the owner to activate it until replacement
 budgets/anomaly alerts, a Region SCP, management-account recovery/MFA and
 CloudTrail are concrete and reviewed.
 
+At 11:59 AM ET AWS verified the new **AgenticBots Staging** monthly budget as
+healthy: $40, $0 actual spend, with 85% actual, 100% actual and 100% forecasted
+email alerts delivered to `nick@agenticbots.dev`. This completes the managed
+project's budget gate; anomaly detection and the post-activation replacement
+design remain open.
+
 ## Local AWS Agent Toolkit setup — 2026-10-15
 
 The official AWS Agent Toolkit is installed locally for Codex, Claude Code and

@@ -53,9 +53,10 @@ owner-authorized staging operation because it creates paid infrastructure.
 The 2026-10-15 read-only review produced a valid empty-tenant plan of 27 adds,
 but it is **not apply-ready**: the paid project still blocks OIDC-provider
 operations. Advanced-feature activation would remove that restriction, but it
-is irreversible and removes the active $50 hard spend limit. Replacement cost
-alerts, Region guardrails, hardened remote state and a CloudTrail audit path
-must exist first. See
+is irreversible and removes the active $50 hard spend limit. A healthy $40
+monthly AWS Budget now provides email alerts; anomaly detection, Region
+guardrails, hardened remote state and a CloudTrail audit path must exist first.
+See
 `docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
 
 ## Production configuration still required

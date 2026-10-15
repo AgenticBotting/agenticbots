@@ -45,7 +45,7 @@ with all three early controls. A fresh read-only AWS check confirmed:
 - estimated October usage: **$0.00**;
 - project resources remain empty for EC2, NAT, Elastic IP, S3, Secrets Manager,
   CloudTrail and CloudWatch alarms;
-- AWS Budgets still returns no budget; and
+- AWS Budgets initially returned no budget; and
 - `iam:ListOpenIDConnectProviders` is still explicitly denied by the managed
   service control policy.
 
@@ -56,6 +56,13 @@ Organization and management account, and expands Region/service access. Do not
 activate it as a routine setup click. Prepare replacement budgets, anomaly
 alerts, Region guardrails, management-account recovery/MFA and an audit trail
 first, then make a separate owner decision.
+
+At 11:59 AM ET the owner created the monthly **AgenticBots Staging** budget for
+**$40**. AWS reported it as healthy, with $0 actual spend and email delivery to
+`nick@agenticbots.dev` for 85% actual, 100% actual and 100% forecasted
+thresholds. Together with the project's $50 hard limit and its earlier
+50%/75%/90% controls, staging now has both early notification and automatic
+containment while advanced features remain off.
 
 Source:
 
@@ -136,13 +143,13 @@ Sources:
 - https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html
 - https://docs.aws.amazon.com/accounts/latest/reference/supported-services-sign-up-new.html
 
-### P0 — No budget or spend alert exists
+### P0 resolved for the managed project — Budget and spend limit exist
 
-The plan creates resources with recurring cost, but AWS Budgets returned no
-budget. The paid project now has a $50 hard spend limit and early controls, but
-AWS removes that limit when advanced features are activated. Create replacement
-forecast and actual-spend alerts and anomaly detection before activation, then
-verify them before any shared foundation is applied.
+The paid project now has a healthy $40 monthly budget, three email alerts, a $50
+hard spend limit and early controls. AWS removes the hard limit when advanced
+features are activated. Preserve the $40 budget, add anomaly detection and
+verify the replacement cost-control design before activation and before any
+shared foundation is applied.
 
 ### P0 — No CloudTrail audit trail exists or is planned
 
