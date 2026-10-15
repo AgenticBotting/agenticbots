@@ -51,8 +51,12 @@ record:
   includes a reviewed manual recovery with a pre-upgrade backup.
 - [ ] AWS cost ceiling, budget alert, alert recipient, destroy procedure and
   Terraform plan have been reviewed by the owner.
-- [ ] Advanced AWS features are active. The managed project policy otherwise
-  blocks the IAM OIDC provider required for Vercel's short-lived AWS login.
+- [ ] Before advanced AWS features are activated, replacement budgets and
+  anomaly alerts, a Region SCP, management-account recovery/MFA and CloudTrail
+  are reviewed. Activation is irreversible and removes the project spend limit.
+- [ ] After explicit owner approval, advanced AWS features are active. The
+  managed project policy otherwise blocks the IAM OIDC provider required for
+  Vercel's short-lived AWS login.
 - [ ] `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` pass.
 
 See `docs/research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md` and

@@ -6,8 +6,8 @@
 valid and has a strong isolation baseline, but the AWS project's managed policy
 currently denies IAM OIDC-provider operations. The first apply includes a
 Vercel OIDC provider, so it would fail before the Vercel control plane could be
-completed. Activate advanced AWS features, create a budget and harden the
-audit/state/bootstrap path before requesting approval for an apply.
+completed. Prepare the advanced-feature transition, replacement cost controls
+and the audit/state/bootstrap path before requesting approval for an apply.
 
 This review was read-only in AWS. No AWS, Vercel, Convex or Cloudflare resource
 was created, updated or deleted. No Terraform apply was run.
@@ -16,7 +16,8 @@ was created, updated or deleted. No Terraform apply was run.
 
 Project facts at review time:
 
-- plan: AWS Free plan, with the selected Region **US East (Ohio), `us-east-2`**;
+- plan at the initial review: AWS Free plan, with the selected Region **US East
+  (Ohio), `us-east-2`**;
 - current estimated AWS cost for 2026-10-01 through 2026-10-15: **$0.00**;
 - budgets returned by the AWS Budgets API: none;
 - EC2 instances, EBS volumes, Elastic IPs and NAT gateways: none;
@@ -33,6 +34,32 @@ Project facts at review time:
 The IAM account-summary MFA number was `0`; that metric describes IAM users and
 does not establish whether the social identity provider has MFA. The connected
 social account must be protected separately.
+
+### Paid-plan follow-up at 11:30 AM ET
+
+The owner upgraded the project and enabled a **$50 monthly hard spend limit**
+with all three early controls. A fresh read-only AWS check confirmed:
+
+- account plan: **PAID**, **ACTIVE**;
+- promotional credits remaining: **$120**;
+- estimated October usage: **$0.00**;
+- project resources remain empty for EC2, NAT, Elastic IP, S3, Secrets Manager,
+  CloudTrail and CloudWatch alarms;
+- AWS Budgets still returns no budget; and
+- `iam:ListOpenIDConnectProviders` is still explicitly denied by the managed
+  service control policy.
+
+Paid-plan activation therefore did not remove the OIDC blocker. AWS documents
+advanced-feature activation as a separate, irreversible transition. It removes
+project spend limits, gives the owner direct responsibility for the AWS
+Organization and management account, and expands Region/service access. Do not
+activate it as a routine setup click. Prepare replacement budgets, anomaly
+alerts, Region guardrails, management-account recovery/MFA and an audit trail
+first, then make a separate owner decision.
+
+Source:
+
+- https://docs.aws.amazon.com/accounts/latest/reference/activate-advanced-features.html
 
 ## Reproducible local plan
 
@@ -99,8 +126,10 @@ by the project's managed service control policy, and the plan requires
 spend plan alone does not remove that restriction; the project needs **advanced
 AWS features** before this OIDC design can work.
 
-Action: activate advanced AWS features in AWS Settings, then repeat the
-read-only OIDC capability check and regenerate the plan.
+Action: prepare and review the irreversible advanced-feature transition first.
+After the owner explicitly accepts removal of the hard spend limit and the
+expanded administrative responsibility, activate it in AWS Settings, repeat
+the read-only OIDC capability check and regenerate the plan.
 
 Sources:
 
@@ -110,10 +139,10 @@ Sources:
 ### P0 — No budget or spend alert exists
 
 The plan creates resources with recurring cost, but AWS Budgets returned no
-budget. Create a staging budget with low forecast and actual-spend alerts before
-any shared foundation is applied. Keep the AWS project spend limit as a second
-fail-safe; a spend limit can pause resources and is not a substitute for early
-alerts.
+budget. The paid project now has a $50 hard spend limit and early controls, but
+AWS removes that limit when advanced features are activated. Create replacement
+forecast and actual-spend alerts and anomaly detection before activation, then
+verify them before any shared foundation is applied.
 
 ### P0 — No CloudTrail audit trail exists or is planned
 
@@ -223,8 +252,10 @@ policy after the exact log/metric API calls are confirmed.
 
 ## Next gate
 
-The next owner action is limited to **activating advanced AWS features** and
-creating a low staging budget in AWS Settings/Billing. After that, repeat the
-inventory and capability checks, add the CloudTrail and state-bootstrap
-hardening, run a fresh redacted plan/cost/IAM review, and ask for explicit
+The next gate is a reviewable **advanced-feature activation readiness plan**:
+replacement budgets and anomaly alerts, a Region-restriction SCP, management
+account recovery/MFA, CloudTrail, and hardened state bootstrap. Activation is
+irreversible and removes the $50 hard spend limit, so it requires a separate
+owner decision after those controls are concrete. Then repeat the inventory and
+OIDC check, generate a fresh redacted plan/cost/IAM review, and ask for explicit
 approval for the exact apply. Do not create a tenant in that apply.

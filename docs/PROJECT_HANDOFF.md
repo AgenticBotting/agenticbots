@@ -22,6 +22,15 @@ paths, and the setup docs now match the new AWS login flow. Full evidence,
 costs and remaining blockers are in
 `docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
 
+At 11:30 AM ET the owner upgraded the project to **PAID/ACTIVE**, enabled a
+**$50 hard monthly spend limit** with all early controls, and AWS reported
+**$120 promotional credits remaining**. The follow-up inventory still showed
+$0 usage and no resources. OIDC-provider reads remain explicitly denied. AWS's
+separate advanced-feature activation is irreversible and removes the project
+spend limit, so do not direct the owner to activate it until replacement
+budgets/anomaly alerts, a Region SCP, management-account recovery/MFA and
+CloudTrail are concrete and reviewed.
+
 ## Local AWS Agent Toolkit setup — 2026-10-15
 
 The official AWS Agent Toolkit is installed locally for Codex, Claude Code and
@@ -462,7 +471,7 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 18. Current blockers
 
-1. **Owner accounts for staging**: AWS project login with advanced features, a Cloudflare-hosted runtime domain, a model provider key, the Convex staging project, Vercel env/OIDC (see `docs/WHAT_I_NEED_FROM_YOU.md`).
+1. **Owner accounts for staging**: prepare the irreversible AWS advanced-feature transition and replacement cost/Region guardrails, then Vercel OIDC; also a Cloudflare-hosted runtime domain, a model provider key and the Convex staging project (see `docs/WHAT_I_NEED_FROM_YOU.md`).
 2. **Convex functions not redeployed** with the new `platform.page` query (owner runs `npx convex deploy`).
 3. **No real prospecting data source**: every vendor adapter is a stub; implementing one requires reading current vendor docs and the owner's explicit approval for paid usage plus a budget.
 4. `platform-v1` not pushed or merged.
