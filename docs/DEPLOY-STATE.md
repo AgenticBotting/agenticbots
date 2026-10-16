@@ -1,6 +1,6 @@
 # Where things stand — deployment
 
-_Last updated: October 15, 2026_
+_Last updated: October 16, 2026_
 
 ## Current verified deployment
 
@@ -57,22 +57,31 @@ validation, container-compose validation, shell syntax checks, and the Trivy
 secret/infrastructure scan. The preview is the reviewable release candidate;
 do not promote a failing commit.
 
-No AWS resources have been applied. Terraform now describes private runtime
-subnets, low-cost outbound-only staging, private production NAT, customer
-encryption and isolated client runtimes. Separate local roots now prepare a
-hardened Terraform state bucket and the CloudTrail/audit/anomaly foundation.
-Fresh no-apply plans are 9 adds for state, 21 for audit controls and 23 for the
-empty staging environment, all with 0 change / 0 destroy. The staging plan has
-no NAT, Elastic IP, EC2 instance or tenant.
+The reviewed AWS state and audit foundations are live in `us-east-2`. The state
+bootstrap applied **9 adds, 0 changes, 0 destroys** and was migrated into its
+KMS-encrypted, versioned, private S3 backend. The audit foundation applied **21
+adds, 0 changes, 0 destroys**: active single-Region CloudTrail, protected S3
+and CloudWatch evidence, root/IAM alarms, encrypted SNS security alerts and a
+$5 daily cost-anomaly monitor. A post-apply Terraform plan reports no drift.
+Native S3 state locking passed a live contention test, and CloudTrail delivered
+its first record to both S3 and CloudWatch without error.
+The SNS security-alert email is waiting for its owner confirmation; the cost
+anomaly email is already confirmed.
+
+No runtime environment or client workload has been applied. Terraform still
+describes private runtime subnets, low-cost outbound-only staging, private
+production NAT, customer encryption and isolated client runtimes. The fresh
+empty staging plan remains 23 adds with 0 change / 0 destroy and contains no
+NAT gateway, Elastic IP, EC2 instance or tenant.
 
 The standing launch authorization in `AGENTS.md` now permits reviewed,
 non-destructive applies while the $50 hard spend limit remains active, without
 another per-command confirmation. The paid project still blocks the staging
 OIDC provider until advanced features are active. Activation is irreversible
 and removes the hard limit, so that activation still needs a new owner
-decision. The healthy $40 AWS Budget remains live at $0 actual spend, while
-the anomaly monitor, Region guardrail, hardened state and CloudTrail controls
-are only prepared locally. Follow
+decision. The healthy $40 AWS Budget remains live at $0 actual spend. The
+hardened state, CloudTrail and anomaly controls are live; the Region guardrail
+remains a review-only file until advanced features exist. Follow
 `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` and
 `docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
 

@@ -58,8 +58,12 @@ describe("AWS infrastructure boundary", () => {
     ]) {
       const config = readFileSync(join(ROOT, backend), "utf8");
       expect(config).toContain('encrypt      = true');
-      expect(config).toContain('kms_key_id   = "REPLACE-state-kms-key-arn"');
+      expect(config).toMatch(/bucket\s+=\s+"agenticbots-tfstate-[a-f0-9]{12}"/);
+      expect(config).toMatch(
+        /kms_key_id\s+=\s+"arn:aws:kms:us-east-2:\d{12}:key\/[0-9a-f-]{36}"/,
+      );
       expect(config).toContain('use_lockfile = true');
+      expect(config).not.toContain("REPLACE-");
     }
   });
 

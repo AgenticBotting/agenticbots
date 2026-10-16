@@ -29,9 +29,9 @@ preview at
 checks returned 200 for `/` and the expected private 307 login redirect for
 `/ops`. Production was not promoted.
 
-## AWS foundation hardening prepared — 2026-10-15
+## AWS foundation hardening live — 2026-10-16
 
-Local Terraform now has three ordered layers: `foundation-bootstrap` creates a
+Terraform has three ordered layers: `foundation-bootstrap` creates a
 KMS-encrypted, versioned, TLS-only state bucket with native locking and deletion
 guards; `foundation` creates a single-Region CloudTrail, private encrypted audit
 storage, root/IAM alarms and a $5 daily Cost Anomaly Detection subscription;
@@ -47,19 +47,29 @@ but their security group still has no inbound rules; SSM and the outbound
 Cloudflare tunnel remain the access paths. Production still uses private
 subnets behind NAT, and the tenant module rejects production public IPs.
 
-Fresh backend-disabled plans passed: state bootstrap **9 add**, audit foundation
-**21 add**, and empty-tenant staging **23 add**, each with 0 change / 0 destroy.
-The staging plan contains no NAT gateway, Elastic IP, EC2 instance or tenant.
-AWS Labs IAM Policy Autopilot reviewed all three plan JSON files locally;
-generated deployment policies are broad baselines and must not be attached as
-written. Terraform validation and six infrastructure boundary tests passed.
-No apply, deployment, advanced-feature activation or cloud mutation occurred.
+On October 16 the state bootstrap was applied from its saved **9 add, 0 change,
+0 destroy** plan. Its temporary local state was migrated immediately into the
+new backend. Live checks prove KMS encryption, versioning, all four S3 public
+access blocks, a private bucket policy result and an encrypted remote state
+object. The ignored local backup was removed after that proof.
 
-The live follow-up inventory remains empty for EC2, NAT, Elastic IP, S3,
-CloudTrail and cost anomaly monitors. The existing **AgenticBots Staging**
-Budget is healthy at $40/month with $0 actual spend. The next action is a
-reviewed state-bootstrap apply under the standing launch authorization;
-advanced features remain off.
+The audit foundation was then applied from its saved **21 add, 0 change, 0
+destroy** plan. CloudTrail is actively logging all read/write management
+events in `us-east-2`; its S3 evidence bucket is private, versioned and
+KMS-encrypted; CloudWatch evidence has KMS encryption and 400-day retention;
+root and IAM alarms are enabled; and the $5 daily Cost Anomaly Detection
+subscription is confirmed. A post-apply Terraform refresh reports **No
+changes**. Native S3 lock contention and automatic release passed, and the
+first CloudTrail record reached both S3 and CloudWatch without a delivery
+error. The encrypted SNS security-alert subscription to
+`nick@agenticbots.dev` is still `PendingConfirmation` and needs one owner
+confirmation from the AWS email.
+
+The live project still has no EC2 instance, NAT gateway, Elastic IP, database,
+client runtime or model workload. The existing **AgenticBots Staging** Budget
+is healthy at $40/month with $0 actual spend, the project remains PAID/ACTIVE
+with $120 promotional credits, and the $50 hard limit remains the containment
+boundary. Advanced features remain off.
 
 ## Read-only AWS inventory and Terraform review — 2026-10-15
 

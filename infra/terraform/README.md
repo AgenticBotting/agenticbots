@@ -18,13 +18,13 @@ modules/backups              daily encrypted EBS snapshots by tag
 
 ## Required order
 
-1. Review and, after explicit approval, apply `foundation-bootstrap` with local
-   state. Immediately migrate that state into its new S3 backend using
-   `backend.tf.example`.
-2. Put the resulting bucket name and KMS key ARN in the backend blocks for
-   `foundation`, `envs/staging` and `envs/prod`.
-3. Review and, after explicit approval, apply `foundation`. Confirm the email
-   subscription and audit delivery.
+1. `foundation-bootstrap` was applied on October 16, 2026 and its temporary
+   local state was migrated into the protected S3 backend. Re-run only from a
+   reviewed saved plan under the `AGENTS.md` preflight.
+2. The resulting bucket name and KMS key ARN are recorded in the backend
+   blocks for `foundation`, `envs/staging` and `envs/prod`.
+3. `foundation` was applied on October 16, 2026 with no post-apply drift.
+   Confirm the pending SNS security email and complete the delivery proof.
 4. Complete `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` before any
    advanced-feature activation.
 5. Generate a new staging plan. Never reuse a saved plan after code, variables,

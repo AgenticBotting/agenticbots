@@ -1,8 +1,34 @@
 # AWS inventory and Terraform plan review — 2026-10-15
 
+## Live foundation follow-up — 2026-10-16
+
+The earlier read-only decision below is preserved as review history and is
+superseded for the state/audit foundation only. Under the standing launch
+authorization, the protected state plan applied **9 additions, 0 changes and 0
+deletions**, then migrated its temporary local state into the new encrypted
+backend. Live checks verified KMS encryption, versioning, TLS-only policy, all
+public-access blocks and a private policy result.
+
+The audit plan then applied **21 additions, 0 changes and 0 deletions**.
+CloudTrail is logging all read/write management events in `us-east-2`; the
+audit bucket is private, versioned and KMS-encrypted; the CloudWatch log group
+is KMS-encrypted with 400-day retention; root and IAM alarms are enabled; and
+the daily Cost Anomaly Detection subscription is confirmed for anomalies at
+or above $5. A post-apply Terraform plan reports no changes. The SNS
+security-alert email remains pending owner confirmation. Native S3 state-lock
+contention and automatic release passed, and the first CloudTrail record
+reached both S3 and CloudWatch without a delivery error.
+
+No environment stack, EC2 instance, NAT gateway, Elastic IP, client runtime,
+database or model workload was created. The project is still PAID/ACTIVE, the
+$40 Budget is healthy at $0 actual spend, $120 promotional credits remain and
+the $50 hard spend limit remains the containment boundary. Advanced features
+remain off, so Vercel OIDC and the Region policy attachment are still blocked
+pending the separate irreversible owner decision.
+
 ## Decision
 
-**Do not apply the current plan yet.** The configuration is syntactically
+**Historical decision from October 15:** Do not apply the environment plan yet. The configuration is syntactically
 valid and has a strong isolation baseline, but the AWS project's managed policy
 currently denies IAM OIDC-provider operations. The first apply includes a
 Vercel OIDC provider, so it would fail before the Vercel control plane could be

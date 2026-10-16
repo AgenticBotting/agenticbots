@@ -1,6 +1,6 @@
 # AWS foundation and advanced-feature safety plan
 
-_Last updated: October 15, 2026_
+_Last updated: October 16, 2026_
 
 This is the ordered launch path for the AgenticBots AWS project. The standing
 launch authorization in `AGENTS.md` permits reviewed, non-destructive applies
@@ -18,6 +18,10 @@ change still need a fresh owner decision.
 - Usage at the last read-only check: **$0** and no customer resources.
 - Advanced features: **off**. Vercel OIDC remains blocked by the managed
   project policy.
+- Protected Terraform state: **live and verified** in `us-east-2`.
+- CloudTrail/audit foundation: **live** with no Terraform drift.
+- Cost anomaly subscription: **confirmed** at a $5 daily threshold.
+- Security-alert SNS email: **waiting for owner confirmation**.
 
 Advanced-feature activation is irreversible and removes the hard project spend
 limit. The $40 AWS Budget is only an alert; it does not stop resources. Do not
@@ -77,19 +81,19 @@ before applying.
 
 ## Safe execution order
 
-1. **Review locally.** Run formatting, validation, security tests and a
-   backend-disabled plan. Confirm `0 to destroy`, confirm the $50 hard limit is
-   active, and do not use production data or tenant entries.
-2. **Bootstrap state.** Apply the reviewed state-bucket plan under the standing
-   authorization. Migrate its local state into the new encrypted backend
-   immediately and verify locking/versioning.
-3. **Create the foundation.** Review the exact CloudTrail, alarm, audit bucket
-   and anomaly-monitor plan, confirm it remains within the hard limit, apply it,
-   and confirm the SNS email subscription from the owner mailbox.
-4. **Prove the controls.** Verify CloudTrail is logging, log-file validation is
-   on, a harmless read event reaches CloudWatch/S3, the bucket is private, a
-   second concurrent Terraform lock fails, and an intentional alarm test
-   reaches the owner. Remove test alarms/events only through an approved plan.
+1. **Completed — review locally.** Formatting, validation, security tests and
+   exact plans passed with zero changes or deletions under the $50 limit.
+2. **Completed — bootstrap state.** The state plan applied on October 16 and
+   its temporary local state migrated into the encrypted backend. Encryption,
+   privacy and versioning are verified.
+3. **Completed except one email click — create the foundation.** The audit
+   plan applied on October 16. Confirm the pending SNS security email from the
+   owner mailbox.
+4. **In progress — prove the controls.** Logging, management event selectors,
+   encryption, privacy, versioning, alarms, anomaly monitoring, the first S3
+   and CloudWatch delivery, native state-lock contention/release and a no-drift
+   re-plan are verified. After the SNS confirmation, send one intentional
+   alarm test to the owner. Remove test events only through a reviewed plan.
 5. **Prepare management recovery.** Complete every item in the checklist below
    and store recovery details outside the repository.
 6. **Make the irreversible decision.** Stop and show the owner that the $50
@@ -119,7 +123,7 @@ Complete and record evidence for each item before activation:
   keys are created.
 - [ ] The management account holds governance/audit controls only. Client
   runtimes remain in the approved workload project/account design.
-- [ ] The state bootstrap and CloudTrail foundation are applied and verified.
+- [x] The state bootstrap and CloudTrail foundation are applied and verified.
 - [ ] The $40 budget alerts and $5 daily anomaly summary reach the owner.
 - [ ] `region-guardrail-us-east-2.json` has a tested rollback path and an owner
   copy outside the repository.
@@ -134,7 +138,7 @@ Complete and record evidence for each item before activation:
 - Advanced-feature activation and the Region-policy attachment.
 - Root/MFA/recovery changes.
 - Email subscription confirmation.
-- Any Terraform apply or Vercel/Convex/AWS deployment.
+- Any change outside the standing authorization in `AGENTS.md`.
 - Creating the first client runtime.
 
 These controls are security-sensitive and should remain explicit owner actions.
