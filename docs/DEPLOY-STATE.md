@@ -13,6 +13,17 @@ _Last updated: October 15, 2026_
 **Verified preview:**
 `https://agenticbots-j7bblgl6i-agentic-bots-projects.vercel.app`
 
+**Current branch preview alias:**
+`https://agenticbots-git-platform-v1-agentic-bots-projects.vercel.app`
+
+On October 16, 2026, the standing launch authorization was committed as
+`6f62a9c` and `platform-v1` was pushed through that commit. Vercel built the
+resulting preview successfully:
+`https://agenticbots-ao1uxhk2z-agentic-bots-projects.vercel.app`. An
+authenticated smoke check returned 200 for `/` with the expected security
+headers and 307 for `/ops` to `/login?next=/ops` with private/no-store caching.
+No production alias changed.
+
 The preview reached **Ready** in about two minutes. It is protected by Vercel
 Authentication, so automated public requests receive the expected sign-in
 redirect. Authenticated checks with `vercel curl` passed for:

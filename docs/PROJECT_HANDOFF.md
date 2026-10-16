@@ -22,6 +22,13 @@ exposure; security weakening; or any change without a safe rollback. This
 standing authorization supersedes older handoff text that says the owner must
 run or approve each routine launch command.
 
+The authorization commit `6f62a9c` and the preceding launch-hardening commits
+were pushed to `origin/platform-v1`. Vercel's Git integration produced a Ready
+preview at
+`https://agenticbots-ao1uxhk2z-agentic-bots-projects.vercel.app`; authenticated
+checks returned 200 for `/` and the expected private 307 login redirect for
+`/ops`. Production was not promoted.
+
 ## AWS foundation hardening prepared — 2026-10-15
 
 Local Terraform now has three ordered layers: `foundation-bootstrap` creates a
