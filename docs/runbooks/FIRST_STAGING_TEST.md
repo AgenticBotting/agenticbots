@@ -15,10 +15,11 @@ creates something in the cloud refuses to run unless you put
 `ALLOW_CLOUD_CHANGES=1` in front of it.
 
 **Time:** about 2 hours the first time. Most of it is creating accounts.
-**Cost:** AWS compute, encrypted storage, backups, the outbound NAT gateway,
-model usage and the runtime domain all incur provider charges. Check the
-current AWS and model-provider estimates before applying Terraform, set budget
-alerts first, and destroy staging resources when the test is complete.
+**Cost:** AWS compute, encrypted storage, backups, a public IPv4 address while
+the staging runtime is active, model usage and the runtime domain all incur
+provider charges. Check the current AWS and model-provider estimates before
+applying Terraform, set budget alerts first, and remove idle staging resources
+when the test is complete through a reviewed, data-preserving plan.
 
 Background on what is and isn't ready: `docs/DEPLOYMENT_READINESS_AUDIT.md`.
 
@@ -60,8 +61,10 @@ record:
 - [ ] `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` pass.
 
 See `docs/research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md` and
-`docs/LAUNCH_IMPLEMENTATION_PLAN.md`. Completing this checklist still does not
-authorize deployment; the owner must approve the exact cloud plan.
+`docs/LAUNCH_IMPLEMENTATION_PLAN.md`. When this checklist and the standing
+authorization preflight in `AGENTS.md` pass, routine deployment may proceed
+without another owner confirmation. Advanced-feature activation remains a
+separate owner decision.
 
 ---
 
@@ -131,7 +134,8 @@ Do not create the state bucket with one-off S3 commands. The reviewed
 dedicated rotating KMS key, versioning, native state locking, public-access
 blocks, TLS-only access and deletion protection. Follow
 `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` through the foundation
-verification step. Each apply in that runbook needs a separate owner approval.
+verification step. The standing launch authorization covers each
+non-destructive apply whose preflight passes.
 
 When the protected backend and audit foundation are verified:
 

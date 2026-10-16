@@ -68,7 +68,8 @@ Exit evidence:
 - Security/privacy release checklist is signed off.
 - Rollback to the prior Vercel deployment is documented.
 
-This phase requires a separate owner authorization to deploy or promote.
+The standing launch authorization in `AGENTS.md` covers this deployment and
+promotion once the phase exit evidence and required checks pass.
 
 ## Phase 1 — Runtime contract hardening (local only)
 

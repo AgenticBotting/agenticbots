@@ -2,10 +2,11 @@
 
 _Last updated: October 15, 2026_
 
-This is the ordered launch path for the AgenticBots AWS project. It is a plan
-and a set of Terraform configurations; it does not authorize any cloud change.
-Every `apply`, policy attachment and advanced-feature activation needs a fresh,
-explicit owner approval after the exact plan and cost are shown.
+This is the ordered launch path for the AgenticBots AWS project. The standing
+launch authorization in `AGENTS.md` permits reviewed, non-destructive applies
+while the $50 hard spend limit remains active. Advanced-feature activation,
+Region-policy attachment after activation and any destructive or over-budget
+change still need a fresh owner decision.
 
 ## Current protection
 
@@ -77,22 +78,23 @@ before applying.
 ## Safe execution order
 
 1. **Review locally.** Run formatting, validation, security tests and a
-   backend-disabled plan. Confirm `0 to destroy`. Do not use production data or
-   tenant entries.
-2. **Approve and bootstrap state.** The owner reviews the exact state-bucket
-   plan and cost, then explicitly approves that apply. Migrate its local state
-   into the new encrypted backend immediately and verify locking/versioning.
-3. **Approve and create the foundation.** Review the exact CloudTrail,
-   alarm, audit bucket and anomaly-monitor plan. Apply only after explicit
-   approval. Confirm the SNS email subscription from the owner mailbox.
+   backend-disabled plan. Confirm `0 to destroy`, confirm the $50 hard limit is
+   active, and do not use production data or tenant entries.
+2. **Bootstrap state.** Apply the reviewed state-bucket plan under the standing
+   authorization. Migrate its local state into the new encrypted backend
+   immediately and verify locking/versioning.
+3. **Create the foundation.** Review the exact CloudTrail, alarm, audit bucket
+   and anomaly-monitor plan, confirm it remains within the hard limit, apply it,
+   and confirm the SNS email subscription from the owner mailbox.
 4. **Prove the controls.** Verify CloudTrail is logging, log-file validation is
    on, a harmless read event reaches CloudWatch/S3, the bucket is private, a
    second concurrent Terraform lock fails, and an intentional alarm test
    reaches the owner. Remove test alarms/events only through an approved plan.
 5. **Prepare management recovery.** Complete every item in the checklist below
    and store recovery details outside the repository.
-6. **Make the irreversible decision.** Show the owner that the $50 hard limit
-   will disappear. Activation in AWS Settings requires its own approval.
+6. **Make the irreversible decision.** Stop and show the owner that the $50
+   hard limit will disappear. Activation in AWS Settings requires a new owner
+   decision and is outside the standing authorization.
 7. **Immediately after activation:** attach and test the Region guardrail,
    verify the $40 Budget and cost anomaly subscription still work, repeat the
    read-only inventory, and confirm no resource exists outside approved

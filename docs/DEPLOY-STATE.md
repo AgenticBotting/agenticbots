@@ -54,12 +54,14 @@ Fresh no-apply plans are 9 adds for state, 21 for audit controls and 23 for the
 empty staging environment, all with 0 change / 0 destroy. The staging plan has
 no NAT, Elastic IP, EC2 instance or tenant.
 
-Applying anything still requires a separate owner-authorized operation. The
-paid project blocks the staging OIDC provider until advanced features are
-active. Activation is irreversible and removes the active $50 hard spend
-limit. The healthy $40 AWS Budget remains live at $0 actual spend, while the
-anomaly monitor, Region guardrail, hardened state and CloudTrail controls are
-only prepared locally. Follow
+The standing launch authorization in `AGENTS.md` now permits reviewed,
+non-destructive applies while the $50 hard spend limit remains active, without
+another per-command confirmation. The paid project still blocks the staging
+OIDC provider until advanced features are active. Activation is irreversible
+and removes the hard limit, so that activation still needs a new owner
+decision. The healthy $40 AWS Budget remains live at $0 actual spend, while
+the anomaly monitor, Region guardrail, hardened state and CloudTrail controls
+are only prepared locally. Follow
 `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` and
 `docs/AWS_INVENTORY_AND_TERRAFORM_REVIEW_2026-10-15.md`.
 

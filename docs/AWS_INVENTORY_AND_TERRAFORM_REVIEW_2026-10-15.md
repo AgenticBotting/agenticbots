@@ -288,9 +288,11 @@ policy after the exact log/metric API calls are confirmed.
 
 The advanced-feature readiness controls are now concrete and reviewable, but
 they are not live. The next gate is to choose globally unique state and audit
-bucket names, generate one final redacted bootstrap plan and obtain explicit
-owner approval for that exact **state-bootstrap-only** apply. After the state
-and audit foundation are live and tested, the owner can separately decide
+bucket names and generate one final redacted bootstrap plan. If its preflight
+passes with no destroy/replacement and the $50 hard limit remains active, the
+standing launch authorization permits that **state-bootstrap-only** apply
+without another question. After the state and audit foundation are live and
+tested, the owner can separately decide
 whether to activate advanced features. Activation remains irreversible and
 removes the $50 hard spend limit. Repeat the inventory and OIDC check after any
 activation, then generate a fresh platform plan. Do not create a tenant in any

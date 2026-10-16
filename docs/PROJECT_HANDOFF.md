@@ -4,6 +4,24 @@ _For the next senior coding agent. Written 2026-10-04. Read `AGENTS.md` (repo ro
 
 ---
 
+## Standing launch authorization — 2026-10-16
+
+The owner authorized agents to carry the existing launch program through
+tested deployment without pausing for confirmation at each reversible step.
+The exact scope and remaining stop conditions are canonical in `AGENTS.md`.
+Routine commits, pushes, Vercel/Convex deployments, reviewed Terraform applies,
+non-destructive AWS changes under the active $50 hard limit, safe web DNS
+records and data-preserving rollbacks may proceed once their preflight checks
+pass.
+
+Agents must still stop for advanced AWS feature activation or removal/raising
+of the hard limit; destructive production/data/history changes; domain,
+nameserver or email-DNS changes; unbudgeted paid services; real customer
+messages, charges, publishing, CRM/ad writes; legal acceptance; secret
+exposure; security weakening; or any change without a safe rollback. This
+standing authorization supersedes older handoff text that says the owner must
+run or approve each routine launch command.
+
 ## AWS foundation hardening prepared — 2026-10-15
 
 Local Terraform now has three ordered layers: `foundation-bootstrap` creates a
@@ -32,9 +50,9 @@ No apply, deployment, advanced-feature activation or cloud mutation occurred.
 
 The live follow-up inventory remains empty for EC2, NAT, Elastic IP, S3,
 CloudTrail and cost anomaly monitors. The existing **AgenticBots Staging**
-Budget is healthy at $40/month with $0 actual spend. The next action is an
-owner-reviewed and explicitly approved state-bootstrap apply; advanced features
-remain off.
+Budget is healthy at $40/month with $0 actual spend. The next action is a
+reviewed state-bootstrap apply under the standing launch authorization;
+advanced features remain off.
 
 ## Read-only AWS inventory and Terraform review — 2026-10-15
 
@@ -403,7 +421,7 @@ Demo sign-in (demo mode only), password `agenticbots-demo`: `admin@agenticbots.d
 | `npm run ops -- <cmd>` / `ops:staging -- <cmd>` | Provisioning CLI (see header of `ops/cli.ts`) |
 | `npm run prospecting:seed` / `prospecting:seed:staging` | Load ontology (idempotent, free) |
 | `npm run prospecting:embed-seed` | Re-embed CSVs after editing them |
-| `npx convex deploy` | Deploy Convex functions (owner runs it; required after `convex/` changes) |
+| `npx convex deploy` | Deploy Convex functions after checks pass under the standing launch authorization |
 
 Tooling notes for a cloud agent: scripts importing `server-only` modules need `tsx --conditions=react-server` (as the npm scripts do). Vitest aliases `server-only` to `tests/support/empty.ts` and runs with `DEMO_MODE=true`.
 
@@ -517,8 +535,8 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 19. Recommended next five tasks (in order)
 
-1. **Verify locally and push**: run `npm run build`, `npm test`, `npm run test:e2e` on the owner's machine; fix anything; ask the owner before pushing `platform-v1`.
-2. **First AWS staging test** per `docs/runbooks/FIRST_STAGING_TEST.md` (owner supplies accounts; no apply without `ALLOW_CLOUD_CHANGES=1` and owner approval). Include `npx convex deploy` and `prospecting:seed:staging`.
+1. **Verify locally and push**: run `npm run build`, `npm test`, `npm run test:e2e`; fix anything; then push `platform-v1` under the standing launch authorization.
+2. **First AWS staging test** per `docs/runbooks/FIRST_STAGING_TEST.md`; use `ALLOW_CLOUD_CHANGES=1` only after the preflight passes. Include `npx convex deploy` and `prospecting:seed:staging`. Advanced-feature activation remains a separate owner decision.
 3. **Background job worker for prospecting**: run `pg_jobs` outside the request (Vercel cron route calling `runQueuedJobs`, guarded by `CRON_SECRET`); make server actions enqueue only.
 4. **Wire Prospecting Bot tool access**: issue the existing runtime/org/Bot-scoped short-lived tool tokens server-side to the Prospecting Bot's runtime profile (via the runtime facade, never exposing other secrets) and expose the 16 tools to the skill.
 5. **First real data adapter, with approval**: implement one contact/verification vendor (from current docs, recorded-response contract test, configured price, client budget, small run), then one discovery source.

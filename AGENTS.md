@@ -26,17 +26,55 @@ next tasks: `docs/PROJECT_HANDOFF.md`.
 - Client-facing terminology is **BOT, BOTS, BOT RUN, BOT ACTIVITY**. Never
   rename Bots to "agents" in UI, copy, routes, types or data.
 
-## Hard prohibitions (never, without the owner's explicit approval in the current task)
+## Standing launch authorization — October 16, 2026
 
-- Deploy anything (Vercel, Convex, AWS, Cloudflare) or run `terraform apply`,
-  `npx convex deploy`, `vercel deploy`, or the CLI with `ALLOW_CLOUD_CHANGES=1`.
-- Make destructive cloud or data changes; delete append-only records.
-- Incur paid third-party API usage (data vendors, model providers, email).
-- Push to GitHub, merge to `main`, force-push, or rewrite published history.
-- Add, print, log or commit secrets. `.env*` files other than `*.example`
-  are never committed.
-- Send real email/messages or write to a real CRM/ad account from code paths
-  you add without approval and policy checks.
+The owner authorizes coding agents to carry the current launch program from
+local development through tested production deployment without asking for a
+new confirmation at every reversible step. This standing authorization remains
+in force until the owner revokes it in writing or changes the limits below.
+
+Within this launch scope, agents may autonomously:
+
+- edit, test, commit, push the current branch, open/update pull requests and
+  merge through normal branch protection after required checks pass;
+- deploy Vercel previews and production releases, deploy Convex functions,
+  run reviewed Terraform applies and use `ALLOW_CLOUD_CHANGES=1` for the
+  reviewed AgenticBots AWS launch plan;
+- create or update non-destructive AWS resources in the selected Region,
+  including state, audit, monitoring, staging and production infrastructure,
+  while the AWS project retains its **$50 monthly hard spend limit**;
+- add or update required web DNS records after recording the existing values;
+  do not alter nameservers or email-delivery records under this authorization;
+- configure already-available credentials in provider secret stores without
+  printing, logging, downloading or committing their values; and
+- roll back a failed release to the last known-good application or
+  infrastructure version when the rollback preserves data and audit evidence.
+
+Before a cloud or production change, inspect the exact diff/plan, run the
+required repository checks, confirm that no unintended destroy or replacement
+is present, confirm the $50 hard limit is active, and record the result in the
+handoff/status docs. If those gates pass, proceed without another question.
+Do not ask the owner to reconfirm an action already covered by this standing
+authorization.
+
+## Actions that still require a fresh owner decision
+
+- Activate advanced AWS features, remove or raise the $50 hard spend limit, or
+  accept a projected recurring cost above that limit.
+- Destroy production resources or data, delete append-only/audit records,
+  force-push, rewrite published history, transfer the domain, change
+  nameservers, or change MX/SPF/DKIM/DMARC records.
+- Buy or enable paid model, data-vendor, email, advertising or other third-party
+  usage outside an already approved fail-closed budget.
+- Send real email/messages, charge a customer, publish on a client's behalf,
+  change ads, or write/delete data in a real CRM or customer system. Existing
+  product approval and policy gates still apply to every such action.
+- Accept legal terms, sign contracts, expose a secret, weaken tenant isolation,
+  disable audit/security controls, or continue when a safe rollback is not
+  available.
+
+Secrets are never added to source, output, logs or commits. `.env*` files other
+than `*.example` are never committed.
 
 ## Engineering rules
 
@@ -119,7 +157,8 @@ status doc when the state of the project changes.
 - Commit logical changes to the current working branch with clear messages.
 - Do not commit `.platform-data/`, `.env*` (except examples), build output,
   or generated demo state.
-- Do not push unless the owner asks.
+- Push and merge under the standing launch authorization only after required
+  checks pass. Never force-push or rewrite published history.
 
 <!-- BEGIN:aws-agent-toolkit-starter-rules -->
 
