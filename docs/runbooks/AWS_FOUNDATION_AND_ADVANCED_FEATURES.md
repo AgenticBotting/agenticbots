@@ -21,7 +21,8 @@ change still need a fresh owner decision.
 - Protected Terraform state: **live and verified** in `us-east-2`.
 - CloudTrail/audit foundation: **live** with no Terraform drift.
 - Cost anomaly subscription: **confirmed** at a $5 daily threshold.
-- Security-alert SNS email: **waiting for owner confirmation**.
+- Security-alert SNS email: **confirmed and delivery-tested**. The labeled test
+  reached the owner and the alarm returned to `OK` with actions enabled.
 
 Advanced-feature activation is irreversible and removes the hard project spend
 limit. The $40 AWS Budget is only an alert; it does not stop resources. Do not
@@ -86,14 +87,13 @@ before applying.
 2. **Completed — bootstrap state.** The state plan applied on October 16 and
    its temporary local state migrated into the encrypted backend. Encryption,
    privacy and versioning are verified.
-3. **Completed except one email click — create the foundation.** The audit
-   plan applied on October 16. Confirm the pending SNS security email from the
-   owner mailbox.
-4. **In progress — prove the controls.** Logging, management event selectors,
+3. **Completed — create the foundation.** The audit plan applied on October 16,
+   and the owner security-alert subscription is confirmed.
+4. **Completed — prove the controls.** Logging, management event selectors,
    encryption, privacy, versioning, alarms, anomaly monitoring, the first S3
    and CloudWatch delivery, native state-lock contention/release and a no-drift
-   re-plan are verified. After the SNS confirmation, send one intentional
-   alarm test to the owner. Remove test events only through a reviewed plan.
+   re-plan are verified. One intentional, clearly labeled alarm test reached
+   the owner; the alarm returned to `OK` and no IAM change occurred.
 5. **Prepare management recovery.** Complete every item in the checklist below
    and store recovery details outside the repository.
 6. **Make the irreversible decision.** Stop and show the owner that the $50
@@ -124,7 +124,9 @@ Complete and record evidence for each item before activation:
 - [ ] The management account holds governance/audit controls only. Client
   runtimes remain in the approved workload project/account design.
 - [x] The state bootstrap and CloudTrail foundation are applied and verified.
-- [ ] The $40 budget alerts and $5 daily anomaly summary reach the owner.
+- [ ] The $40 budget and $5 daily anomaly subscriptions are confirmed to the
+  owner email; mark this complete after the first real alert or summary proves
+  delivery. The separate security-alert delivery test has passed.
 - [ ] `region-guardrail-us-east-2.json` has a tested rollback path and an owner
   copy outside the repository.
 - [ ] The last inventory is empty outside `us-east-2`; only approved global
@@ -137,7 +139,6 @@ Complete and record evidence for each item before activation:
 
 - Advanced-feature activation and the Region-policy attachment.
 - Root/MFA/recovery changes.
-- Email subscription confirmation.
 - Any change outside the standing authorization in `AGENTS.md`.
 - Creating the first client runtime.
 

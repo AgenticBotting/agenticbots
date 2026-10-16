@@ -24,7 +24,8 @@ modules/backups              daily encrypted EBS snapshots by tag
 2. The resulting bucket name and KMS key ARN are recorded in the backend
    blocks for `foundation`, `envs/staging` and `envs/prod`.
 3. `foundation` was applied on October 16, 2026 with no post-apply drift.
-   Confirm the pending SNS security email and complete the delivery proof.
+   Its owner SNS subscription and labeled CloudWatch delivery proof are
+   complete; the tested alarm returned to `OK` with actions enabled.
 4. Complete `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` before any
    advanced-feature activation.
 5. Generate a new staging plan. Never reuse a saved plan after code, variables,

@@ -15,9 +15,11 @@ audit bucket is private, versioned and KMS-encrypted; the CloudWatch log group
 is KMS-encrypted with 400-day retention; root and IAM alarms are enabled; and
 the daily Cost Anomaly Detection subscription is confirmed for anomalies at
 or above $5. A post-apply Terraform plan reports no changes. The SNS
-security-alert email remains pending owner confirmation. Native S3 state-lock
-contention and automatic release passed, and the first CloudTrail record
-reached both S3 and CloudWatch without a delivery error.
+security-alert email is confirmed with authenticated unsubscribe protection.
+An explicitly labeled alarm test reached the owner's Gmail inbox, and the
+alarm returned to `OK` with actions enabled; no IAM change occurred. Native S3
+state-lock contention and automatic release passed, and the first CloudTrail
+record reached both S3 and CloudWatch without a delivery error.
 
 No environment stack, EC2 instance, NAT gateway, Elastic IP, client runtime,
 database or model workload was created. The project is still PAID/ACTIVE, the
@@ -270,12 +272,14 @@ That is acceptable for the standard staging tier but does not satisfy the
 optional enterprise high-availability tier. The HA tier needs an explicit
 multi-AZ egress and runtime design, tested failover and a higher cost estimate.
 
-### P1 — Alarm delivery is optional in staging
+### P1 reduced — Foundation alarm delivery is verified; runtime delivery must remain required
 
-An empty `alarm_email` produces an SNS topic with no subscriber. Require and
-confirm the staging alarm recipient before the first runtime. Production already
-has a runtime precondition for an alarm topic, but subscription delivery must be
-tested too.
+The foundation security topic now has a confirmed owner subscriber and a live
+CloudWatch delivery test. An empty environment `alarm_email` can still produce
+a runtime topic without a subscriber. Require and confirm the staging runtime
+recipient before the first runtime. Production already has a runtime
+precondition for an alarm topic, but its subscription delivery must be tested
+too.
 
 ### P1 — AMI and bootstrap changes do not roll forward automatically
 

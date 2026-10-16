@@ -16,6 +16,9 @@ _Last updated: October 16, 2026_
 **Current branch preview alias:**
 `https://agenticbots-git-platform-v1-agentic-bots-projects.vercel.app`
 
+**Latest verified infrastructure-doc preview:**
+`https://agenticbots-pdw5276y9-agentic-bots-projects.vercel.app`
+
 On October 16, 2026, the standing launch authorization was committed as
 `6f62a9c` and `platform-v1` was pushed through that commit. Vercel built the
 resulting preview successfully:
@@ -65,8 +68,10 @@ and CloudWatch evidence, root/IAM alarms, encrypted SNS security alerts and a
 $5 daily cost-anomaly monitor. A post-apply Terraform plan reports no drift.
 Native S3 state locking passed a live contention test, and CloudTrail delivered
 its first record to both S3 and CloudWatch without error.
-The SNS security-alert email is waiting for its owner confirmation; the cost
-anomaly email is already confirmed.
+The encrypted SNS security-alert email subscription is confirmed with
+authenticated unsubscribe protection. An explicitly labeled alarm test reached
+the owner's Gmail inbox, and the tested alarm is back in `OK` with actions
+enabled. The cost-anomaly email subscription is also confirmed.
 
 No runtime environment or client workload has been applied. Terraform still
 describes private runtime subnets, low-cost outbound-only staging, private

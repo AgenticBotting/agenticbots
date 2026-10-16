@@ -62,8 +62,10 @@ subscription is confirmed. A post-apply Terraform refresh reports **No
 changes**. Native S3 lock contention and automatic release passed, and the
 first CloudTrail record reached both S3 and CloudWatch without a delivery
 error. The encrypted SNS security-alert subscription to
-`nick@agenticbots.dev` is still `PendingConfirmation` and needs one owner
-confirmation from the AWS email.
+`nick@agenticbots.dev` is confirmed with authenticated unsubscribe protection.
+An explicitly labeled test moved `agenticbots-iam-api-activity` to `ALARM`, the
+owner received the matching Amazon CloudWatch email in Gmail, and the alarm
+returned to `OK` with actions enabled. No IAM change occurred during the test.
 
 The live project still has no EC2 instance, NAT gateway, Elastic IP, database,
 client runtime or model workload. The existing **AgenticBots Staging** Budget
