@@ -6,9 +6,10 @@ _Last updated: October 16, 2026_
 
 The public website and interface build successfully on Vercel. AWS has the
 protected Terraform state, CloudTrail, security alarms and cost controls. The
-deployed Vercel project currently has no platform environment variables, no
-Convex staging database and no client runtime. There is therefore no real BOT
-behind the deployed dashboard yet.
+deployed Vercel project currently has no platform environment variables or
+client runtime. A separate Convex staging project now exists and its platform
+functions are deployed, but it is only connected to the local staging setup.
+There is therefore no real BOT behind the deployed dashboard yet.
 
 The software becomes a working system when this chain passes:
 
@@ -52,12 +53,17 @@ The proof passes only when all of these are true:
 
 ## What is still needed
 
-Only three outside services are missing from the test harness:
+The durable staging database is now complete: project `agenticbots-staging`
+exists, its platform secret and functions are configured, and the repository
+health check succeeds.
 
-1. A separate `agenticbots-staging` Convex project for durable platform data.
-2. A Cloudflare-managed runtime domain and least-privilege API token for the
+Two outside services and one qualification gate remain:
+
+1. A Cloudflare-managed runtime domain and least-privilege API token for the
    private outbound tunnel.
-3. One server-side model API key with a small provider-enforced staging limit.
+2. One server-side model API key with a small provider-enforced staging limit.
+3. Qualification of the pinned Hermes candidate on an isolated AWS staging
+   server before it can be promoted into a client runtime.
 
 Do not paste any key into chat or source code. The setup flow places values in
 the correct provider secret store without printing them.
@@ -71,7 +77,7 @@ needed to prove the BOT and remain a later explicit owner decision.
 
 1. Qualify the current stable Hermes candidate in an isolated AWS staging
    runtime. Docker runs on that server; it is not required on the owner's Mac.
-2. Create/configure the separate Convex and Cloudflare staging resources.
+2. Configure the Cloudflare staging resource; Convex staging is complete.
 3. Generate the exact Terraform plan and verify zero destroys/replacements and
    the current $50 hard limit.
 4. Create one fictional tenant and one SEO BOT.

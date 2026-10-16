@@ -84,10 +84,19 @@ boundary. Advanced features remain off.
 
 The Vercel preview currently proves the public website and interface build,
 not a live BOT platform. No environment variables are configured in the
-Vercel project, and the staging Convex project, Cloudflare runtime tunnel,
-model credential and AWS client runtime do not exist yet. A real BOT cannot
-run until that chain is connected. This is stated plainly in
+Vercel project. The separate `agenticbots-staging` Convex project and platform
+functions are now deployed and reachable from the ignored local staging
+configuration, but the Cloudflare runtime tunnel, model credential and AWS
+client runtime do not exist yet. A real BOT cannot run until that chain is
+connected. This is stated plainly in
 `docs/runbooks/PROVE_ONE_REAL_BOT.md`.
+
+The first Convex deployment caught an ES target mismatch in
+`convex/platformIntegrity.ts`: `Object.hasOwn` was unavailable in Convex's
+typecheck target. It now uses
+`Object.prototype.hasOwnProperty.call`, with coverage for protected own fields
+and inherited properties. Convex functions deploy cleanly and the staging
+repository health check passes. No customer data existed during this change.
 
 The first real test no longer depends on Vercel OIDC or advanced AWS features.
 Staging defaults `enable_vercel_control_plane=false`; the local operator app
@@ -595,11 +604,12 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 18. Current blockers
 
-1. **Three staging services**: create the separate Convex staging project, a
-   Cloudflare-hosted runtime domain/tunnel credential and one capped model
-   provider key. Advanced AWS features and Vercel OIDC are no longer blockers
-   for the first local proof (see `docs/runbooks/PROVE_ONE_REAL_BOT.md`).
-2. **Convex functions not redeployed** with the new `platform.page` query (owner runs `npx convex deploy`).
+1. **Two staging services**: configure a Cloudflare-hosted runtime domain and
+   tunnel credential plus one capped model-provider key. Convex staging is
+   complete. Advanced AWS features and Vercel OIDC are no longer blockers for
+   the first local proof (see `docs/runbooks/PROVE_ONE_REAL_BOT.md`).
+2. **Hermes qualification**: the current candidate remains blocked until its
+   source, container, contract, SBOM, restore and staging-canary gates pass.
 3. **No real prospecting data source**: every vendor adapter is a stub; implementing one requires reading current vendor docs and the owner's explicit approval for paid usage plus a budget.
 4. `platform-v1` is pushed but not merged or promoted to production.
 

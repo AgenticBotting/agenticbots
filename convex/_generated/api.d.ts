@@ -11,6 +11,9 @@
 import type * as auth from "../auth.js";
 import type * as course from "../course.js";
 import type * as http from "../http.js";
+import type * as platform from "../platform.js";
+import type * as platformIntegrity from "../platformIntegrity.js";
+import type * as platformTables from "../platformTables.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +25,9 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   course: typeof course;
   http: typeof http;
+  platform: typeof platform;
+  platformIntegrity: typeof platformIntegrity;
+  platformTables: typeof platformTables;
 }>;
 
 /**

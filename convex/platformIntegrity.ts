@@ -17,6 +17,9 @@ const SHARED = new Set([
   "pg_company_merge_reviews", "pg_people", "pg_company_people", "pg_contact_points", "pg_domain_intel", "pg_signals",
 ]);
 
+const hasOwn = (value: Record<string, unknown>, key: string): boolean =>
+  Object.prototype.hasOwnProperty.call(value, key);
+
 export function validateRecord(table: string, id: string, doc: Record<string, unknown>): void {
   if (!doc || typeof doc !== "object" || Array.isArray(doc) || doc.id !== id || typeof id !== "string" || !id || id.length > 200) throw new Error("Invalid record identity.");
   if (!Number.isSafeInteger(doc.version) || Number(doc.version) < 1) throw new Error("Invalid record version.");
@@ -54,7 +57,7 @@ export function validatePatch(table: string, patch: Record<string, unknown>, exi
   if (!patch || typeof patch !== "object" || Array.isArray(patch)) throw new Error("Invalid record patch.");
   if (IMMUTABLE.has(table)) throw new Error("Immutable history cannot be edited. Record a correction event.");
   for (const key of ["id", "orgId", "createdAt", "version", "__proto__", "constructor", "prototype"]) {
-    if (Object.hasOwn(patch, key)) throw new Error("Record identity and ownership cannot be changed.");
+    if (hasOwn(patch, key)) throw new Error("Record identity and ownership cannot be changed.");
   }
   const boundFields: Record<string, string[]> = {
     sessions: ["userId", "tokenHash", "expiresAt"],
@@ -65,7 +68,7 @@ export function validatePatch(table: string, patch: Record<string, unknown>, exi
     privacy_cases: ["subjectUserId", "contactEmail", "kind", "details", "dueAt"],
     processed_webhooks: ["source", "externalId"],
   };
-  if ((boundFields[table] ?? []).some(key => Object.hasOwn(patch, key))) throw new Error("Security binding cannot be changed.");
+  if ((boundFields[table] ?? []).some(key => hasOwn(patch, key))) throw new Error("Security binding cannot be changed.");
   // A payment is immutable except for a one-time link to its correction payment.
   if (table === "payments") {
     if (Object.keys(patch).some(k => !["updatedAt", "reversedByPaymentId"].includes(k)) ||

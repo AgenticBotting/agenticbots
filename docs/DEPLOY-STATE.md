@@ -90,6 +90,13 @@ store, AWS runtime connection or model provider behind `/ops`; the current
 deployment is a verified website and interface shell. The exact real-software
 proof and pass/fail criteria are in `docs/runbooks/PROVE_ONE_REAL_BOT.md`.
 
+A separate Convex project, `agenticbots-staging`, is now provisioned for the
+local staging path. Its platform secret and functions are configured and its
+repository health check passes. During the first deploy, Convex's TypeScript
+target rejected `Object.hasOwn`; the storage-integrity check now uses the
+compatible `Object.prototype.hasOwnProperty.call` form with regression tests.
+No customer data was present. Convex is not yet connected to Vercel.
+
 The first staging proof now leaves `enable_vercel_control_plane=false` and
 runs the operator app locally with the owner's short-lived AWS profile. This
 removes Vercel OIDC and advanced-feature activation from the first-test path
