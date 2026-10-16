@@ -43,6 +43,20 @@ describe("AWS infrastructure boundary", () => {
     expect(runtimeSecurityGroup).not.toMatch(/\bingress\s*\{/);
   });
 
+  it("keeps the first staging proof independent of irreversible Vercel OIDC activation", () => {
+    const staging = readFileSync(join(ROOT, "infra/terraform/envs/staging/main.tf"), "utf8");
+    const production = readFileSync(join(ROOT, "infra/terraform/envs/prod/main.tf"), "utf8");
+    const stack = readFileSync(join(ROOT, "infra/terraform/modules/platform-stack/main.tf"), "utf8");
+
+    expect(staging).toContain('variable "enable_vercel_control_plane"');
+    expect(staging).toContain("default     = false");
+    expect(staging).toContain("enable_vercel_control_plane       = var.enable_vercel_control_plane");
+    expect(production).toContain('variable "enable_vercel_control_plane"');
+    expect(production).toContain("default = true");
+    expect(stack).toContain("count                      = var.enable_vercel_control_plane ? 1 : 0");
+    expect(stack).toContain("try(module.control_plane[0].role_arn, null)");
+  });
+
   it("protects Terraform state with encryption, versioning, TLS and deletion guards", () => {
     const bootstrap = readFileSync(join(ROOT, "infra/terraform/foundation-bootstrap/main.tf"), "utf8");
 

@@ -364,15 +364,17 @@ const SHARED_TARGETS = [
 async function envApply() {
   requireLiveMode();
   say(`Creating the shared ${tfEnv()} infrastructure (no client runtimes):`);
-  say("  network (VPC, no inbound access), lifecycle command document, Vercel OIDC role,");
-  say("  daily backup policy, runtime-bundle bucket, alarm topic.\n");
+  say("  network (VPC, no inbound access), lifecycle command document,");
+  say("  daily backup policy, runtime-bundle bucket and alarm topic.");
+  say("  The Vercel OIDC role is optional; the first local staging proof leaves it off.\n");
   say(`  cd infra/terraform/envs/${tfEnv()} && terraform init && terraform apply ${SHARED_TARGETS.map((t) => `-target=${t}`).join(" ")}\n`);
   requireCloud("the environment apply");
   tf(["init", "-input=false"]);
   // Interactive: terraform shows the plan and asks you to type "yes".
   tf(["apply", ...SHARED_TARGETS.map((t) => `-target=${t}`)]);
   say(`\n✔ Shared ${tfEnv()} infrastructure is in place. Values for your env file / Vercel:`);
-  say(`  AWS_ROLE_ARN=${tfOutput<string>("control_plane_role_arn")}`);
+  const roleArn = tfOutput<string | null>("control_plane_role_arn");
+  say(roleArn ? `  AWS_ROLE_ARN=${roleArn}` : "  AWS_ROLE_ARN=(not created; local staging uses AWS_PROFILE)");
   say(`  AWS_LIFECYCLE_DOCUMENT=${tfOutput<string>("lifecycle_document")}`);
   say(`  ARTIFACT_BUCKET=${tfOutput<string>("artifact_bucket")}`);
 }

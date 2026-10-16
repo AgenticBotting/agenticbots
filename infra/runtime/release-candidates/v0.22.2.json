@@ -1,0 +1,23 @@
+{
+  "repository": "NousResearch/hermes-agent",
+  "tag": "v0.22.2",
+  "releaseUrl": "https://github.com/NousResearch/hermes-agent/releases/tag/v0.22.2",
+  "publishedAt": "2026-10-15T08:21:32Z",
+  "tagObjectSha": "7b77e29eedd85a8497ce2821448dac7964dc46f6",
+  "sourceCommit": "d923a5eb487a17c0a68801bba9ef0f56c81040a8",
+  "manifestDigest": "sha256:36099926da316742423544e055d4734777105ffe6341873af5459b957d0c2919",
+  "image": "nousresearch/hermes-agent:stable@sha256:36099926da316742423544e055d4734777105ffe6341873af5459b957d0c2919",
+  "tagSignatureVerified": false,
+  "tagSignatureReason": "unsigned",
+  "qualification": {
+    "sourceReviewed": false,
+    "toolAllowlistReviewed": false,
+    "apiContractPassed": false,
+    "containerSmokePassed": false,
+    "migrationRestorePassed": false,
+    "sbomScanPassed": false,
+    "stagingCanaryPassed": false
+  },
+  "promotionAllowed": false,
+  "notes": "Current upstream candidate metadata only. Qualify on an isolated AWS staging runtime; never install or promote automatically."
+}

@@ -16,6 +16,11 @@ variable "existing_vercel_oidc_provider_arn" {
   type    = string
   default = ""
 }
+variable "enable_vercel_control_plane" {
+  description = "Enable only after advanced AWS features are explicitly approved. Local staging uses the short-lived AWS CLI login."
+  type        = bool
+  default     = false
+}
 variable "artifact_bucket" { type = string }
 variable "alarm_email" {
   type    = string
@@ -58,6 +63,7 @@ module "stack" {
   vercel_team_slug                  = var.vercel_team_slug
   vercel_project_name               = var.vercel_project_name
   vercel_environments               = ["preview", "development"]
+  enable_vercel_control_plane       = var.enable_vercel_control_plane
   existing_vercel_oidc_provider_arn = var.existing_vercel_oidc_provider_arn
   artifact_bucket                   = var.artifact_bucket
   alarm_email                       = var.alarm_email

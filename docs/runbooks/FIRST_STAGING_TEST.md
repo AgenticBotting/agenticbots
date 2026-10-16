@@ -55,9 +55,10 @@ record:
 - [ ] Before advanced AWS features are activated, replacement budgets and
   anomaly alerts, a Region SCP, management-account recovery/MFA and CloudTrail
   are reviewed. Activation is irreversible and removes the project spend limit.
-- [ ] After explicit owner approval, advanced AWS features are active. The
-  managed project policy otherwise blocks the IAM OIDC provider required for
-  Vercel's short-lived AWS login.
+- [ ] Keep `enable_vercel_control_plane=false` for this first proof. The local
+  operator app uses the owner's short-lived AWS login, so advanced AWS
+  features and Vercel OIDC are not required. Enabling them later remains an
+  explicit owner decision because activation removes the $50 hard spend limit.
 - [ ] `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` pass.
 
 See `docs/research/HERMES_DOCUMENTATION_AUDIT_2026-10-11.md` and
@@ -150,9 +151,10 @@ When the protected backend and audit foundation are verified:
    ```
    - `artifact_bucket` = the chosen **artifact bucket** name. Terraform
      creates it; do not create it yourself.
-   - `vercel_team_slug`: leave `lot-sealers-projects`. That is the slug in
-     your Vercel dashboard URL, `vercel.com/<slug>/agenticbots`. Change it
-     if yours differs.
+   - `vercel_team_slug`: leave `agentic-bots-projects`. That is the current
+     scope in the Vercel dashboard URL, `vercel.com/<slug>/agenticbots`.
+   - `enable_vercel_control_plane`: leave `false`. This avoids the blocked
+     Vercel OIDC provider and preserves the AWS project's $50 hard limit.
    - Set `default_engine_image` to the newly reviewed tag and immutable digest.
      Do not use the historical `v2026.9.24` value or `latest`.
    - `default_model`: leave it, or paste another model id from
@@ -264,7 +266,7 @@ logs, backups, a running EC2 instance, its public IPv4 address, EBS, data
 transfer and model use can still cost money.
 - an isolated staging network with no inbound access;
 - the one allowed remote command;
-- the login role Vercel will use later;
+- no Vercel login role yet; the local test uses your short-lived AWS login;
 - daily backups;
 - the bucket for the runtime bundle;
 - an alarm topic.
@@ -275,9 +277,9 @@ ALLOW_CLOUD_CHANGES=1 npm run ops:staging -- env:apply
 
 Terraform shows a plan ending in `Plan: N to add, 0 to change, 0 to
 destroy` and asks you to type `yes`. If the plan says **destroy**, type
-`no` and stop. At the end it prints `AWS_ROLE_ARN=…` and
-`AWS_LIFECYCLE_DOCUMENT=…`. Save these for Vercel later; nothing needs
-changing now.
+`no` and stop. At the end it prints `AWS_ROLE_ARN=(not created; local staging
+uses AWS_PROFILE)` plus `AWS_LIFECYCLE_DOCUMENT=…`. Save the lifecycle value;
+the Vercel role is deliberately postponed.
 
 ## Step 9 — Start AgenticBots on your computer and sign in (≈5 min)
 
@@ -392,7 +394,11 @@ Copy the output into a chat with Claude.
 
 ---
 
-## After this works: the same test from Vercel (staging on a Preview deployment)
+## After this works: the same test from Vercel (separate owner decision)
+
+The local proof comes first. Moving the control plane to Vercel requires
+advanced AWS features, which permanently removes the $50 project spend limit.
+Do not start this section until the owner explicitly accepts that change.
 
 1. Vercel → `agenticbots` → **Settings → Security → OpenID Connect**:
    set **Issuer Mode** to **Team**.

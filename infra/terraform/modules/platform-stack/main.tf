@@ -34,6 +34,11 @@ variable "vercel_environments" {
   description = "Vercel environments allowed to assume the control-plane role (production, preview, development)."
   type        = list(string)
 }
+variable "enable_vercel_control_plane" {
+  description = "Create the Vercel OIDC provider and control-plane role. Disable for a local-only staging proof that uses the operator's short-lived AWS login."
+  type        = bool
+  default     = true
+}
 variable "existing_vercel_oidc_provider_arn" {
   description = "An AWS account can hold only ONE OIDC provider per issuer URL. Leave empty in the first environment you apply; in the second, pass the first one's output `vercel_oidc_provider_arn`."
   type        = string
@@ -88,6 +93,7 @@ module "lifecycle_document" {
 }
 
 module "control_plane" {
+  count                      = var.enable_vercel_control_plane ? 1 : 0
   source                     = "../control-plane-role"
   name                       = "agenticbots-control-plane-${var.environment}"
   environment                = var.environment
@@ -212,8 +218,8 @@ module "tenant" {
   tags                        = local.tags
 }
 
-output "control_plane_role_arn" { value = module.control_plane.role_arn }
-output "vercel_oidc_provider_arn" { value = module.control_plane.oidc_provider_arn }
+output "control_plane_role_arn" { value = try(module.control_plane[0].role_arn, null) }
+output "vercel_oidc_provider_arn" { value = try(module.control_plane[0].oidc_provider_arn, null) }
 output "lifecycle_document" { value = module.lifecycle_document.name }
 output "artifact_bucket" { value = aws_s3_bucket.artifacts.bucket }
 output "tenants" {

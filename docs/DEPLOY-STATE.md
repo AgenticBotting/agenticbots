@@ -75,16 +75,29 @@ enabled. The cost-anomaly email subscription is also confirmed.
 
 No runtime environment or client workload has been applied. Terraform still
 describes private runtime subnets, low-cost outbound-only staging, private
-production NAT, customer encryption and isolated client runtimes. The fresh
-empty staging plan remains 23 adds with 0 change / 0 destroy and contains no
-NAT gateway, Elastic IP, EC2 instance or tenant.
+production NAT, customer encryption and isolated client runtimes. A fresh
+read-only plan on October 16, with Vercel OIDC disabled and an empty tenant
+map, reports **21 adds, 0 changes and 0 destroys**. It contains no NAT gateway,
+Elastic IP, EC2 instance, client runtime or tenant.
+
+The deployed Vercel project has no Preview, Production or Development
+environment variables configured. It therefore has no durable Convex platform
+store, AWS runtime connection or model provider behind `/ops`; the current
+deployment is a verified website and interface shell. The exact real-software
+proof and pass/fail criteria are in `docs/runbooks/PROVE_ONE_REAL_BOT.md`.
+
+The first staging proof now leaves `enable_vercel_control_plane=false` and
+runs the operator app locally with the owner's short-lived AWS profile. This
+removes Vercel OIDC and advanced-feature activation from the first-test path
+while preserving the $50 project hard limit. Vercel OIDC remains a later
+production-control-plane step.
 
 The standing launch authorization in `AGENTS.md` now permits reviewed,
 non-destructive applies while the $50 hard spend limit remains active, without
-another per-command confirmation. The paid project still blocks the staging
-OIDC provider until advanced features are active. Activation is irreversible
-and removes the hard limit, so that activation still needs a new owner
-decision. The healthy $40 AWS Budget remains live at $0 actual spend. The
+another per-command confirmation. The paid project still blocks the optional
+Vercel OIDC provider until advanced features are active. Activation is
+irreversible and removes the hard limit, so that activation still needs a new
+owner decision. The healthy $40 AWS Budget remains live at $0 actual spend. The
 hardened state, CloudTrail and anomaly controls are live; the Region guardrail
 remains a review-only file until advanced features exist. Follow
 `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` and

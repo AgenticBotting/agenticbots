@@ -73,6 +73,35 @@ is healthy at $40/month with $0 actual spend, the project remains PAID/ACTIVE
 with $120 promotional credits, and the $50 hard limit remains the containment
 boundary. Advanced features remain off.
 
+## Working-software proof path — 2026-10-16
+
+The Vercel preview currently proves the public website and interface build,
+not a live BOT platform. No environment variables are configured in the
+Vercel project, and the staging Convex project, Cloudflare runtime tunnel,
+model credential and AWS client runtime do not exist yet. A real BOT cannot
+run until that chain is connected. This is stated plainly in
+`docs/runbooks/PROVE_ONE_REAL_BOT.md`.
+
+The first real test no longer depends on Vercel OIDC or advanced AWS features.
+Staging defaults `enable_vercel_control_plane=false`; the local operator app
+uses the owner's short-lived `agenticbots-staging` AWS profile. This preserves
+the $50 hard limit while proving the full path from the operator screen through
+Convex, AWS, Hermes and a model, then back to a durable result. Production
+keeps the Vercel control-plane role enabled by default. Advanced-feature
+activation remains a separate owner decision.
+
+A live read-only plan using that configuration reports **21 adds, 0 changes
+and 0 destroys** for the shared staging network, encrypted artifact storage,
+alarm topic, backup policy and fixed lifecycle command. The empty tenant map
+creates no EC2 instance, NAT gateway, Elastic IP or model workload. Nothing
+from this plan was applied.
+
+For an immediate safe walkthrough, run `npm run demo`, open
+`http://localhost:3003/login`, and use `admin@agenticbots.demo` /
+`agenticbots-demo`. This validates the interface, authorization, records and
+approval flow with the no-network `DemoRuntimeAdapter`; it is not evidence of
+a real model or AWS run.
+
 ## Read-only AWS inventory and Terraform review — 2026-10-15
 
 The selected Region is empty apart from AWS-managed defaults and estimated
@@ -124,6 +153,17 @@ endpoint remains in its required `us-east-1` Region. The AWS starter rules are
 appended to the root `AGENTS.md`, with help level `HIGH`; the AgenticBots
 project rules take precedence where they conflict.
 
+## Current Hermes candidate — 2026-10-16
+
+The read-only release watcher now resolves the official stable release to
+`v0.22.2`, source commit `d923a5eb487a17c0a68801bba9ef0f56c81040a8`
+and manifest digest
+`sha256:36099926da316742423544e055d4734777105ffe6341873af5459b957d0c2919`.
+The annotated tag is unsigned. The candidate record deliberately leaves every
+qualification gate false and `promotionAllowed=false`; it is not the active
+Terraform image and must be qualified on an isolated AWS staging runtime. See
+`docs/research/HERMES_V0_22_2_QUALIFICATION.md`.
+
 ## Phase 1 runtime hardening started — 2026-10-12
 
 The first local-only controls are implemented. Root and every BOT profile now
@@ -132,14 +172,11 @@ terminal, code execution and BOT-created schedules stay disabled. Hermes turns
 are capped at 25 iterations and 600 seconds, provider attempts are bounded and
 the post-exhaustion recovery ladder is off. A security test locks these values.
 
-The official `v0.21.7` release is recorded as a **candidate**, not the active
-pin. A read-only watcher resolves the official annotated tag to commit
-`71d34bad1045610252eda02ee79549436896e784` and manifest digest
-`sha256:444b4259…fad8b`. GitHub reports the tag as unsigned. Docker is not
-installed on the review host, so container, SBOM, contract, migration and
-staging gates remain closed and `promotionAllowed` is false. See
-[`research/HERMES_V0_21_7_QUALIFICATION.md`](research/HERMES_V0_21_7_QUALIFICATION.md).
-No cloud resources, secrets, paid inference or deployed runtime changed.
+The earlier `v0.21.7` candidate remains an immutable historical qualification
+record. It was never promoted. Docker is not installed on the review Mac, so
+container, SBOM, contract, migration and staging gates remained closed. The
+current candidate is recorded separately above. No secrets, paid inference or
+deployed runtime changed during either read-only release check.
 
 ## Hermes and launch plan update — 2026-10-11
 
@@ -275,7 +312,9 @@ The homepage has been rebuilt around the owner’s visual references and a benef
 | Owner | Nick Thomson — not a software engineer. Wants plain-English explanations, no jargon questions, and to be told before anything irreversible, expensive or security-sensitive. |
 | Product | AgenticBots.dev: an implementation firm that **operates "Bots"** for contractors and local service businesses. Client-facing terms are **BOT, BOTS, BOT RUN, BOT ACTIVITY** — never "agents". |
 
-Nothing has been deployed to AWS. The marketing site deploys to Vercel from `main` (see `docs/DEPLOY-STATE.md`).
+Only the protected Terraform-state and audit foundations are deployed to AWS.
+No client runtime, model workload or application database is deployed. The
+current Vercel preview comes from `platform-v1`; see `docs/DEPLOY-STATE.md`.
 
 ---
 
@@ -324,7 +363,7 @@ UI (pages, API routes) → services → BotRuntime facade (src/server/runtime/in
 
 * **Bot types** live in `src/config/bot-catalog.ts` (`seo`, `ads`, `reviews`, `content`, `prospecting`, `outbound`, `reactivation`, `crm`, `analytics`, `proposal`). **Bot instances** are rows in `bots` (`orgId`, `typeKey`, `runtimeProfile`, `credentialRef`, model, capabilities, integrations).
 * One runtime (one EC2, one engine deployment) **per client**. Each Bot = one engine **profile** with its own key, skills and memory.
-* The active infrastructure examples still carry the historical **Hermes Agent v2026.9.24** digest solely as a reproducible baseline; it is not approved for staging. `v0.21.7` is the selected candidate and remains blocked pending disposable-container and staging qualification. Engine names, URLs, ports, headers and wire types exist **only** under `src/server/runtime/hermes/**` (plus `runtime-types.ts` provider union and the `redact.ts` deny-list). Enforced by ESLint `no-restricted-imports` and `tests/security/runtime-boundary.test.ts`.
+* The active infrastructure examples still carry the historical **Hermes Agent v2026.9.24** digest solely as a reproducible baseline; it is not approved for staging. The recorded candidate remains blocked pending disposable-container and staging qualification; run the release check before selecting the current upstream stable release. Engine names, URLs, ports, headers and wire types exist **only** under `src/server/runtime/hermes/**` (plus `runtime-types.ts` provider union and the `redact.ts` deny-list). Enforced by ESLint `no-restricted-imports` and `tests/security/runtime-boundary.test.ts`.
 * Neutral vocabulary: run status `queued · running · waiting_for_approval · completed · failed · cancelled · interrupted`; events `bot.run.*`, `bot.action.*`, `bot.approval.*`; `translate.ts` turns them into client text.
 * Approvals: anything that sends, publishes, changes ads, writes CRM or deletes stops for human approval.
 * Results are only numbers a Bot reported on a `METRICS {...}` line — never estimates.
@@ -335,12 +374,14 @@ Details: `docs/ARCHITECTURE.md` §5–8, `docs/runbooks/UPGRADE_HERMES.md`.
 
 ---
 
-## 4. AWS staging architecture (built, never applied)
+## 4. AWS staging architecture (runtime built in Terraform, not applied)
 
 * Terraform `modules/platform-stack` wrapped by `envs/staging` and `envs/prod`; every name/tag/secret path carries the environment, so both can share one AWS account.
 * Per client (`modules/tenant-runtime`): EC2 (t3.medium default, **no inbound rules**), encrypted EBS data volume, per-tenant KMS key, IAM instance role that can read **only** `agenticbots/<env>/tenants/<tenant>/*` secrets, CloudWatch alarms and log group.
 * `modules/lifecycle-document`: the **only** remote command the web app may run (SSM document with enumerated actions: start/stop runtime, deploy-bot, etc.).
-* `modules/control-plane-role`: role assumed by Vercel via **OIDC** (no static keys).
+* `modules/control-plane-role`: optional role assumed by Vercel via **OIDC**
+  (no static keys). It is disabled for the local-first staging proof and stays
+  enabled by default for production.
 * `modules/backups`: DLM daily encrypted snapshots.
 * Connectivity: `cloudflared` on the instance → Cloudflare Tunnel + Access service token + per-profile bearer key. Needs a domain on Cloudflare (`agenticbots.dev` DNS is at GoDaddy; a separate cheap runtime domain is recommended).
 * Provisioning: `npm run ops:staging -- tenant:create …` then `tenant:provision` (two-phase: secrets first, then instance). The CLI refuses cloud changes unless `ALLOW_CLOUD_CHANGES=1`.
@@ -547,15 +588,21 @@ Tooling notes for a cloud agent: scripts importing `server-only` modules need `t
 
 ## 18. Current blockers
 
-1. **Owner accounts for staging**: prepare the irreversible AWS advanced-feature transition and replacement cost/Region guardrails, then Vercel OIDC; also a Cloudflare-hosted runtime domain, a model provider key and the Convex staging project (see `docs/WHAT_I_NEED_FROM_YOU.md`).
+1. **Three staging services**: create the separate Convex staging project, a
+   Cloudflare-hosted runtime domain/tunnel credential and one capped model
+   provider key. Advanced AWS features and Vercel OIDC are no longer blockers
+   for the first local proof (see `docs/runbooks/PROVE_ONE_REAL_BOT.md`).
 2. **Convex functions not redeployed** with the new `platform.page` query (owner runs `npx convex deploy`).
 3. **No real prospecting data source**: every vendor adapter is a stub; implementing one requires reading current vendor docs and the owner's explicit approval for paid usage plus a budget.
-4. `platform-v1` not pushed or merged.
+4. `platform-v1` is pushed but not merged or promoted to production.
 
 ## 19. Recommended next five tasks (in order)
 
 1. **Verify locally and push**: run `npm run build`, `npm test`, `npm run test:e2e`; fix anything; then push `platform-v1` under the standing launch authorization.
-2. **First AWS staging test** per `docs/runbooks/FIRST_STAGING_TEST.md`; use `ALLOW_CLOUD_CHANGES=1` only after the preflight passes. Include `npx convex deploy` and `prospecting:seed:staging`. Advanced-feature activation remains a separate owner decision.
+2. **Prove one real BOT** per `docs/runbooks/PROVE_ONE_REAL_BOT.md` and
+   `docs/runbooks/FIRST_STAGING_TEST.md`; use `ALLOW_CLOUD_CHANGES=1` only after
+   the preflight passes. Include the staging Convex deployment. Advanced AWS
+   feature activation remains a separate owner decision.
 3. **Background job worker for prospecting**: run `pg_jobs` outside the request (Vercel cron route calling `runQueuedJobs`, guarded by `CRON_SECRET`); make server actions enqueue only.
 4. **Wire Prospecting Bot tool access**: issue the existing runtime/org/Bot-scoped short-lived tool tokens server-side to the Prospecting Bot's runtime profile (via the runtime facade, never exposing other secrets) and expose the 16 tools to the skill.
 5. **First real data adapter, with approval**: implement one contact/verification vendor (from current docs, recorded-response contract test, configured price, client budget, small run), then one discovery source.

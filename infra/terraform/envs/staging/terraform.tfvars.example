@@ -1,14 +1,19 @@
 # Copy to terraform.tfvars (git-ignored) and fill in.
 region              = "us-east-2"
 # Vercel → Settings → General → "Team URL" / slug. For a personal (Hobby)
-# account this is the scope shown in the dashboard URL, e.g. lot-sealers-projects.
-vercel_team_slug    = "lot-sealers-projects"
+# account this is the scope shown in the dashboard URL.
+vercel_team_slug    = "agentic-bots-projects"
 vercel_project_name = "agenticbots"
+# Keep false for the first real test. The local operator app uses the
+# short-lived `agenticbots-staging` AWS login, so advanced AWS features and
+# Vercel OIDC are not required yet.
+enable_vercel_control_plane = false
 # Globally unique S3 bucket name for runtime bundles.
 artifact_bucket     = "agenticbots-staging-artifacts-REPLACE"
 alarm_email         = ""
-# Only if another AgenticBots environment in this SAME AWS account was applied
-# first: paste its `vercel_oidc_provider_arn` output here.
+# Used only when enable_vercel_control_plane=true. If another AgenticBots
+# environment in this SAME AWS account was applied first, paste its
+# `vercel_oidc_provider_arn` output here.
 existing_vercel_oidc_provider_arn = ""
 # Pinned by digest (multi-arch index digest of the v2026.9.24 tag, read from
 # Docker Hub on 2026-10-03). Re-check with:

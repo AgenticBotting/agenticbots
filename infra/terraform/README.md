@@ -28,7 +28,11 @@ modules/backups              daily encrypted EBS snapshots by tag
    complete; the tested alarm returned to `OK` with actions enabled.
 4. Complete `docs/runbooks/AWS_FOUNDATION_AND_ADVANCED_FEATURES.md` before any
    advanced-feature activation.
-5. Generate a new staging plan. Never reuse a saved plan after code, variables,
+5. The first local staging proof leaves `enable_vercel_control_plane=false` and
+   uses the owner's short-lived AWS login. This allows the BOT runtime to be
+   proven while the $50 hard project limit remains active. Enable Vercel OIDC
+   only after the separate advanced-feature decision.
+6. Generate a new staging plan. Never reuse a saved plan after code, variables,
    credentials or live infrastructure changes.
 
 Clients are declared in `envs/<env>/tenants.auto.tfvars.json`, which the
