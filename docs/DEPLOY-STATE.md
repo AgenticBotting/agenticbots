@@ -16,8 +16,12 @@ _Last updated: October 16, 2026_
 **Current branch preview alias:**
 `https://agenticbots-git-platform-v1-agentic-bots-projects.vercel.app`
 
-**Latest verified infrastructure-doc preview:**
-`https://agenticbots-pdw5276y9-agentic-bots-projects.vercel.app`
+**Latest verified launch-readiness preview:**
+`https://agenticbots-hfu41amjm-agentic-bots-projects.vercel.app`
+
+Commit `306f4f9` reached Ready in about one minute. An authenticated smoke check
+returned 200 for `/` and the expected 307 from `/ops` to
+`/login?next=/ops`. No production alias changed.
 
 On October 16, 2026, the standing launch authorization was committed as
 `6f62a9c` and `platform-v1` was pushed through that commit. Vercel built the

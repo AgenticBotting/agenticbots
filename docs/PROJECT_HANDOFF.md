@@ -29,6 +29,13 @@ preview at
 checks returned 200 for `/` and the expected private 307 login redirect for
 `/ops`. Production was not promoted.
 
+The local-first staging path and real-BOT proof criteria were committed and
+pushed as `306f4f9`. Vercel preview
+`https://agenticbots-hfu41amjm-agentic-bots-projects.vercel.app` reached Ready;
+authenticated smoke checks returned 200 for `/` and the expected 307 login
+redirect for `/ops`. This preview remains an interface shell because no
+Vercel platform environment variables are configured.
+
 ## AWS foundation hardening live — 2026-10-16
 
 Terraform has three ordered layers: `foundation-bootstrap` creates a
